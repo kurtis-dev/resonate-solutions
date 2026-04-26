@@ -9,12 +9,15 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        ink: "#0d1720",
-        muted: "#617082",
-        line: "#dbe3ea",
-        brand: "#0f9f8f",
-        brandDark: "#087567",
-        gold: "#f5b84b"
+        ink: "#202320",
+        muted: "#6d746d",
+        line: "#e6ddd1",
+        brand: "#4d8b72",
+        brandDark: "#2f6652",
+        gold: "#e8a93a",
+        cream: "#fbf6ee",
+        sage: "#dce9df",
+        coral: "#d97856"
       },
       boxShadow: {
         soft: "0 18px 60px rgba(13, 23, 32, 0.12)"

@@ -16,13 +16,13 @@ html {
 
 body {
   margin: 0;
-  background: #f6f8fb;
-  color: #0d1720;
+  background: #fbf6ee;
+  color: #202320;
 }
 
 ::selection {
-  background: #c9fff7;
-  color: #0d1720;
+  background: #dce9df;
+  color: #202320;
 }
 
 textarea,
