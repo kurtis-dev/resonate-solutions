@@ -103,7 +103,7 @@ export default function ReplyPilotPage() {
                       </span>
                     </div>
                     <p className="mt-3 rounded-lg bg-white p-3 text-sm leading-6 text-muted">
-                      "{scenario.review}"
+                      {scenario.review}
                     </p>
                     <div className="mt-3 grid gap-3">
                       {scenario.replies.map((reply, index) => (
