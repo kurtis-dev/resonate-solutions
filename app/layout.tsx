@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
-import { ReplyPilotNav } from "@/components/ReplyPilotNav";
+import { SiteNav } from "@/components/SiteNav";
 
 export const metadata: Metadata = {
   title: "Resonate Solutions - Local Business Presence Kits",
@@ -17,7 +17,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <ReplyPilotNav />
+        <SiteNav />
         {children}
         <Footer />
       </body>
