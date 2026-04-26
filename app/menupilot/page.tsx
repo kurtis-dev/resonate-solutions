@@ -54,7 +54,7 @@ export default function MenuPilotPage() {
               <div className="border-b border-line pb-4">
                 <p className="text-sm font-black uppercase tracking-[0.14em] text-brand">Today</p>
                 <h2 className="mt-2 text-3xl font-black text-ink">Bentonville Square</h2>
-                <p className="mt-1 text-sm text-muted">11:00 AM - 2:00 PM · Near the south entrance</p>
+                <p className="mt-1 text-sm text-muted">11:00 AM - 2:00 PM - Near the south entrance</p>
               </div>
               <div className="mt-5 grid gap-3">
                 {sampleMenu.map(([item, price]) => (
