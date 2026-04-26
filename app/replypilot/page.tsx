@@ -35,6 +35,29 @@ const ownerWorkflow = [
   ["Post or hand off", "Copy it yourself, send it to a manager, or use connected posting support where available."]
 ];
 
+const heroScenarios = [
+  {
+    rating: "4 stars",
+    label: "Mixed positive",
+    review: "Great service and friendly staff. The wait was a little long, but the food was excellent.",
+    replies: [
+      "Thank you for your kind review. We are glad you enjoyed the food and friendly service, and we appreciate your patience while our team works to improve wait times.",
+      "We appreciate you taking the time to share this. It is great to hear the food and staff made a good impression, and we will keep working on a smoother, faster visit.",
+      "Thanks so much for visiting us. We are happy the meal was worth the wait, and your feedback helps us keep improving the experience for every guest."
+    ]
+  },
+  {
+    rating: "1 star",
+    label: "Complaint",
+    review: "Terrible experience. We waited forever, no one checked on us, and the manager acted like we were bothering them. I will not be back.",
+    replies: [
+      "Thank you for bringing this to our attention. We are sorry your visit felt frustrating, and we would like the opportunity to learn more so our management team can review what happened.",
+      "We appreciate your honest feedback. This is not the experience we want guests to have, and we will share your comments with our team so we can address the service concerns you described.",
+      "Thank you for taking the time to explain your experience. We take feedback like this seriously and invite you to contact our team directly so we can better understand the situation."
+    ]
+  }
+];
+
 export default function ReplyPilotPage() {
   return (
     <main>
@@ -60,23 +83,43 @@ export default function ReplyPilotPage() {
           </div>
           <div className="rounded-lg border border-white/15 bg-white/10 p-4 shadow-soft backdrop-blur">
             <div className="rounded-lg bg-white p-5">
-              <div className="flex items-center justify-between border-b border-line pb-4">
+              <div className="flex flex-wrap items-center justify-between gap-3 border-b border-line pb-4">
                 <div>
-                  <p className="text-sm font-bold text-ink">Incoming review</p>
-                  <p className="text-xs text-muted">4 stars · Local business</p>
+                  <p className="text-sm font-bold text-ink">Incoming reviews</p>
+                  <p className="text-xs text-muted">Two common situations - Approval-ready drafts</p>
                 </div>
-                <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-brand">Approval-ready</span>
+                <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-brand">Safe Reply Mode</span>
               </div>
-              <p className="mt-5 rounded-lg bg-slate-50 p-4 text-sm leading-6 text-muted">
-                “Great service and friendly staff. The wait was a little long, but the food was excellent.”
-              </p>
-              <div className="mt-5 space-y-3">
-                {[1, 2, 3].map((item) => (
-                  <div key={item} className="rounded-lg border border-line p-4">
-                    <p className="text-sm leading-6 text-ink">
-                      Thank you for your review. We are glad you enjoyed the food and service, and we appreciate your patience while our team works to improve wait times.
+              <div className="mt-5 grid gap-5">
+                {heroScenarios.map((scenario) => (
+                  <article key={scenario.label} className="rounded-lg border border-line bg-slate-50 p-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2">
+                      <div>
+                        <p className="text-sm font-black text-ink">{scenario.label}</p>
+                        <p className="text-xs text-muted">{scenario.rating} - Local business</p>
+                      </div>
+                      <span className={`rounded-full px-3 py-1 text-xs font-bold ${scenario.rating === "1 star" ? "bg-red-50 text-red-700" : "bg-brand/10 text-brand"}`}>
+                        {scenario.rating === "1 star" ? "Needs care" : "Ready"}
+                      </span>
+                    </div>
+                    <p className="mt-3 rounded-lg bg-white p-3 text-sm leading-6 text-muted">
+                      "{scenario.review}"
                     </p>
-                  </div>
+                    <div className="mt-3 grid gap-3">
+                      {scenario.replies.map((reply, index) => (
+                        <div
+                          key={reply}
+                          className="group rounded-lg border border-line bg-white p-4 transition duration-200 hover:-translate-y-1 hover:border-brand hover:shadow-soft"
+                        >
+                          <div className="mb-2 flex items-center justify-between gap-3">
+                            <span className="text-xs font-black uppercase tracking-[0.14em] text-brand">Option {index + 1}</span>
+                            <span className="text-xs font-bold text-muted opacity-0 transition group-hover:opacity-100">Preview</span>
+                          </div>
+                          <p className="text-sm leading-6 text-ink">{reply}</p>
+                        </div>
+                      ))}
+                    </div>
+                  </article>
                 ))}
               </div>
             </div>
