@@ -62,7 +62,7 @@ function complaintFocus(reviewText: string) {
   if (review.includes("dirty") || review.includes("clean")) issues.push("the cleanliness concern");
 
   if (!issues.length) return "the concern you described";
-  return [...new Set(issues)].slice(0, 2).join(" and ");
+  return Array.from(new Set(issues)).slice(0, 2).join(" and ");
 }
 
 function contactLine(includeContactOffer?: boolean) {
