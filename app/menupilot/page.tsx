@@ -41,11 +41,11 @@ export default function MenuPilotPage() {
               For food trucks, pop-ups, and small restaurants that need a simple mobile page for menu items, hours, location, photos, and review links without building a full website.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/replypilot/pricing" className="min-h-12 rounded-lg bg-brand px-6 py-3 text-center font-bold text-white hover:bg-brandDark">
+              <Link href="/pricing" className="min-h-12 rounded-lg bg-brand px-6 py-3 text-center font-bold text-white hover:bg-brandDark">
                 View launch plans
               </Link>
-              <Link href="/replypilot" className="min-h-12 rounded-lg border border-white/25 px-6 py-3 text-center font-bold text-white hover:bg-white/10">
-                See ReplyPilot
+              <Link href="/" className="min-h-12 rounded-lg border border-white/25 px-6 py-3 text-center font-bold text-white hover:bg-white/10">
+                See full offer
               </Link>
             </div>
           </div>

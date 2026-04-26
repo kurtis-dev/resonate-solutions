@@ -4,8 +4,8 @@ import { Footer } from "@/components/Footer";
 import { ReplyPilotNav } from "@/components/ReplyPilotNav";
 
 export const metadata: Metadata = {
-  title: "Resonate Solutions - AI Tools for Local Business Communication",
-  description: "AI-assisted customer communication tools for local businesses, starting with ReplyPilot review reply workflows.",
+  title: "Resonate Solutions - Local Business Presence Kits",
+  description: "Mobile menu pages, QR codes, food photos, Google profile tune-ups, and public link cleanup for local businesses.",
   metadataBase: new URL("https://resonate.solutions")
 };
 

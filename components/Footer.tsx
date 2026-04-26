@@ -7,14 +7,14 @@ export function Footer() {
         <div>
           <p className="font-bold text-ink">Resonate Solutions</p>
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
-            AI-assisted customer communication tools for local businesses. ReplyPilot provides generated draft replies only; users are responsible for reviewing and editing before posting.
+            Mobile presence kits for local businesses: menu pages, QR codes, public links, photos, and Google profile cleanup.
           </p>
         </div>
         <nav className="flex flex-wrap gap-5 text-sm font-medium text-muted">
           <Link className="hover:text-ink" href="/privacy">Privacy</Link>
           <Link className="hover:text-ink" href="/terms">Terms</Link>
           <Link className="hover:text-ink" href="/disclaimer">Disclaimer</Link>
-          <Link className="hover:text-ink" href="/replypilot/pricing">Pricing</Link>
+          <Link className="hover:text-ink" href="/pricing">Pricing</Link>
         </nav>
       </div>
     </footer>

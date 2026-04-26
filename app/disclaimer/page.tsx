@@ -3,10 +3,10 @@ export default function DisclaimerPage() {
     <main className="mx-auto max-w-3xl px-5 py-16">
       <h1 className="text-4xl font-black text-ink">Disclaimer</h1>
       <div className="mt-8 space-y-6 leading-7 text-muted">
-        <p>ReplyPilot generates draft responses for customer reviews. Drafts may be incomplete, inaccurate, inappropriate for a specific situation, or unsuitable for platform policies.</p>
-        <p>Users must review and edit all replies before posting. ReplyPilot is not legal, marketing, public relations, or reputation management advice.</p>
-        <p>ReplyPilot is not affiliated with Google, Yelp, Facebook, or TripAdvisor. All platform names are used descriptively to identify where customer reviews may appear.</p>
-        <p>ReplyPilot makes no income, review-rating, conversion, or customer-retention guarantees.</p>
+        <p>Resonate Solutions may help prepare public business information, menu content, photos, QR links, and related customer-facing materials. Business owners are responsible for confirming accuracy before publication.</p>
+        <p>Resonate Solutions is not legal, accounting, search ranking, food safety, marketing compliance, or public relations advice.</p>
+        <p>Resonate Solutions is not affiliated with Google, Facebook, Instagram, Yelp, TripAdvisor, Square, Stripe, or other third-party platforms. Platform names are used descriptively.</p>
+        <p>Resonate Solutions makes no income, search ranking, customer visit, review-rating, conversion, or customer-retention guarantees.</p>
       </div>
     </main>
   );

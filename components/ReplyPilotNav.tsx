@@ -9,15 +9,12 @@ export function ReplyPilotNav() {
           <span>Resonate Solutions</span>
         </Link>
         <nav className="hidden items-center gap-7 text-sm font-medium text-muted md:flex">
-          <Link className="hover:text-ink" href="/">Reputation Desk</Link>
-          <Link className="hover:text-ink" href="/replypilot">ReplyPilot</Link>
+          <Link className="hover:text-ink" href="/">Local Presence</Link>
           <Link className="hover:text-ink" href="/menupilot">MenuPilot</Link>
-          <Link className="hover:text-ink" href="/replypilot/generator">Generator</Link>
-          <Link className="hover:text-ink" href="/replypilot/pricing">Pricing</Link>
-          <Link className="hover:text-ink" href="/replypilot/account">Account</Link>
+          <Link className="hover:text-ink" href="/pricing">Pricing</Link>
         </nav>
-        <Link href="/replypilot/generator" className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-brandDark">
-          Try free
+        <Link href="/menupilot" className="rounded-lg bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-brandDark">
+          Start kit
         </Link>
       </div>
     </header>

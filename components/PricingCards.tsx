@@ -13,7 +13,10 @@ export function PricingCards() {
             {plan.highlighted ? <span className="rounded-full bg-brand/10 px-3 py-1 text-xs font-bold text-brand">Popular</span> : null}
           </div>
           <p className="mt-4 text-sm leading-6 text-muted">{plan.description}</p>
-          <p className="mt-6 text-4xl font-black text-ink">{plan.price}<span className="text-base font-semibold text-muted">/mo</span></p>
+          <p className="mt-6 text-4xl font-black text-ink">
+            {plan.price}
+            {plan.billingPeriod ? <span className="text-base font-semibold text-muted">/{plan.billingPeriod}</span> : null}
+          </p>
           <p className="mt-2 text-sm font-bold text-brand">{plan.limit}</p>
           <ul className="mt-6 space-y-3 text-sm text-muted">
             {plan.features.map((feature) => (

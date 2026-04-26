@@ -3,6 +3,7 @@ export type Plan = {
   price: string;
   description: string;
   limit: string;
+  billingPeriod: string;
   features: string[];
   cta: string;
   highlighted?: boolean;
@@ -11,40 +12,44 @@ export type Plan = {
 
 export const plans: Plan[] = [
   {
-    name: "Free",
+    name: "Audit",
     price: "$0",
-    description: "Try ReplyPilot with a simple one-time reply credit.",
-    limit: "10 free replies",
-    features: ["Paste reviews manually", "Choose tone", "Copy and download replies"],
-    cta: "Start free",
-    checkoutUrl: "/replypilot/generator"
+    description: "A quick fit check for a local business that wants to know what customers cannot find.",
+    limit: "Free discovery review",
+    billingPeriod: "",
+    features: ["Menu and link check", "Google profile notes", "Photo gap notes", "Simple next-step plan"],
+    cta: "Start audit",
+    checkoutUrl: "/menupilot"
   },
   {
-    name: "Starter",
-    price: "$9",
-    description: "A generous plan for one local business that wants review replies and basic reputation follow-through handled faster.",
-    limit: "75 replies/month",
-    features: ["Everything in Free", "Saved business profile", "Safe Reply Mode", "Mobile-friendly workflow", "Review request link placeholder", "Menu/location page placeholder"],
-    cta: "Upgrade to Starter",
-    checkoutUrl: "/replypilot/checkout?plan=starter"
-  },
-  {
-    name: "Pro",
-    price: "$29",
-    description: "For busy businesses that need more automation, approval steps, bulk drafting, and reputation reporting.",
-    limit: "300 replies/month",
-    features: ["Everything in Starter", "Multiple business profiles", "Approval workflow", "Bulk reply drafting placeholder", "Weekly reputation report placeholder", "Google profile checklist placeholder"],
-    cta: "Upgrade to Pro",
+    name: "Launch Kit",
+    price: "$299",
+    description: "A practical first package for food trucks, pop-ups, coffee shops, and small restaurants.",
+    limit: "One-time setup",
+    billingPeriod: "setup",
+    features: ["Mobile menu page", "QR code", "Basic food or service photos", "Hours and location block", "Google review link", "One revision"],
+    cta: "Choose Launch Kit",
     highlighted: true,
-    checkoutUrl: "/replypilot/checkout?plan=pro"
+    checkoutUrl: "/checkout?plan=launch-kit"
   },
   {
-    name: "Agency",
-    price: "$79",
-    description: "For agencies and consultants managing reviews, reports, and follow-up for multiple clients.",
-    limit: "1,000 replies/month",
-    features: ["Everything in Pro", "Client workspaces", "CSV export placeholder", "Platform access status", "Complaint follow-up queue placeholder"],
-    cta: "Upgrade to Agency",
-    checkoutUrl: "/replypilot/checkout?plan=agency"
+    name: "Upkeep",
+    price: "$49",
+    description: "Monthly updates for businesses that change hours, specials, locations, or menu items.",
+    limit: "Monthly plan",
+    billingPeriod: "mo",
+    features: ["Menu updates", "Hours and location updates", "Specials and sold-out notes", "Photo swaps", "Link cleanup"],
+    cta: "Choose Upkeep",
+    checkoutUrl: "/checkout?plan=upkeep"
+  },
+  {
+    name: "Managed Presence",
+    price: "$149",
+    description: "A more hands-on plan for owners who want Resonate to keep customer-facing info fresh.",
+    limit: "Monthly service",
+    billingPeriod: "mo",
+    features: ["Monthly check-in", "Google profile checklist", "Fresh content suggestions", "New photo support", "Customer link cleanup"],
+    cta: "Choose Managed",
+    checkoutUrl: "/checkout?plan=managed"
   }
 ];
