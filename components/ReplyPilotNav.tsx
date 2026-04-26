@@ -9,7 +9,9 @@ export function ReplyPilotNav() {
           <span>Resonate Solutions</span>
         </Link>
         <nav className="hidden items-center gap-7 text-sm font-medium text-muted md:flex">
+          <Link className="hover:text-ink" href="/">Reputation Desk</Link>
           <Link className="hover:text-ink" href="/replypilot">ReplyPilot</Link>
+          <Link className="hover:text-ink" href="/menupilot">MenuPilot</Link>
           <Link className="hover:text-ink" href="/replypilot/generator">Generator</Link>
           <Link className="hover:text-ink" href="/replypilot/pricing">Pricing</Link>
           <Link className="hover:text-ink" href="/replypilot/account">Account</Link>

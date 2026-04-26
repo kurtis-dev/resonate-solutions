@@ -22,18 +22,18 @@ export const plans: Plan[] = [
   {
     name: "Starter",
     price: "$9",
-    description: "A generous plan for one local business that wants review replies handled faster.",
+    description: "A generous plan for one local business that wants review replies and basic reputation follow-through handled faster.",
     limit: "75 replies/month",
-    features: ["Everything in Free", "Saved business profile", "Safe Reply Mode", "Mobile-friendly workflow"],
+    features: ["Everything in Free", "Saved business profile", "Safe Reply Mode", "Mobile-friendly workflow", "Review request link placeholder", "Menu/location page placeholder"],
     cta: "Upgrade to Starter",
     checkoutUrl: "/replypilot/checkout?plan=starter"
   },
   {
     name: "Pro",
     price: "$29",
-    description: "For busy businesses that need more automation, approval steps, and bulk drafting.",
+    description: "For busy businesses that need more automation, approval steps, bulk drafting, and reputation reporting.",
     limit: "300 replies/month",
-    features: ["Everything in Starter", "Multiple business profiles", "Approval workflow", "Bulk reply drafting placeholder"],
+    features: ["Everything in Starter", "Multiple business profiles", "Approval workflow", "Bulk reply drafting placeholder", "Weekly reputation report placeholder", "Google profile checklist placeholder"],
     cta: "Upgrade to Pro",
     highlighted: true,
     checkoutUrl: "/replypilot/checkout?plan=pro"
@@ -41,9 +41,9 @@ export const plans: Plan[] = [
   {
     name: "Agency",
     price: "$79",
-    description: "For agencies and consultants replying for multiple clients.",
+    description: "For agencies and consultants managing reviews, reports, and follow-up for multiple clients.",
     limit: "1,000 replies/month",
-    features: ["Everything in Pro", "Client workspaces", "CSV export placeholder", "Platform access status"],
+    features: ["Everything in Pro", "Client workspaces", "CSV export placeholder", "Platform access status", "Complaint follow-up queue placeholder"],
     cta: "Upgrade to Agency",
     checkoutUrl: "/replypilot/checkout?plan=agency"
   }
