@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { getMenuBusiness, publicMenuUrl } from "@/lib/menu-store";
+import { mailtoLink, questionsEmail } from "@/lib/contact";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -46,6 +47,10 @@ export default async function PublicMenuPage({ params }: PageProps) {
   const phoneUrl = actionUrl("phone", business.phone);
   const heroImage = business.heroImageUrl || "/assets/menu-bowl.svg";
   const section = business.sections[0];
+  const photoEmailLink = mailtoLink(
+    `Photos or questions for ${business.businessName}`,
+    `Business/menu page: ${menuUrl}\n\nAttach photos or ask a question here.`
+  );
 
   return (
     <main className="bg-cream">
@@ -80,11 +85,19 @@ export default async function PublicMenuPage({ params }: PageProps) {
             {business.reviewUrl ? <a href={business.reviewUrl} className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Reviews</a> : null}
             {business.instagramUrl ? <a href={business.instagramUrl} className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Instagram</a> : null}
             {phoneUrl ? <a href={phoneUrl} className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Call</a> : null}
+            <a href={photoEmailLink} className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Ask a question</a>
           </div>
         </div>
       </section>
 
       <section className="mx-auto max-w-7xl px-5 pb-20">
+        <div className="mb-6 rounded-[1.5rem] border border-line bg-white p-5 shadow-sm">
+          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">Need details?</p>
+          <p className="mt-2 leading-7 text-muted">
+            Customers can ask about an item below. Owners can send menu photos, updates, and questions to{" "}
+            <a href={photoEmailLink} className="font-black text-brandDark">{questionsEmail}</a>.
+          </p>
+        </div>
         <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
           <div>
             <div className="mb-5">
@@ -105,6 +118,20 @@ export default async function PublicMenuPage({ params }: PageProps) {
                       {item.badge ? <span className="rounded-full bg-sage px-3 py-1 text-xs font-black text-brandDark">{item.badge}</span> : null}
                       {item.isSoldOut ? <span className="rounded-full bg-cream px-3 py-1 text-xs font-black text-coral">Sold out</span> : null}
                     </div>
+                    <details className="mt-5 rounded-2xl border border-line bg-cream p-4">
+                      <summary className="cursor-pointer font-black text-ink">Ask about this item</summary>
+                      <form action="/api/menu-comments" method="POST" className="mt-4 grid gap-3">
+                        <input type="hidden" name="businessSlug" value={business.slug} />
+                        <input type="hidden" name="businessName" value={business.businessName} />
+                        <input type="hidden" name="itemId" value={item.id} />
+                        <input type="hidden" name="itemName" value={item.name} />
+                        <input type="hidden" name="returnTo" value={`/m/${business.slug}`} />
+                        <input name="customerName" placeholder="Name, optional" className="rounded-xl border border-line bg-white px-3 py-2 text-sm" />
+                        <input name="customerEmail" type="email" placeholder="Email, optional" className="rounded-xl border border-line bg-white px-3 py-2 text-sm" />
+                        <textarea name="comment" required rows={3} placeholder={`Question or comment about ${item.name}`} className="rounded-xl border border-line bg-white px-3 py-2 text-sm" />
+                        <button type="submit" className="rounded-full bg-brand px-4 py-2 text-sm font-black text-white">Send comment</button>
+                      </form>
+                    </details>
                   </div>
                 </article>
               ))}

@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { createMenuBusinessAction } from "@/app/admin/menus/actions";
 import { listMenuBusinesses } from "@/lib/menu-store";
+import { mailtoLink, questionsEmail } from "@/lib/contact";
 
 type PageProps = {
   searchParams: Promise<{ status?: string }>;
@@ -33,6 +34,12 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
         <p className="mt-5 leading-7 text-muted">
           This is the first operator workflow: enter a local business, publish its menu page, and use the generated QR code anywhere customers need the current details.
         </p>
+        <a
+          href={mailtoLink("MenuPilot photos and menu details")}
+          className="mt-6 inline-flex rounded-full border border-line bg-white px-5 py-3 font-black text-ink hover:border-brand"
+        >
+          Photo inbox: {questionsEmail}
+        </a>
       </div>
 
       {statusMessage ? <p className="mb-6 rounded-2xl bg-sage px-5 py-4 font-bold text-brandDark">{statusMessage}</p> : null}

@@ -45,6 +45,16 @@ export type MenuBusinessSummary = Pick<MenuBusiness, "slug" | "businessName" | "
   itemCount: number;
 };
 
+export type MenuItemQuestion = {
+  businessSlug: string;
+  businessName: string;
+  itemId?: string;
+  itemName: string;
+  customerName?: string;
+  customerEmail?: string;
+  comment: string;
+};
+
 const demoBusiness: MenuBusiness = {
   id: "demo-food-truck",
   slug: "demo-food-truck",
@@ -357,4 +367,42 @@ export async function createMenuBusiness(formData: FormData) {
   }
 
   return { ok: true, slug };
+}
+
+export async function saveMenuItemQuestion(question: MenuItemQuestion) {
+  const sql = await getSql();
+
+  if (!sql) {
+    console.info("DATABASE_URL not configured. Menu item question was not persisted.", question);
+    return { persisted: false };
+  }
+
+  await sql`
+    insert into menu_item_questions (
+      id,
+      created_at,
+      business_slug,
+      business_name,
+      item_id,
+      item_name,
+      customer_name,
+      customer_email,
+      comment,
+      source
+    )
+    values (
+      ${crypto.randomUUID()},
+      now(),
+      ${question.businessSlug},
+      ${question.businessName},
+      ${question.itemId || null},
+      ${question.itemName},
+      ${question.customerName || null},
+      ${question.customerEmail || null},
+      ${question.comment},
+      'public_menu'
+    )
+  `;
+
+  return { persisted: true };
 }

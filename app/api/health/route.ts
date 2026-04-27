@@ -11,7 +11,8 @@ export async function GET() {
       upkeepPriceConfigured: Boolean(process.env.STRIPE_PRICE_UPKEEP),
       managedPriceConfigured: Boolean(process.env.STRIPE_PRICE_MANAGED),
       adminProtected: Boolean(process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD),
-      siteUrlConfigured: Boolean(process.env.NEXT_PUBLIC_SITE_URL)
+      siteUrlConfigured: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
+      questionsEmailConfigured: Boolean(process.env.NEXT_PUBLIC_QUESTIONS_EMAIL)
     }
   });
 }

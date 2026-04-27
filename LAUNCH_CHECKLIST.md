@@ -29,6 +29,9 @@ Use this before treating a deployment as customer-ready.
 - [ ] `/m/demo-food-truck` loads a public menu page.
 - [ ] Demo menu page shows item photos, descriptions, prices, status note, hours, and location.
 - [ ] Demo menu page action buttons work or use safe placeholder links.
+- [ ] Demo menu item comment form submits and returns to the menu page.
+- [ ] Menu item question appears in `/admin` after database setup.
+- [ ] Photo and questions email link opens `questions@resonate.solutions`.
 - [ ] `/api/qr/demo-food-truck` returns a QR SVG.
 - [ ] QR code points to the public menu URL configured by `NEXT_PUBLIC_SITE_URL`.
 - [ ] `/admin/menus` is blocked without Basic Auth.

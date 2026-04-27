@@ -64,6 +64,7 @@ STRIPE_PRICE_LAUNCH_KIT
 STRIPE_PRICE_UPKEEP
 STRIPE_PRICE_MANAGED
 NEXT_PUBLIC_SITE_URL
+NEXT_PUBLIC_QUESTIONS_EMAIL
 ```
 
 ## Database
@@ -98,6 +99,12 @@ Each public menu page includes a QR image at:
 
 ```text
 /api/qr/[customer-slug]
+```
+
+Customers can ask about menu items from the public menu page. Business owners can send menu photos and questions to:
+
+```text
+questions@resonate.solutions
 ```
 
 Configure `ADMIN_USERNAME` and `ADMIN_PASSWORD` before sharing any `/admin` URL.

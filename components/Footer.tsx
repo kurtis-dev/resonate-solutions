@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { questionsEmail } from "@/lib/contact";
 
 export function Footer() {
   return (
@@ -9,6 +10,9 @@ export function Footer() {
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
             Mobile presence kits for local businesses: menu pages, QR codes, public links, photos, and Google profile cleanup.
           </p>
+          <a className="mt-3 inline-flex text-sm font-black text-brandDark hover:text-ink" href={`mailto:${questionsEmail}`}>
+            {questionsEmail}
+          </a>
         </div>
         <nav className="flex flex-wrap gap-5 text-sm font-medium text-muted">
           <Link className="hover:text-ink" href="/privacy">Privacy</Link>

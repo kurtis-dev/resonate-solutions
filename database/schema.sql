@@ -82,7 +82,21 @@ create table if not exists menu_items (
   sort_order integer not null default 0
 );
 
+create table if not exists menu_item_questions (
+  id text primary key,
+  created_at timestamptz not null default now(),
+  business_slug text not null,
+  business_name text not null,
+  item_id text,
+  item_name text not null,
+  customer_name text,
+  customer_email text,
+  comment text not null,
+  source text not null default 'public_menu'
+);
+
 create index if not exists businesses_slug_idx on businesses (slug);
 create index if not exists businesses_published_idx on businesses (is_published);
 create index if not exists menu_sections_business_idx on menu_sections (business_id);
 create index if not exists menu_items_business_idx on menu_items (business_id);
+create index if not exists menu_item_questions_business_idx on menu_item_questions (business_slug);

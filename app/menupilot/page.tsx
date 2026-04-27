@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { IntakeForm } from "@/components/IntakeForm";
+import { mailtoLink, questionsEmail } from "@/lib/contact";
 
 const features = [
   {
@@ -28,6 +29,11 @@ const sampleMenu = [
 ];
 
 export default function MenuPilotPage() {
+  const photoEmailLink = mailtoLink(
+    "MenuPilot photos and menu details",
+    "Attach menu photos, food photos, pricing, hours, location, and any updates you want included."
+  );
+
   return (
     <main>
       <section className="relative overflow-hidden bg-cream">
@@ -40,6 +46,10 @@ export default function MenuPilotPage() {
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
               For food trucks, pop-ups, coffee shops, salons, and small restaurants that need menu items, hours, location, photos, and review links to come through clearly without building a full website.
+            </p>
+            <p className="mt-5 max-w-2xl rounded-2xl bg-white px-5 py-4 leading-7 text-muted shadow-sm">
+              Have photos already? Send menu photos, item photos, pricing, and questions to{" "}
+              <a href={photoEmailLink} className="font-black text-brandDark">{questionsEmail}</a>.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/pricing" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
