@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { saveIntakeRecord } from "@/lib/customer-store";
 import { createIntakeRecord, parseIntakePayload } from "@/lib/intake";
 
 export async function POST(request: Request) {
@@ -17,9 +18,8 @@ export async function POST(request: Request) {
   }
 
   const record = createIntakeRecord(parsed.payload);
+  const storage = await saveIntakeRecord(record);
 
-  // DATABASE: Save `record` to your database here.
-  // Good next choices: Vercel Postgres/Neon, Supabase, Airtable, or a Google Sheet automation.
   // EMAIL: Send `record` to your inbox here with Resend, Postmark, or another email provider.
   // CRM: Later, this can also create a lead in a lightweight CRM or client workspace.
   console.info("New Resonate intake", record);
@@ -27,6 +27,7 @@ export async function POST(request: Request) {
   return NextResponse.json({
     ok: true,
     id: record.id,
+    storage,
     message: "Thanks. Resonate received your Soundcheck request."
   });
 }

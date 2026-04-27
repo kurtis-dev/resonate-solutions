@@ -40,15 +40,44 @@ http://localhost:3000
 
 ## Payment Integration
 
-The checkout placeholder is in:
+The checkout and payment tracking code is in:
 
 ```text
 app/checkout/page.tsx
+app/api/checkout/route.ts
+app/api/stripe/webhook/route.ts
 lib/plans.ts
 components/PricingCards.tsx
 ```
 
-Replace the placeholder checkout page with Stripe Checkout, Stripe Payment Links, Square invoices, or your preferred payment flow.
+The app is set up for Stripe Checkout. Add these Vercel environment variables:
+
+```text
+STRIPE_SECRET_KEY
+STRIPE_WEBHOOK_SECRET
+STRIPE_PRICE_LAUNCH_KIT
+STRIPE_PRICE_UPKEEP
+STRIPE_PRICE_MANAGED
+NEXT_PUBLIC_SITE_URL
+```
+
+## Database
+
+The database schema is in:
+
+```text
+database/schema.sql
+```
+
+Use a Postgres database such as Neon, Vercel Postgres, or Supabase. Add `DATABASE_URL` in Vercel, then run the schema SQL in your database.
+
+The first internal operations view is:
+
+```text
+/admin
+```
+
+Add authentication before sharing that URL publicly.
 
 ## Positioning
 
@@ -77,7 +106,9 @@ Launch services:
 ## Production Checklist
 
 - Add contact form or lead capture.
-- Add Stripe Checkout or payment links.
+- Connect Stripe price IDs and webhook secret.
+- Connect a Postgres database and run `database/schema.sql`.
+- Add authentication for `/admin`.
 - Replace placeholder legal pages with attorney-reviewed policies.
 - Add support email and business contact information.
 - Add analytics.
