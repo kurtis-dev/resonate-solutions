@@ -28,6 +28,34 @@ const customerQuestions = [
   "Can I trust this place?"
 ];
 
+const customerMenuPreview = [
+  {
+    item: "Smoked Chicken Bowl",
+    detail: "Rice, greens, corn salsa, pickled onion, house sauce",
+    price: "$12",
+    note: "Popular"
+  },
+  {
+    item: "Hot Honey Biscuit",
+    detail: "Crispy chicken, local honey, pepper butter",
+    price: "$7",
+    note: "2 left"
+  },
+  {
+    item: "Seasonal Lemonade",
+    detail: "Blackberry, basil, fresh lemon",
+    price: "$4",
+    note: "New"
+  }
+];
+
+const publicDetailExamples = [
+  ["Today", "Bentonville Square, 11 AM to 2 PM"],
+  ["Ordering", "Walk-up open, online preorders close at 1:30"],
+  ["Updates", "Hot honey biscuit is limited today"],
+  ["Trust", "Photos, review link, social link, and directions in one place"]
+];
+
 const serviceSteps = [
   ["Soundcheck", "We listen for the missing notes in the customer path: menu, hours, location, photos, links, and Google details."],
   ["Tune", "We build the mobile page, QR path, menu layout, public links, and Google-ready details."],
@@ -85,9 +113,12 @@ export default function ResonateHome() {
           <div className="rounded-[1.75rem] border border-line bg-white p-4 shadow-soft">
             <div className="grid gap-3 sm:grid-cols-[0.85fr_1.15fr]">
               <div className="rounded-[1.25rem] bg-sage p-4">
-                <div className="aspect-[4/5] rounded-[1rem] bg-[linear-gradient(145deg,#d97856,#e8a93a_55%,#4d8b72)] p-4 text-white">
-                  <p className="text-sm font-bold">Photo day</p>
-                  <div className="mt-28 rounded-full bg-white/85 px-4 py-2 text-sm font-black text-ink">fresh menu photos</div>
+                <div className="overflow-hidden rounded-[1rem] bg-white shadow-sm">
+                  <img src="/assets/menu-bowl.svg" alt="Example plated menu item photo" className="aspect-[4/5] w-full object-cover" />
+                  <div className="p-4">
+                    <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Photo Day</p>
+                    <div className="mt-3 rounded-full bg-cream px-4 py-2 text-sm font-black text-ink">Fresh Menu Photos</div>
+                  </div>
                 </div>
               </div>
               <div className="rounded-[1.25rem] bg-cream p-5">
@@ -97,14 +128,16 @@ export default function ResonateHome() {
                   <p className="mt-1 text-sm text-muted">Open today, 11 AM to 2 PM, Bentonville Square</p>
                 </div>
                 <div className="mt-5 grid gap-3">
-                  {[
-                    ["Smoked chicken bowl", "$12"],
-                    ["Hot honey biscuit", "$7"],
-                    ["Seasonal lemonade", "$4"]
-                  ].map(([item, price]) => (
-                    <div key={item} className="flex items-center justify-between rounded-2xl border border-line bg-white p-4">
-                      <span className="font-black text-ink">{item}</span>
-                      <span className="font-black text-coral">{price}</span>
+                  {customerMenuPreview.map((menuItem) => (
+                    <div key={menuItem.item} className="rounded-2xl border border-line bg-white p-4">
+                      <div className="flex items-start justify-between gap-3">
+                        <div>
+                          <span className="font-black text-ink">{menuItem.item}</span>
+                          <p className="mt-1 text-sm leading-5 text-muted">{menuItem.detail}</p>
+                        </div>
+                        <span className="font-black text-coral">{menuItem.price}</span>
+                      </div>
+                      <span className="mt-3 inline-flex rounded-full bg-sage px-3 py-1 text-xs font-black text-brandDark">{menuItem.note}</span>
                     </div>
                   ))}
                 </div>
@@ -112,6 +145,48 @@ export default function ResonateHome() {
                   <span className="rounded-full bg-ink px-3 py-3 text-white">Directions</span>
                   <span className="rounded-full bg-brand px-3 py-3 text-white">Order link</span>
                 </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">What customers see</p>
+            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
+              A menu page that answers the questions people ask before they spend.
+            </h2>
+            <p className="mt-5 leading-7 text-muted">
+              The goal is not a fancy website for its own sake. It is a fast, useful customer view with the current menu, real item photos, prices, hours, location, order links, and the little details that remove doubt.
+            </p>
+          </div>
+          <div className="rounded-[1.75rem] border border-line bg-cream p-4 shadow-soft">
+            <div className="rounded-[1.25rem] bg-white p-5">
+              <div className="flex flex-col gap-4 border-b border-line pb-5 sm:flex-row sm:items-center sm:justify-between">
+                <div>
+                  <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Live customer menu</p>
+                  <h3 className="mt-2 text-3xl font-black text-ink">Ozark Street Kitchen</h3>
+                  <p className="mt-1 text-sm text-muted">Open now near Bentonville Square</p>
+                </div>
+                <div className="rounded-2xl bg-ink px-4 py-3 text-center text-sm font-black text-white">Scan QR</div>
+              </div>
+              <div className="mt-5 grid gap-4 md:grid-cols-[0.85fr_1.15fr]">
+                <img src="/assets/menu-bowl.svg" alt="Example menu item with food photography" className="h-full min-h-64 rounded-2xl border border-line object-cover" />
+                <div className="grid gap-3">
+                  {publicDetailExamples.map(([label, value]) => (
+                    <div key={label} className="rounded-2xl border border-line bg-cream p-4">
+                      <p className="text-xs font-black uppercase tracking-[0.12em] text-brand">{label}</p>
+                      <p className="mt-1 font-bold text-ink">{value}</p>
+                    </div>
+                  ))}
+                </div>
+              </div>
+              <div className="mt-5 grid grid-cols-2 gap-2 text-center text-sm font-bold sm:grid-cols-4">
+                {["Directions", "Order", "Instagram", "Reviews"].map((action) => (
+                  <span key={action} className="rounded-full border border-line bg-white px-3 py-3 text-ink">{action}</span>
+                ))}
               </div>
             </div>
           </div>
