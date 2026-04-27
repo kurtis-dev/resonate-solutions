@@ -9,7 +9,7 @@ export function getStripe() {
 
   if (!stripeClient) {
     stripeClient = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: "2026-02-25.clover" as Stripe.LatestApiVersion
+      apiVersion: "2026-04-22.dahlia"
     });
   }
 

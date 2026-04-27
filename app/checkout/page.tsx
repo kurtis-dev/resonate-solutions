@@ -1,19 +1,20 @@
 import Link from "next/link";
 import { getPlanById } from "@/lib/plans";
 
-export default function CheckoutPage({
+export default async function CheckoutPage({
   searchParams
 }: {
-  searchParams: { plan?: string; status?: string };
+  searchParams: Promise<{ plan?: string; status?: string }>;
 }) {
-  const planId = searchParams.plan || "launch-kit";
+  const params = await searchParams;
+  const planId = params.plan || "launch-kit";
   const plan = getPlanById(planId) || getPlanById("launch-kit");
   const statusMessage =
-    searchParams.status === "missing-stripe"
+    params.status === "missing-stripe"
       ? "Stripe is not connected yet. Add STRIPE_SECRET_KEY and the matching Stripe Price ID environment variable in Vercel."
-      : searchParams.status === "cancelled"
+      : params.status === "cancelled"
         ? "Checkout was cancelled. You can restart when ready."
-        : searchParams.status === "checkout-error"
+        : params.status === "checkout-error"
           ? "Stripe did not return a checkout URL. Please try again."
           : "";
 
