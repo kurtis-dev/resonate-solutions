@@ -1,21 +1,22 @@
 import Link from "next/link";
+import { IntakeForm } from "@/components/IntakeForm";
 
 const features = [
   {
-    title: "Mobile menu page",
-    text: "A clean menu that loads fast on a phone, with sections, prices, sold-out notes, and daily specials."
+    title: "Menu signal page",
+    text: "A clean menu that loads fast on a phone, with sections, prices, sold-out notes, photos, and daily specials."
   },
   {
-    title: "Where we are today",
-    text: "A simple location block for food trucks, pop-ups, and small restaurants that move or change hours."
+    title: "Today signal",
+    text: "A simple location and hours block for food trucks, pop-ups, and small restaurants that move or change schedules."
   },
   {
-    title: "QR code ready",
-    text: "Put one QR code on the truck, counter, receipt, or social profile and update the page without reprinting anything."
+    title: "QR amplifier",
+    text: "Put one QR code on the truck, counter, receipt, or social profile and update the destination without reprinting anything."
   },
   {
-    title: "Google profile helper",
-    text: "Keep the public essentials aligned: hours, services, menu link, photos, and customer review touchpoints."
+    title: "Soundcheck audit",
+    text: "Check the public essentials: hours, services, menu link, photos, customer links, and the details that make people choose."
   }
 ];
 
@@ -35,10 +36,10 @@ export default function MenuPilotPage() {
           <div className="self-center">
             <p className="inline-flex rounded-full bg-sage px-4 py-2 text-sm font-bold text-brandDark">MenuPilot by Resonate Solutions</p>
             <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
-              A menu and location page customers can actually find.
+              Tune your menu into a clear customer signal.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-              For food trucks, pop-ups, coffee shops, salons, and small restaurants that need a simple customer page for menu items, hours, location, photos, and review links without building a full website.
+              For food trucks, pop-ups, coffee shops, salons, and small restaurants that need menu items, hours, location, photos, and review links to come through clearly without building a full website.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/pricing" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
@@ -52,7 +53,7 @@ export default function MenuPilotPage() {
           <div className="rounded-[1.75rem] border border-line bg-white p-4 shadow-soft">
             <div className="rounded-[1.25rem] bg-cream p-5">
               <div className="border-b border-line pb-4">
-                <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Today</p>
+                <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Now playing</p>
                 <h2 className="mt-2 text-3xl font-black text-ink">Bentonville Square</h2>
                 <p className="mt-1 text-sm text-muted">11:00 AM - 2:00 PM - Near the south entrance</p>
               </div>
@@ -82,10 +83,10 @@ export default function MenuPilotPage() {
         <div className="mb-10 max-w-3xl">
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Why it fits</p>
           <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-            Discovery is broken for a lot of small food businesses.
+            Discovery gets noisy for a lot of small businesses.
           </h2>
           <p className="mt-5 leading-7 text-muted">
-            Customers often cannot find the menu, current location, hours, or a reliable link. MenuPilot gives them one lightweight page that can sit on Google, Instagram, QR codes, receipts, and signs.
+            Customers often cannot find the current menu, location, hours, or reliable link. MenuPilot gives them one lightweight signal that can sit on Google, Instagram, QR codes, receipts, and signs.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
@@ -95,6 +96,21 @@ export default function MenuPilotPage() {
               <p className="mt-3 leading-7 text-muted">{feature.text}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="bg-sage">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brandDark">Backend start</p>
+            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
+              The first real workflow is a Soundcheck request.
+            </h2>
+            <p className="mt-5 leading-7 text-muted">
+              Before heavy automation, Resonate needs a clean intake loop: collect the business details, identify what is hard for customers to find, and turn that into a launch kit or upkeep plan.
+            </p>
+          </div>
+          <IntakeForm />
         </div>
       </section>
     </main>

@@ -3,7 +3,7 @@ import Link from "next/link";
 const offerCards = [
   {
     title: "A menu people can find",
-    text: "One clean phone-friendly page for menu items, prices, photos, hours, location, specials, and order links."
+    text: "One clean phone-friendly signal for menu items, prices, photos, hours, location, specials, and order links."
   },
   {
     title: "Photos that help people choose",
@@ -15,7 +15,7 @@ const offerCards = [
   },
   {
     title: "Google-ready public details",
-    text: "A practical cleanup pass for hours, menu links, photos, review links, services, and missing customer info."
+    text: "A practical Soundcheck for hours, menu links, photos, review links, services, and missing customer info."
   }
 ];
 
@@ -29,9 +29,9 @@ const customerQuestions = [
 ];
 
 const serviceSteps = [
-  ["Visit", "We collect the details customers keep asking for and take practical photos with the owner close by."],
-  ["Publish", "We build the mobile page, QR path, menu layout, public links, and Google-ready details."],
-  ["Refresh", "We keep seasonal items, hours, specials, photos, and links from quietly going stale."]
+  ["Soundcheck", "We listen for the missing notes in the customer path: menu, hours, location, photos, links, and Google details."],
+  ["Tune", "We build the mobile page, QR path, menu layout, public links, and Google-ready details."],
+  ["Keep tempo", "We keep seasonal items, hours, specials, photos, and links from quietly going stale."]
 ];
 
 const launchPackages = [
@@ -92,7 +92,7 @@ export default function ResonateHome() {
               </div>
               <div className="rounded-[1.25rem] bg-cream p-5">
                 <div className="border-b border-line pb-4">
-                  <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Customer page</p>
+                  <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Clear signal</p>
                   <h2 className="mt-2 text-3xl font-black text-ink">Ozark Street Kitchen</h2>
                   <p className="mt-1 text-sm text-muted">Open today, 11 AM to 2 PM, Bentonville Square</p>
                 </div>
@@ -176,7 +176,7 @@ export default function ResonateHome() {
               Start with helpful service. Let the software grow from the work people actually buy.
             </h2>
             <p className="mt-5 leading-7 text-muted">
-              The first version can feel personal: you show up, take photos, organize the details, publish the page, and leave the owner with a link customers can actually use.
+              The first version can feel personal: you show up, take photos, organize the details, tune the public signal, and leave the owner with a link customers can actually use.
             </p>
           </div>
           <div className="grid gap-5 lg:grid-cols-3">
