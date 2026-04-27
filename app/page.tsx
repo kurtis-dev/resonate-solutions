@@ -67,7 +67,7 @@ export default function ResonateHome() {
               Make your local business easier to find, choose, and trust.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-              Resonate helps local businesses turn scattered menus, links, hours, photos, and Google details into one polished customer path that feels easy on a phone.
+              We help local businesses get found, chosen, and trusted with clean mobile pages, useful photos, QR links, and public details that stay current.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/menupilot" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
