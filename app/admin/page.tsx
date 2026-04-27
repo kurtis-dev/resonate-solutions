@@ -1,4 +1,5 @@
 import { getSql } from "@/lib/db";
+import Link from "next/link";
 
 type Row = Record<string, unknown>;
 
@@ -66,6 +67,9 @@ export default async function AdminPage() {
         <p className="mt-5 leading-7 text-muted">
           This is the first internal view for Soundcheck requests, Stripe subscription status, and payment events. Add authentication before sharing this URL publicly.
         </p>
+        <Link href="/admin/menus" className="mt-6 inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
+          Create customer menu
+        </Link>
       </div>
       <div className="grid gap-6">
         <DataTable title="Recent Soundcheck requests" rows={intakes} columns={["created_at", "business_name", "contact_name", "email", "business_type", "city", "main_need", "package_interest"]} />

@@ -6,10 +6,14 @@ Resonate Solutions is a Next.js site for local business presence kits: mobile me
 
 ```text
 app/
+  admin/page.tsx         Internal operations dashboard
+  admin/menus/page.tsx   Internal menu page creator
+  api/qr/[slug]/route.ts QR code image endpoint
   checkout/page.tsx      Payment placeholder
   disclaimer/page.tsx    Disclaimer page
   globals.css            Tailwind base styles
   layout.tsx             Shared app layout
+  m/[slug]/page.tsx      Public customer menu pages
   menupilot/page.tsx     MenuPilot product page
   page.tsx               Homepage
   pricing/page.tsx       Pricing page
@@ -20,6 +24,7 @@ components/
   PricingCards.tsx
   SiteNav.tsx
 lib/
+  menu-store.ts          Business, menu, and QR data helpers
   plans.ts               Pricing and checkout destination placeholders
 package.json
 tailwind.config.ts
@@ -77,7 +82,25 @@ The first internal operations view is:
 /admin
 ```
 
-Add authentication before sharing that URL publicly.
+The first internal menu builder is:
+
+```text
+/admin/menus
+```
+
+It creates public customer menu pages at:
+
+```text
+/m/[customer-slug]
+```
+
+Each public menu page includes a QR image at:
+
+```text
+/api/qr/[customer-slug]
+```
+
+Configure `ADMIN_USERNAME` and `ADMIN_PASSWORD` before sharing any `/admin` URL.
 
 ## Positioning
 
@@ -112,4 +135,5 @@ Launch services:
 - Replace placeholder legal pages with attorney-reviewed policies.
 - Add support email and business contact information.
 - Add analytics.
-- Build a first customer menu template once a real business signs up.
+- Create the first real customer menu page in `/admin/menus`.
+- Print or save the QR code from `/api/qr/[customer-slug]`.

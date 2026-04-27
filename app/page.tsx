@@ -101,8 +101,8 @@ export default function ResonateHome() {
               <Link href="/menupilot" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
                 See MenuPilot
               </Link>
-              <Link href="/pricing" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
-                View launch packages
+              <Link href="/m/demo-food-truck" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
+                View demo menu
               </Link>
             </div>
             <p className="mt-6 max-w-xl text-sm leading-6 text-muted">
@@ -161,6 +161,9 @@ export default function ResonateHome() {
             <p className="mt-5 leading-7 text-muted">
               The goal is not a fancy website for its own sake. It is a fast, useful customer view with the current menu, real item photos, prices, hours, location, order links, and the little details that remove doubt.
             </p>
+            <Link href="/m/demo-food-truck" className="mt-7 inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
+              Open the live demo menu
+            </Link>
           </div>
           <div className="rounded-[1.75rem] border border-line bg-cream p-4 shadow-soft">
             <div className="rounded-[1.25rem] bg-white p-5">

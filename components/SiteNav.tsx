@@ -11,6 +11,7 @@ export function SiteNav() {
         <nav className="hidden items-center gap-7 text-sm font-medium text-muted md:flex">
           <Link className="hover:text-ink" href="/">Local Presence</Link>
           <Link className="hover:text-ink" href="/menupilot">MenuPilot</Link>
+          <Link className="hover:text-ink" href="/m/demo-food-truck">Demo Menu</Link>
           <Link className="hover:text-ink" href="/pricing">Pricing</Link>
         </nav>
         <Link href="/menupilot" className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-brandDark">

@@ -14,13 +14,27 @@ Use this before treating a deployment as customer-ready.
 - [ ] Header logo opens `/`.
 - [ ] Header `Local Presence` opens `/`.
 - [ ] Header `MenuPilot` opens `/menupilot`.
+- [ ] Header `Demo Menu` opens `/m/demo-food-truck`.
 - [ ] Header `Pricing` opens `/pricing`.
 - [ ] Header `Start kit` opens `/menupilot`.
 - [ ] Homepage `See MenuPilot` opens `/menupilot`.
-- [ ] Homepage `View launch packages` opens `/pricing`.
+- [ ] Homepage `View demo menu` opens `/m/demo-food-truck`.
+- [ ] Homepage `Open the live demo menu` opens `/m/demo-food-truck`.
 - [ ] MenuPilot `View launch plans` opens `/pricing`.
 - [ ] MenuPilot `See full offer` opens `/`.
 - [ ] Footer links open `/privacy`, `/terms`, `/disclaimer`, and `/pricing`.
+
+## 2A. MenuPilot Product Audit
+
+- [ ] `/m/demo-food-truck` loads a public menu page.
+- [ ] Demo menu page shows item photos, descriptions, prices, status note, hours, and location.
+- [ ] Demo menu page action buttons work or use safe placeholder links.
+- [ ] `/api/qr/demo-food-truck` returns a QR SVG.
+- [ ] QR code points to the public menu URL configured by `NEXT_PUBLIC_SITE_URL`.
+- [ ] `/admin/menus` is blocked without Basic Auth.
+- [ ] `/admin/menus` creates a published menu page after database setup.
+- [ ] New business appears in the existing menu pages list.
+- [ ] New public menu URL opens at `/m/[customer-slug]`.
 
 ## 3. Lead Intake
 
@@ -51,6 +65,7 @@ Use this before treating a deployment as customer-ready.
 - [ ] `/admin` shows recent Soundcheck requests.
 - [ ] `/admin` shows subscription status.
 - [ ] `/admin` shows payment events.
+- [ ] `/admin` links to the menu page creator.
 - [ ] No sensitive secrets appear in page source, logs, or `/api/health`.
 
 ## 6. Mobile Quality
@@ -59,6 +74,8 @@ Use this before treating a deployment as customer-ready.
 - [ ] MenuPilot works at phone width.
 - [ ] Pricing cards stack cleanly on phone.
 - [ ] Soundcheck form is usable on phone.
+- [ ] Public menu page is usable on phone.
+- [ ] QR code panel does not cause horizontal scrolling.
 - [ ] No text overlaps, clipped buttons, or horizontal scrolling on normal mobile widths.
 
 ## 7. Legal And Trust
@@ -86,3 +103,4 @@ Use this before treating a deployment as customer-ready.
 - [ ] Add Stripe webhook endpoint and `STRIPE_WEBHOOK_SECRET`.
 - [ ] Configure `ADMIN_USERNAME` and `ADMIN_PASSWORD`.
 - [ ] Add a support/contact email.
+- [ ] Create the first real customer menu page.
