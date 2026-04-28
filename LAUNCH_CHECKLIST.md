@@ -14,25 +14,25 @@ Use this before treating a deployment as customer-ready.
 - [ ] Header logo opens `/`.
 - [ ] Header `Local Presence` opens `/`.
 - [ ] Header `MenuPilot` opens `/menupilot`.
-- [ ] Header `Demo Menu` opens `/m/demo-food-truck`.
+- [ ] Header `Burger Preview` opens `/m/burger-truck-preview`.
 - [ ] Header `Pricing` opens `/pricing`.
 - [ ] Header `Start kit` opens `/menupilot`.
 - [ ] Homepage `See MenuPilot` opens `/menupilot`.
-- [ ] Homepage `View demo menu` opens `/m/demo-food-truck`.
-- [ ] Homepage `Open the live demo menu` opens `/m/demo-food-truck`.
+- [ ] Homepage `View burger preview` opens `/m/burger-truck-preview`.
+- [ ] Homepage `Open the burger truck preview` opens `/m/burger-truck-preview`.
 - [ ] MenuPilot `View launch plans` opens `/pricing`.
 - [ ] MenuPilot `See full offer` opens `/`.
 - [ ] Footer links open `/privacy`, `/terms`, `/disclaimer`, and `/pricing`.
 
 ## 2A. MenuPilot Product Audit
 
-- [ ] `/m/demo-food-truck` loads a public menu page.
+- [ ] `/m/burger-truck-preview` loads a public menu page.
 - [ ] Demo menu page shows item photos, descriptions, prices, status note, hours, and location.
 - [ ] Demo menu page action buttons work or use safe placeholder links.
 - [ ] Demo menu item comment form submits and returns to the menu page.
 - [ ] Menu item question appears in `/admin` after database setup.
 - [ ] Photo and questions email link opens `questions@resonate.solutions`.
-- [ ] `/api/qr/demo-food-truck` returns a QR SVG.
+- [ ] `/api/qr/burger-truck-preview` returns a QR SVG.
 - [ ] QR code points to the public menu URL configured by `NEXT_PUBLIC_SITE_URL`.
 - [ ] `/admin/menus` is blocked without Basic Auth.
 - [ ] `/admin/menus` creates a published menu page after database setup.
@@ -81,13 +81,19 @@ Use this before treating a deployment as customer-ready.
 - [ ] QR code panel does not cause horizontal scrolling.
 - [ ] No text overlaps, clipped buttons, or horizontal scrolling on normal mobile widths.
 
+## 6A. Repeatable Smoke Test
+
+- [ ] Run `npm run build` before pushing.
+- [ ] Run `npm run smoke` against local production server before pushing.
+- [ ] Run `BASE_URL=https://www.resonate.solutions npm run smoke` after Vercel deploys.
+
 ## 7. Legal And Trust
 
 - [ ] Privacy Policy exists and is reachable.
 - [ ] Terms of Use exists and is reachable.
 - [ ] Disclaimer exists and is reachable.
 - [ ] Placeholder legal copy is reviewed before accepting real customer payments.
-- [ ] Support/contact email is added before launch.
+- [x] Support/contact email is added as `questions@resonate.solutions`.
 - [ ] No income, ranking, review, or customer guarantees are stated.
 
 ## 8. Analytics And Operations
@@ -105,5 +111,4 @@ Use this before treating a deployment as customer-ready.
 - [ ] Create Stripe products/prices and add Stripe env vars to Vercel.
 - [ ] Add Stripe webhook endpoint and `STRIPE_WEBHOOK_SECRET`.
 - [ ] Configure `ADMIN_USERNAME` and `ADMIN_PASSWORD`.
-- [ ] Add a support/contact email.
 - [ ] Create the first real customer menu page.
