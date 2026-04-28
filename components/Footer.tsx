@@ -6,7 +6,11 @@ export function Footer() {
     <footer className="border-t border-line bg-white">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 md:grid-cols-[1fr_auto]">
         <div>
-          <p className="font-bold text-ink">Resonate Solutions</p>
+          <img
+            src="/assets/resonate-logo-primary.png"
+            alt="Resonate Solutions"
+            className="h-12 w-auto max-w-[230px] object-contain"
+          />
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
             Mobile presence kits for local businesses: menu pages, QR codes, public links, photos, and Google profile cleanup.
           </p>

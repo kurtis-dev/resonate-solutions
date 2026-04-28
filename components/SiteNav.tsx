@@ -4,9 +4,12 @@ export function SiteNav() {
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-cream/90 backdrop-blur">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
-        <Link href="/" className="flex items-center gap-3 font-bold text-ink">
-          <span className="flex h-9 w-9 items-center justify-center rounded-full bg-brand text-white">R</span>
-          <span>Resonate Solutions</span>
+        <Link href="/" className="flex items-center gap-3" aria-label="Resonate Solutions home">
+          <img
+            src="/assets/resonate-logo-primary.png"
+            alt="Resonate Solutions"
+            className="h-10 w-auto max-w-[150px] object-contain sm:max-w-[190px]"
+          />
         </Link>
         <nav className="hidden items-center gap-7 text-sm font-medium text-muted md:flex">
           <Link className="hover:text-ink" href="/">Local Presence</Link>

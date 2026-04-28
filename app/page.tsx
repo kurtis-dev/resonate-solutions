@@ -97,7 +97,11 @@ export default function ResonateHome() {
         <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#4d8b72,#e8a93a,#d97856)]" />
         <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-16 md:grid-cols-[1fr_0.86fr] md:py-24">
           <div className="self-center">
-            <p className="inline-flex rounded-full bg-sage px-4 py-2 text-sm font-bold text-brandDark">Resonate Solutions</p>
+            <img
+              src="/assets/resonate-logo-primary.png"
+              alt="Resonate Solutions"
+              className="h-16 w-auto max-w-[280px] object-contain"
+            />
             <h1 className="mt-6 max-w-4xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
               Make your local business easier to find, choose, and trust.
             </h1>
