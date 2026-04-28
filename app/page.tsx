@@ -41,25 +41,25 @@ const customerQuestions = [
 
 const customerMenuPreview = [
   {
-    item: "Classic Smash Burger",
-    detail: "Crispy-edge patty, cheese, pickles, onions, house sauce",
-    price: "$9",
+    item: "The OG Smashburger",
+    detail: "Grilled onions, American cheese, burger sauce, and pickles",
+    price: "$9.99",
+    note: "Local favorite",
+    image: "/assets/mellow-moose-og-smashburger.jpg"
+  },
+  {
+    item: "Blazing Moose Fries",
+    detail: "Nacho cheese, grilled peppers, beef patty, bacon, Smokeshow sauce, and ranch",
+    price: "$13.99",
     note: "Best seller",
-    image: "/assets/menu-photo-burger.svg"
+    image: "/assets/mellow-moose-blazing-fries.jpg"
   },
   {
-    item: "Loaded Truck Fries",
-    detail: "Fries with cheese, sauce, onions, and a little heat",
-    price: "$7",
-    note: "Shareable",
-    image: "/assets/menu-photo-fries.svg"
-  },
-  {
-    item: "Craft Lemonade",
-    detail: "Blackberry, basil, fresh lemon",
-    price: "$4",
-    note: "Rotates",
-    image: "/assets/menu-photo-lemonade.svg"
+    item: "Hearty Shroom and Cheese Burger",
+    detail: "Cheese, mushroom brown gravy, and mayonnaise on a toasted bun",
+    price: "$11.99",
+    note: "Mellow pick",
+    image: "/assets/mellow-moose-hearty-shroom.jpg"
   }
 ];
 
@@ -98,7 +98,7 @@ export default function ResonateHome() {
         <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-16 md:grid-cols-[1fr_0.86fr] md:py-24">
           <div className="self-center">
             <img
-              src="/assets/resonate-logo-primary.png"
+              src="/assets/resonate-logo-flat.png"
               alt="Resonate Solutions"
               className="h-16 w-auto max-w-[280px] object-contain"
             />
@@ -112,8 +112,8 @@ export default function ResonateHome() {
               <Link href="/menupilot" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
                 See MenuPilot
               </Link>
-              <Link href="/m/burger-truck-preview" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
-                View burger preview
+              <Link href="/m/mellow-moose-burgers" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
+                View Mellow Moose
               </Link>
             </div>
             <p className="mt-6 max-w-xl text-sm leading-6 text-muted">
@@ -125,18 +125,18 @@ export default function ResonateHome() {
             <div className="grid gap-3 sm:grid-cols-[0.85fr_1.15fr]">
               <div className="rounded-[1.25rem] bg-sage p-4">
                 <div className="overflow-hidden rounded-[1rem] bg-white shadow-sm">
-                  <img src="/assets/menu-photo-burger.svg" alt="Example smash burger menu photo" className="aspect-[4/5] w-full object-cover" />
+                  <img src="/assets/mellow-moose-og-smashburger.jpg" alt="Mellow Moose smash burger" className="aspect-[4/5] w-full object-cover" />
                   <div className="p-4">
                     <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Customer page</p>
-                    <div className="mt-3 rounded-full bg-cream px-4 py-2 text-sm font-black text-ink">Fresh Menu Photos</div>
+                    <div className="mt-3 rounded-full bg-cream px-4 py-2 text-sm font-black text-ink">Mellow Moose Burgers</div>
                   </div>
                 </div>
               </div>
               <div className="rounded-[1.25rem] bg-cream p-5">
                 <div className="border-b border-line pb-4">
                   <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Clear signal</p>
-                  <h2 className="mt-2 text-3xl font-black text-ink">Burger Truck Preview</h2>
-                  <p className="mt-1 text-sm text-muted">Lunch and dinner, Siloam Springs service area</p>
+                  <h2 className="mt-2 text-3xl font-black text-ink">Mellow Moose Burgers</h2>
+                  <p className="mt-1 text-sm text-muted">Griffin&apos;s Food Court, Siloam Springs</p>
                 </div>
                 <div className="mt-5 grid gap-3">
                   {customerMenuPreview.map((menuItem) => (
@@ -175,8 +175,8 @@ export default function ResonateHome() {
             <p className="mt-5 leading-7 text-muted">
               The goal is not to make every restaurant, truck, or shop look the same. Each page should carry the business's own signal: the logo, colors, photos, menu rhythm, favorite items, and the customer actions that matter most.
             </p>
-            <Link href="/m/burger-truck-preview" className="mt-7 inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
-              Open the burger truck preview
+            <Link href="/m/mellow-moose-burgers" className="mt-7 inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
+              Open the Mellow Moose page
             </Link>
           </div>
           <div className="rounded-[1.75rem] border border-line bg-cream p-4 shadow-soft">
@@ -184,13 +184,13 @@ export default function ResonateHome() {
               <div className="flex flex-col gap-4 border-b border-line pb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Live customer menu</p>
-                  <h3 className="mt-2 text-3xl font-black text-ink">Burger Truck Preview</h3>
-                  <p className="mt-1 text-sm text-muted">Open now in Siloam Springs</p>
+                  <h3 className="mt-2 text-3xl font-black text-ink">Mellow Moose Burgers</h3>
+                  <p className="mt-1 text-sm text-muted">Griffin&apos;s Food Court in Siloam Springs</p>
                 </div>
                 <div className="rounded-2xl bg-ink px-4 py-3 text-center text-sm font-black text-white">Scan QR</div>
               </div>
               <div className="mt-5 grid gap-4 md:grid-cols-[0.85fr_1.15fr]">
-                <img src="/assets/menu-photo-burger.svg" alt="Example burger menu item photography" className="h-full min-h-64 rounded-2xl border border-line object-cover" />
+                <img src="/assets/mellow-moose-food-truck.jpg" alt="Mellow Moose Burgers food truck" className="h-full min-h-64 rounded-2xl border border-line object-cover" />
                 <div className="grid gap-3">
                   {customSignals.map(([label, value]) => (
                     <div key={label} className="rounded-2xl border border-line bg-cream p-4">

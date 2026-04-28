@@ -349,7 +349,7 @@ export default async function PublicMenuPage({ params, searchParams }: PageProps
       <section className="mx-auto max-w-6xl px-4 py-6 sm:px-5 sm:py-10">
         <div className="overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-soft">
           <div className="relative min-h-[420px] bg-ink">
-            <img src={business.heroImageUrl || "/assets/menu-photo-bowl.svg"} alt={`${business.businessName} featured menu item`} className="absolute inset-0 h-full w-full object-cover" />
+            <img src={business.heroImageUrl || "/assets/resonate-logo-flat.png"} alt={`${business.businessName} featured menu item`} className="absolute inset-0 h-full w-full object-cover" />
             <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(16,27,31,.1),rgba(16,27,31,.76))]" />
             <div className="relative flex min-h-[420px] flex-col justify-end p-5 sm:p-8">
               <div className="max-w-3xl">

@@ -7,7 +7,7 @@ export function Footer() {
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 md:grid-cols-[1fr_auto]">
         <div>
           <img
-            src="/assets/resonate-logo-primary.png"
+            src="/assets/resonate-logo-flat.png"
             alt="Resonate Solutions"
             className="h-12 w-auto max-w-[230px] object-contain"
           />

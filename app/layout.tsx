@@ -14,7 +14,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Resonate Solutions",
     description: "Custom local presence pages for businesses that need menus, photos, QR links, hours, and public details people can actually find.",
-    images: ["/assets/resonate-logo-primary.png"]
+    images: ["/assets/resonate-logo-flat.png"]
   }
 };
 

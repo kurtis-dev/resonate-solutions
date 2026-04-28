@@ -49,31 +49,31 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
           <h2 className="text-2xl font-black text-ink">New menu page</h2>
           <form action={createMenuBusinessAction} className="mt-6 grid gap-4">
             <div className="grid gap-4 md:grid-cols-2">
-              <Field label="Business name" name="businessName" placeholder="Ozark Street Kitchen" required />
-              <Field label="Optional slug" name="slug" placeholder="ozark-street-kitchen" />
+              <Field label="Business name" name="businessName" placeholder="Mellow Moose Burgers" required />
+              <Field label="Optional slug" name="slug" placeholder="mellow-moose-burgers" />
               <Field label="Business type" name="businessType" placeholder="Food truck, coffee shop, salon" />
-              <Field label="City" name="city" placeholder="Bentonville, AR" />
-              <Field label="Hours summary" name="hoursSummary" placeholder="Open today, 11 AM to 2 PM" />
-              <Field label="Location summary" name="locationSummary" placeholder="Bentonville Square, south entrance" />
-              <Field label="Address or map search" name="address" placeholder="Bentonville Square, Bentonville, AR" />
-              <Field label="Phone" name="phone" placeholder="(479) 555-0142" />
+              <Field label="City" name="city" placeholder="Siloam Springs, AR" />
+              <Field label="Hours summary" name="hoursSummary" placeholder="Tue-Fri 11 AM-2 PM & 4-8 PM" />
+              <Field label="Location summary" name="locationSummary" placeholder="Griffin's Food Court" />
+              <Field label="Address or map search" name="address" placeholder="825 S Mt Olive, Siloam Springs, AR" />
+              <Field label="Phone" name="phone" placeholder="(479) 305-2800" />
               <Field label="Order URL" name="orderingUrl" placeholder="https://..." />
               <Field label="Review URL" name="reviewUrl" placeholder="https://..." />
               <Field label="Facebook URL" name="facebookUrl" placeholder="https://..." />
               <Field label="Instagram URL" name="instagramUrl" placeholder="https://..." />
-              <Field label="Hero image URL" name="heroImageUrl" placeholder="/assets/menu-bowl.svg" />
+              <Field label="Hero image URL" name="heroImageUrl" placeholder="/assets/mellow-moose-logo.jpg" />
               <Field label="Brand theme" name="brandTheme" placeholder="default or mellow-moose" />
               <Field label="Active menu key" name="activeMenuKey" placeholder="main, mellow-moose, dos-gordos" />
             </div>
 
             <label className="grid gap-2 text-sm font-bold text-ink">
               Short description
-              <textarea name="description" rows={3} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Fresh bowls, biscuits, and lemonade near the square." />
+              <textarea name="description" rows={3} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Smashed fresh beef burgers, loaded fries, salads, kids meals, and rotating specials." />
             </label>
 
             <label className="grid gap-2 text-sm font-bold text-ink">
               Status note
-              <input name="statusNote" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Hot honey biscuits are limited today." />
+              <input name="statusNote" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Best of Siloam Springs 2026 Winner: Burger / Local" />
             </label>
 
             <label className="grid gap-2 text-sm font-bold text-ink">
@@ -92,7 +92,7 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
                 name="menuItems"
                 rows={7}
                 className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal"
-                placeholder={"Smoked Chicken Bowl | $12 | Rice, greens, corn salsa, pickled onion | Popular\nHot Honey Biscuit | $7 | Crispy chicken, local honey, pepper butter | 2 left"}
+                placeholder={"The OG Smashburger | $9.99 | Grilled onions, American cheese, burger sauce, and pickles | Local favorite\nBlazing Moose Fries | $13.99 | Nacho cheese, grilled peppers, beef patty, bacon, Smokeshow sauce, and ranch | Best seller"}
               />
               <span className="text-xs font-normal leading-5 text-muted">Format each line as: item name | price | description | badge.</span>
             </label>
@@ -147,10 +147,6 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
           </form>
 
           <h2 className="mt-8 text-2xl font-black text-ink">Existing menu pages</h2>
-          <Link href="/m/demo-food-truck" className="mt-5 block rounded-2xl border border-line bg-cream p-4 hover:border-brand">
-            <span className="font-black text-ink">Demo food truck</span>
-            <span className="mt-1 block text-sm text-muted">Open the built-in example customer menu.</span>
-          </Link>
           {!businesses ? (
             <p className="mt-5 leading-7 text-muted">Connect the database to see customer menu pages created from this admin form.</p>
           ) : businesses.length === 0 ? (

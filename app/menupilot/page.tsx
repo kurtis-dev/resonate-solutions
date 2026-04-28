@@ -22,9 +22,9 @@ const features = [
 ];
 
 const sampleMenu = [
-  ["Classic Smash Burger", "$9", "/assets/menu-photo-burger.svg", "Best seller"],
-  ["Loaded Truck Fries", "$7", "/assets/menu-photo-fries.svg", "Shareable"],
-  ["Craft Lemonade", "$4", "/assets/menu-photo-lemonade.svg", "Rotates"]
+  ["The OG Smashburger", "$9.99", "/assets/mellow-moose-og-smashburger.jpg", "Local favorite"],
+  ["Blazing Moose Fries", "$13.99", "/assets/mellow-moose-blazing-fries.jpg", "Best seller"],
+  ["Hearty Shroom and Cheese Burger", "$11.99", "/assets/mellow-moose-hearty-shroom.jpg", "Mellow pick"]
 ];
 
 const approvalItems = [
@@ -72,8 +72,8 @@ export default function MenuPilotPage() {
             <div className="rounded-[1.25rem] bg-cream p-5">
               <div className="border-b border-line pb-4">
                 <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Now playing</p>
-                <h2 className="mt-2 text-3xl font-black text-ink">Bentonville Square</h2>
-                <p className="mt-1 text-sm text-muted">11:00 AM - 2:00 PM - Near the south entrance</p>
+                <h2 className="mt-2 text-3xl font-black text-ink">Mellow Moose Burgers</h2>
+                <p className="mt-1 text-sm text-muted">Griffin&apos;s Food Court - Siloam Springs</p>
               </div>
               <div className="mt-5 grid gap-3">
                 {sampleMenu.map(([item, price, image, note]) => (
@@ -98,8 +98,8 @@ export default function MenuPilotPage() {
                   <span className="rounded-full bg-white/10 px-3 py-2">Share menu</span>
                 </div>
               </div>
-              <Link href="/m/burger-truck-preview" className="mt-4 block rounded-full bg-brand px-5 py-3 text-center font-black text-white transition hover:bg-brandDark">
-                View burger truck preview
+              <Link href="/m/mellow-moose-burgers" className="mt-4 block rounded-full bg-brand px-5 py-3 text-center font-black text-white transition hover:bg-brandDark">
+                View Mellow Moose menu
               </Link>
             </div>
           </div>

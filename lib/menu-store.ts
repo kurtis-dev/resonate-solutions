@@ -69,190 +69,6 @@ export type MenuItemQuestion = {
   comment: string;
 };
 
-const demoBusiness: MenuBusiness = {
-  id: "demo-food-truck",
-  slug: "demo-food-truck",
-  businessName: "Ozark Street Kitchen",
-  businessType: "Food truck",
-  description: "A sample customer menu page showing how food, hours, location, links, and updates come together from one QR code.",
-  city: "Bentonville, AR",
-  statusNote: "Hot honey biscuits are limited today.",
-  hoursSummary: "Open today, 11 AM to 2 PM",
-  locationSummary: "Bentonville Square, near the south entrance",
-  address: "Bentonville Square, Bentonville, AR",
-  orderingUrl: "https://example.com/order",
-  reviewUrl: "https://example.com/review",
-  instagramUrl: "https://example.com/instagram",
-  phone: "(479) 555-0142",
-  heroImageUrl: "/assets/menu-photo-bowl.svg",
-  isPublished: true,
-  sections: [
-    { id: "demo-specials", name: "Today specials", sortOrder: 0 },
-    { id: "demo-bowls", name: "Bowls", sortOrder: 1 },
-    { id: "demo-drinks", name: "Drinks", sortOrder: 2 }
-  ],
-  items: [
-    {
-      id: "demo-1",
-      sectionId: "demo-specials",
-      name: "Hot Honey Biscuit",
-      description: "Crispy chicken, local honey, pepper butter, and a soft buttermilk biscuit.",
-      price: "$7",
-      imageUrl: "/assets/menu-photo-biscuit.svg",
-      badge: "2 left",
-      isSoldOut: false,
-      sortOrder: 0
-    },
-    {
-      id: "demo-2",
-      sectionId: "demo-specials",
-      name: "Smoked Chicken Bowl",
-      description: "Rice, greens, corn salsa, pickled onion, smoked chicken, and house sauce.",
-      price: "$12",
-      imageUrl: "/assets/menu-photo-bowl.svg",
-      badge: "Popular",
-      isSoldOut: false,
-      sortOrder: 1
-    },
-    {
-      id: "demo-3",
-      sectionId: "demo-bowls",
-      name: "Veggie Market Bowl",
-      description: "Roasted seasonal vegetables, rice, greens, toasted seeds, and herb dressing.",
-      price: "$10",
-      imageUrl: "/assets/menu-photo-bowl.svg",
-      badge: "Vegetarian",
-      isSoldOut: false,
-      sortOrder: 2
-    },
-    {
-      id: "demo-4",
-      sectionId: "demo-bowls",
-      name: "Smoked Chicken Bowl",
-      description: "A larger bowl with extra smoked chicken, corn salsa, pickled onion, and sauce.",
-      price: "$12",
-      imageUrl: "/assets/menu-photo-bowl.svg",
-      badge: null,
-      isSoldOut: true,
-      sortOrder: 3
-    },
-    {
-      id: "demo-5",
-      sectionId: "demo-drinks",
-      name: "Seasonal Lemonade",
-      description: "Blackberry, basil, and fresh lemon over ice.",
-      price: "$4",
-      imageUrl: "/assets/menu-photo-lemonade.svg",
-      badge: "New",
-      isSoldOut: false,
-      sortOrder: 4
-    },
-    {
-      id: "demo-6",
-      sectionId: "demo-drinks",
-      name: "Sweet Tea",
-      description: "House brewed black tea, lightly sweetened, served cold.",
-      price: "$3",
-      imageUrl: "/assets/menu-photo-lemonade.svg",
-      badge: null,
-      isSoldOut: false,
-      sortOrder: 5
-    }
-  ]
-};
-
-const burgerTruckPreview: MenuBusiness = {
-  id: "burger-truck-preview",
-  slug: "burger-truck-preview",
-  businessName: "Siloam Burger Truck Preview",
-  businessType: "Food truck preview",
-  description: "A permission-safe preview built for a real burger truck workflow: current menu, item photos, hours, location, QR sharing, and easy customer questions.",
-  city: "Siloam Springs, AR",
-  statusNote: "Preview mode: ready to swap in the approved business name, photos, links, and exact menu.",
-  hoursSummary: "Sample hours: lunch and dinner service",
-  locationSummary: "Sample location: Siloam Springs service area",
-  address: "Siloam Springs, AR",
-  orderingUrl: "https://example.com/order",
-  reviewUrl: "https://example.com/review",
-  instagramUrl: "https://example.com/instagram",
-  phone: "(479) 555-0199",
-  heroImageUrl: "/assets/menu-photo-burger.svg",
-  isPublished: true,
-  sections: [
-    { id: "burger-signature", name: "Signature burgers", sortOrder: 0 },
-    { id: "burger-sides", name: "Sides", sortOrder: 1 },
-    { id: "burger-drinks", name: "Drinks", sortOrder: 2 }
-  ],
-  items: [
-    {
-      id: "burger-1",
-      sectionId: "burger-signature",
-      name: "Classic Smash Burger",
-      description: "Crispy-edge beef patty, cheese, pickles, onions, and house sauce on a toasted bun.",
-      price: "$9",
-      imageUrl: "/assets/menu-photo-burger.svg",
-      badge: "Best seller",
-      isSoldOut: false,
-      sortOrder: 0
-    },
-    {
-      id: "burger-2",
-      sectionId: "burger-signature",
-      name: "Double Stack",
-      description: "Two smashed patties, double cheese, pickles, grilled onions, and house sauce.",
-      price: "$12",
-      imageUrl: "/assets/menu-photo-burger.svg",
-      badge: "Hungry pick",
-      isSoldOut: false,
-      sortOrder: 1
-    },
-    {
-      id: "burger-3",
-      sectionId: "burger-signature",
-      name: "Spicy Jam Burger",
-      description: "Smash patty, pepper cheese, jalapeno jam, crisp onion, and creamy sauce.",
-      price: "$11",
-      imageUrl: "/assets/menu-photo-burger.svg",
-      badge: "Limited",
-      isSoldOut: false,
-      sortOrder: 2
-    },
-    {
-      id: "burger-4",
-      sectionId: "burger-sides",
-      name: "Loaded Truck Fries",
-      description: "Crispy fries with cheese, sauce, onions, and a little heat.",
-      price: "$7",
-      imageUrl: "/assets/menu-photo-fries.svg",
-      badge: "Shareable",
-      isSoldOut: false,
-      sortOrder: 3
-    },
-    {
-      id: "burger-5",
-      sectionId: "burger-sides",
-      name: "Seasoned Fries",
-      description: "Golden fries tossed with house seasoning.",
-      price: "$4",
-      imageUrl: "/assets/menu-photo-fries.svg",
-      badge: null,
-      isSoldOut: false,
-      sortOrder: 4
-    },
-    {
-      id: "burger-6",
-      sectionId: "burger-drinks",
-      name: "Craft Lemonade",
-      description: "Fresh lemon over ice with a rotating fruit flavor.",
-      price: "$4",
-      imageUrl: "/assets/menu-photo-lemonade.svg",
-      badge: "Rotates",
-      isSoldOut: false,
-      sortOrder: 5
-    }
-  ]
-};
-
 const mellowMooseBurgers: MenuBusiness = {
   id: "mellow-moose-burgers",
   slug: "mellow-moose-burgers",
@@ -580,7 +396,7 @@ const mellowMooseBurgers: MenuBusiness = {
   ]
 };
 
-const demoBusinesses = [demoBusiness, burgerTruckPreview, mellowMooseBurgers];
+const demoBusinesses = [mellowMooseBurgers];
 
 function text(row: Row, key: string) {
   const value = row[key];
@@ -816,7 +632,7 @@ export async function createMenuBusiness(formData: FormData) {
       ${String(formData.get("facebookUrl") || "").trim() || null},
       ${String(formData.get("instagramUrl") || "").trim() || null},
       ${String(formData.get("phone") || "").trim() || null},
-      ${String(formData.get("heroImageUrl") || "").trim() || "/assets/menu-photo-bowl.svg"},
+      ${String(formData.get("heroImageUrl") || "").trim() || "/assets/resonate-logo-flat.png"},
       ${formData.get("isPublished") === "on"},
       now(),
       now()
