@@ -146,14 +146,14 @@ export default function MenuPilotPage() {
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Real-client ready</p>
             <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              While we wait for approval, the burger truck version is already staged.
+              Mellow Moose Burgers is first in line.
             </h2>
             <p className="mt-5 leading-7 text-muted">
-              This preview uses permission-safe sample copy and art. Once a business owner approves, the structure stays the same and we swap in the real menu, photos, hours, location, and links.
+              The first customer page is built around their moose logo, Colorado-inspired menu style, real food photos, Griffin&apos;s Food Court location, and Clover ordering.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link href="/m/burger-truck-preview" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white shadow-soft hover:bg-brandDark">
-                Open burger truck preview
+              <Link href="/m/mellow-moose-burgers" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white shadow-soft hover:bg-brandDark">
+                Open Mellow Moose
               </Link>
               <a href={photoEmailLink} className="rounded-full border border-line bg-white px-5 py-3 text-center font-black text-ink hover:border-brand">
                 Send menu details

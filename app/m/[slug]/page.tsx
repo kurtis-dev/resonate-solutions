@@ -55,6 +55,7 @@ export default async function PublicMenuPage({ params }: PageProps) {
   const directionsUrl = actionUrl("directions", business.address || business.locationSummary);
   const phoneUrl = actionUrl("phone", business.phone);
   const heroImage = business.heroImageUrl || "/assets/menu-photo-bowl.svg";
+  const isMellowMoose = business.slug === "mellow-moose-burgers";
   const sectionIds = new Set(business.sections.map((section) => section.id));
   const groupedSections = business.sections
     .map((section) => ({
@@ -75,8 +76,9 @@ export default async function PublicMenuPage({ params }: PageProps) {
 
   const actionLinks = [
     directionsUrl ? { label: "Directions", href: directionsUrl, style: "bg-ink text-white" } : null,
-    business.orderingUrl ? { label: "Order", href: business.orderingUrl, style: "bg-brand text-white" } : null,
+    business.orderingUrl ? { label: isMellowMoose ? "Order on Clover" : "Order", href: business.orderingUrl, style: "bg-brand text-white" } : null,
     business.reviewUrl ? { label: "Reviews", href: business.reviewUrl, style: "border border-line bg-white text-ink" } : null,
+    business.facebookUrl ? { label: "Facebook", href: business.facebookUrl, style: "border border-line bg-white text-ink" } : null,
     business.instagramUrl ? { label: "Instagram", href: business.instagramUrl, style: "border border-line bg-white text-ink" } : null,
     phoneUrl ? { label: "Call", href: phoneUrl, style: "border border-line bg-white text-ink" } : null,
     { label: "Ask", href: photoEmailLink, style: "border border-line bg-white text-ink" }
@@ -86,12 +88,24 @@ export default async function PublicMenuPage({ params }: PageProps) {
     <main className="bg-cream">
       <section className="mx-auto max-w-6xl px-4 py-6 sm:px-5 sm:py-10">
         <div className="overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-soft">
-          <div className="relative min-h-[420px] bg-ink">
-            <img src={heroImage} alt={`${business.businessName} featured menu item`} className="absolute inset-0 h-full w-full object-cover" />
-            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(16,27,31,.1),rgba(16,27,31,.76))]" />
+          <div className={`relative min-h-[420px] ${isMellowMoose ? "bg-[#62d3ca]" : "bg-ink"}`}>
+            {isMellowMoose ? (
+              <div className="absolute inset-0 bg-[linear-gradient(180deg,#62d3ca_0%,#62d3ca_48%,#2d6b34_49%,#184821_72%,#0f2e19_100%)]" />
+            ) : null}
+            <img
+              src={heroImage}
+              alt={`${business.businessName} featured menu item`}
+              className={`absolute inset-0 h-full w-full ${isMellowMoose ? "object-contain p-10 sm:p-14" : "object-cover"}`}
+            />
+            <div className={`absolute inset-0 ${isMellowMoose ? "bg-[linear-gradient(180deg,rgba(255,255,255,.06),rgba(16,27,31,.68))]" : "bg-[linear-gradient(180deg,rgba(16,27,31,.1),rgba(16,27,31,.76))]"}`} />
             <div className="relative flex min-h-[420px] flex-col justify-end p-5 sm:p-8">
               <div className="max-w-3xl">
-                <p className="inline-flex rounded-full bg-white/90 px-4 py-2 text-sm font-black text-brandDark">{business.businessType}</p>
+                <div className="flex flex-wrap gap-2">
+                  <p className="inline-flex rounded-full bg-white/90 px-4 py-2 text-sm font-black text-brandDark">{business.businessType}</p>
+                  {isMellowMoose ? (
+                    <p className="inline-flex rounded-full bg-[#f4d15f] px-4 py-2 text-sm font-black text-ink">Best of Siloam 2026</p>
+                  ) : null}
+                </div>
                 <h1 className="mt-4 text-5xl font-black leading-none text-white sm:text-7xl">{business.businessName}</h1>
                 {business.city ? <p className="mt-3 text-lg font-bold text-white/90">{business.city}</p> : null}
               </div>
@@ -116,11 +130,11 @@ export default async function PublicMenuPage({ params }: PageProps) {
                 ) : null}
               </div>
               {business.statusNote ? (
-                <p className="mt-5 rounded-2xl bg-sage px-4 py-3 font-bold text-brandDark">{business.statusNote}</p>
+                <p className={`mt-5 rounded-2xl px-4 py-3 font-bold ${isMellowMoose ? "bg-[#f4d15f] text-ink" : "bg-sage text-brandDark"}`}>{business.statusNote}</p>
               ) : null}
             </div>
 
-            <div className="rounded-2xl border border-line bg-cream p-4">
+            <div className={`rounded-2xl border border-line p-4 ${isMellowMoose ? "bg-[#f6efe3]" : "bg-cream"}`}>
               <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">Quick links</p>
               <div className="mt-4 grid grid-cols-2 gap-2">
                 {actionLinks.map((action) => (
@@ -197,13 +211,16 @@ export default async function PublicMenuPage({ params }: PageProps) {
                 <div className="grid gap-4 md:grid-cols-2">
                   {section.items.map((item) => (
                     <article id={`item-${item.id}`} key={item.id} className={`group scroll-mt-6 overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition hover:-translate-y-1 hover:border-brand hover:shadow-soft ${item.isSoldOut ? "opacity-65" : ""}`}>
-                      <div className="relative">
-                        {item.imageUrl ? <img src={item.imageUrl} alt={item.name} className="h-52 w-full object-cover transition duration-500 group-hover:scale-[1.03]" /> : null}
-                        {item.price ? <span className="absolute right-4 top-4 rounded-full bg-white px-4 py-2 font-black text-coral shadow-sm">{item.price}</span> : null}
-                      </div>
+                      {item.imageUrl ? (
+                        <div className="relative">
+                          <img src={item.imageUrl} alt={item.name} className="h-52 w-full object-cover transition duration-500 group-hover:scale-[1.03]" />
+                          {item.price ? <span className="absolute right-4 top-4 rounded-full bg-white px-4 py-2 font-black text-coral shadow-sm">{item.price}</span> : null}
+                        </div>
+                      ) : null}
                       <div className="p-5">
                         <div className="flex items-start justify-between gap-4">
                           <h4 className="text-xl font-black text-ink">{item.name}</h4>
+                          {!item.imageUrl && item.price ? <span className="shrink-0 rounded-full bg-cream px-3 py-1 text-sm font-black text-coral">{item.price}</span> : null}
                         </div>
                         {item.description ? <p className="mt-2 leading-7 text-muted">{item.description}</p> : null}
                         <div className="mt-4 flex flex-wrap gap-2">
@@ -236,9 +253,16 @@ export default async function PublicMenuPage({ params }: PageProps) {
             <div className="mb-5 rounded-2xl bg-sage p-4">
               <p className="text-xs font-black uppercase tracking-[0.14em] text-brandDark">Made for this business</p>
               <p className="mt-2 text-sm leading-6 text-muted">
-                Colors, photos, menu sections, quick links, and updates can be tuned to match the owner&apos;s real brand and customer flow.
+                {isMellowMoose
+                  ? "Built around the moose logo, Colorado mountain feel, real item photos, Clover ordering, and the menu customers ask for before they order."
+                  : "Colors, photos, menu sections, quick links, and updates can be tuned to match the owner's real brand and customer flow."}
               </p>
             </div>
+            {isMellowMoose ? (
+              <div className="mb-5 overflow-hidden rounded-2xl border border-line bg-white">
+                <img src="/assets/mellow-moose-best-of-siloam.jpg" alt="Best of Siloam Springs 2026 Burger Local winner badge" className="w-full object-cover" />
+              </div>
+            ) : null}
             <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">Share this menu</p>
             <img src={`/api/qr/${business.slug}`} alt={`QR code for ${business.businessName}`} className="mt-4 aspect-square w-full rounded-2xl border border-line bg-white p-3" />
             <p className="mt-4 break-all text-sm leading-6 text-muted">{menuUrl}</p>

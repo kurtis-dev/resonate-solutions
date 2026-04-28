@@ -33,6 +33,7 @@ export type MenuBusiness = {
   address?: string | null;
   orderingUrl?: string | null;
   reviewUrl?: string | null;
+  facebookUrl?: string | null;
   instagramUrl?: string | null;
   phone?: string | null;
   heroImageUrl?: string | null;
@@ -239,7 +240,301 @@ const burgerTruckPreview: MenuBusiness = {
   ]
 };
 
-const demoBusinesses = [demoBusiness, burgerTruckPreview];
+const mellowMooseBurgers: MenuBusiness = {
+  id: "mellow-moose-burgers",
+  slug: "mellow-moose-burgers",
+  businessName: "Mellow Moose Burgers",
+  businessType: "Smash burger restaurant",
+  description: "Smashed fresh beef burgers, loaded fries, salads, kids meals, and rotating specials from Griffin's Food Court in Siloam Springs.",
+  city: "Siloam Springs, AR",
+  statusNote: "Best of Siloam Springs 2026 Winner: Burger / Local",
+  hoursSummary: "Tue-Fri 11 AM-2 PM & 4-8 PM; Sat 11 AM-5 PM",
+  locationSummary: "Griffin's Food Court",
+  address: "825 S Mt Olive, Siloam Springs, AR 72761",
+  orderingUrl: "https://www.clover.com/online-ordering/dos-gordos-tacos-siloam-springs",
+  reviewUrl: "https://www.google.com/search?q=Mellow+Moose+Burgers+reviews",
+  facebookUrl: "https://www.facebook.com/profile.php?id=61556196630616",
+  instagramUrl: null,
+  phone: "(479) 305-2800",
+  heroImageUrl: "/assets/mellow-moose-logo.jpg",
+  isPublished: true,
+  sections: [
+    { id: "moose-burgers", name: "Burgers", sortOrder: 0 },
+    { id: "moose-fries", name: "Fries", sortOrder: 1 },
+    { id: "moose-salads", name: "Salads", sortOrder: 2 },
+    { id: "moose-kids", name: "Kid's Menu", sortOrder: 3 },
+    { id: "moose-extras", name: "Sides & Extras", sortOrder: 4 },
+    { id: "moose-specials", name: "Rotating specials", sortOrder: 5 }
+  ],
+  items: [
+    {
+      id: "moose-1",
+      sectionId: "moose-burgers",
+      name: "The OG Smashburger",
+      description: "Beef patty, grilled onions, American cheese, burger sauce, and pickles on a toasted bun.",
+      price: "$9.99 / $12.99 with fries",
+      imageUrl: "/assets/mellow-moose-og-smashburger.jpg",
+      badge: "Local favorite",
+      isSoldOut: false,
+      sortOrder: 0
+    },
+    {
+      id: "moose-2",
+      sectionId: "moose-fries",
+      name: "Blazing Moose Fries",
+      description: "Fries, nacho cheese sauce, grilled onions, grilled peppers, beef patty, chopped bacon, Smokeshow sauce, and ranch.",
+      price: "$13.99",
+      imageUrl: "/assets/mellow-moose-blazing-fries.jpg",
+      badge: "Best seller",
+      isSoldOut: false,
+      sortOrder: 1
+    },
+    {
+      id: "moose-3",
+      sectionId: "moose-burgers",
+      name: "Mellow Moose Cheeseburger",
+      description: "Beef patty, cheddar cheese, lettuce, tomato, red onion, pickles, mayonnaise, and mustard on a toasted bun.",
+      price: "$8.99 / $11.99 with fries",
+      imageUrl: null,
+      badge: "Classic",
+      isSoldOut: false,
+      sortOrder: 2
+    },
+    {
+      id: "moose-4",
+      sectionId: "moose-burgers",
+      name: "Mellow Moose Bacon Cheeseburger",
+      description: "The classic Mellow Moose Cheeseburger with bacon.",
+      price: "$9.99 / $12.99 with fries",
+      imageUrl: null,
+      badge: "Bacon",
+      isSoldOut: false,
+      sortOrder: 3
+    },
+    {
+      id: "moose-5",
+      sectionId: "moose-burgers",
+      name: "Bleu Sky Burger",
+      description: "Beef patty, bleu cheese crumbles, bacon, grilled onion, lettuce, tomato, mayonnaise, and mustard on a toasted bun.",
+      price: "$11.99 / $14.99 with fries",
+      imageUrl: null,
+      badge: "Bold",
+      isSoldOut: false,
+      sortOrder: 4
+    },
+    {
+      id: "moose-6",
+      sectionId: "moose-burgers",
+      name: "Hearty Shroom and Cheese Burger",
+      description: "Beef patty, cheese, mushroom brown gravy, and mayonnaise on a toasted bun.",
+      price: "$11.99 / $14.99 with fries",
+      imageUrl: null,
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 5
+    },
+    {
+      id: "moose-7",
+      sectionId: "moose-burgers",
+      name: "Return of the Schmac Burger",
+      description: "Beef patty, American cheese, schmac sauce, red onion, lettuce, and pickles on a toasted bun.",
+      price: "$9.99 / $12.99 with fries",
+      imageUrl: null,
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 6
+    },
+    {
+      id: "moose-8",
+      sectionId: "moose-burgers",
+      name: "Burn, Burn, Burger",
+      description: "Beef patty, cheddar cheese, bacon, Smokeshow sauce, grilled peppers, red onion, lettuce, tomato, pickles, mayonnaise, and mustard on a toasted bun.",
+      price: "$11.99 / $14.99 with fries",
+      imageUrl: null,
+      badge: "Spicy",
+      isSoldOut: false,
+      sortOrder: 7
+    },
+    {
+      id: "moose-9",
+      sectionId: "moose-burgers",
+      name: "Grilled Chicken Sandwich",
+      description: "Grilled chicken breast, bacon, cheddar cheese, lettuce, tomato, red onion, pickles, and mayonnaise on a toasted bun.",
+      price: "$9.99 / $12.99 with fries",
+      imageUrl: null,
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 8
+    },
+    {
+      id: "moose-10",
+      sectionId: "moose-fries",
+      name: "Side of Fries",
+      description: "Crispy fries served on the side.",
+      price: "$3.99",
+      imageUrl: null,
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 9
+    },
+    {
+      id: "moose-11",
+      sectionId: "moose-fries",
+      name: "Cheese Fries",
+      description: "Fries with nacho cheese sauce.",
+      price: "$5.99",
+      imageUrl: null,
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 10
+    },
+    {
+      id: "moose-12",
+      sectionId: "moose-fries",
+      name: "Loaded Fries",
+      description: "Fries, nacho cheese sauce, bacon, and ranch.",
+      price: "$7.99",
+      imageUrl: null,
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 11
+    },
+    {
+      id: "moose-13",
+      sectionId: "moose-fries",
+      name: "Moose Fries",
+      description: "Fries, nacho cheese sauce, grilled onion, beef patty, pickles, and burger sauce.",
+      price: "$11.99",
+      imageUrl: null,
+      badge: "Loaded",
+      isSoldOut: false,
+      sortOrder: 12
+    },
+    {
+      id: "moose-14",
+      sectionId: "moose-salads",
+      name: "Side Salad",
+      description: "Lettuce, sliced tomato, red onion, shredded cheese, and choice of dressing.",
+      price: "$3.99",
+      imageUrl: null,
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 13
+    },
+    {
+      id: "moose-15",
+      sectionId: "moose-salads",
+      name: "Grilled Chicken or Patty Salad",
+      description: "Choice of grilled chicken breast or beef patty on lettuce with sliced tomato, red onion, shredded cheese, and choice of dressing.",
+      price: "$10.99",
+      imageUrl: null,
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 14
+    },
+    {
+      id: "moose-16",
+      sectionId: "moose-kids",
+      name: "Lil Moose Cheeseburger",
+      description: "Beef patty, American cheese, ketchup, and pickle on a toasted bun. Choice of fries or fruit cup.",
+      price: "$6.99",
+      imageUrl: null,
+      badge: "Kid's meal",
+      isSoldOut: false,
+      sortOrder: 15
+    },
+    {
+      id: "moose-17",
+      sectionId: "moose-kids",
+      name: "Chicken Nuggets",
+      description: "Chicken nuggets served with choice of fries or fruit cup.",
+      price: "$6.99",
+      imageUrl: null,
+      badge: "Kid's meal",
+      isSoldOut: false,
+      sortOrder: 16
+    },
+    {
+      id: "moose-18",
+      sectionId: "moose-extras",
+      name: "Sauce or Dressing",
+      description: "House Ranch, Schmac Sauce, Burger Sauce, or Balsamic Vinaigrette.",
+      price: "$0.79",
+      imageUrl: null,
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 17
+    },
+    {
+      id: "moose-19",
+      sectionId: "moose-extras",
+      name: "Add-ons",
+      description: "Extra cheese, fresh jalapeno, grilled onions, grilled peppers, bleu cheese crumbles, bacon, or extra patty.",
+      price: "$0.79-$2.99",
+      imageUrl: null,
+      badge: "Customize",
+      isSoldOut: false,
+      sortOrder: 18
+    },
+    {
+      id: "moose-20",
+      sectionId: "moose-extras",
+      name: "Drinks and Fruit Cup",
+      description: "Water or juice, soda, and fruit cup options.",
+      price: "$1-$2",
+      imageUrl: null,
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 19
+    },
+    {
+      id: "moose-21",
+      sectionId: "moose-specials",
+      name: "Jalapeno Ranch Bacon Cheeseburger",
+      description: "A photographed Mellow Moose special with bacon, jalapeno, cheese, and creamy ranch-style sauce.",
+      price: null,
+      imageUrl: "/assets/mellow-moose-jalapeno-ranch-bacon.jpg",
+      badge: "Rotating special",
+      isSoldOut: false,
+      sortOrder: 20
+    },
+    {
+      id: "moose-22",
+      sectionId: "moose-specials",
+      name: "Moose Slammer Jammer",
+      description: "A sweet-heat photographed special with jam, bacon, jalapeno, and melted cheese.",
+      price: null,
+      imageUrl: "/assets/mellow-moose-slammer-jammer.jpg",
+      badge: "Rotating special",
+      isSoldOut: false,
+      sortOrder: 21
+    },
+    {
+      id: "moose-23",
+      sectionId: "moose-specials",
+      name: "The Cowboy",
+      description: "A saucy photographed special stacked with bacon, jalapenos, and barbecue-style flavor.",
+      price: null,
+      imageUrl: "/assets/mellow-moose-cowboy.jpg",
+      badge: "Rotating special",
+      isSoldOut: false,
+      sortOrder: 22
+    },
+    {
+      id: "moose-24",
+      sectionId: "moose-specials",
+      name: "Torta Burger",
+      description: "A photographed throwback-style burger with Dos Gordos energy and Mellow Moose smash burger attitude.",
+      price: null,
+      imageUrl: "/assets/mellow-moose-torta-burger.jpg",
+      badge: "Rotating special",
+      isSoldOut: false,
+      sortOrder: 23
+    }
+  ]
+};
+
+const demoBusinesses = [demoBusiness, burgerTruckPreview, mellowMooseBurgers];
 
 function text(row: Row, key: string) {
   const value = row[key];
@@ -365,6 +660,7 @@ async function hydrateBusiness(row: Row): Promise<MenuBusiness> {
     address: text(row, "address"),
     orderingUrl: text(row, "ordering_url"),
     reviewUrl: text(row, "review_url"),
+    facebookUrl: null,
     instagramUrl: text(row, "instagram_url"),
     phone: text(row, "phone"),
     heroImageUrl: text(row, "hero_image_url"),

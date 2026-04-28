@@ -8,7 +8,9 @@ const checks = [
   { path: "/terms", expect: "text/html" },
   { path: "/disclaimer", expect: "text/html" },
   { path: "/m/burger-truck-preview", expect: "text/html" },
+  { path: "/m/mellow-moose-burgers", expect: "text/html" },
   { path: "/api/qr/burger-truck-preview", expect: "image/svg+xml" },
+  { path: "/api/qr/mellow-moose-burgers", expect: "image/svg+xml" },
   { path: "/api/health", expect: "application/json" }
 ];
 
