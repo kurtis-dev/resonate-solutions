@@ -70,42 +70,79 @@ const demoBusiness: MenuBusiness = {
   reviewUrl: "https://example.com/review",
   instagramUrl: "https://example.com/instagram",
   phone: "(479) 555-0142",
-  heroImageUrl: "/assets/menu-bowl.svg",
+  heroImageUrl: "/assets/menu-photo-bowl.svg",
   isPublished: true,
-  sections: [{ id: "demo-menu", name: "Today menu", sortOrder: 0 }],
+  sections: [
+    { id: "demo-specials", name: "Today specials", sortOrder: 0 },
+    { id: "demo-bowls", name: "Bowls", sortOrder: 1 },
+    { id: "demo-drinks", name: "Drinks", sortOrder: 2 }
+  ],
   items: [
     {
       id: "demo-1",
-      sectionId: "demo-menu",
-      name: "Smoked Chicken Bowl",
-      description: "Rice, greens, corn salsa, pickled onion, and house sauce.",
-      price: "$12",
-      imageUrl: "/assets/menu-bowl.svg",
-      badge: "Popular",
+      sectionId: "demo-specials",
+      name: "Hot Honey Biscuit",
+      description: "Crispy chicken, local honey, pepper butter, and a soft buttermilk biscuit.",
+      price: "$7",
+      imageUrl: "/assets/menu-photo-biscuit.svg",
+      badge: "2 left",
       isSoldOut: false,
       sortOrder: 0
     },
     {
       id: "demo-2",
-      sectionId: "demo-menu",
-      name: "Hot Honey Biscuit",
-      description: "Crispy chicken, local honey, and pepper butter.",
-      price: "$7",
-      imageUrl: "/assets/menu-bowl.svg",
-      badge: "2 left",
+      sectionId: "demo-specials",
+      name: "Smoked Chicken Bowl",
+      description: "Rice, greens, corn salsa, pickled onion, smoked chicken, and house sauce.",
+      price: "$12",
+      imageUrl: "/assets/menu-photo-bowl.svg",
+      badge: "Popular",
       isSoldOut: false,
       sortOrder: 1
     },
     {
       id: "demo-3",
-      sectionId: "demo-menu",
-      name: "Seasonal Lemonade",
-      description: "Blackberry, basil, and fresh lemon.",
-      price: "$4",
-      imageUrl: "/assets/menu-bowl.svg",
-      badge: "New",
+      sectionId: "demo-bowls",
+      name: "Veggie Market Bowl",
+      description: "Roasted seasonal vegetables, rice, greens, toasted seeds, and herb dressing.",
+      price: "$10",
+      imageUrl: "/assets/menu-photo-bowl.svg",
+      badge: "Vegetarian",
       isSoldOut: false,
       sortOrder: 2
+    },
+    {
+      id: "demo-4",
+      sectionId: "demo-bowls",
+      name: "Smoked Chicken Bowl",
+      description: "A larger bowl with extra smoked chicken, corn salsa, pickled onion, and sauce.",
+      price: "$12",
+      imageUrl: "/assets/menu-photo-bowl.svg",
+      badge: null,
+      isSoldOut: true,
+      sortOrder: 3
+    },
+    {
+      id: "demo-5",
+      sectionId: "demo-drinks",
+      name: "Seasonal Lemonade",
+      description: "Blackberry, basil, and fresh lemon over ice.",
+      price: "$4",
+      imageUrl: "/assets/menu-photo-lemonade.svg",
+      badge: "New",
+      isSoldOut: false,
+      sortOrder: 4
+    },
+    {
+      id: "demo-6",
+      sectionId: "demo-drinks",
+      name: "Sweet Tea",
+      description: "House brewed black tea, lightly sweetened, served cold.",
+      price: "$3",
+      imageUrl: "/assets/menu-photo-lemonade.svg",
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 5
     }
   ]
 };
@@ -329,7 +366,7 @@ export async function createMenuBusiness(formData: FormData) {
       ${String(formData.get("reviewUrl") || "").trim() || null},
       ${String(formData.get("instagramUrl") || "").trim() || null},
       ${String(formData.get("phone") || "").trim() || null},
-      ${String(formData.get("heroImageUrl") || "").trim() || "/assets/menu-bowl.svg"},
+      ${String(formData.get("heroImageUrl") || "").trim() || "/assets/menu-photo-bowl.svg"},
       ${formData.get("isPublished") === "on"},
       now(),
       now()

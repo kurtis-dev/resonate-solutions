@@ -45,103 +45,147 @@ export default async function PublicMenuPage({ params }: PageProps) {
   const menuUrl = publicMenuUrl(business.slug);
   const directionsUrl = actionUrl("directions", business.address || business.locationSummary);
   const phoneUrl = actionUrl("phone", business.phone);
-  const heroImage = business.heroImageUrl || "/assets/menu-bowl.svg";
-  const section = business.sections[0];
+  const heroImage = business.heroImageUrl || "/assets/menu-photo-bowl.svg";
+  const sectionIds = new Set(business.sections.map((section) => section.id));
+  const groupedSections = business.sections
+    .map((section) => ({
+      ...section,
+      items: business.items.filter((item) => item.sectionId === section.id)
+    }))
+    .filter((section) => section.items.length > 0);
+  const unsectionedItems = business.items.filter((item) => !item.sectionId || !sectionIds.has(item.sectionId));
   const photoEmailLink = mailtoLink(
     `Photos or questions for ${business.businessName}`,
     `Business/menu page: ${menuUrl}\n\nAttach photos or ask a question here.`
   );
 
+  const actionLinks = [
+    directionsUrl ? { label: "Directions", href: directionsUrl, style: "bg-ink text-white" } : null,
+    business.orderingUrl ? { label: "Order", href: business.orderingUrl, style: "bg-brand text-white" } : null,
+    business.reviewUrl ? { label: "Reviews", href: business.reviewUrl, style: "border border-line bg-white text-ink" } : null,
+    business.instagramUrl ? { label: "Instagram", href: business.instagramUrl, style: "border border-line bg-white text-ink" } : null,
+    phoneUrl ? { label: "Call", href: phoneUrl, style: "border border-line bg-white text-ink" } : null,
+    { label: "Ask", href: photoEmailLink, style: "border border-line bg-white text-ink" }
+  ].filter(Boolean) as { label: string; href: string; style: string }[];
+
   return (
     <main className="bg-cream">
-      <section className="mx-auto grid max-w-7xl gap-8 px-5 py-10 lg:grid-cols-[0.95fr_1.05fr] lg:py-16">
+      <section className="mx-auto max-w-6xl px-4 py-6 sm:px-5 sm:py-10">
         <div className="overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-soft">
-          <img src={heroImage} alt={`${business.businessName} menu item`} className="h-80 w-full object-cover lg:h-full" />
-        </div>
-        <div className="self-center rounded-[1.75rem] border border-line bg-white p-6 shadow-sm md:p-8">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">{business.businessType}</p>
-          <h1 className="mt-3 text-5xl font-black leading-none text-ink md:text-7xl">{business.businessName}</h1>
-          {business.description ? <p className="mt-5 text-lg leading-8 text-muted">{business.description}</p> : null}
-          <div className="mt-6 grid gap-3 sm:grid-cols-2">
-            {business.hoursSummary ? (
-              <div className="rounded-2xl bg-cream p-4">
-                <p className="text-xs font-black uppercase tracking-[0.12em] text-brand">Hours</p>
-                <p className="mt-1 font-bold text-ink">{business.hoursSummary}</p>
+          <div className="relative min-h-[420px] bg-ink">
+            <img src={heroImage} alt={`${business.businessName} featured menu item`} className="absolute inset-0 h-full w-full object-cover" />
+            <div className="absolute inset-0 bg-[linear-gradient(180deg,rgba(16,27,31,.1),rgba(16,27,31,.76))]" />
+            <div className="relative flex min-h-[420px] flex-col justify-end p-5 sm:p-8">
+              <div className="max-w-3xl">
+                <p className="inline-flex rounded-full bg-white/90 px-4 py-2 text-sm font-black text-brandDark">{business.businessType}</p>
+                <h1 className="mt-4 text-5xl font-black leading-none text-white sm:text-7xl">{business.businessName}</h1>
+                {business.city ? <p className="mt-3 text-lg font-bold text-white/90">{business.city}</p> : null}
               </div>
-            ) : null}
-            {business.locationSummary ? (
-              <div className="rounded-2xl bg-cream p-4">
-                <p className="text-xs font-black uppercase tracking-[0.12em] text-brand">Location</p>
-                <p className="mt-1 font-bold text-ink">{business.locationSummary}</p>
-              </div>
-            ) : null}
+            </div>
           </div>
-          {business.statusNote ? (
-            <p className="mt-5 rounded-2xl bg-sage px-4 py-3 font-bold text-brandDark">{business.statusNote}</p>
-          ) : null}
-          <div className="mt-6 grid gap-2 sm:grid-cols-2">
-            {directionsUrl ? <a href={directionsUrl} className="rounded-full bg-ink px-5 py-3 text-center font-black text-white">Directions</a> : null}
-            {business.orderingUrl ? <a href={business.orderingUrl} className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Order</a> : null}
-            {business.reviewUrl ? <a href={business.reviewUrl} className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Reviews</a> : null}
-            {business.instagramUrl ? <a href={business.instagramUrl} className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Instagram</a> : null}
-            {phoneUrl ? <a href={phoneUrl} className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Call</a> : null}
-            <a href={photoEmailLink} className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Ask a question</a>
+
+          <div className="grid gap-6 p-5 md:grid-cols-[1fr_340px] md:p-8">
+            <div>
+              {business.description ? <p className="max-w-3xl text-lg leading-8 text-muted">{business.description}</p> : null}
+              <div className="mt-6 grid gap-3 sm:grid-cols-2">
+                {business.hoursSummary ? (
+                  <div className="rounded-2xl bg-cream p-4">
+                    <p className="text-xs font-black uppercase tracking-[0.12em] text-brand">Hours</p>
+                    <p className="mt-1 font-bold text-ink">{business.hoursSummary}</p>
+                  </div>
+                ) : null}
+                {business.locationSummary ? (
+                  <div className="rounded-2xl bg-cream p-4">
+                    <p className="text-xs font-black uppercase tracking-[0.12em] text-brand">Location</p>
+                    <p className="mt-1 font-bold text-ink">{business.locationSummary}</p>
+                  </div>
+                ) : null}
+              </div>
+              {business.statusNote ? (
+                <p className="mt-5 rounded-2xl bg-sage px-4 py-3 font-bold text-brandDark">{business.statusNote}</p>
+              ) : null}
+            </div>
+
+            <div className="rounded-2xl border border-line bg-cream p-4">
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">Quick links</p>
+              <div className="mt-4 grid grid-cols-2 gap-2">
+                {actionLinks.map((action) => (
+                  <a key={action.label} href={action.href} className={`rounded-full px-4 py-3 text-center text-sm font-black transition hover:-translate-y-0.5 hover:shadow-sm ${action.style}`}>
+                    {action.label}
+                  </a>
+                ))}
+              </div>
+            </div>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 pb-20">
-        <div className="mb-6 rounded-[1.5rem] border border-line bg-white p-5 shadow-sm">
-          <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">Need details?</p>
-          <p className="mt-2 leading-7 text-muted">
-            Customers can ask about an item below. Owners can send menu photos, updates, and questions to{" "}
-            <a href={photoEmailLink} className="font-black text-brandDark">{questionsEmail}</a>.
-          </p>
-        </div>
-        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+      <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-5">
+        <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
-            <div className="mb-5">
-              <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">{section?.name || "Menu"}</p>
-              <h2 className="mt-2 text-4xl font-black text-ink">Current menu</h2>
-            </div>
-            <div className="grid gap-4 md:grid-cols-2">
-              {business.items.map((item) => (
-                <article key={item.id} className={`overflow-hidden rounded-2xl border border-line bg-white shadow-sm ${item.isSoldOut ? "opacity-60" : ""}`}>
-                  {item.imageUrl ? <img src={item.imageUrl} alt={item.name} className="h-44 w-full object-cover" /> : null}
-                  <div className="p-5">
-                    <div className="flex items-start justify-between gap-4">
-                      <h3 className="text-xl font-black text-ink">{item.name}</h3>
-                      {item.price ? <span className="font-black text-coral">{item.price}</span> : null}
-                    </div>
-                    {item.description ? <p className="mt-2 leading-7 text-muted">{item.description}</p> : null}
-                    <div className="mt-4 flex flex-wrap gap-2">
-                      {item.badge ? <span className="rounded-full bg-sage px-3 py-1 text-xs font-black text-brandDark">{item.badge}</span> : null}
-                      {item.isSoldOut ? <span className="rounded-full bg-cream px-3 py-1 text-xs font-black text-coral">Sold out</span> : null}
-                    </div>
-                    <details className="mt-5 rounded-2xl border border-line bg-cream p-4">
-                      <summary className="cursor-pointer font-black text-ink">Ask about this item</summary>
-                      <form action="/api/menu-comments" method="POST" className="mt-4 grid gap-3">
-                        <input type="hidden" name="businessSlug" value={business.slug} />
-                        <input type="hidden" name="businessName" value={business.businessName} />
-                        <input type="hidden" name="itemId" value={item.id} />
-                        <input type="hidden" name="itemName" value={item.name} />
-                        <input type="hidden" name="returnTo" value={`/m/${business.slug}`} />
-                        <input name="customerName" placeholder="Name, optional" className="rounded-xl border border-line bg-white px-3 py-2 text-sm" />
-                        <input name="customerEmail" type="email" placeholder="Email, optional" className="rounded-xl border border-line bg-white px-3 py-2 text-sm" />
-                        <textarea name="comment" required rows={3} placeholder={`Question or comment about ${item.name}`} className="rounded-xl border border-line bg-white px-3 py-2 text-sm" />
-                        <button type="submit" className="rounded-full bg-brand px-4 py-2 text-sm font-black text-white">Send comment</button>
-                      </form>
-                    </details>
-                  </div>
-                </article>
-              ))}
-            </div>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Current menu</p>
+            <h2 className="mt-2 text-4xl font-black text-ink sm:text-5xl">Browse before you order</h2>
           </div>
-          <aside className="h-fit rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
+          <div className="rounded-2xl border border-line bg-white px-5 py-4 shadow-sm">
+            <p className="text-sm leading-6 text-muted">
+              Menu questions and photo updates go to{" "}
+              <a href={photoEmailLink} className="font-black text-brandDark">{questionsEmail}</a>.
+            </p>
+          </div>
+        </div>
+
+        <div className="grid gap-8 lg:grid-cols-[1fr_320px]">
+          <div className="space-y-10">
+            {[...groupedSections, ...(unsectionedItems.length ? [{ id: "more", name: "More", sortOrder: 99, items: unsectionedItems }] : [])].map((section) => (
+              <section key={section.id} id={section.id}>
+                <div className="mb-4 flex items-center justify-between gap-4 border-b border-line pb-3">
+                  <h3 className="text-2xl font-black text-ink">{section.name}</h3>
+                  <span className="rounded-full bg-white px-3 py-1 text-sm font-black text-muted">{section.items.length} items</span>
+                </div>
+                <div className="grid gap-4 md:grid-cols-2">
+                  {section.items.map((item) => (
+                    <article key={item.id} className={`group overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition hover:-translate-y-1 hover:border-brand hover:shadow-soft ${item.isSoldOut ? "opacity-65" : ""}`}>
+                      <div className="relative">
+                        {item.imageUrl ? <img src={item.imageUrl} alt={item.name} className="h-52 w-full object-cover transition duration-500 group-hover:scale-[1.03]" /> : null}
+                        {item.price ? <span className="absolute right-4 top-4 rounded-full bg-white px-4 py-2 font-black text-coral shadow-sm">{item.price}</span> : null}
+                      </div>
+                      <div className="p-5">
+                        <div className="flex items-start justify-between gap-4">
+                          <h4 className="text-xl font-black text-ink">{item.name}</h4>
+                        </div>
+                        {item.description ? <p className="mt-2 leading-7 text-muted">{item.description}</p> : null}
+                        <div className="mt-4 flex flex-wrap gap-2">
+                          {item.badge ? <span className="rounded-full bg-sage px-3 py-1 text-xs font-black text-brandDark">{item.badge}</span> : null}
+                          {item.isSoldOut ? <span className="rounded-full bg-cream px-3 py-1 text-xs font-black text-coral">Sold out</span> : null}
+                        </div>
+                        <details className="mt-5 rounded-2xl border border-line bg-cream p-4">
+                          <summary className="cursor-pointer font-black text-ink transition hover:text-brandDark">Ask about this item</summary>
+                          <form action="/api/menu-comments" method="POST" className="mt-4 grid gap-3">
+                            <input type="hidden" name="businessSlug" value={business.slug} />
+                            <input type="hidden" name="businessName" value={business.businessName} />
+                            <input type="hidden" name="itemId" value={item.id} />
+                            <input type="hidden" name="itemName" value={item.name} />
+                            <input type="hidden" name="returnTo" value={`/m/${business.slug}`} />
+                            <input name="customerName" placeholder="Name, optional" className="rounded-xl border border-line bg-white px-3 py-2 text-sm" />
+                            <input name="customerEmail" type="email" placeholder="Email, optional" className="rounded-xl border border-line bg-white px-3 py-2 text-sm" />
+                            <textarea name="comment" required rows={3} placeholder={`Question or comment about ${item.name}`} className="rounded-xl border border-line bg-white px-3 py-2 text-sm" />
+                            <button type="submit" className="rounded-full bg-brand px-4 py-2 text-sm font-black text-white transition hover:bg-brandDark">Send comment</button>
+                          </form>
+                        </details>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ))}
+          </div>
+
+          <aside className="h-fit rounded-[1.75rem] border border-line bg-white p-6 shadow-sm lg:sticky lg:top-6">
             <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">Share this menu</p>
             <img src={`/api/qr/${business.slug}`} alt={`QR code for ${business.businessName}`} className="mt-4 aspect-square w-full rounded-2xl border border-line bg-white p-3" />
             <p className="mt-4 break-all text-sm leading-6 text-muted">{menuUrl}</p>
-            <a href={`/api/qr/${business.slug}`} className="mt-5 block rounded-full bg-ink px-5 py-3 text-center font-black text-white">Open QR code</a>
+            <a href={`/api/qr/${business.slug}`} className="mt-5 block rounded-full bg-ink px-5 py-3 text-center font-black text-white transition hover:-translate-y-0.5 hover:shadow-sm">Open QR code</a>
+            <a href={photoEmailLink} className="mt-3 block rounded-full border border-line px-5 py-3 text-center font-black text-ink transition hover:border-brand">Send photos or updates</a>
           </aside>
         </div>
       </section>

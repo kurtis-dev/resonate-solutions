@@ -33,19 +33,22 @@ const customerMenuPreview = [
     item: "Smoked Chicken Bowl",
     detail: "Rice, greens, corn salsa, pickled onion, house sauce",
     price: "$12",
-    note: "Popular"
+    note: "Popular",
+    image: "/assets/menu-photo-bowl.svg"
   },
   {
     item: "Hot Honey Biscuit",
     detail: "Crispy chicken, local honey, pepper butter",
     price: "$7",
-    note: "2 left"
+    note: "2 left",
+    image: "/assets/menu-photo-biscuit.svg"
   },
   {
     item: "Seasonal Lemonade",
     detail: "Blackberry, basil, fresh lemon",
     price: "$4",
-    note: "New"
+    note: "New",
+    image: "/assets/menu-photo-lemonade.svg"
   }
 ];
 
@@ -114,10 +117,10 @@ export default function ResonateHome() {
             <div className="grid gap-3 sm:grid-cols-[0.85fr_1.15fr]">
               <div className="rounded-[1.25rem] bg-sage p-4">
                 <div className="overflow-hidden rounded-[1rem] bg-white shadow-sm">
-                  <img src="/assets/menu-bowl.svg" alt="Example plated menu item photo" className="aspect-[4/5] w-full object-cover" />
+                  <img src="/assets/menu-photo-biscuit.svg" alt="Example hot honey biscuit menu photo" className="aspect-[4/5] w-full object-cover" />
                   <div className="p-4">
                     <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Photo Day</p>
-                    <div className="mt-3 rounded-full bg-cream px-4 py-2 text-sm font-black text-ink">Fresh Menu Photos</div>
+                    <div className="mt-3 rounded-full bg-cream px-4 py-2 text-sm font-black text-ink">Fresh menu photos</div>
                   </div>
                 </div>
               </div>
@@ -130,12 +133,15 @@ export default function ResonateHome() {
                 <div className="mt-5 grid gap-3">
                   {customerMenuPreview.map((menuItem) => (
                     <div key={menuItem.item} className="rounded-2xl border border-line bg-white p-4">
-                      <div className="flex items-start justify-between gap-3">
+                      <div className="flex items-start gap-3">
+                        <img src={menuItem.image} alt={menuItem.item} className="h-16 w-16 rounded-xl object-cover" />
                         <div>
-                          <span className="font-black text-ink">{menuItem.item}</span>
+                          <div className="flex items-start justify-between gap-3">
+                            <span className="font-black text-ink">{menuItem.item}</span>
+                            <span className="font-black text-coral">{menuItem.price}</span>
+                          </div>
                           <p className="mt-1 text-sm leading-5 text-muted">{menuItem.detail}</p>
                         </div>
-                        <span className="font-black text-coral">{menuItem.price}</span>
                       </div>
                       <span className="mt-3 inline-flex rounded-full bg-sage px-3 py-1 text-xs font-black text-brandDark">{menuItem.note}</span>
                     </div>
@@ -176,7 +182,7 @@ export default function ResonateHome() {
                 <div className="rounded-2xl bg-ink px-4 py-3 text-center text-sm font-black text-white">Scan QR</div>
               </div>
               <div className="mt-5 grid gap-4 md:grid-cols-[0.85fr_1.15fr]">
-                <img src="/assets/menu-bowl.svg" alt="Example menu item with food photography" className="h-full min-h-64 rounded-2xl border border-line object-cover" />
+                <img src="/assets/menu-photo-bowl.svg" alt="Example menu item with food photography" className="h-full min-h-64 rounded-2xl border border-line object-cover" />
                 <div className="grid gap-3">
                   {publicDetailExamples.map(([label, value]) => (
                     <div key={label} className="rounded-2xl border border-line bg-cream p-4">

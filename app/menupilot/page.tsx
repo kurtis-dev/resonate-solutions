@@ -22,10 +22,9 @@ const features = [
 ];
 
 const sampleMenu = [
-  ["Honey Latte", "$5.50"],
-  ["Cold Brew", "$4.25"],
-  ["Breakfast Taco", "$3.75"],
-  ["Brisket Slider", "$7.00"]
+  ["Hot Honey Biscuit", "$7", "/assets/menu-photo-biscuit.svg", "2 left"],
+  ["Smoked Chicken Bowl", "$12", "/assets/menu-photo-bowl.svg", "Popular"],
+  ["Seasonal Lemonade", "$4", "/assets/menu-photo-lemonade.svg", "New"]
 ];
 
 export default function MenuPilotPage() {
@@ -68,10 +67,16 @@ export default function MenuPilotPage() {
                 <p className="mt-1 text-sm text-muted">11:00 AM - 2:00 PM - Near the south entrance</p>
               </div>
               <div className="mt-5 grid gap-3">
-                {sampleMenu.map(([item, price]) => (
-                  <div key={item} className="flex items-center justify-between rounded-2xl border border-line bg-white p-4">
-                    <span className="font-bold text-ink">{item}</span>
-                    <span className="font-black text-coral">{price}</span>
+                {sampleMenu.map(([item, price, image, note]) => (
+                  <div key={item} className="grid grid-cols-[76px_1fr] gap-3 rounded-2xl border border-line bg-white p-3">
+                    <img src={image} alt={item} className="h-20 w-20 rounded-xl object-cover" />
+                    <div>
+                      <div className="flex items-start justify-between gap-3">
+                        <span className="font-bold text-ink">{item}</span>
+                        <span className="font-black text-coral">{price}</span>
+                      </div>
+                      <span className="mt-2 inline-flex rounded-full bg-sage px-3 py-1 text-xs font-black text-brandDark">{note}</span>
+                    </div>
                   </div>
                 ))}
               </div>
