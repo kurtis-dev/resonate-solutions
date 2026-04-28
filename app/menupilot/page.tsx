@@ -22,9 +22,18 @@ const features = [
 ];
 
 const sampleMenu = [
-  ["Hot Honey Biscuit", "$7", "/assets/menu-photo-biscuit.svg", "2 left"],
-  ["Smoked Chicken Bowl", "$12", "/assets/menu-photo-bowl.svg", "Popular"],
-  ["Seasonal Lemonade", "$4", "/assets/menu-photo-lemonade.svg", "New"]
+  ["Classic Smash Burger", "$9", "/assets/menu-photo-burger.svg", "Best seller"],
+  ["Loaded Truck Fries", "$7", "/assets/menu-photo-fries.svg", "Shareable"],
+  ["Craft Lemonade", "$4", "/assets/menu-photo-lemonade.svg", "Rotates"]
+];
+
+const approvalItems = [
+  "Approved business name and logo",
+  "Current menu items with prices",
+  "3 to 8 food photos or a time to take them",
+  "Hours, service location, and move-around schedule",
+  "Order, review, Facebook, Instagram, or phone links",
+  "Any items that sell out, rotate, or need a note"
 ];
 
 export default function MenuPilotPage() {
@@ -89,6 +98,9 @@ export default function MenuPilotPage() {
                   <span className="rounded-full bg-white/10 px-3 py-2">Share menu</span>
                 </div>
               </div>
+              <Link href="/m/burger-truck-preview" className="mt-4 block rounded-full bg-brand px-5 py-3 text-center font-black text-white transition hover:bg-brandDark">
+                View burger truck preview
+              </Link>
             </div>
           </div>
         </div>
@@ -126,6 +138,42 @@ export default function MenuPilotPage() {
             </p>
           </div>
           <IntakeForm />
+        </div>
+      </section>
+
+      <section className="bg-white">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Real-client ready</p>
+            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
+              While we wait for approval, the burger truck version is already staged.
+            </h2>
+            <p className="mt-5 leading-7 text-muted">
+              This preview uses permission-safe sample copy and art. Once a business owner approves, the structure stays the same and we swap in the real menu, photos, hours, location, and links.
+            </p>
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
+              <Link href="/m/burger-truck-preview" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white shadow-soft hover:bg-brandDark">
+                Open burger truck preview
+              </Link>
+              <a href={photoEmailLink} className="rounded-full border border-line bg-white px-5 py-3 text-center font-black text-ink hover:border-brand">
+                Send menu details
+              </a>
+            </div>
+          </div>
+          <div className="rounded-[1.75rem] border border-line bg-cream p-5 shadow-soft">
+            <h3 className="text-2xl font-black text-ink">Approval checklist</h3>
+            <p className="mt-2 leading-7 text-muted">
+              The handoff should feel easy for the owner. This is all we need before turning the preview into their actual customer page.
+            </p>
+            <div className="mt-5 grid gap-3">
+              {approvalItems.map((item, index) => (
+                <div key={item} className="flex gap-3 rounded-2xl border border-line bg-white p-4">
+                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sage text-sm font-black text-brandDark">{index + 1}</span>
+                  <span className="font-bold text-ink">{item}</span>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </section>
     </main>

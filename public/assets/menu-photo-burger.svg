@@ -1,0 +1,29 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" role="img" aria-label="Smash burger">
+  <defs>
+    <linearGradient id="bg" x1="0" x2="1" y1="0" y2="1">
+      <stop offset="0" stop-color="#f5e6cf"/>
+      <stop offset="1" stop-color="#b9895b"/>
+    </linearGradient>
+    <filter id="shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="22" stdDeviation="22" flood-color="#4c2e1d" flood-opacity=".25"/>
+    </filter>
+  </defs>
+  <rect width="1200" height="900" fill="url(#bg)"/>
+  <circle cx="230" cy="210" r="130" fill="#4d8b72" opacity=".13"/>
+  <circle cx="980" cy="700" r="190" fill="#d97856" opacity=".13"/>
+  <g filter="url(#shadow)">
+    <ellipse cx="600" cy="662" rx="360" ry="88" fill="#6c422a" opacity=".2"/>
+    <path d="M322 385c30-122 161-193 322-174 151 18 252 103 256 218H322z" fill="#df9a44"/>
+    <path d="M342 405h518c24 0 43 19 43 43s-19 43-43 43H342c-24 0-43-19-43-43s19-43 43-43z" fill="#5a3322"/>
+    <path d="M332 468c104 42 202 40 295-5 98-48 191-47 279 3v74H332z" fill="#f3c94e"/>
+    <path d="M304 520c83 29 149 25 199-13 33-25 62-24 87 4 38 42 92 42 163 1 58-33 115-33 172 0v78H304z" fill="#4d8b72"/>
+    <path d="M323 565h555c28 0 51 22 51 50s-23 50-51 50H323c-28 0-51-22-51-50s23-50 51-50z" fill="#7a3d24"/>
+    <path d="M330 629h540c33 0 60 27 60 60H270c0-33 27-60 60-60z" fill="#d88d42"/>
+    <g fill="#fff4c7">
+      <ellipse cx="458" cy="292" rx="30" ry="11" transform="rotate(-18 458 292)"/>
+      <ellipse cx="558" cy="258" rx="30" ry="11" transform="rotate(13 558 258)"/>
+      <ellipse cx="688" cy="291" rx="30" ry="11" transform="rotate(-9 688 291)"/>
+      <ellipse cx="775" cy="347" rx="27" ry="10" transform="rotate(17 775 347)"/>
+    </g>
+  </g>
+</svg>

@@ -30,32 +30,32 @@ const customerQuestions = [
 
 const customerMenuPreview = [
   {
-    item: "Smoked Chicken Bowl",
-    detail: "Rice, greens, corn salsa, pickled onion, house sauce",
-    price: "$12",
-    note: "Popular",
-    image: "/assets/menu-photo-bowl.svg"
+    item: "Classic Smash Burger",
+    detail: "Crispy-edge patty, cheese, pickles, onions, house sauce",
+    price: "$9",
+    note: "Best seller",
+    image: "/assets/menu-photo-burger.svg"
   },
   {
-    item: "Hot Honey Biscuit",
-    detail: "Crispy chicken, local honey, pepper butter",
+    item: "Loaded Truck Fries",
+    detail: "Fries with cheese, sauce, onions, and a little heat",
     price: "$7",
-    note: "2 left",
-    image: "/assets/menu-photo-biscuit.svg"
+    note: "Shareable",
+    image: "/assets/menu-photo-fries.svg"
   },
   {
-    item: "Seasonal Lemonade",
+    item: "Craft Lemonade",
     detail: "Blackberry, basil, fresh lemon",
     price: "$4",
-    note: "New",
+    note: "Rotates",
     image: "/assets/menu-photo-lemonade.svg"
   }
 ];
 
 const publicDetailExamples = [
-  ["Today", "Bentonville Square, 11 AM to 2 PM"],
-  ["Ordering", "Walk-up open, online preorders close at 1:30"],
-  ["Updates", "Hot honey biscuit is limited today"],
+  ["Today", "Siloam Springs service area, lunch and dinner"],
+  ["Ordering", "Walk-up open, online order link optional"],
+  ["Updates", "Limited items and sold-out notes stay current"],
   ["Trust", "Photos, review link, social link, and directions in one place"]
 ];
 
@@ -104,8 +104,8 @@ export default function ResonateHome() {
               <Link href="/menupilot" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
                 See MenuPilot
               </Link>
-              <Link href="/m/demo-food-truck" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
-                View demo menu
+              <Link href="/m/burger-truck-preview" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
+                View burger preview
               </Link>
             </div>
             <p className="mt-6 max-w-xl text-sm leading-6 text-muted">
@@ -117,7 +117,7 @@ export default function ResonateHome() {
             <div className="grid gap-3 sm:grid-cols-[0.85fr_1.15fr]">
               <div className="rounded-[1.25rem] bg-sage p-4">
                 <div className="overflow-hidden rounded-[1rem] bg-white shadow-sm">
-                  <img src="/assets/menu-photo-biscuit.svg" alt="Example hot honey biscuit menu photo" className="aspect-[4/5] w-full object-cover" />
+                  <img src="/assets/menu-photo-burger.svg" alt="Example smash burger menu photo" className="aspect-[4/5] w-full object-cover" />
                   <div className="p-4">
                     <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Photo Day</p>
                     <div className="mt-3 rounded-full bg-cream px-4 py-2 text-sm font-black text-ink">Fresh menu photos</div>
@@ -127,8 +127,8 @@ export default function ResonateHome() {
               <div className="rounded-[1.25rem] bg-cream p-5">
                 <div className="border-b border-line pb-4">
                   <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Clear signal</p>
-                  <h2 className="mt-2 text-3xl font-black text-ink">Ozark Street Kitchen</h2>
-                  <p className="mt-1 text-sm text-muted">Open today, 11 AM to 2 PM, Bentonville Square</p>
+                  <h2 className="mt-2 text-3xl font-black text-ink">Burger Truck Preview</h2>
+                  <p className="mt-1 text-sm text-muted">Lunch and dinner, Siloam Springs service area</p>
                 </div>
                 <div className="mt-5 grid gap-3">
                   {customerMenuPreview.map((menuItem) => (
@@ -167,8 +167,8 @@ export default function ResonateHome() {
             <p className="mt-5 leading-7 text-muted">
               The goal is not a fancy website for its own sake. It is a fast, useful customer view with the current menu, real item photos, prices, hours, location, order links, and the little details that remove doubt.
             </p>
-            <Link href="/m/demo-food-truck" className="mt-7 inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
-              Open the live demo menu
+            <Link href="/m/burger-truck-preview" className="mt-7 inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
+              Open the burger truck preview
             </Link>
           </div>
           <div className="rounded-[1.75rem] border border-line bg-cream p-4 shadow-soft">
@@ -176,13 +176,13 @@ export default function ResonateHome() {
               <div className="flex flex-col gap-4 border-b border-line pb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
                   <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Live customer menu</p>
-                  <h3 className="mt-2 text-3xl font-black text-ink">Ozark Street Kitchen</h3>
-                  <p className="mt-1 text-sm text-muted">Open now near Bentonville Square</p>
+                  <h3 className="mt-2 text-3xl font-black text-ink">Burger Truck Preview</h3>
+                  <p className="mt-1 text-sm text-muted">Open now in Siloam Springs</p>
                 </div>
                 <div className="rounded-2xl bg-ink px-4 py-3 text-center text-sm font-black text-white">Scan QR</div>
               </div>
               <div className="mt-5 grid gap-4 md:grid-cols-[0.85fr_1.15fr]">
-                <img src="/assets/menu-photo-bowl.svg" alt="Example menu item with food photography" className="h-full min-h-64 rounded-2xl border border-line object-cover" />
+                <img src="/assets/menu-photo-burger.svg" alt="Example burger menu item photography" className="h-full min-h-64 rounded-2xl border border-line object-cover" />
                 <div className="grid gap-3">
                   {publicDetailExamples.map(([label, value]) => (
                     <div key={label} className="rounded-2xl border border-line bg-cream p-4">

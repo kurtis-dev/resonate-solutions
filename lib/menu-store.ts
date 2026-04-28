@@ -147,6 +147,100 @@ const demoBusiness: MenuBusiness = {
   ]
 };
 
+const burgerTruckPreview: MenuBusiness = {
+  id: "burger-truck-preview",
+  slug: "burger-truck-preview",
+  businessName: "Siloam Burger Truck Preview",
+  businessType: "Food truck preview",
+  description: "A permission-safe preview built for a real burger truck workflow: current menu, item photos, hours, location, QR sharing, and easy customer questions.",
+  city: "Siloam Springs, AR",
+  statusNote: "Preview mode: ready to swap in the approved business name, photos, links, and exact menu.",
+  hoursSummary: "Sample hours: lunch and dinner service",
+  locationSummary: "Sample location: Siloam Springs service area",
+  address: "Siloam Springs, AR",
+  orderingUrl: "https://example.com/order",
+  reviewUrl: "https://example.com/review",
+  instagramUrl: "https://example.com/instagram",
+  phone: "(479) 555-0199",
+  heroImageUrl: "/assets/menu-photo-burger.svg",
+  isPublished: true,
+  sections: [
+    { id: "burger-signature", name: "Signature burgers", sortOrder: 0 },
+    { id: "burger-sides", name: "Sides", sortOrder: 1 },
+    { id: "burger-drinks", name: "Drinks", sortOrder: 2 }
+  ],
+  items: [
+    {
+      id: "burger-1",
+      sectionId: "burger-signature",
+      name: "Classic Smash Burger",
+      description: "Crispy-edge beef patty, cheese, pickles, onions, and house sauce on a toasted bun.",
+      price: "$9",
+      imageUrl: "/assets/menu-photo-burger.svg",
+      badge: "Best seller",
+      isSoldOut: false,
+      sortOrder: 0
+    },
+    {
+      id: "burger-2",
+      sectionId: "burger-signature",
+      name: "Double Stack",
+      description: "Two smashed patties, double cheese, pickles, grilled onions, and house sauce.",
+      price: "$12",
+      imageUrl: "/assets/menu-photo-burger.svg",
+      badge: "Hungry pick",
+      isSoldOut: false,
+      sortOrder: 1
+    },
+    {
+      id: "burger-3",
+      sectionId: "burger-signature",
+      name: "Spicy Jam Burger",
+      description: "Smash patty, pepper cheese, jalapeno jam, crisp onion, and creamy sauce.",
+      price: "$11",
+      imageUrl: "/assets/menu-photo-burger.svg",
+      badge: "Limited",
+      isSoldOut: false,
+      sortOrder: 2
+    },
+    {
+      id: "burger-4",
+      sectionId: "burger-sides",
+      name: "Loaded Truck Fries",
+      description: "Crispy fries with cheese, sauce, onions, and a little heat.",
+      price: "$7",
+      imageUrl: "/assets/menu-photo-fries.svg",
+      badge: "Shareable",
+      isSoldOut: false,
+      sortOrder: 3
+    },
+    {
+      id: "burger-5",
+      sectionId: "burger-sides",
+      name: "Seasoned Fries",
+      description: "Golden fries tossed with house seasoning.",
+      price: "$4",
+      imageUrl: "/assets/menu-photo-fries.svg",
+      badge: null,
+      isSoldOut: false,
+      sortOrder: 4
+    },
+    {
+      id: "burger-6",
+      sectionId: "burger-drinks",
+      name: "Craft Lemonade",
+      description: "Fresh lemon over ice with a rotating fruit flavor.",
+      price: "$4",
+      imageUrl: "/assets/menu-photo-lemonade.svg",
+      badge: "Rotates",
+      isSoldOut: false,
+      sortOrder: 5
+    }
+  ]
+};
+
+const demoBusinesses = [demoBusiness, burgerTruckPreview];
+
 function text(row: Row, key: string) {
   const value = row[key];
   return value === null || value === undefined ? null : String(value);
@@ -177,8 +271,10 @@ export function publicMenuUrl(slug: string) {
 }
 
 export async function getMenuBusiness(slug: string) {
-  if (slug === demoBusiness.slug) {
-    return demoBusiness;
+  const localDemo = demoBusinesses.find((business) => business.slug === slug);
+
+  if (localDemo) {
+    return localDemo;
   }
 
   const sql = await getSql();
