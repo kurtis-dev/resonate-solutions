@@ -46,14 +46,18 @@ create table if not exists businesses (
   slug text not null unique,
   business_name text not null,
   business_type text not null,
+  active_menu_key text,
+  brand_theme text,
   description text,
   city text,
   status_note text,
+  popup_banner text,
   hours_summary text,
   location_summary text,
   address text,
   ordering_url text,
   review_url text,
+  facebook_url text,
   instagram_url text,
   phone text,
   hero_image_url text,
@@ -82,6 +86,18 @@ create table if not exists menu_items (
   sort_order integer not null default 0
 );
 
+create table if not exists menu_variants (
+  id text primary key,
+  business_id text not null references businesses(id) on delete cascade,
+  variant_key text not null,
+  label text not null,
+  banner text,
+  order_url text,
+  is_enabled boolean not null default true,
+  sort_order integer not null default 0,
+  unique (business_id, variant_key)
+);
+
 create table if not exists menu_item_questions (
   id text primary key,
   created_at timestamptz not null default now(),
@@ -97,6 +113,8 @@ create table if not exists menu_item_questions (
 
 create index if not exists businesses_slug_idx on businesses (slug);
 create index if not exists businesses_published_idx on businesses (is_published);
+create index if not exists businesses_active_menu_idx on businesses (active_menu_key);
+create index if not exists menu_variants_business_idx on menu_variants (business_id);
 create index if not exists menu_sections_business_idx on menu_sections (business_id);
 create index if not exists menu_items_business_idx on menu_items (business_id);
 create index if not exists menu_item_questions_business_idx on menu_item_questions (business_slug);

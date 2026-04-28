@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createMenuBusinessAction } from "@/app/admin/menus/actions";
+import { createMenuBusinessAction, updateMenuModeAction } from "@/app/admin/menus/actions";
 import { listMenuBusinesses } from "@/lib/menu-store";
 import { mailtoLink, questionsEmail } from "@/lib/contact";
 
@@ -59,8 +59,11 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
               <Field label="Phone" name="phone" placeholder="(479) 555-0142" />
               <Field label="Order URL" name="orderingUrl" placeholder="https://..." />
               <Field label="Review URL" name="reviewUrl" placeholder="https://..." />
+              <Field label="Facebook URL" name="facebookUrl" placeholder="https://..." />
               <Field label="Instagram URL" name="instagramUrl" placeholder="https://..." />
               <Field label="Hero image URL" name="heroImageUrl" placeholder="/assets/menu-bowl.svg" />
+              <Field label="Brand theme" name="brandTheme" placeholder="default or mellow-moose" />
+              <Field label="Active menu key" name="activeMenuKey" placeholder="main, mellow-moose, dos-gordos" />
             </div>
 
             <label className="grid gap-2 text-sm font-bold text-ink">
@@ -71,6 +74,11 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
             <label className="grid gap-2 text-sm font-bold text-ink">
               Status note
               <input name="statusNote" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Hot honey biscuits are limited today." />
+            </label>
+
+            <label className="grid gap-2 text-sm font-bold text-ink">
+              Popup banner
+              <input name="popupBanner" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Dos Gordos popup is active today." />
             </label>
 
             <label className="grid gap-2 text-sm font-bold text-ink">
@@ -101,7 +109,44 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
         </section>
 
         <section className="rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-black text-ink">Existing menu pages</h2>
+          <h2 className="text-2xl font-black text-ink">Customer page controls</h2>
+          <p className="mt-3 leading-7 text-muted">
+            This is the shape of the owner/admin experience: switch the active menu, adjust the banner, review the public page, and keep one QR code pointed at the current customer-facing version.
+          </p>
+          <div className="mt-5 grid gap-3">
+            <Link href="/m/mellow-moose-burgers" className="block rounded-2xl border border-line bg-cream p-4 hover:border-brand">
+              <span className="font-black text-ink">Open Mellow Moose live page</span>
+              <span className="mt-1 block text-sm text-muted">Normal burger menu and local favorites.</span>
+            </Link>
+            <Link href="/m/mellow-moose-burgers?menu=dos-gordos" className="block rounded-2xl border border-line bg-cream p-4 hover:border-brand">
+              <span className="font-black text-ink">Preview Dos Gordos popup mode</span>
+              <span className="mt-1 block text-sm text-muted">Shows the takeover structure without changing the live default.</span>
+            </Link>
+          </div>
+
+          <form action={updateMenuModeAction} className="mt-6 rounded-2xl border border-line bg-sage p-4">
+            <h3 className="font-black text-ink">Database menu mode update</h3>
+            <p className="mt-2 text-sm leading-6 text-muted">
+              Once Mellow Moose is stored in the database, this form becomes the button that flips the live QR destination between regular menu and popup menu.
+            </p>
+            <input type="hidden" name="slug" value="mellow-moose-burgers" />
+            <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
+              Active menu key
+              <select name="activeMenuKey" defaultValue="mellow-moose" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal">
+                <option value="mellow-moose">Mellow Moose Burgers</option>
+                <option value="dos-gordos">Dos Gordos popup</option>
+              </select>
+            </label>
+            <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
+              Banner text
+              <input name="popupBanner" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder="Dos Gordos popup is active at Mellow Moose today." />
+            </label>
+            <button type="submit" className="mt-4 rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
+              Save active menu mode
+            </button>
+          </form>
+
+          <h2 className="mt-8 text-2xl font-black text-ink">Existing menu pages</h2>
           <Link href="/m/demo-food-truck" className="mt-5 block rounded-2xl border border-line bg-cream p-4 hover:border-brand">
             <span className="font-black text-ink">Demo food truck</span>
             <span className="mt-1 block text-sm text-muted">Open the built-in example customer menu.</span>

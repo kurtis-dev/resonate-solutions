@@ -25,9 +25,12 @@ export type MenuBusiness = {
   slug: string;
   businessName: string;
   businessType: string;
+  activeMenuKey?: string | null;
+  brandTheme?: "default" | "mellow-moose";
   description?: string | null;
   city?: string | null;
   statusNote?: string | null;
+  popupBanner?: string | null;
   hoursSummary?: string | null;
   locationSummary?: string | null;
   address?: string | null;
@@ -38,6 +41,16 @@ export type MenuBusiness = {
   phone?: string | null;
   heroImageUrl?: string | null;
   isPublished: boolean;
+  sections: MenuSection[];
+  items: MenuItem[];
+  menuVariants?: MenuVariant[];
+};
+
+export type MenuVariant = {
+  key: string;
+  label: string;
+  banner?: string | null;
+  orderUrl?: string | null;
   sections: MenuSection[];
   items: MenuItem[];
 };
@@ -245,9 +258,12 @@ const mellowMooseBurgers: MenuBusiness = {
   slug: "mellow-moose-burgers",
   businessName: "Mellow Moose Burgers",
   businessType: "Smash burger restaurant",
+  activeMenuKey: "mellow-moose",
+  brandTheme: "mellow-moose",
   description: "Smashed fresh beef burgers, loaded fries, salads, kids meals, and rotating specials from Griffin's Food Court in Siloam Springs.",
   city: "Siloam Springs, AR",
   statusNote: "Best of Siloam Springs 2026 Winner: Burger / Local",
+  popupBanner: null,
   hoursSummary: "Tue-Fri 11 AM-2 PM & 4-8 PM; Sat 11 AM-5 PM",
   locationSummary: "Griffin's Food Court",
   address: "825 S Mt Olive, Siloam Springs, AR 72761",
@@ -328,7 +344,7 @@ const mellowMooseBurgers: MenuBusiness = {
       name: "Hearty Shroom and Cheese Burger",
       description: "Beef patty, cheese, mushroom brown gravy, and mayonnaise on a toasted bun.",
       price: "$11.99 / $14.99 with fries",
-      imageUrl: null,
+      imageUrl: "/assets/mellow-moose-hearty-shroom.jpg",
       badge: null,
       isSoldOut: false,
       sortOrder: 5
@@ -531,6 +547,36 @@ const mellowMooseBurgers: MenuBusiness = {
       isSoldOut: false,
       sortOrder: 23
     }
+  ],
+  menuVariants: [
+    {
+      key: "mellow-moose",
+      label: "Mellow Moose Burgers",
+      banner: null,
+      orderUrl: "https://www.clover.com/online-ordering/dos-gordos-tacos-siloam-springs",
+      sections: [],
+      items: []
+    },
+    {
+      key: "dos-gordos",
+      label: "Dos Gordos popup",
+      banner: "Dos Gordos popup is active at Mellow Moose today.",
+      orderUrl: "https://www.clover.com/online-ordering/dos-gordos-tacos-siloam-springs",
+      sections: [{ id: "dos-gordos-menu", name: "Dos Gordos Popup Menu", sortOrder: 0 }],
+      items: [
+        {
+          id: "dos-gordos-popup-menu",
+          sectionId: "dos-gordos-menu",
+          name: "Dos Gordos Popup Menu",
+          description: "The throwback popup menu takes over this page when the owner activates Dos Gordos day.",
+          price: null,
+          imageUrl: "/assets/mellow-moose-dos-gordos-menu.jpg",
+          badge: "Popup mode",
+          isSoldOut: false,
+          sortOrder: 0
+        }
+      ]
+    }
   ]
 };
 
@@ -652,15 +698,18 @@ async function hydrateBusiness(row: Row): Promise<MenuBusiness> {
     slug: text(row, "slug") || "",
     businessName: text(row, "business_name") || "",
     businessType: text(row, "business_type") || "",
+    activeMenuKey: text(row, "active_menu_key"),
+    brandTheme: text(row, "brand_theme") === "mellow-moose" ? "mellow-moose" : "default",
     description: text(row, "description"),
     city: text(row, "city"),
     statusNote: text(row, "status_note"),
+    popupBanner: text(row, "popup_banner"),
     hoursSummary: text(row, "hours_summary"),
     locationSummary: text(row, "location_summary"),
     address: text(row, "address"),
     orderingUrl: text(row, "ordering_url"),
     reviewUrl: text(row, "review_url"),
-    facebookUrl: null,
+    facebookUrl: text(row, "facebook_url"),
     instagramUrl: text(row, "instagram_url"),
     phone: text(row, "phone"),
     heroImageUrl: text(row, "hero_image_url"),
@@ -680,7 +729,8 @@ async function hydrateBusiness(row: Row): Promise<MenuBusiness> {
       badge: text(item, "badge"),
       isSoldOut: booleanValue(item, "is_sold_out"),
       sortOrder: numberValue(item, "sort_order")
-    }))
+    })),
+    menuVariants: []
   };
 }
 
@@ -728,14 +778,18 @@ export async function createMenuBusiness(formData: FormData) {
       slug,
       business_name,
       business_type,
+      active_menu_key,
+      brand_theme,
       description,
       city,
       status_note,
+      popup_banner,
       hours_summary,
       location_summary,
       address,
       ordering_url,
       review_url,
+      facebook_url,
       instagram_url,
       phone,
       hero_image_url,
@@ -748,14 +802,18 @@ export async function createMenuBusiness(formData: FormData) {
       ${slug},
       ${businessName},
       ${String(formData.get("businessType") || "Local business").trim()},
+      ${String(formData.get("activeMenuKey") || "main").trim()},
+      ${String(formData.get("brandTheme") || "default").trim()},
       ${String(formData.get("description") || "").trim() || null},
       ${String(formData.get("city") || "").trim() || null},
       ${String(formData.get("statusNote") || "").trim() || null},
+      ${String(formData.get("popupBanner") || "").trim() || null},
       ${String(formData.get("hoursSummary") || "").trim() || null},
       ${String(formData.get("locationSummary") || "").trim() || null},
       ${String(formData.get("address") || "").trim() || null},
       ${String(formData.get("orderingUrl") || "").trim() || null},
       ${String(formData.get("reviewUrl") || "").trim() || null},
+      ${String(formData.get("facebookUrl") || "").trim() || null},
       ${String(formData.get("instagramUrl") || "").trim() || null},
       ${String(formData.get("phone") || "").trim() || null},
       ${String(formData.get("heroImageUrl") || "").trim() || "/assets/menu-photo-bowl.svg"},
@@ -794,6 +852,32 @@ export async function createMenuBusiness(formData: FormData) {
       )
     `;
   }
+
+  return { ok: true, slug };
+}
+
+export async function updateMenuMode(formData: FormData) {
+  const sql = await getSql();
+
+  if (!sql) {
+    return { ok: false, reason: "missing-db" };
+  }
+
+  const slug = String(formData.get("slug") || "").trim();
+  const activeMenuKey = String(formData.get("activeMenuKey") || "main").trim();
+  const popupBanner = String(formData.get("popupBanner") || "").trim();
+
+  if (!slug) {
+    return { ok: false, reason: "missing-slug" };
+  }
+
+  await sql`
+    update businesses
+    set active_menu_key = ${activeMenuKey},
+        popup_banner = ${popupBanner || null},
+        updated_at = now()
+    where slug = ${slug}
+  `;
 
   return { ok: true, slug };
 }
