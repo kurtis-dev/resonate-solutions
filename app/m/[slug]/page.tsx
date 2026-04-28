@@ -34,6 +34,15 @@ function actionUrl(kind: "directions" | "phone", value?: string | null) {
   return `tel:${value.replace(/[^0-9+]/g, "")}`;
 }
 
+function isFavoriteBadge(value?: string | null) {
+  if (!value) {
+    return false;
+  }
+
+  const badge = value.toLowerCase();
+  return ["best", "popular", "favorite", "seller", "signature"].some((term) => badge.includes(term));
+}
+
 export default async function PublicMenuPage({ params }: PageProps) {
   const { slug } = await params;
   const business = await getMenuBusiness(slug);
@@ -54,6 +63,11 @@ export default async function PublicMenuPage({ params }: PageProps) {
     }))
     .filter((section) => section.items.length > 0);
   const unsectionedItems = business.items.filter((item) => !item.sectionId || !sectionIds.has(item.sectionId));
+  const favoriteItems = business.items
+    .filter((item) => !item.isSoldOut && isFavoriteBadge(item.badge))
+    .slice(0, 4);
+  const fallbackFavorites = business.items.filter((item) => !item.isSoldOut).slice(0, 3);
+  const localFavorites = favoriteItems.length ? favoriteItems : fallbackFavorites;
   const photoEmailLink = mailtoLink(
     `Photos or questions for ${business.businessName}`,
     `Business/menu page: ${menuUrl}\n\nAttach photos or ask a question here.`
@@ -121,6 +135,41 @@ export default async function PublicMenuPage({ params }: PageProps) {
       </section>
 
       <section className="mx-auto max-w-6xl px-4 pb-20 sm:px-5">
+        {localFavorites.length ? (
+          <div className="mb-10 rounded-[1.75rem] border border-line bg-white p-5 shadow-soft sm:p-6">
+            <div className="mb-5 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
+              <div>
+                <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Local favorites</p>
+                <h2 className="mt-2 text-3xl font-black text-ink sm:text-4xl">Start with what people come back for.</h2>
+              </div>
+              <p className="max-w-md text-sm leading-6 text-muted">
+                Best sellers, popular picks, and owner-recommended items can sit up front so first-time customers have an easy starting point.
+              </p>
+            </div>
+            <div className="grid gap-4 md:grid-cols-3">
+              {localFavorites.map((item, index) => (
+                <a key={item.id} href={`#item-${item.id}`} className="group overflow-hidden rounded-2xl border border-line bg-cream shadow-sm transition hover:-translate-y-1 hover:border-brand hover:shadow-soft">
+                  <div className="relative">
+                    {item.imageUrl ? <img src={item.imageUrl} alt={item.name} className="h-44 w-full object-cover transition duration-500 group-hover:scale-[1.03]" /> : null}
+                    <span className="absolute left-3 top-3 rounded-full bg-white px-3 py-1 text-xs font-black text-brandDark shadow-sm">#{index + 1}</span>
+                    {item.price ? <span className="absolute right-3 top-3 rounded-full bg-white px-3 py-1 text-sm font-black text-coral shadow-sm">{item.price}</span> : null}
+                  </div>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between gap-3">
+                      <h3 className="text-lg font-black text-ink">{item.name}</h3>
+                    </div>
+                    {item.description ? <p className="mt-2 max-h-12 overflow-hidden text-sm leading-6 text-muted">{item.description}</p> : null}
+                    <div className="mt-3 flex flex-wrap gap-2">
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-brandDark">{item.badge || "Favorite"}</span>
+                      <span className="rounded-full bg-white px-3 py-1 text-xs font-black text-muted">View details</span>
+                    </div>
+                  </div>
+                </a>
+              ))}
+            </div>
+          </div>
+        ) : null}
+
         <div className="mb-8 flex flex-col justify-between gap-4 md:flex-row md:items-end">
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Current menu</p>
@@ -144,7 +193,7 @@ export default async function PublicMenuPage({ params }: PageProps) {
                 </div>
                 <div className="grid gap-4 md:grid-cols-2">
                   {section.items.map((item) => (
-                    <article key={item.id} className={`group overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition hover:-translate-y-1 hover:border-brand hover:shadow-soft ${item.isSoldOut ? "opacity-65" : ""}`}>
+                    <article id={`item-${item.id}`} key={item.id} className={`group scroll-mt-6 overflow-hidden rounded-2xl border border-line bg-white shadow-sm transition hover:-translate-y-1 hover:border-brand hover:shadow-soft ${item.isSoldOut ? "opacity-65" : ""}`}>
                       <div className="relative">
                         {item.imageUrl ? <img src={item.imageUrl} alt={item.name} className="h-52 w-full object-cover transition duration-500 group-hover:scale-[1.03]" /> : null}
                         {item.price ? <span className="absolute right-4 top-4 rounded-full bg-white px-4 py-2 font-black text-coral shadow-sm">{item.price}</span> : null}
