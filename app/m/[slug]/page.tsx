@@ -174,6 +174,9 @@ export default async function PublicMenuPage({ params }: PageProps) {
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Current menu</p>
             <h2 className="mt-2 text-4xl font-black text-ink sm:text-5xl">Browse before you order</h2>
+            <p className="mt-3 max-w-2xl leading-7 text-muted">
+              This page is designed around {business.businessName}: its menu, photos, customer actions, and the details people need before they choose.
+            </p>
           </div>
           <div className="rounded-2xl border border-line bg-white px-5 py-4 shadow-sm">
             <p className="text-sm leading-6 text-muted">
@@ -230,6 +233,12 @@ export default async function PublicMenuPage({ params }: PageProps) {
           </div>
 
           <aside className="h-fit rounded-[1.75rem] border border-line bg-white p-6 shadow-sm lg:sticky lg:top-6">
+            <div className="mb-5 rounded-2xl bg-sage p-4">
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-brandDark">Made for this business</p>
+              <p className="mt-2 text-sm leading-6 text-muted">
+                Colors, photos, menu sections, quick links, and updates can be tuned to match the owner&apos;s real brand and customer flow.
+              </p>
+            </div>
             <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">Share this menu</p>
             <img src={`/api/qr/${business.slug}`} alt={`QR code for ${business.businessName}`} className="mt-4 aspect-square w-full rounded-2xl border border-line bg-white p-3" />
             <p className="mt-4 break-all text-sm leading-6 text-muted">{menuUrl}</p>

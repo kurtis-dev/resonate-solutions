@@ -6,6 +6,10 @@ const offerCards = [
     text: "One clean phone-friendly signal for menu items, prices, photos, hours, location, specials, and order links."
   },
   {
+    title: "A page that feels like yours",
+    text: "Your colors, logo, photos, voice, best sellers, and customer flow shape the page so it does not look like everyone else's QR menu."
+  },
+  {
     title: "Photos that help people choose",
     text: "Simple on-site photo sessions so customers can see the food, service, space, or product before they decide."
   },
@@ -17,6 +21,13 @@ const offerCards = [
     title: "Google-ready public details",
     text: "A practical Soundcheck for hours, menu links, photos, review links, services, and missing customer info."
   }
+];
+
+const customSignals = [
+  ["Logo and colors", "Use the marks, colors, and tone customers already associate with the business."],
+  ["Menu personality", "Feature local favorites, owner picks, item notes, sold-out updates, and the way the menu is actually talked about."],
+  ["Real photos", "Swap generic placeholders for crisp item photos, truck photos, counter photos, or product shots."],
+  ["Customer actions", "Shape the page around what matters most: directions, ordering, reviews, calls, questions, or social links."]
 ];
 
 const customerQuestions = [
@@ -50,13 +61,6 @@ const customerMenuPreview = [
     note: "Rotates",
     image: "/assets/menu-photo-lemonade.svg"
   }
-];
-
-const publicDetailExamples = [
-  ["Today", "Siloam Springs service area, lunch and dinner"],
-  ["Ordering", "Walk-up open, online order link optional"],
-  ["Updates", "Limited items and sold-out notes stay current"],
-  ["Trust", "Photos, review link, social link, and directions in one place"]
 ];
 
 const serviceSteps = [
@@ -98,7 +102,7 @@ export default function ResonateHome() {
               Make your local business easier to find, choose, and trust.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-              We help local businesses get found, chosen, and trusted with clean mobile pages, useful photos, QR links, and public details that stay current.
+              We help local businesses get found, chosen, and trusted with custom mobile pages, useful photos, QR links, and public details that feel like the business instead of a generic directory listing.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/menupilot" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
@@ -119,8 +123,8 @@ export default function ResonateHome() {
                 <div className="overflow-hidden rounded-[1rem] bg-white shadow-sm">
                   <img src="/assets/menu-photo-burger.svg" alt="Example smash burger menu photo" className="aspect-[4/5] w-full object-cover" />
                   <div className="p-4">
-                    <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Photo Day</p>
-                    <div className="mt-3 rounded-full bg-cream px-4 py-2 text-sm font-black text-ink">Fresh menu photos</div>
+                    <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Customer page</p>
+                    <div className="mt-3 rounded-full bg-cream px-4 py-2 text-sm font-black text-ink">Fresh Menu Photos</div>
                   </div>
                 </div>
               </div>
@@ -160,12 +164,12 @@ export default function ResonateHome() {
       <section className="bg-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">What customers see</p>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Make the page yours</p>
             <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              A menu page that answers the questions people ask before they spend.
+              Not a template with your food dropped in. A page built around your business.
             </h2>
             <p className="mt-5 leading-7 text-muted">
-              The goal is not a fancy website for its own sake. It is a fast, useful customer view with the current menu, real item photos, prices, hours, location, order links, and the little details that remove doubt.
+              The goal is not to make every restaurant, truck, or shop look the same. Each page should carry the business's own signal: the logo, colors, photos, menu rhythm, favorite items, and the customer actions that matter most.
             </p>
             <Link href="/m/burger-truck-preview" className="mt-7 inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
               Open the burger truck preview
@@ -184,7 +188,7 @@ export default function ResonateHome() {
               <div className="mt-5 grid gap-4 md:grid-cols-[0.85fr_1.15fr]">
                 <img src="/assets/menu-photo-burger.svg" alt="Example burger menu item photography" className="h-full min-h-64 rounded-2xl border border-line object-cover" />
                 <div className="grid gap-3">
-                  {publicDetailExamples.map(([label, value]) => (
+                  {customSignals.map(([label, value]) => (
                     <div key={label} className="rounded-2xl border border-line bg-cream p-4">
                       <p className="text-xs font-black uppercase tracking-[0.12em] text-brand">{label}</p>
                       <p className="mt-1 font-bold text-ink">{value}</p>
@@ -226,10 +230,10 @@ export default function ResonateHome() {
           <div className="mb-10 max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">What we build</p>
             <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              Practical polish for businesses that do not need a giant website.
+              Practical polish for businesses that do not need a giant website or a generic menu clone.
             </h2>
           </div>
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
             {offerCards.map((card) => (
               <article key={card.title} className="rounded-2xl border border-line bg-cream p-6 shadow-sm">
                 <h3 className="text-xl font-black text-ink">{card.title}</h3>

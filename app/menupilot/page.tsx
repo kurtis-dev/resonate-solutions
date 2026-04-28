@@ -4,8 +4,8 @@ import { mailtoLink, questionsEmail } from "@/lib/contact";
 
 const features = [
   {
-    title: "Menu signal page",
-    text: "A clean menu that loads fast on a phone, with sections, prices, sold-out notes, photos, and daily specials."
+    title: "Custom menu page",
+    text: "A phone-friendly page shaped around the business's logo, colors, menu structure, photos, best sellers, prices, notes, and daily specials."
   },
   {
     title: "Today signal",
@@ -16,8 +16,8 @@ const features = [
     text: "Put one QR code on the truck, counter, receipt, or social profile and update the destination without reprinting anything."
   },
   {
-    title: "Soundcheck audit",
-    text: "Check the public essentials: hours, services, menu link, photos, customer links, and the details that make people choose."
+    title: "Brand soundcheck",
+    text: "Check whether the public page sounds and looks like the business: not a copied template, not a generic listing, and not a blurry menu photo."
   }
 ];
 
@@ -50,10 +50,10 @@ export default function MenuPilotPage() {
           <div className="self-center">
             <p className="inline-flex rounded-full bg-sage px-4 py-2 text-sm font-bold text-brandDark">MenuPilot by Resonate Solutions</p>
             <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
-              Tune your menu into a clear customer signal.
+              Tune your menu into a page that feels like your business.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-              For food trucks, pop-ups, coffee shops, salons, and small restaurants that need menu items, hours, location, photos, and review links to come through clearly without building a full website.
+              For food trucks, pop-ups, coffee shops, salons, and small restaurants that need menu items, hours, location, photos, and review links to come through clearly without looking like everyone else's hosted menu.
             </p>
             <p className="mt-5 max-w-2xl rounded-2xl bg-white px-5 py-4 leading-7 text-muted shadow-sm">
               Have photos already? Send menu photos, item photos, pricing, and questions to{" "}
@@ -109,11 +109,11 @@ export default function MenuPilotPage() {
       <section className="mx-auto max-w-7xl px-5 py-20">
         <div className="mb-10 max-w-3xl">
           <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Why it fits</p>
-          <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-            Discovery gets noisy for a lot of small businesses.
-          </h2>
-          <p className="mt-5 leading-7 text-muted">
-            Customers often cannot find the current menu, location, hours, or reliable link. MenuPilot gives them one lightweight signal that can sit on Google, Instagram, QR codes, receipts, and signs.
+            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
+              Discovery gets noisy for a lot of small businesses.
+            </h2>
+            <p className="mt-5 leading-7 text-muted">
+            Customers often cannot find the current menu, location, hours, or reliable link. MenuPilot gives them one lightweight signal that can sit on Google, Instagram, QR codes, receipts, and signs while still feeling like the business they came looking for.
           </p>
         </div>
         <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
