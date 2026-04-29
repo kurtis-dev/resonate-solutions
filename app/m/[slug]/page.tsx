@@ -361,7 +361,7 @@ function MellowMooseShell({
       </section>
 
       <section className="mx-auto max-w-5xl px-5 pb-16">
-        <div className="grid gap-7 rounded-[1.5rem] bg-[linear-gradient(135deg,#ff6422,#ffc22e)] p-7 text-[#2f1c12] shadow-[0_16px_40px_rgba(55,34,22,.14)] md:grid-cols-[1fr_auto] md:items-center">
+        <div className="grid gap-8 rounded-[1.5rem] bg-[linear-gradient(135deg,#ff6422,#ffc22e)] p-7 text-[#2f1c12] shadow-[0_16px_40px_rgba(55,34,22,.14)] md:grid-cols-[minmax(0,1fr)_18rem] md:items-center md:p-9">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.16em]">Share the menu</p>
             <h2 className="mt-2 text-4xl font-black leading-none">Scan. Share. Smash.</h2>
@@ -373,9 +373,13 @@ function MellowMooseShell({
               {activeMenu.orderUrl ? <a href={activeMenu.orderUrl} className="rounded-full bg-white px-5 py-3 text-sm font-black text-[#3a2418]">Order on Clover</a> : null}
             </div>
           </div>
-          <div className="rounded-[1.25rem] bg-[#fffaf3] p-4 shadow-[0_12px_30px_rgba(55,34,22,.18)]">
-            <img src={`/api/qr/${business.slug}`} alt={`QR code for ${business.businessName}`} className="h-40 w-40 rounded-xl bg-white p-2" />
-            <p className="mt-2 text-center text-xs font-black">{menuUrl.replace(/^https?:\/\//, "")}</p>
+          <div className="w-full max-w-[15.5rem] justify-self-center rounded-[1.35rem] bg-[#fff8ed] p-5 text-center shadow-[0_14px_32px_rgba(55,34,22,.18)] ring-1 ring-white/70 md:justify-self-end">
+            <div className="mx-auto flex h-48 w-48 items-center justify-center rounded-[1rem] bg-white p-3 shadow-[inset_0_0_0_1px_rgba(58,36,24,.08)]">
+              <img src={`/api/qr/${business.slug}`} alt={`QR code for ${business.businessName}`} className="h-full w-full" />
+            </div>
+            <p className="mt-4 text-[0.68rem] font-black uppercase tracking-[0.14em] text-[#8b4a22]">Live menu</p>
+            <p className="mt-1 text-sm font-black leading-5 text-[#3a2418]">resonate.solutions</p>
+            <p className="text-xs font-bold leading-5 text-[#6e4c37]">/m/mellow-moose-burgers</p>
           </div>
         </div>
       </section>
