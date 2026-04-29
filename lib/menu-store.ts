@@ -401,7 +401,7 @@ const mellowMooseBurgers: MenuBusiness = {
           name: "#2 Street Tacos",
           description: "Four corn tortillas with choice of Al Pastor or Birria, cilantro, and onion, served with limes, grilled onions, and two salsas.",
           price: "$13",
-          imageUrl: null,
+          imageUrl: "/assets/dos-gordos-street-tacos.jpg",
           badge: null,
           isSoldOut: false,
           sortOrder: 1
@@ -412,7 +412,7 @@ const mellowMooseBurgers: MenuBusiness = {
           name: "#3 Cali Fries",
           description: "Fries, nacho cheese, choice of Al Pastor or Birria, pico, sour cream, and mild salsa.",
           price: "$17",
-          imageUrl: "/assets/mellow-moose-flaming-hot-fries.jpg",
+          imageUrl: "/assets/dos-gordos-cali-fries.jpg",
           badge: "Loaded",
           isSoldOut: false,
           sortOrder: 2
@@ -423,7 +423,7 @@ const mellowMooseBurgers: MenuBusiness = {
           name: "#4 Birria Moose Burger",
           description: "Toasted bun, mayo, fresh smashed patty, cheese, birria, pico, and mild salsa.",
           price: "$15 / $18 with fries",
-          imageUrl: "/assets/mellow-moose-torta-burger.jpg",
+          imageUrl: null,
           badge: "Mellow x Dos Gordos",
           isSoldOut: false,
           sortOrder: 3

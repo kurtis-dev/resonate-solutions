@@ -74,6 +74,9 @@ export default function MenuPilotPage() {
               <Link href="/pricing" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
                 View monthly plans
               </Link>
+              <Link href="/menupilot/examples" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
+                See MenuPilot examples
+              </Link>
               <Link href="/m/mellow-moose-burgers" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
                 View example menu
               </Link>

@@ -3,11 +3,13 @@ const baseUrl = (process.env.BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || "ht
 const checks = [
   { path: "/", expect: "text/html" },
   { path: "/menupilot", expect: "text/html" },
+  { path: "/menupilot/examples", expect: "text/html" },
   { path: "/pricing", expect: "text/html" },
   { path: "/privacy", expect: "text/html" },
   { path: "/terms", expect: "text/html" },
   { path: "/disclaimer", expect: "text/html" },
   { path: "/m/mellow-moose-burgers", expect: "text/html" },
+  { path: "/m/mellow-moose-burgers?menu=dos-gordos", expect: "text/html" },
   { path: "/api/qr/mellow-moose-burgers", expect: "image/svg+xml" },
   { path: "/api/health", expect: "application/json" }
 ];
