@@ -23,6 +23,7 @@ const ownerControls = [
   "Update hours for the week",
   "Post closing early or sold-out notes",
   "Feature daily specials",
+  "Flag changed location",
   "Swap food photos",
   "Keep the same QR code"
 ];

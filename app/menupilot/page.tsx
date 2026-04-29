@@ -48,6 +48,13 @@ const ownerView = [
   "Switch into popup mode when a second menu takes over"
 ];
 
+const liveBadges = [
+  { label: "Closed early", text: "Weather, catering, sellout, or family emergency." },
+  { label: "Changed location", text: "Food truck moved today? Put it at the top before customers drive." },
+  { label: "Sold out", text: "Make sold-out items obvious before someone starts an order." },
+  { label: "Daily special", text: "Happy Hour, Fry Day, combo deals, popup items, or limited runs." }
+];
+
 export default function MenuPilotPage() {
   const photoEmailLink = mailtoLink(
     "MenuPilot photos and menu details",
@@ -185,6 +192,30 @@ export default function MenuPilotPage() {
               <p className="mt-3 leading-7 text-muted">{feature.text}</p>
             </article>
           ))}
+        </div>
+      </section>
+
+      <section className="bg-cream">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+          <div>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Live signal badges</p>
+            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
+              The important change should be obvious immediately.
+            </h2>
+            <p className="mt-5 leading-7 text-muted">
+              Specials and status notes do not have to live on the menu every day. They can be switched on when the owner needs them, then removed when the day changes.
+            </p>
+          </div>
+          <div className="grid gap-4 sm:grid-cols-2">
+            {liveBadges.map((badge) => (
+              <article key={badge.label} className="rounded-2xl border border-line bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
+                <span className="inline-flex rounded-full bg-sage px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-brandDark">
+                  {badge.label}
+                </span>
+                <p className="mt-4 leading-7 text-muted">{badge.text}</p>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 

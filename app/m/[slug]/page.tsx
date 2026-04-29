@@ -239,11 +239,7 @@ function MellowMooseShell({
         { label: "Order here", title: "Use the Clover button", body: "Tap Order on Clover to start an order from the current menu." },
         { label: "Regular menu", title: "Mellow Moose Burgers", body: "Looking for burgers instead? Jump back to the regular Mellow Moose menu below." }
       ]
-    : [
-        { label: "Happy Hour", title: "$1 off regular burgers", body: "Regular-size burgers are $1 off when Happy Hour is active." },
-        { label: "Combo", title: "2 for $22", body: "Two Mellow Moose Burgers and two fries. Mention the special at the window." },
-        { label: "Fry Day", title: "Schmac Fry Special", body: "Friday brings the Schmac Fry Special while supplies last." }
-      ];
+    : [];
 
   return (
     <main className="min-h-screen bg-[#f8f0e5] text-[#2f1c12]">
@@ -326,17 +322,19 @@ function MellowMooseShell({
         </section>
       ) : null}
 
-      <section className="mx-auto max-w-5xl px-5 pb-10">
-        <div className="grid gap-4 md:grid-cols-3">
-          {todaySpecials.map((special) => (
-            <article key={special.title} className="rounded-[1rem] border border-[#dfd2c3] bg-[#fffaf3] p-5 shadow-[0_10px_25px_rgba(55,34,22,.08)]">
-              <p className="text-xs font-black uppercase tracking-[0.14em] text-[#ff6422]">{special.label}</p>
-              <h2 className="mt-2 text-2xl font-black leading-tight text-[#21140d]">{special.title}</h2>
-              <p className="mt-2 text-sm leading-6 text-[#68513f]">{special.body}</p>
-            </article>
-          ))}
-        </div>
-      </section>
+      {todaySpecials.length ? (
+        <section className="mx-auto max-w-5xl px-5 pb-10">
+          <div className="grid gap-4 md:grid-cols-3">
+            {todaySpecials.map((special) => (
+              <article key={special.title} className="rounded-[1rem] border border-[#dfd2c3] bg-[#fffaf3] p-5 shadow-[0_10px_25px_rgba(55,34,22,.08)]">
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-[#ff6422]">{special.label}</p>
+                <h2 className="mt-2 text-2xl font-black leading-tight text-[#21140d]">{special.title}</h2>
+                <p className="mt-2 text-sm leading-6 text-[#68513f]">{special.body}</p>
+              </article>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="mx-auto max-w-5xl px-5 py-10">
         <p className="text-xs font-black uppercase tracking-[0.16em] text-[#ff6422]">{isDosGordos ? "Takeover menu" : "Start here"}</p>
