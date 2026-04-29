@@ -125,10 +125,28 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
           </div>
 
           <form action={updateMenuModeAction} className="mt-6 rounded-2xl border border-line bg-sage p-4">
-            <h3 className="font-black text-ink">Database menu mode update</h3>
+            <h3 className="font-black text-ink">Owner control center</h3>
             <p className="mt-2 text-sm leading-6 text-muted">
-              Once Mellow Moose is stored in the database, this form becomes the button that flips the live QR destination between regular menu and popup menu.
+              Once Mellow Moose is stored in the database, this becomes the simple control panel for menu mode, weekly hours, sellout notes, weather closures, and live specials.
             </p>
+            <div className="mt-4 grid gap-3 md:grid-cols-2">
+              <div className="rounded-2xl bg-white p-4">
+                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Status switch</span>
+                <p className="mt-1 text-sm text-muted">Open, closed, closing early, sold out, low inventory, or weather delay.</p>
+              </div>
+              <div className="rounded-2xl bg-white p-4">
+                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Weekly hours</span>
+                <p className="mt-1 text-sm text-muted">Update the week without rebuilding the website.</p>
+              </div>
+              <div className="rounded-2xl bg-white p-4">
+                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Daily specials</span>
+                <p className="mt-1 text-sm text-muted">Happy Hour, 2 for $22, Fry Day, or one-off calendar promos.</p>
+              </div>
+              <div className="rounded-2xl bg-white p-4">
+                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Menu takeover</span>
+                <p className="mt-1 text-sm text-muted">Swap Mellow Moose to Dos Gordos and back with one menu key.</p>
+              </div>
+            </div>
             <input type="hidden" name="slug" value="mellow-moose-burgers" />
             <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
               Active menu key
@@ -139,10 +157,18 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
             </label>
             <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
               Banner text
-              <input name="popupBanner" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder="Dos Gordos popup is active at Mellow Moose today." />
+              <input name="popupBanner" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder="Dos Gordos Takeover at Mellow Moose is active today." />
+            </label>
+            <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
+              Live status note
+              <input name="statusNote" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder="Closing at 7 PM tonight because of weather." />
+            </label>
+            <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
+              Hours this week
+              <textarea name="hoursSummary" rows={3} className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder={"Tue 11-2 & 4-8\nWed 11-2 & 4-8\nThu catering lunch; open 4-8"} />
             </label>
             <button type="submit" className="mt-4 rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
-              Save active menu mode
+              Save live controls
             </button>
           </form>
 

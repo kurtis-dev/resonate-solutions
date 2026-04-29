@@ -138,7 +138,7 @@ const mellowMooseBurgers: MenuBusiness = {
       name: "Mellow Moose Bacon Cheeseburger",
       description: "The classic Mellow Moose Cheeseburger with bacon.",
       price: "$9.99 / $12.99 with fries",
-      imageUrl: null,
+      imageUrl: "/assets/mellow-moose-bacon-cheeseburger.jpg",
       badge: "Bacon",
       isSoldOut: false,
       sortOrder: 3
@@ -171,8 +171,8 @@ const mellowMooseBurgers: MenuBusiness = {
       name: "Return of the Schmac Burger",
       description: "Beef patty, American cheese, schmac sauce, red onion, lettuce, and pickles on a toasted bun.",
       price: "$9.99 / $12.99 with fries",
-      imageUrl: null,
-      badge: null,
+      imageUrl: "/assets/mellow-moose-return-of-the-schmac.jpg",
+      badge: "Fry Day favorite",
       isSoldOut: false,
       sortOrder: 6
     },
@@ -376,20 +376,68 @@ const mellowMooseBurgers: MenuBusiness = {
     {
       key: "dos-gordos",
       label: "Dos Gordos popup",
-      banner: "Dos Gordos popup is active at Mellow Moose today.",
+      banner: "Dos Gordos Takeover at Mellow Moose is active today.",
       orderUrl: "https://www.clover.com/online-ordering/dos-gordos-tacos-siloam-springs",
-      sections: [{ id: "dos-gordos-menu", name: "Dos Gordos Popup Menu", sortOrder: 0 }],
+      sections: [
+        { id: "dos-gordos-tacos", name: "Tacos & Quesabirria", sortOrder: 0 },
+        { id: "dos-gordos-loaded", name: "Loaded Fries & Burger", sortOrder: 1 },
+        { id: "dos-gordos-extras", name: "Extras", sortOrder: 2 }
+      ],
       items: [
         {
-          id: "dos-gordos-popup-menu",
-          sectionId: "dos-gordos-menu",
-          name: "Dos Gordos Popup Menu",
-          description: "The throwback popup menu takes over this page when the owner activates Dos Gordos day.",
-          price: null,
-          imageUrl: "/assets/mellow-moose-dos-gordos-menu.jpg",
-          badge: "Popup mode",
+          id: "dos-gordos-quesabirria",
+          sectionId: "dos-gordos-tacos",
+          name: "#1 Quesabirria Tacos",
+          description: "Three corn tortillas grilled with cheese and birria, served with grilled onions, cilantro, and consome on the side. Choice of two salsas.",
+          price: "$13",
+          imageUrl: "/assets/dos-gordos-birria-tacos.jpg",
+          badge: "Takeover favorite",
           isSoldOut: false,
           sortOrder: 0
+        },
+        {
+          id: "dos-gordos-street-tacos",
+          sectionId: "dos-gordos-tacos",
+          name: "#2 Street Tacos",
+          description: "Four corn tortillas with choice of Al Pastor or Birria, cilantro, and onion, served with limes, grilled onions, and two salsas.",
+          price: "$13",
+          imageUrl: null,
+          badge: null,
+          isSoldOut: false,
+          sortOrder: 1
+        },
+        {
+          id: "dos-gordos-cali-fries",
+          sectionId: "dos-gordos-loaded",
+          name: "#3 Cali Fries",
+          description: "Fries, nacho cheese, choice of Al Pastor or Birria, pico, sour cream, and mild salsa.",
+          price: "$17",
+          imageUrl: "/assets/mellow-moose-flaming-hot-fries.jpg",
+          badge: "Loaded",
+          isSoldOut: false,
+          sortOrder: 2
+        },
+        {
+          id: "dos-gordos-birria-moose-burger",
+          sectionId: "dos-gordos-loaded",
+          name: "#4 Birria Moose Burger",
+          description: "Toasted bun, mayo, fresh smashed patty, cheese, birria, pico, and mild salsa.",
+          price: "$15 / $18 with fries",
+          imageUrl: "/assets/mellow-moose-torta-burger.jpg",
+          badge: "Mellow x Dos Gordos",
+          isSoldOut: false,
+          sortOrder: 3
+        },
+        {
+          id: "dos-gordos-extras",
+          sectionId: "dos-gordos-extras",
+          name: "Extras",
+          description: "Ask at the truck for salsa, consome, and daily add-ons while supplies last.",
+          price: null,
+          imageUrl: null,
+          badge: null,
+          isSoldOut: false,
+          sortOrder: 4
         }
       ]
     }
@@ -682,6 +730,8 @@ export async function updateMenuMode(formData: FormData) {
   const slug = String(formData.get("slug") || "").trim();
   const activeMenuKey = String(formData.get("activeMenuKey") || "main").trim();
   const popupBanner = String(formData.get("popupBanner") || "").trim();
+  const statusNote = String(formData.get("statusNote") || "").trim();
+  const hoursSummary = String(formData.get("hoursSummary") || "").trim();
 
   if (!slug) {
     return { ok: false, reason: "missing-slug" };
@@ -691,6 +741,8 @@ export async function updateMenuMode(formData: FormData) {
     update businesses
     set active_menu_key = ${activeMenuKey},
         popup_banner = ${popupBanner || null},
+        status_note = ${statusNote || null},
+        hours_summary = ${hoursSummary || null},
         updated_at = now()
     where slug = ${slug}
   `;
