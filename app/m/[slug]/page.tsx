@@ -254,8 +254,8 @@ function MellowMooseShell({
             Now serving · Siloam Springs
           </span>
           <h1 className="mt-5 text-6xl font-black leading-[0.9] tracking-tight text-[#3a2418] [text-wrap:balance] md:text-7xl">
-            Smashed fresh.<br />
-            <span className="text-white drop-shadow-[0_1px_0_rgba(58,36,24,.12)]">Mellow vibes.</span>
+            Mellow Moose<br />
+            <span className="text-white drop-shadow-[0_1px_0_rgba(58,36,24,.12)]">Burgers.</span>
           </h1>
           <p className="mt-7 max-w-xl text-lg leading-8 text-[#4d3525]">
             Smash burgers, loaded fries, salads, kids meals, and rotating specials from a little orange truck at Griffin&apos;s Food Court.
