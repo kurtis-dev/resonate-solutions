@@ -234,19 +234,27 @@ export default function MenuPilotPage() {
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {liveBadges.map((badge) => (
-              <article key={badge.label} className="group overflow-hidden rounded-[1.25rem] border border-line bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
+              <article key={badge.label} className="group overflow-hidden rounded-[1.25rem] border-4 border-ink bg-white shadow-sm outline outline-2 outline-offset-4 outline-transparent transition hover:-translate-y-1 hover:border-brand hover:outline-brand/25 hover:shadow-soft">
                 <div className="relative aspect-[4/3] overflow-hidden bg-ink">
                   <img
                     src={badge.image}
                     alt={`${badge.label} menu status example`}
                     className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
                   />
-                  <div className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-brandDark shadow-sm">
+                  <div className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-brandDark shadow-sm ring-2 ring-ink/10">
                     {badge.label}
+                  </div>
+                  <div className="absolute bottom-4 right-4 rounded-full bg-ink px-3 py-2 text-xs font-black uppercase tracking-[0.1em] text-white shadow-soft transition group-hover:bg-brand">
+                    Admin click
                   </div>
                 </div>
                 <div className="p-5">
-                  <h3 className="text-xl font-black text-ink">{badge.title}</h3>
+                  <div className="flex items-start justify-between gap-4">
+                    <h3 className="text-xl font-black text-ink">{badge.title}</h3>
+                    <span className="mt-1 h-5 w-9 rounded-full border-2 border-ink bg-cream p-0.5 transition group-hover:border-brand group-hover:bg-brand">
+                      <span className="block h-3 w-3 rounded-full bg-ink transition group-hover:translate-x-4 group-hover:bg-white" />
+                    </span>
+                  </div>
                   <p className="mt-3 leading-7 text-muted">{badge.text}</p>
                 </div>
               </article>
