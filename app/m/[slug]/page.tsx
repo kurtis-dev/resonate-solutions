@@ -403,7 +403,7 @@ function MellowMooseShell({
             ))}
           </div>
           <p className="mt-5 rounded-xl bg-[#eadfce] p-4 text-sm leading-6 text-[#6f5746]">
-            Food truck hours can shift with weather, events, catering, or sellouts. Check here or Facebook before you roll out, Burger Fam.
+            Updated daily for hours, location, sellouts, weather notes, and special events. This is the spot to check before you roll out, Burger Fam.
           </p>
         </article>
       </section>
