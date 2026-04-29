@@ -6,7 +6,7 @@ export function PricingCards() {
       {plans.map((plan) => (
         <article
           key={plan.name}
-          className={`rounded-lg border bg-white p-6 shadow-sm ${plan.highlighted ? "border-brand shadow-soft" : "border-line"}`}
+          className={`group rounded-2xl border bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-soft ${plan.highlighted ? "border-brand shadow-soft" : "border-line hover:border-brand/40"}`}
         >
           <div className="flex items-center justify-between gap-3">
             <h3 className="text-xl font-bold text-ink">{plan.name}</h3>
@@ -20,9 +20,14 @@ export function PricingCards() {
           <p className="mt-2 text-sm font-bold text-brand">{plan.limit}</p>
           <ul className="mt-6 space-y-3 text-sm text-muted">
             {plan.features.map((feature) => (
-              <li key={feature} className="flex gap-2">
-                <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-gold" />
-                <span>{feature}</span>
+              <li key={feature.label} className="group/feature rounded-xl border border-transparent p-3 transition hover:border-brand/30 hover:bg-sage">
+                <div className="flex gap-2">
+                  <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-gold" />
+                  <span className="font-bold text-ink">{feature.label}</span>
+                </div>
+                <p className="mt-2 max-h-0 overflow-hidden pl-4 text-xs leading-5 text-muted opacity-0 transition-all duration-200 group-hover/feature:max-h-32 group-hover/feature:opacity-100">
+                  {feature.detail}
+                </p>
               </li>
             ))}
           </ul>

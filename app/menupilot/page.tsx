@@ -34,6 +34,20 @@ const showcaseNotes = [
   "Popup menus and sold-out notes can be switched when the day changes."
 ];
 
+const customerView = [
+  "A branded menu page that feels like the business",
+  "Best sellers, local favorites, prices, and photos",
+  "Order, call, directions, review, and share buttons",
+  "Current hours, location, sold-out notes, and special events"
+];
+
+const ownerView = [
+  "Update hours without rebuilding the page",
+  "Post closing early, sold out, or weather notes",
+  "Feature Happy Hour, Fry Day, combos, or daily specials",
+  "Switch into popup mode when a second menu takes over"
+];
+
 export default function MenuPilotPage() {
   const photoEmailLink = mailtoLink(
     "MenuPilot photos and menu details",
@@ -99,6 +113,54 @@ export default function MenuPilotPage() {
                 View Mellow Moose menu
               </Link>
             </div>
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-20">
+          <div className="mx-auto max-w-3xl text-center">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Two sides of the product</p>
+            <h2 className="mt-3 text-4xl font-black leading-tight text-ink md:text-5xl">
+              Customers see a clean menu. Owners get control behind it.
+            </h2>
+            <p className="mt-5 leading-7 text-muted">
+              MenuPilot is not just a pretty page. It is a customer-facing menu plus an owner workflow for the details that change during real business life.
+            </p>
+          </div>
+          <div className="mt-12 grid gap-6 lg:grid-cols-2">
+            <article className="rounded-[1.5rem] border border-line bg-cream p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
+              <div className="flex items-center justify-between gap-4 border-b border-line pb-5">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-brand">What the customer sees</p>
+                  <h3 className="mt-2 text-3xl font-black text-ink">The public menu</h3>
+                </div>
+                <span className="rounded-full bg-white px-4 py-2 text-sm font-black text-brandDark shadow-sm">Mobile first</span>
+              </div>
+              <div className="mt-6 grid gap-3">
+                {customerView.map((item) => (
+                  <div key={item} className="rounded-2xl bg-white p-4 font-bold text-ink shadow-sm">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </article>
+            <article className="rounded-[1.5rem] border border-line bg-ink p-6 text-white shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
+              <div className="flex items-center justify-between gap-4 border-b border-white/15 pb-5">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.14em] text-gold">What you see</p>
+                  <h3 className="mt-2 text-3xl font-black">The owner controls</h3>
+                </div>
+                <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-black text-white">Live updates</span>
+              </div>
+              <div className="mt-6 grid gap-3">
+                {ownerView.map((item) => (
+                  <div key={item} className="rounded-2xl bg-white/10 p-4 font-bold text-white">
+                    {item}
+                  </div>
+                ))}
+              </div>
+            </article>
           </div>
         </div>
       </section>
