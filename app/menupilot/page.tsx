@@ -49,10 +49,30 @@ const ownerView = [
 ];
 
 const liveBadges = [
-  { label: "Closed early", text: "Weather, catering, sellout, or family emergency." },
-  { label: "Changed location", text: "Food truck moved today? Put it at the top before customers drive." },
-  { label: "Sold out", text: "Make sold-out items obvious before someone starts an order." },
-  { label: "Daily special", text: "Happy Hour, Fry Day, combo deals, popup items, or limited runs." }
+  {
+    label: "Low inventory",
+    title: "Warn before the rush",
+    text: "Turn on a clear low-inventory signal when a best seller is almost gone.",
+    image: "/assets/mellow-moose-low-inventory.jpg"
+  },
+  {
+    label: "Closed today",
+    title: "Make closed obvious",
+    text: "Post a closed notice for weather, catering, maintenance, or sold-out days.",
+    image: "/assets/mellow-moose-closed-sign.jpg"
+  },
+  {
+    label: "Happy Hour",
+    title: "Feature a timed special",
+    text: "Promote a limited special without redesigning the whole menu page.",
+    image: "/assets/mellow-moose-happy-hour.jpg"
+  },
+  {
+    label: "Closing early",
+    title: "Update the day fast",
+    text: "Tell customers the current plan before they drive across town.",
+    image: "/assets/mellow-moose-closing-early.jpg"
+  }
 ];
 
 export default function MenuPilotPage() {
@@ -198,21 +218,37 @@ export default function MenuPilotPage() {
       <section className="bg-cream">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Live signal badges</p>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Admin-side signals</p>
             <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              The important change should be obvious immediately.
+              One click can change what customers need to know today.
             </h2>
             <p className="mt-5 leading-7 text-muted">
-              Specials and status notes do not have to live on the menu every day. They can be switched on when the owner needs them, then removed when the day changes.
+              Specials and status notes do not have to live on the menu every day. MenuPilot can give the owner simple switches for low inventory, closed notices, happy hour, popup menus, and early closing alerts.
             </p>
+            <div className="mt-6 rounded-[1.25rem] border border-line bg-white p-5 shadow-sm">
+              <p className="text-sm font-black uppercase tracking-[0.14em] text-brandDark">Owner control idea</p>
+              <p className="mt-3 leading-7 text-muted">
+                The public page stays polished. Behind it, the business can choose which signal is active, add a short note, and turn it off when the day changes.
+              </p>
+            </div>
           </div>
           <div className="grid gap-4 sm:grid-cols-2">
             {liveBadges.map((badge) => (
-              <article key={badge.label} className="rounded-2xl border border-line bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
-                <span className="inline-flex rounded-full bg-sage px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-brandDark">
-                  {badge.label}
-                </span>
-                <p className="mt-4 leading-7 text-muted">{badge.text}</p>
+              <article key={badge.label} className="group overflow-hidden rounded-[1.25rem] border border-line bg-white shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
+                <div className="relative aspect-[4/3] overflow-hidden bg-ink">
+                  <img
+                    src={badge.image}
+                    alt={`${badge.label} menu status example`}
+                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                  />
+                  <div className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-brandDark shadow-sm">
+                    {badge.label}
+                  </div>
+                </div>
+                <div className="p-5">
+                  <h3 className="text-xl font-black text-ink">{badge.title}</h3>
+                  <p className="mt-3 leading-7 text-muted">{badge.text}</p>
+                </div>
               </article>
             ))}
           </div>
