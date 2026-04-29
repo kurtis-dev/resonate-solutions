@@ -2,7 +2,7 @@ import { plans } from "@/lib/plans";
 
 export function PricingCards() {
   return (
-    <div className="grid gap-5 lg:grid-cols-4">
+    <div className="grid gap-5 lg:grid-cols-3">
       {plans.map((plan) => (
         <article
           key={plan.name}

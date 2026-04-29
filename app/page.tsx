@@ -69,24 +69,24 @@ const serviceSteps = [
   ["Keep tempo", "We keep seasonal items, hours, specials, photos, and links from quietly going stale."]
 ];
 
-const launchPackages = [
+const monthlyPlans = [
   {
-    name: "Launch Kit",
-    price: "$299 setup",
-    text: "A friendly first package for food trucks, pop-ups, coffee stands, salons, and local shops.",
-    features: ["Mobile page", "QR code", "Starter photo set", "Google review link", "Launch-ready handoff"]
+    name: "Mic Check",
+    price: "Free",
+    text: "A quick fit check before anyone pays: what is missing, what customers cannot find, and which monthly plan makes sense.",
+    features: ["Menu and link review", "Google profile notes", "Photo gaps", "Low/high plan recommendation"]
   },
   {
-    name: "Upkeep",
+    name: "MenuPilot Core",
     price: "$49/mo",
-    text: "For businesses that change hours, specials, locations, or menu items more than they expected.",
-    features: ["Menu updates", "Hours and location updates", "Specials and sold-out notes", "Photo swaps"]
+    text: "For owners who need one polished menu page, a QR code, and a small number of monthly edits.",
+    features: ["Custom menu page", "QR code", "Order/call/directions links", "2 updates per month"]
   },
   {
-    name: "Managed Presence",
+    name: "MenuPilot Managed",
     price: "$149/mo",
-    text: "For owners who want a real person keeping the public details polished in the background.",
-    features: ["Monthly check-in", "Google profile checklist", "Fresh photo support", "Customer link cleanup"]
+    text: "For businesses that change specials, photos, popups, hours, or locations and want more hands-on help.",
+    features: ["Everything in Core", "8 updates per month", "Popup menu switching", "Monthly customer-path check"]
   }
 ];
 
@@ -252,16 +252,16 @@ export default function ResonateHome() {
       <section className="bg-sage">
         <div className="mx-auto max-w-7xl px-5 py-20">
           <div className="mb-10 max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brandDark">Launch offer</p>
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brandDark">Monthly service</p>
             <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              Start with helpful service. Let the software grow from the work people actually buy.
+              Keep the offer simple: low monthly or high monthly.
             </h2>
             <p className="mt-5 leading-7 text-muted">
-              The first version can feel personal: you show up, take photos, organize the details, tune the public signal, and leave the owner with a link customers can actually use.
+              Core is for businesses that need the menu page and light edits. Managed is for owners who want Resonate keeping the public details fresh when specials, hours, locations, photos, or popup menus change.
             </p>
           </div>
           <div className="grid gap-5 lg:grid-cols-3">
-            {launchPackages.map((plan) => (
+            {monthlyPlans.map((plan) => (
               <article key={plan.name} className="rounded-2xl border border-white/70 bg-white p-6 shadow-sm">
                 <h3 className="text-2xl font-black text-ink">{plan.name}</h3>
                 <p className="mt-2 text-3xl font-black text-brandDark">{plan.price}</p>

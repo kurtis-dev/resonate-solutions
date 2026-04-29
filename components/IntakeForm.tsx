@@ -107,9 +107,8 @@ export function IntakeForm() {
           Interest
           <select required value={form.packageInterest} onChange={(event) => updateField("packageInterest", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
             <option>Free Mic Check audit</option>
-            <option>Launch Kit</option>
-            <option>Upkeep</option>
-            <option>Managed Presence</option>
+            <option>MenuPilot Core</option>
+            <option>MenuPilot Managed</option>
           </select>
         </label>
       </div>

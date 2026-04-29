@@ -58,7 +58,7 @@ export default function MenuPilotPage() {
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/pricing" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
-                View launch plans
+                View monthly plans
               </Link>
               <Link href="/m/mellow-moose-burgers" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
                 View example menu
@@ -130,7 +130,7 @@ export default function MenuPilotPage() {
               Start with a Mic Check.
             </h2>
             <p className="mt-5 leading-7 text-muted">
-              Before heavy automation, Resonate needs a clean intake loop: collect the business details, identify what is hard for customers to find, and turn that into a launch kit or upkeep plan.
+              Before heavy automation, Resonate needs a clean intake loop: collect the business details, identify what is hard for customers to find, and recommend the low monthly or high monthly plan that actually fits.
             </p>
           </div>
           <IntakeForm />
