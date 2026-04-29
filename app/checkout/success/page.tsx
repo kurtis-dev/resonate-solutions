@@ -10,7 +10,7 @@ export default function CheckoutSuccessPage() {
           Stripe confirmed the checkout flow. The backend webhook will record successful payments and subscription status once Stripe environment variables and the database are connected.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/menupilot" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Request Soundcheck</Link>
+          <Link href="/menupilot" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Request Mic Check</Link>
           <Link href="/" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back home</Link>
         </div>
       </section>

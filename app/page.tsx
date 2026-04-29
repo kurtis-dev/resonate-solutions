@@ -2,24 +2,24 @@ import Link from "next/link";
 
 const offerCards = [
   {
-    title: "A menu people can find",
-    text: "One clean phone-friendly signal for menu items, prices, photos, hours, location, specials, and order links."
+    title: "Custom menu page",
+    text: "A mobile-first menu shaped around the business's logo, colors, photos, item notes, prices, hours, and order links."
   },
   {
-    title: "A page that feels like yours",
-    text: "Your colors, logo, photos, voice, best sellers, and customer flow shape the page so it does not look like everyone else's QR menu."
+    title: "Real food and product photos",
+    text: "Useful, current images that help customers choose without scrolling old posts or guessing from a blurry upload."
   },
   {
-    title: "Photos that help people choose",
-    text: "Simple on-site photo sessions so customers can see the food, service, space, or product before they decide."
+    title: "QR code that stays useful",
+    text: "One link for signs, trucks, counters, receipts, and profiles. Update the page without reprinting."
   },
   {
-    title: "A QR code that stays useful",
-    text: "Put one QR code on the truck, counter, sign, receipt, or social profile and update the page without reprinting."
+    title: "Live updates",
+    text: "Hours, location, specials, sold-out items, popup menus, and seasonal changes can stay current."
   },
   {
-    title: "Google-ready public details",
-    text: "A practical Soundcheck for hours, menu links, photos, review links, services, and missing customer info."
+    title: "Customer path cleanup",
+    text: "A practical Mic Check for the links and details people need before they visit, order, call, or leave a review."
   }
 ];
 
@@ -64,7 +64,7 @@ const customerMenuPreview = [
 ];
 
 const serviceSteps = [
-  ["Soundcheck", "We listen for the missing notes in the customer path: menu, hours, location, photos, links, and Google details."],
+  ["Mic Check", "We find the missing notes in the customer path: menu, hours, location, photos, links, and Google details."],
   ["Tune", "We build the mobile page, QR path, menu layout, public links, and Google-ready details."],
   ["Keep tempo", "We keep seasonal items, hours, specials, photos, and links from quietly going stale."]
 ];
@@ -74,7 +74,7 @@ const launchPackages = [
     name: "Launch Kit",
     price: "$299 setup",
     text: "A friendly first package for food trucks, pop-ups, coffee stands, salons, and local shops.",
-    features: ["Mobile page", "QR code", "Basic photos", "Google review link", "One revision"]
+    features: ["Mobile page", "QR code", "Starter photo set", "Google review link", "Launch-ready handoff"]
   },
   {
     name: "Upkeep",
@@ -95,46 +95,38 @@ export default function ResonateHome() {
     <main>
       <section className="relative overflow-hidden bg-cream">
         <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#4d8b72,#e8a93a,#d97856)]" />
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-16 md:grid-cols-[1fr_0.86fr] md:py-24">
+        <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-16 md:grid-cols-[0.9fr_1fr] md:py-24">
           <div className="self-center">
-            <img
-              src="/assets/resonate-logo-flat.png"
-              alt="Resonate Solutions"
-              className="h-16 w-auto max-w-[280px] object-contain"
-            />
-            <h1 className="mt-6 max-w-4xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
-              Make your local business easier to find, choose, and trust.
+            <h1 className="max-w-4xl text-5xl font-black leading-[0.96] text-ink md:text-7xl">
+              MenuPilot makes your menu easier to find, trust, and order from.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-              We help local businesses get found, chosen, and trusted with custom mobile pages, useful photos, QR links, and public details that feel like the business instead of a generic directory listing.
+              Practical polish for food trucks, pop-ups, and local restaurants that do not need a giant website or another generic menu clone.
             </p>
-            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-8">
               <Link href="/menupilot" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
                 See MenuPilot
               </Link>
-              <Link href="/m/mellow-moose-burgers" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
-                View Mellow Moose
-              </Link>
             </div>
             <p className="mt-6 max-w-xl text-sm leading-6 text-muted">
-              Built for the kind of owner who is great at the actual work and tired of customers asking where the current menu, location, or booking link is hiding.
+              A custom menu page, QR code, ordering link, hours, location, and useful photos, all tuned to feel like the business.
             </p>
           </div>
 
-          <div className="rounded-[1.75rem] border border-line bg-white p-4 shadow-soft">
+          <div className="rounded-[0.9rem] border border-[#d7c1a1] bg-[#fffaf0] p-3 shadow-[0_24px_70px_rgba(47,31,16,.14)]">
             <div className="grid gap-3 sm:grid-cols-[0.85fr_1.15fr]">
-              <div className="rounded-[1.25rem] bg-sage p-4">
-                <div className="overflow-hidden rounded-[1rem] bg-white shadow-sm">
+              <div className="rounded-[0.75rem] bg-[#f06f23] p-3">
+                <div className="overflow-hidden rounded-[0.65rem] bg-white shadow-sm">
                   <img src="/assets/mellow-moose-og-smashburger.jpg" alt="Mellow Moose smash burger" className="aspect-[4/5] w-full object-cover" />
                   <div className="p-4">
-                    <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Customer page</p>
-                    <div className="mt-3 rounded-full bg-cream px-4 py-2 text-sm font-black text-ink">Mellow Moose Burgers</div>
+                    <p className="text-sm font-black uppercase tracking-[0.12em] text-[#8d3709]">Real customer example</p>
+                    <div className="mt-3 rounded-full bg-[#fff0cf] px-4 py-2 text-sm font-black text-ink">Mellow Moose Burgers</div>
                   </div>
                 </div>
               </div>
-              <div className="rounded-[1.25rem] bg-cream p-5">
+              <div className="rounded-[0.75rem] bg-white p-5">
                 <div className="border-b border-line pb-4">
-                  <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Clear signal</p>
+                  <p className="text-sm font-black uppercase tracking-[0.12em] text-[#8d3709]">MenuPilot example</p>
                   <h2 className="mt-2 text-3xl font-black text-ink">Mellow Moose Burgers</h2>
                   <p className="mt-1 text-sm text-muted">Griffin&apos;s Food Court, Siloam Springs</p>
                 </div>
@@ -157,7 +149,7 @@ export default function ResonateHome() {
                 </div>
                 <div className="mt-5 grid grid-cols-2 gap-2 text-center text-sm font-bold">
                   <span className="rounded-full bg-ink px-3 py-3 text-white">Directions</span>
-                  <span className="rounded-full bg-brand px-3 py-3 text-white">Order link</span>
+                  <span className="rounded-full bg-[#f06f23] px-3 py-3 text-white">Order on Clover</span>
                 </div>
               </div>
             </div>
@@ -166,34 +158,50 @@ export default function ResonateHome() {
       </section>
 
       <section className="bg-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Make the page yours</p>
-            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              Not a template with your food dropped in. A page built around your business.
+        <div className="mx-auto max-w-7xl px-5 py-20">
+          <div className="mb-10 max-w-3xl">
+            <h2 className="text-4xl font-black text-ink md:text-5xl">
+              Practical polish for businesses that do not need a giant website or a generic menu clone.
             </h2>
             <p className="mt-5 leading-7 text-muted">
-              The goal is not to make every restaurant, truck, or shop look the same. Each page should carry the business's own signal: the logo, colors, photos, menu rhythm, favorite items, and the customer actions that matter most.
+              MenuPilot starts with the daily details customers actually need, then makes them look current, useful, and specific to the business.
             </p>
-            <Link href="/m/mellow-moose-burgers" className="mt-7 inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
-              Open the Mellow Moose page
-            </Link>
           </div>
-          <div className="rounded-[1.75rem] border border-line bg-cream p-4 shadow-soft">
-            <div className="rounded-[1.25rem] bg-white p-5">
+          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
+            {offerCards.map((card) => (
+              <article key={card.title} className="rounded-[0.9rem] border border-line bg-cream p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
+                <h3 className="text-xl font-black text-ink">{card.title}</h3>
+                <p className="mt-3 leading-7 text-muted">{card.text}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-[#fffaf0]">
+        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr]">
+          <div>
+            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
+              Your menu should feel like your place, not a listing template.
+            </h2>
+            <p className="mt-5 leading-7 text-muted">
+              Logos, colors, photos, best sellers, popup menus, and customer actions shape the page so the menu feels unmistakably theirs.
+            </p>
+          </div>
+          <div className="rounded-[0.9rem] border border-[#d7c1a1] bg-white p-4 shadow-soft">
+            <div className="rounded-[0.75rem] bg-[#fff4df] p-5">
               <div className="flex flex-col gap-4 border-b border-line pb-5 sm:flex-row sm:items-center sm:justify-between">
                 <div>
-                  <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Live customer menu</p>
                   <h3 className="mt-2 text-3xl font-black text-ink">Mellow Moose Burgers</h3>
                   <p className="mt-1 text-sm text-muted">Griffin&apos;s Food Court in Siloam Springs</p>
                 </div>
-                <div className="rounded-2xl bg-ink px-4 py-3 text-center text-sm font-black text-white">Scan QR</div>
+                <div className="rounded-xl bg-ink px-4 py-3 text-center text-sm font-black text-white">QR-ready</div>
               </div>
               <div className="mt-5 grid gap-4 md:grid-cols-[0.85fr_1.15fr]">
                 <img src="/assets/mellow-moose-food-truck.jpg" alt="Mellow Moose Burgers food truck" className="h-full min-h-64 rounded-2xl border border-line object-cover" />
                 <div className="grid gap-3">
                   {customSignals.map(([label, value]) => (
-                    <div key={label} className="rounded-2xl border border-line bg-cream p-4">
+                    <div key={label} className="rounded-xl border border-line bg-white p-4">
                       <p className="text-xs font-black uppercase tracking-[0.12em] text-brand">{label}</p>
                       <p className="mt-1 font-bold text-ink">{value}</p>
                     </div>
@@ -202,7 +210,7 @@ export default function ResonateHome() {
               </div>
               <div className="mt-5 grid grid-cols-2 gap-2 text-center text-sm font-bold sm:grid-cols-4">
                 {["Directions", "Order", "Instagram", "Reviews"].map((action) => (
-                  <span key={action} className="rounded-full border border-line bg-white px-3 py-3 text-ink">{action}</span>
+                  <span key={action} className="rounded-full border border-line bg-white px-3 py-3 text-ink">Example: {action}</span>
                 ))}
               </div>
             </div>
@@ -229,32 +237,13 @@ export default function ResonateHome() {
         </div>
       </section>
 
-      <section className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-20">
-          <div className="mb-10 max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">What we build</p>
-            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              Practical polish for businesses that do not need a giant website or a generic menu clone.
-            </h2>
-          </div>
-          <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-5">
-            {offerCards.map((card) => (
-              <article key={card.title} className="rounded-2xl border border-line bg-cream p-6 shadow-sm">
-                <h3 className="text-xl font-black text-ink">{card.title}</h3>
-                <p className="mt-3 leading-7 text-muted">{card.text}</p>
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
       <section className="mx-auto max-w-7xl px-5 py-20">
         <div className="grid gap-5 md:grid-cols-3">
           {serviceSteps.map(([title, text], index) => (
-            <article key={title} className="rounded-2xl border border-line bg-white p-7 shadow-sm">
-              <span className="text-sm font-black text-coral">0{index + 1}</span>
-              <h2 className="mt-4 text-3xl font-black text-ink">{title}</h2>
-              <p className="mt-3 leading-7 text-muted">{text}</p>
+            <article key={title} className="relative border-l-4 border-ink bg-white px-7 py-8 shadow-[8px_8px_0_rgba(32,35,32,.08)]">
+              <span className="absolute -left-[1.15rem] top-8 flex h-8 w-8 items-center justify-center rounded-full bg-coral text-sm font-black text-white">{index + 1}</span>
+              <h2 className="text-3xl font-black text-ink">{title}</h2>
+              <p className="mt-3 text-base leading-7 text-muted">{text}</p>
             </article>
           ))}
         </div>

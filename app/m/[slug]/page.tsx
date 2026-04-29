@@ -83,7 +83,17 @@ function IconBadge({ children }: { children: string }) {
   );
 }
 
-function MenuCard({ item, isMellowMoose }: { item: MenuItem; isMellowMoose: boolean }) {
+function MenuCard({
+  item,
+  isMellowMoose,
+  orderUrl,
+  phoneUrl
+}: {
+  item: MenuItem;
+  isMellowMoose: boolean;
+  orderUrl?: string | null;
+  phoneUrl?: string | null;
+}) {
   const hasImage = Boolean(item.imageUrl);
 
   return (
@@ -108,6 +118,20 @@ function MenuCard({ item, isMellowMoose }: { item: MenuItem; isMellowMoose: bool
           {item.badge ? <span className="rounded-full bg-[#d5f0dd] px-3 py-1 text-xs font-black text-[#246038]">{item.badge}</span> : null}
           {item.isSoldOut ? <span className="rounded-full bg-[#f7e5d2] px-3 py-1 text-xs font-black text-[#9b3d08]">Sold out</span> : null}
         </div>
+        {isMellowMoose ? (
+          <div className="mt-5 grid gap-2 sm:grid-cols-2">
+            {orderUrl ? (
+              <a href={orderUrl} className="rounded-full border-2 border-[#25150b] bg-[#25150b] px-4 py-2 text-center text-sm font-black text-white transition hover:-translate-y-0.5">
+                Order on Clover
+              </a>
+            ) : null}
+            {phoneUrl ? (
+              <a href={phoneUrl} className="rounded-full border-2 border-[#25150b] bg-[#fff4df] px-4 py-2 text-center text-sm font-black text-[#25150b] transition hover:-translate-y-0.5 hover:bg-[#f9ce46]">
+                Call to order
+              </a>
+            ) : null}
+          </div>
+        ) : null}
       </div>
     </article>
   );
@@ -120,7 +144,7 @@ function MellowMooseShell({
   groupedSections,
   localFavorites,
   menuUrl,
-  photoEmailLink
+  phoneUrl
 }: {
   business: MenuBusiness;
   actionLinks: ActionLink[];
@@ -128,11 +152,13 @@ function MellowMooseShell({
   groupedSections: Array<MenuSection & { items: MenuItem[] }>;
   localFavorites: MenuItem[];
   menuUrl: string;
-  photoEmailLink: string;
+  phoneUrl: string | null;
 }) {
+  const hours = ["Tue-Fri: 11 AM-2 PM", "Tue-Fri: 4 PM-8 PM", "Sat: 11 AM-5 PM"];
+
   return (
-    <main className="min-h-screen bg-[#f7ead7] text-[#25150b]">
-      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_12%_8%,rgba(22,169,157,.22),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(255,122,26,.25),transparent_26%),linear-gradient(135deg,#fff4df_0%,#f7ead7_42%,#d6efe2_100%)]" />
+    <main className="min-h-screen bg-[#fff0cf] text-[#25150b]">
+      <div className="fixed inset-0 -z-10 bg-[radial-gradient(circle_at_12%_8%,rgba(22,169,157,.24),transparent_28%),radial-gradient(circle_at_88%_18%,rgba(255,122,26,.34),transparent_26%),linear-gradient(135deg,#fff0cf_0%,#ffd999_38%,#d6efe2_100%)]" />
 
       <section className="mx-auto max-w-7xl px-4 py-5 sm:px-6 lg:py-8">
         <div className="grid gap-5 lg:grid-cols-[1fr_420px]">
@@ -173,14 +199,18 @@ function MellowMooseShell({
           <aside className="grid gap-5">
             <div className="rounded-[2rem] border-4 border-[#25150b] bg-[#f9ce46] p-5 shadow-[8px_8px_0_#25150b]">
               <div className="grid grid-cols-[auto_1fr] gap-4">
-                  <IconBadge>H</IconBadge>
+                <IconBadge>H</IconBadge>
                 <div>
                   <p className="text-sm font-black uppercase tracking-[0.12em]">Open this week</p>
-                  <p className="mt-1 text-lg font-black leading-snug">{business.hoursSummary}</p>
+                  <ul className="mt-2 space-y-1 text-lg font-black leading-snug">
+                    {hours.map((line) => (
+                      <li key={line}>{line}</li>
+                    ))}
+                  </ul>
                 </div>
               </div>
               <div className="mt-4 grid grid-cols-[auto_1fr] gap-4">
-                  <IconBadge>M</IconBadge>
+                <IconBadge>M</IconBadge>
                 <div>
                   <p className="text-sm font-black uppercase tracking-[0.12em]">Find the truck</p>
                   <p className="mt-1 text-lg font-black leading-snug">{business.address}</p>
@@ -264,7 +294,7 @@ function MellowMooseShell({
               </div>
               <div className="grid gap-4 md:grid-cols-2">
                 {section.items.map((item) => (
-                  <MenuCard key={item.id} item={item} isMellowMoose />
+                  <MenuCard key={item.id} item={item} isMellowMoose orderUrl={activeMenu.orderUrl} phoneUrl={phoneUrl} />
                 ))}
               </div>
             </section>
@@ -276,13 +306,6 @@ function MellowMooseShell({
           <img src={`/api/qr/${business.slug}`} alt={`QR code for ${business.businessName}`} className="mt-4 aspect-square w-full rounded-2xl border-2 border-[#25150b] bg-white p-3" />
           <p className="mt-4 break-all text-sm leading-6 text-[#5b4331]">{menuUrl}</p>
           <a href={`/api/qr/${business.slug}`} className="mt-5 block rounded-full border-2 border-[#25150b] bg-[#25150b] px-5 py-3 text-center font-black text-white transition hover:-translate-y-0.5">Open QR code</a>
-          <a href={photoEmailLink} className="mt-3 block rounded-full border-2 border-[#25150b] bg-white px-5 py-3 text-center font-black text-[#25150b] transition hover:-translate-y-0.5 hover:bg-[#f9ce46]">Send updates</a>
-          <div className="mt-5 rounded-2xl border-2 border-[#25150b] bg-[#d5f0dd] p-4">
-            <p className="text-sm font-black">Your brand, not a listing template.</p>
-            <p className="mt-2 text-sm leading-6 text-[#5b4331]">
-              Logos, colorways, photos, QR codes, ordering links, and special menus can be tuned to the business.
-            </p>
-          </div>
         </aside>
       </section>
     </main>
@@ -339,7 +362,7 @@ export default async function PublicMenuPage({ params, searchParams }: PageProps
         groupedSections={sectionsWithMore}
         localFavorites={localFavorites}
         menuUrl={menuUrl}
-        photoEmailLink={photoEmailLink}
+        phoneUrl={phoneUrl}
       />
     );
   }

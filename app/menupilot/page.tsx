@@ -16,7 +16,7 @@ const features = [
     text: "Put one QR code on the truck, counter, receipt, or social profile and update the destination without reprinting anything."
   },
   {
-    title: "Brand soundcheck",
+    title: "Brand Mic Check",
     text: "Check whether the public page sounds and looks like the business: not a copied template, not a generic listing, and not a blurry menu photo."
   }
 ];
@@ -27,13 +27,11 @@ const sampleMenu = [
   ["Hearty Shroom and Cheese Burger", "$11.99", "/assets/mellow-moose-hearty-shroom.jpg", "Mellow pick"]
 ];
 
-const approvalItems = [
-  "Approved business name and logo",
-  "Current menu items with prices",
-  "3 to 8 food photos or a time to take them",
-  "Hours, service location, and move-around schedule",
-  "Order, review, Facebook, Instagram, or phone links",
-  "Any items that sell out, rotate, or need a note"
+const showcaseNotes = [
+  "Logo, color, and menu tone become the design system.",
+  "Best sellers and local favorites sit up front.",
+  "QR, order, call, direction, and review actions stay obvious.",
+  "Popup menus and sold-out notes can be switched when the day changes."
 ];
 
 export default function MenuPilotPage() {
@@ -48,9 +46,8 @@ export default function MenuPilotPage() {
         <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#4d8b72,#e8a93a,#d97856)]" />
         <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-20 md:grid-cols-[1fr_0.85fr] md:py-28">
           <div className="self-center">
-            <p className="inline-flex rounded-full bg-sage px-4 py-2 text-sm font-bold text-brandDark">MenuPilot by Resonate Solutions</p>
-            <h1 className="mt-5 max-w-4xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
-              Tune your menu into a page that feels like your business.
+            <h1 className="max-w-4xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
+              Menu pages that feel like the business, not the platform.
             </h1>
             <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
               For food trucks, pop-ups, coffee shops, salons, and small restaurants that need menu items, hours, location, photos, and review links to come through clearly without looking like everyone else's hosted menu.
@@ -63,8 +60,8 @@ export default function MenuPilotPage() {
               <Link href="/pricing" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
                 View launch plans
               </Link>
-              <Link href="/" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
-                See full offer
+              <Link href="/m/mellow-moose-burgers" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
+                View example menu
               </Link>
             </div>
           </div>
@@ -129,9 +126,8 @@ export default function MenuPilotPage() {
       <section className="bg-sage">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.85fr_1.15fr]">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brandDark">Backend start</p>
             <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              The first real workflow is a Soundcheck request.
+              Start with a Mic Check.
             </h2>
             <p className="mt-5 leading-7 text-muted">
               Before heavy automation, Resonate needs a clean intake loop: collect the business details, identify what is hard for customers to find, and turn that into a launch kit or upkeep plan.
@@ -144,12 +140,11 @@ export default function MenuPilotPage() {
       <section className="bg-white">
         <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr]">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Real-client ready</p>
             <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              Mellow Moose Burgers is first in line.
+              Show the custom work without taking over the customer page.
             </h2>
             <p className="mt-5 leading-7 text-muted">
-              The first customer page is built around their moose logo, Colorado-inspired menu style, real food photos, Griffin&apos;s Food Court location, and Clover ordering.
+              Mellow Moose gets a real customer menu they can share. MenuPilot gets a smaller showcase that explains what Resonate customized: brand color, menu structure, food photos, action links, QR code, and popup-ready controls.
             </p>
             <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <Link href="/m/mellow-moose-burgers" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white shadow-soft hover:bg-brandDark">
@@ -161,12 +156,9 @@ export default function MenuPilotPage() {
             </div>
           </div>
           <div className="rounded-[1.75rem] border border-line bg-cream p-5 shadow-soft">
-            <h3 className="text-2xl font-black text-ink">Approval checklist</h3>
-            <p className="mt-2 leading-7 text-muted">
-              The handoff should feel easy for the owner. This is all we need before turning the preview into their actual customer page.
-            </p>
+            <h3 className="text-2xl font-black text-ink">What the example proves</h3>
             <div className="mt-5 grid gap-3">
-              {approvalItems.map((item, index) => (
+              {showcaseNotes.map((item, index) => (
                 <div key={item} className="flex gap-3 rounded-2xl border border-line bg-white p-4">
                   <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sage text-sm font-black text-brandDark">{index + 1}</span>
                   <span className="font-bold text-ink">{item}</span>

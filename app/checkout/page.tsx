@@ -39,7 +39,7 @@ export default async function CheckoutPage({
         </form>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link href="/pricing" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back to pricing</Link>
-          <Link href="/menupilot" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Soundcheck</Link>
+          <Link href="/menupilot" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Mic Check</Link>
         </div>
       </section>
     </main>

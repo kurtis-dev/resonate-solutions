@@ -1,13 +1,22 @@
+"use client";
+
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { questionsEmail } from "@/lib/contact";
 
 export function Footer() {
+  const pathname = usePathname();
+
+  if (pathname.startsWith("/m/")) {
+    return null;
+  }
+
   return (
     <footer className="border-t border-line bg-white">
       <div className="mx-auto grid max-w-7xl gap-8 px-5 py-10 md:grid-cols-[1fr_auto]">
         <div>
           <img
-            src="/assets/resonate-logo-flat.png"
+            src="/assets/resonate-logo-transparent.png"
             alt="Resonate Solutions"
             className="h-12 w-auto max-w-[230px] object-contain"
           />

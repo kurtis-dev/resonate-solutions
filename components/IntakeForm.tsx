@@ -16,7 +16,7 @@ const initialForm = {
   city: "",
   currentMenuLink: "",
   mainNeed: "Customers cannot find our current menu",
-  packageInterest: "Free Soundcheck audit",
+  packageInterest: "Free Mic Check audit",
   notes: "",
   website: ""
 };
@@ -27,7 +27,7 @@ export function IntakeForm() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setState({ status: "submitting", message: "Sending your Soundcheck request..." });
+    setState({ status: "submitting", message: "Sending your Mic Check request..." });
 
     const response = await fetch("/api/intake", {
       method: "POST",
@@ -53,7 +53,7 @@ export function IntakeForm() {
   return (
     <form onSubmit={onSubmit} className="grid gap-4 rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
       <div>
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Start with a Soundcheck</p>
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Start with a Mic Check</p>
         <h2 className="mt-2 text-3xl font-black text-ink">Find the missing notes in your customer path.</h2>
         <p className="mt-3 leading-7 text-muted">
           Send the basics and Resonate can review what customers see now: menu, hours, location, photos, links, and Google profile signals.
@@ -106,7 +106,7 @@ export function IntakeForm() {
         <label className="grid gap-2 text-sm font-bold text-ink">
           Interest
           <select required value={form.packageInterest} onChange={(event) => updateField("packageInterest", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
-            <option>Free Soundcheck audit</option>
+            <option>Free Mic Check audit</option>
             <option>Launch Kit</option>
             <option>Upkeep</option>
             <option>Managed Presence</option>
@@ -122,7 +122,7 @@ export function IntakeForm() {
       <input tabIndex={-1} autoComplete="off" value={form.website} onChange={(event) => updateField("website", event.target.value)} className="hidden" aria-hidden="true" />
 
       <button disabled={state.status === "submitting"} type="submit" className="rounded-full bg-brand px-6 py-3 font-black text-white shadow-soft hover:bg-brandDark disabled:cursor-not-allowed disabled:opacity-70">
-        {state.status === "submitting" ? "Sending..." : "Request Soundcheck"}
+        {state.status === "submitting" ? "Sending..." : "Request Mic Check"}
       </button>
 
       {state.message ? (
