@@ -19,18 +19,18 @@ export type Plan = {
 export const plans: Plan[] = [
   {
     id: "audit",
-    name: "Mic Check",
+    name: "Free Menu Review",
     price: "$0",
-    description: "A quick fit check for a local business that wants to know what customers cannot find before paying monthly.",
+    description: "A quick review for a local business that wants to know what customers cannot find before paying monthly.",
     limit: "Free discovery review",
     billingPeriod: "",
     features: [
       { label: "Menu and link check", detail: "I look at what a customer can actually find right now: menu, address, ordering, hours, and social links." },
       { label: "Google profile notes", detail: "Basic notes on whether the business profile sends people to the right place." },
       { label: "Photo gap notes", detail: "A quick read on whether the food, space, or service needs better visual proof." },
-      { label: "Plan recommendation", detail: "A plain recommendation for owner-managed or Resonate-managed support." }
+      { label: "Plan recommendation", detail: "A plain recommendation for whether you should update the page yourself or have Resonate handle updates." }
     ],
-    cta: "Request Mic Check",
+    cta: "Request Free Review",
     checkoutUrl: "/menupilot",
     paymentMode: "none"
   },
@@ -47,7 +47,7 @@ export const plans: Plan[] = [
       { label: "Clover/order link", detail: "MenuPilot does not replace checkout. It sends ready customers to Clover or another ordering link." },
       { label: "QR code", detail: "One QR link for the truck, counter, social profiles, printed cards, and signs." },
       { label: "Mobile-first page", detail: "Built for customers checking late at night or from a parking lot before they drive over." },
-      { label: "Basic admin/status toggles", detail: "Starter includes simple controls for routine visibility updates." },
+      { label: "Basic update switches", detail: "Starter includes simple switches for routine messages like open, closed, or special hours." },
       { label: "Email support", detail: "Questions and basic support go through questions@resonate.solutions." }
     ],
     cta: "Choose Starter",
@@ -59,14 +59,14 @@ export const plans: Plan[] = [
     id: "plus",
     name: "MenuPilot Plus",
     price: "$99",
-    description: "The main offer for food trucks and small restaurants that want the page plus daily business controls.",
+    description: "The main offer for food trucks and small restaurants that want the page plus easy daily update tools.",
     limit: "$299 setup fee",
     billingPeriod: "mo",
     features: [
       { label: "Everything in Starter", detail: "Includes the branded menu page, QR code, order link, photos, hours, location, mobile layout, and email support." },
-      { label: "Specials/status controls", detail: "Turn on closed early, sold out, happy hour, popup menu, and changed location notices when customers need to know." },
+      { label: "Specials and status updates", detail: "Turn on closed early, sold out, happy hour, popup menu, and changed location notices when customers need to know." },
       { label: "Best sellers and local favorites", detail: "Guide people toward the items they should try first instead of making every item compete equally." },
-      { label: "Monthly polish/checkup", detail: "A recurring look at the page so obvious stale details, weak labels, and broken customer paths do not sit untouched." },
+      { label: "Monthly page checkup", detail: "A recurring look at the page so stale details, weak labels, and broken links do not sit untouched." },
       { label: "Google, Clover, and social link help", detail: "Help connecting the public page to the profiles and order links customers already use." }
     ],
     cta: "Choose Plus",
@@ -79,13 +79,13 @@ export const plans: Plan[] = [
     id: "managed",
     name: "Resonate Managed",
     price: "$299",
-    description: "For owners who want the page kept fresh without logging in, editing controls, or chasing menu details.",
+    description: "For owners who want the page kept fresh without logging in or chasing menu details.",
     limit: "$499 setup fee",
     billingPeriod: "mo",
     features: [
-      { label: "Everything in Plus", detail: "You still get the custom page, QR link, action buttons, admin controls, monthly polish, and mobile-first customer menu." },
+      { label: "Everything in Plus", detail: "You still get the custom page, QR link, action buttons, update tools, monthly polish, and mobile-first customer menu." },
       { label: "Resonate handles updates", detail: "Send changes by email or message and I update hours, specials, popup menus, photos, and visible page details for you." },
-      { label: "Weekly menu presence check", detail: "I check that the public page still reflects what customers need to know that week." },
+      { label: "Weekly menu page check", detail: "I check that the public page still reflects what customers need to know that week." },
       { label: "Specials and event support", detail: "Happy Hour, Fry Day, 2 for $22, popup days, weather closures, and sold-out notices can be surfaced quickly." },
       { label: "Photo swaps and light cleanup", detail: "I can replace weak item images, crop better photos, and keep the page looking intentional." },
       { label: "Priority support", detail: "This is priced for higher-touch service so urgent changes are not treated like casual favors." }

@@ -38,7 +38,7 @@ const ownerView = [
   "Keep the page current without relying on Facebook"
 ];
 
-const adminControls = [
+const dailyUpdates = [
   {
     title: "Low inventory warning",
     label: "Almost gone",
@@ -140,20 +140,20 @@ const planCards = [
       "Clover/order link",
       "QR code",
       "Mobile-first page",
-      "Basic admin/status toggles",
+      "Basic update switches",
       "Email support"
     ]
   },
   {
     name: "MenuPilot Plus",
     tag: "$99/mo + $299 setup",
-    text: "The main offer for food trucks and small restaurants that want the page plus daily business controls.",
+    text: "The main offer for food trucks and small restaurants that want the page plus easy daily update tools.",
     cta: "Choose Plus",
     href: "/pricing",
     featured: true,
     items: [
       "Everything in Starter",
-      "Closed early, sold out, happy hour, popup menu, and changed location controls",
+      "Closed early, sold out, happy hour, popup menu, and changed location updates",
       "Best sellers and local favorites",
       "Monthly polish/checkup",
       "Help connecting Google Business, Clover, and social links"
@@ -162,14 +162,14 @@ const planCards = [
   {
     name: "Resonate Managed",
     tag: "$299/mo + $499 setup",
-    text: "For owners who want the page kept fresh without logging in, editing controls, or chasing menu details.",
+    text: "For owners who want the page kept fresh without logging in or chasing menu details.",
     cta: "Send menu photos and details",
     href: `mailto:${questionsEmail}`,
     featured: false,
     items: [
       "Everything in Plus",
       "Resonate handles updates",
-      "Weekly menu presence check",
+      "Weekly menu page check",
       "Specials and event support",
       "Photo swaps and light cleanup",
       "Priority support"
@@ -259,7 +259,7 @@ export default function MenuPilotPage() {
             <Link href="/pricing" className="hover:text-ink">Pricing</Link>
           </nav>
           <Link href="/pricing" className="rounded-full bg-ink px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-coral">
-            Start Mic Check
+            Free Menu Review
           </Link>
         </div>
       </section>
@@ -274,7 +274,7 @@ export default function MenuPilotPage() {
           </Link>
           <nav className="hidden items-center gap-8 text-sm font-semibold text-muted md:flex">
             <a href="#how-it-works" className="hover:text-ink">How it works</a>
-            <a href="#controls" className="hover:text-ink">Controls</a>
+            <a href="#daily-updates" className="hover:text-ink">Daily updates</a>
             <a href="#why" className="hover:text-ink">Why it matters</a>
             <a href="#plans" className="hover:text-ink">Plans</a>
           </nav>
@@ -289,7 +289,7 @@ export default function MenuPilotPage() {
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-[1fr_0.85fr] lg:py-24">
           <div>
             <h1 className="max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.01em] text-ink md:text-7xl">
-              Menu pages that feel like <span className="text-coral">your business</span>, not the platform.
+              Menu pages that feel like <span className="text-coral">your business</span>, not a checkout link.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
               Give customers one clean place to find your menu, hours, location, specials, food photos, and order links without sending them hunting through social posts or blurry menu screenshots.
@@ -320,7 +320,7 @@ export default function MenuPilotPage() {
           <div className="max-w-3xl">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">How it works</p>
             <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-              One polished page out front. Real controls behind it.
+              One polished page customers see. Simple updates behind it.
             </h2>
           </div>
           <div className="mt-12 grid gap-6 lg:grid-cols-2">
@@ -337,9 +337,9 @@ export default function MenuPilotPage() {
             </article>
             <article className="rounded-[1.75rem] bg-ink p-7 text-white shadow-soft">
               <span className="inline-flex rounded-full bg-gold px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-ink">
-                What owners control
+                What owners can update
               </span>
-              <h3 className="mt-5 text-3xl font-extrabold">Real updates, no rebuild</h3>
+              <h3 className="mt-5 text-3xl font-extrabold">Real updates, no website rebuild</h3>
               <ul className="mt-6 grid gap-4 text-white/90">
                 {ownerView.map((item) => (
                   <CheckLine key={item} dark>{item}</CheckLine>
@@ -350,24 +350,24 @@ export default function MenuPilotPage() {
         </div>
       </section>
 
-      <section id="controls" className="border-y border-line bg-cream">
+      <section id="daily-updates" className="border-y border-line bg-cream">
         <div className="mx-auto max-w-7xl px-5 py-20">
           <div className="grid gap-8 lg:grid-cols-[0.85fr_1fr] lg:items-end">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Admin controls</p>
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Daily updates</p>
               <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-                One click can change what customers need to know today.
+                Change what customers need to know today.
               </h2>
               <p className="mt-5 max-w-2xl leading-7 text-muted">
-                Your public menu stays polished. Behind it, you can turn on the right signal for the day.
+                Your public menu stays polished. Behind it, you can turn on the right message for the day.
               </p>
             </div>
             <div className="rounded-full border border-line bg-white px-5 py-3 text-sm font-bold text-muted shadow-sm">
-              Try the toggles - this is how the admin side should feel.
+              These are the kinds of updates owners can make without rebuilding the page.
             </div>
           </div>
           <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {adminControls.map((control) => (
+            {dailyUpdates.map((control) => (
               <article
                 key={control.title}
                 className={`group rounded-[1.5rem] border-2 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-soft ${
@@ -446,7 +446,7 @@ export default function MenuPilotPage() {
           <div className="rounded-[2rem] bg-cream p-6 text-ink shadow-soft">
             <div className="flex flex-wrap items-center justify-between gap-3">
               <div>
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-coral">Brand kit sample</p>
+                <p className="text-xs font-bold uppercase tracking-[0.16em] text-coral">Brand sample</p>
                 <h3 className="mt-2 text-3xl font-extrabold">Mellow Moose Burgers</h3>
               </div>
               <span className="rounded-full bg-[#fff0e9] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-coral">Live customer</span>
@@ -484,7 +484,7 @@ export default function MenuPilotPage() {
               Two ways to run your MenuPilot page.
             </h2>
             <p className="mt-4 leading-7 text-muted">
-              Starter gives you the page. Plus gives you the live business controls. Managed is priced for owners who want Resonate handling the updates.
+              Starter gives you the page. Plus gives you easy daily update tools. Managed is priced for owners who want Resonate handling the updates.
             </p>
           </div>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">

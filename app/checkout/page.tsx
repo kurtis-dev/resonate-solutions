@@ -24,7 +24,7 @@ export default async function CheckoutPage({
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Checkout</p>
         <h1 className="mt-3 text-4xl font-black text-ink">Start your monthly MenuPilot plan.</h1>
         <p className="mt-4 leading-7 text-muted">
-          You selected <strong>{plan?.name}</strong>. Once Stripe is connected, this button sends customers to a secure Stripe Checkout page and webhook events update your backend.
+          You selected <strong>{plan?.name}</strong>. Once payment is connected, this button will send customers to a secure checkout page and record the plan for follow-up.
         </p>
         {statusMessage ? <p className="mt-5 rounded-2xl bg-[#fff0e9] px-4 py-3 text-sm font-bold text-coral">{statusMessage}</p> : null}
         <form action="/api/checkout" method="POST" className="mt-8 grid gap-4">
@@ -39,7 +39,7 @@ export default async function CheckoutPage({
         </form>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link href="/pricing" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back to pricing</Link>
-          <Link href="/menupilot" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Mic Check</Link>
+          <Link href="/menupilot" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Free Review</Link>
         </div>
       </section>
     </main>

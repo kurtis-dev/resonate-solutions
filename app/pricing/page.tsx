@@ -6,10 +6,10 @@ export default function PricingPage() {
       <div className="mb-10 max-w-3xl">
         <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Pricing</p>
         <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-6xl">
-          Monthly menu presence for local businesses that need to stay easy to find.
+          Simple monthly menu pages for local businesses that need to stay easy to find.
         </h1>
         <p className="mt-5 leading-7 text-muted">
-          Starter gives the business the branded page. Plus adds the daily controls that make the page feel current. Resonate Managed is for owners who want updates handled for them.
+          Starter gives the business the branded page. Plus adds easy daily update tools. Resonate Managed is for owners who want updates handled for them.
         </p>
       </div>
       <PricingCards />
