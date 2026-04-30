@@ -6,7 +6,7 @@ export default function TermsPage() {
       <div className="mt-8 space-y-6 leading-7 text-muted">
         <p>These placeholder Terms of Use should be reviewed by a qualified attorney before commercial launch.</p>
         <h2 className="text-2xl font-black text-ink">Use of Service</h2>
-        <p>Resonate Solutions provides menu pages, QR links, photo support, and related customer-facing materials for local businesses.</p>
+        <p>Resonate Solutions provides local business pages, QR links, photo support, and related customer-facing materials for local businesses.</p>
         <h2 className="text-2xl font-black text-ink">Accounts and Billing</h2>
         <p>Paid setup packages and monthly plans are intended to be billed through a payment processor. Subscription, cancellation, refund, and service policies should be finalized before accepting payments.</p>
         <h2 className="text-2xl font-black text-ink">Acceptable Use</h2>

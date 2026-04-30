@@ -23,7 +23,7 @@ export default async function CheckoutPage({
     <main className="mx-auto flex max-w-2xl px-5 py-16">
       <section className="w-full rounded-[1.75rem] border border-line bg-white p-8 shadow-sm">
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Checkout</p>
-        <h1 className="mt-3 text-4xl font-black text-ink">{isOneTime ? "Start your custom design buildout." : "Start your monthly MenuPilot plan."}</h1>
+        <h1 className="mt-3 text-4xl font-black text-ink">{isOneTime ? "Start your custom design buildout." : "Start your monthly Resonate Local plan."}</h1>
         <p className="mt-4 leading-7 text-muted">
           You selected <strong>{plan?.name}</strong>. Once payment is connected, this button will open a secure checkout page and record the selection for follow-up.
         </p>
@@ -40,7 +40,7 @@ export default async function CheckoutPage({
         </form>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link href="/pricing" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back to pricing</Link>
-          <Link href="/menupilot" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Free Review</Link>
+          <Link href="/menupilot" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Free Local Review</Link>
         </div>
       </section>
     </main>

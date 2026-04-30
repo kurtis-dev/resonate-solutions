@@ -117,6 +117,12 @@ Primary offer:
 Make your local business easier to find, choose, and trust.
 ```
 
+Current product direction:
+
+```text
+Resonate Local: customer-ready pages for local service businesses.
+```
+
 Launch services:
 
 - Mobile menu and customer pages
@@ -124,6 +130,12 @@ Launch services:
 - Basic food, service, or product photos
 - Google review link and profile cleanup
 - Ongoing menu, hours, location, and link updates
+
+Customer build workflow:
+
+```text
+docs/resonate-local-pages-customer-workflow.md
+```
 
 ## Vercel Deployment
 

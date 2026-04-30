@@ -19,16 +19,16 @@ export type Plan = {
 export const plans: Plan[] = [
   {
     id: "audit",
-    name: "Free Menu Review",
+    name: "Free Local Review",
     price: "$0",
     description: "A quick review for a local business that wants to know what customers cannot find before paying monthly.",
     limit: "Free discovery review",
     billingPeriod: "",
     features: [
-      { label: "Menu and link check", detail: "I look at what a customer can actually find right now: menu, address, ordering, hours, and social links." },
+      { label: "Page and link check", detail: "I look at what a customer can actually find right now: services, address, booking or ordering links, hours, and social links." },
       { label: "Google profile notes", detail: "Basic notes on whether the business profile sends people to the right place." },
       { label: "Photo gap notes", detail: "A quick read on whether the food, space, or service needs better visual proof." },
-      { label: "Plain next step", detail: "A simple recommendation for what would make the menu easier for customers to use." }
+      { label: "Plain next step", detail: "A simple recommendation for what would make the business easier for customers to understand and contact." }
     ],
     cta: "Request Free Review",
     checkoutUrl: "/menupilot",
@@ -36,18 +36,18 @@ export const plans: Plan[] = [
   },
   {
     id: "core",
-    name: "MenuPilot Starter",
+    name: "Resonate Local Starter",
     price: "$49",
-    description: "For very small trucks and popups that want a clean branded menu page and mostly manage updates themselves.",
+    description: "For local businesses that want one clean branded page and mostly manage updates themselves.",
     limit: "$199 setup fee",
     billingPeriod: "mo",
     features: [
-      { label: "Custom branded menu page", detail: "A mobile-first page using the business logo, colors, menu, food photos, hours, location, and order links." },
-      { label: "Hours, location, menu, and photos", detail: "The essential customer details live in one clean place instead of scattered posts and old screenshots." },
-      { label: "Clover/order link", detail: "MenuPilot does not replace checkout. It sends ready customers to Clover or another ordering link." },
+      { label: "Custom branded local page", detail: "A mobile-first page using the business logo, colors, services, photos, hours, location, and next-step links." },
+      { label: "Hours, location, services, and photos", detail: "The essential customer details live in one clean place instead of scattered posts and old screenshots." },
+      { label: "Booking, quote, or order link", detail: "The page does not replace the tools you already use. It sends ready customers to the right next step." },
       { label: "QR code", detail: "One QR link for the truck, counter, social profiles, printed cards, and signs." },
-      { label: "Mobile-first page", detail: "Built for customers checking late at night or from a parking lot before they drive over." },
-      { label: "Basic update switches", detail: "Starter includes simple switches for open today, closed today, special hours, and moved location." },
+      { label: "Mobile-first page", detail: "Built for customers checking from their phone before they call, book, order, or drive over." },
+      { label: "Business-type layout", detail: "The page language is shaped around the kind of business, not a one-size-fits-all template." },
       { label: "Email support", detail: "Questions and basic support go through questions@resonate.solutions." }
     ],
     cta: "Choose Starter",
@@ -57,17 +57,17 @@ export const plans: Plan[] = [
   },
   {
     id: "plus",
-    name: "MenuPilot Plus",
+    name: "Resonate Local Plus",
     price: "$99",
-    description: "The main offer for food trucks and small restaurants that want the page plus easy daily update tools.",
+    description: "The main offer for businesses that want the page plus easy update tools for availability, specials, delays, policies, or promotions.",
     limit: "$299 setup fee",
     billingPeriod: "mo",
     features: [
-      { label: "Everything in Starter", detail: "Includes the branded menu page, QR code, order link, photos, hours, location, mobile layout, and email support." },
-      { label: "More update switches", detail: "Turn on closed early, sold out, happy hour, daily special, popup menu, and changed location notices when customers need to know." },
-      { label: "Best sellers and local favorites", detail: "Guide people toward the items they should try first instead of making every item compete equally." },
+      { label: "Everything in Starter", detail: "Includes the branded local page, QR code, next-step links, photos, hours, location, mobile layout, and email support." },
+      { label: "Business-specific updates", detail: "Show openings, delays, specials, availability, policy reminders, service area changes, or promotions when customers need to know." },
+      { label: "Featured services or offers", detail: "Guide people toward the service, package, or offer you want them to notice first." },
       { label: "Monthly page checkup", detail: "A recurring look at the page so stale details, weak labels, and broken links do not sit untouched." },
-      { label: "Link placement help", detail: "I place the ordering, maps, phone, social, and review links you already have so customers know where to go next." }
+      { label: "Link placement help", detail: "I place the booking, quote, ordering, maps, phone, social, and review links you already have so customers know where to go next." }
     ],
     cta: "Choose Plus",
     highlighted: true,
@@ -83,9 +83,9 @@ export const plans: Plan[] = [
     limit: "$499 setup fee",
     billingPeriod: "",
     features: [
-      { label: "Brand direction", detail: "We shape the menu page around the business colors, logo, voice, food style, and customer experience." },
-      { label: "Menu page layout", detail: "I organize the page sections, favorites, photos, QR code, location, hours, and ordering path." },
-      { label: "Photo and copy cleanup", detail: "I crop supplied photos, tighten labels, and make the menu easier to scan." },
+      { label: "Brand direction", detail: "We shape the page around the business colors, logo, voice, service style, and customer experience." },
+      { label: "Page layout", detail: "I organize the page sections, featured services, photos, QR code, location, hours, and next-step path." },
+      { label: "Photo and copy cleanup", detail: "I crop supplied photos, tighten labels, and make the page easier to scan." },
       { label: "Launch checklist", detail: "We check the page on phone and desktop before sharing the QR code or link publicly." }
     ],
     cta: "Ask About Buildout",
