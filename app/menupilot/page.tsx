@@ -1,79 +1,222 @@
 import Link from "next/link";
-import { IntakeForm } from "@/components/IntakeForm";
 import { mailtoLink, questionsEmail } from "@/lib/contact";
 
-const features = [
-  {
-    title: "Custom menu page",
-    text: "A phone-friendly page shaped around the business's logo, colors, menu structure, photos, best sellers, prices, notes, and daily specials."
-  },
-  {
-    title: "Today signal",
-    text: "A simple location and hours block for food trucks, pop-ups, and small restaurants that move or change schedules."
-  },
-  {
-    title: "QR amplifier",
-    text: "Put one QR code on the truck, counter, receipt, or social profile and update the destination without reprinting anything."
-  },
-  {
-    title: "Brand Mic Check",
-    text: "Check whether the public page sounds and looks like the business: not a copied template, not a generic listing, and not a blurry menu photo."
-  }
-];
-
 const sampleMenu = [
-  ["The OG Smashburger", "$9.99", "/assets/mellow-moose-og-smashburger.jpg", "Local favorite"],
-  ["Blazing Moose Fries", "$13.99", "/assets/mellow-moose-blazing-fries.jpg", "Best seller"],
-  ["Hearty Shroom and Cheese Burger", "$11.99", "/assets/mellow-moose-hearty-shroom.jpg", "Mellow pick"]
-];
-
-const showcaseNotes = [
-  "Logo, color, and menu tone become the design system.",
-  "Best sellers and local favorites sit up front.",
-  "QR, order, call, direction, and review actions stay obvious.",
-  "Popup menus and sold-out notes can be switched when the day changes."
+  {
+    name: "The OG Smashburger",
+    price: "$9.50",
+    image: "/assets/mellow-moose-og-smashburger.jpg",
+    tag: "Best seller"
+  },
+  {
+    name: "Blazing Moose Fries",
+    price: "$7.00",
+    image: "/assets/mellow-moose-blazing-fries.jpg",
+    tag: "Local favorite"
+  },
+  {
+    name: "Jalapeno Ranch Bacon",
+    price: "$11.00",
+    image: "/assets/mellow-moose-jalapeno-ranch-bacon.jpg",
+    tag: "Menu pick"
+  }
 ];
 
 const customerView = [
-  "A branded menu page that feels like the business",
-  "Best sellers, local favorites, prices, and photos",
+  "A branded mobile menu that feels like your business",
+  "Food photos, prices, best sellers, and local favorites",
   "Order, call, directions, review, and share buttons",
-  "Current hours, location, sold-out notes, and special events"
+  "Current hours, location, specials, and sold-out notes"
 ];
 
 const ownerView = [
-  "Update hours without rebuilding the page",
+  "Change hours without rebuilding your site",
   "Post closing early, sold out, or weather notes",
-  "Feature Happy Hour, Fry Day, combos, or daily specials",
-  "Switch into popup mode when a second menu takes over"
+  "Feature happy hour, combo deals, or daily specials",
+  "Switch into popup mode when a second menu takes over",
+  "Update location when the truck moves",
+  "Keep the page current without relying on Facebook"
 ];
 
-const liveBadges = [
+const adminControls = [
   {
-    label: "Low inventory",
-    title: "Warn before the rush",
-    text: "Turn on a clear low-inventory signal when a best seller is almost gone.",
-    image: "/assets/mellow-moose-low-inventory.jpg"
+    title: "Low inventory warning",
+    label: "Almost gone",
+    text: "Turn on when an item is almost gone.",
+    customerSees: "Almost out of brisket - get it before it is gone.",
+    active: false
   },
   {
-    label: "Closed today",
-    title: "Make closed obvious",
-    text: "Post a closed notice for weather, catering, maintenance, or sold-out days.",
-    image: "/assets/mellow-moose-closed-sign.jpg"
+    title: "Sorry, we are closed",
+    label: "Closed",
+    text: "Use for unexpected closures.",
+    customerSees: "We are closed today. Back tomorrow at 11a.",
+    active: false
   },
   {
-    label: "Happy Hour",
-    title: "Feature a timed special",
-    text: "Promote a limited special without redesigning the whole menu page.",
-    image: "/assets/mellow-moose-happy-hour.jpg"
+    title: "Happy Hour all day",
+    label: "Special",
+    text: "Promote a time-based deal.",
+    customerSees: "$2 off all baskets today only.",
+    active: true
   },
   {
-    label: "Closing early",
-    title: "Update the day fast",
-    text: "Tell customers the current plan before they drive across town.",
-    image: "/assets/mellow-moose-closing-early.jpg"
+    title: "Closing early",
+    label: "Hours",
+    text: "Let folks know before they drive.",
+    customerSees: "Closing at 6p tonight. Last orders at 5:45p.",
+    active: false
+  },
+  {
+    title: "Sold out",
+    label: "Sold out",
+    text: "Mark items unavailable.",
+    customerSees: "Sold out: Cowboy Burger. Back Friday.",
+    active: false
+  },
+  {
+    title: "Changed location",
+    label: "Moved",
+    text: "Update where the truck is parked.",
+    customerSees: "Today only - parked at Memorial Park.",
+    active: false
+  },
+  {
+    title: "Daily special",
+    label: "Featured",
+    text: "Feature one item up top.",
+    customerSees: "Today: Slammer Jammer and fries for $13.",
+    active: true
+  },
+  {
+    title: "Popup menu active",
+    label: "Takeover",
+    text: "Switch to a takeover menu.",
+    customerSees: "Dos Gordos Takeover - tortas and tacos today.",
+    active: false
   }
 ];
+
+const reasons = [
+  {
+    title: "Facebook posts disappear",
+    text: "Today&apos;s update gets buried under tomorrow&apos;s post. New customers may never see it."
+  },
+  {
+    title: "Google is not always enough",
+    text: "Hours can go stale, photos can feel random, and specials rarely get the room they need."
+  },
+  {
+    title: "Ordering pages are not storefronts",
+    text: "Clover and delivery links are useful, but they do not always explain who you are or why people should choose you."
+  },
+  {
+    title: "Screenshots are not a menu",
+    text: "Blurry paper-menu photos make it harder for customers to trust what they are reading."
+  },
+  {
+    title: "One front door",
+    text: "Link to ordering, directions, phone, reviews, socials, QR codes, and current updates from one polished page."
+  },
+  {
+    title: "Always current",
+    text: "Sold out, closing early, weather closures, popup takeovers, and location changes can be made obvious."
+  }
+];
+
+const brandItems = ["Your colors", "Your photos", "Your voice", "Your story"];
+
+const planCards = [
+  {
+    name: "Owner Managed",
+    tag: "You drive",
+    text: "For businesses that want a custom menu page and simple controls to update hours, specials, sold-out items, and status notes themselves.",
+    cta: "Start your MenuPilot page",
+    href: "/pricing",
+    featured: false,
+    items: [
+      "Custom-branded MenuPilot page",
+      "Self-serve admin for hours and status",
+      "Sold-out, specials, and popup toggles",
+      "Order, call, directions, and share buttons",
+      "Email support"
+    ]
+  },
+  {
+    name: "Resonate Managed",
+    tag: "We drive",
+    text: "For businesses that want Resonate Solutions to handle menu changes, photo swaps, specials, and page improvements for them.",
+    cta: "Send menu photos and details",
+    href: `mailto:${questionsEmail}`,
+    featured: true,
+    items: [
+      "Everything in Owner Managed",
+      "We update hours, specials, and sold-out items",
+      "Menu changes and price updates handled for you",
+      "Photo swaps and seasonal refreshes",
+      "Ongoing page improvements",
+      "Priority text and email support"
+    ]
+  }
+];
+
+function CheckLine({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
+  return (
+    <li className="flex gap-3">
+      <span className={dark ? "font-black text-gold" : "font-black text-brand"}>✓</span>
+      <span>{children}</span>
+    </li>
+  );
+}
+
+function PhonePreview() {
+  return (
+    <div className="relative mx-auto max-w-[360px] rounded-[2.35rem] border-[7px] border-ink bg-white shadow-soft">
+      <div className="absolute -right-5 -top-4 rotate-3 rounded-full bg-gold px-4 py-2 text-sm font-black text-ink shadow-sm">
+        Live preview
+      </div>
+      <div className="flex items-center justify-between rounded-t-[1.85rem] bg-ink px-6 py-3 text-xs font-black uppercase tracking-[0.14em] text-white">
+        <span>9:41</span>
+        <span>Sample menu</span>
+        <span>...</span>
+      </div>
+      <div className="bg-[linear-gradient(135deg,#4d8b72,#dce9df)] px-6 py-7 text-ink">
+        <span className="rounded-full bg-ink px-3 py-1 text-xs font-black uppercase tracking-[0.1em] text-white">
+          Open today - 11a-8p
+        </span>
+        <h2 className="mt-4 text-3xl font-black leading-none">Mellow Moose Burgers</h2>
+        <p className="mt-2 text-sm font-semibold">Smash burgers - Siloam Springs, AR</p>
+        <div className="mt-5 grid grid-cols-4 gap-2 text-center text-xs font-black">
+          {["Order", "Map", "Call", "Share"].map((action) => (
+            <span key={action} className="rounded-2xl bg-white/95 px-2 py-3 shadow-sm">
+              {action}
+            </span>
+          ))}
+        </div>
+      </div>
+      <div className="rounded-b-[1.85rem] bg-cream px-5 py-5">
+        <div className="flex items-end justify-between">
+          <h3 className="text-lg font-black text-ink">Local Favorites</h3>
+          <span className="text-xs font-black uppercase tracking-[0.12em] text-brandDark">See all</span>
+        </div>
+        <div className="mt-4 grid gap-3">
+          {sampleMenu.map((item) => (
+            <div key={item.name} className="grid grid-cols-[64px_1fr_auto] items-center gap-3 rounded-2xl border border-line bg-white p-3 shadow-sm">
+              <img src={item.image} alt={item.name} className="h-14 w-14 rounded-xl object-cover" />
+              <div className="min-w-0">
+                <span className="inline-flex rounded-full bg-sage px-2 py-1 text-[10px] font-black uppercase tracking-[0.08em] text-brandDark">
+                  {item.tag}
+                </span>
+                <p className="mt-1 truncate font-black text-ink">{item.name}</p>
+              </div>
+              <span className="rounded-full bg-ink px-3 py-2 text-sm font-black text-white">{item.price}</span>
+            </div>
+          ))}
+        </div>
+      </div>
+    </div>
+  );
+}
 
 export default function MenuPilotPage() {
   const photoEmailLink = mailtoLink(
@@ -82,180 +225,139 @@ export default function MenuPilotPage() {
   );
 
   return (
-    <main>
-      <section className="relative overflow-hidden bg-cream">
-        <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#4d8b72,#e8a93a,#d97856)]" />
-        <div className="relative mx-auto grid max-w-7xl gap-12 px-5 py-20 md:grid-cols-[1fr_0.85fr] md:py-28">
-          <div className="self-center">
-            <h1 className="max-w-4xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
-              Menu pages that feel like the business, not the platform.
+    <main className="bg-cream">
+      <section className="border-b border-line">
+        <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4">
+          <Link href="/" className="flex items-center gap-3">
+            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-brand text-lg font-black text-white">M</span>
+            <span>
+              <span className="block text-lg font-black leading-none text-ink">MenuPilot</span>
+              <span className="text-[11px] font-black uppercase tracking-[0.18em] text-muted">by Resonate Solutions</span>
+            </span>
+          </Link>
+          <nav className="hidden items-center gap-8 text-sm font-bold text-muted md:flex">
+            <a href="#how-it-works" className="hover:text-ink">How it works</a>
+            <a href="#controls" className="hover:text-ink">Controls</a>
+            <a href="#why" className="hover:text-ink">Why it matters</a>
+            <a href="#plans" className="hover:text-ink">Plans</a>
+          </nav>
+          <Link href="/pricing" className="rounded-full bg-brand px-5 py-3 text-sm font-black text-white shadow-sm transition hover:bg-brandDark">
+            Start your page
+          </Link>
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden">
+        <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#4d8b72,#dce9df,#e8a93a,#d97856)]" />
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-[1fr_0.85fr] lg:py-24">
+          <div>
+            <h1 className="max-w-4xl text-5xl font-black leading-[0.95] text-ink md:text-7xl">
+              Menu pages that feel like <span className="text-brand">your business</span>, not the platform.
             </h1>
-            <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-              For food trucks, pop-ups, coffee shops, salons, and small restaurants that need menu items, hours, location, photos, and review links to come through clearly without looking like everyone else's hosted menu.
-            </p>
-            <p className="mt-5 max-w-2xl rounded-2xl bg-white px-5 py-4 leading-7 text-muted shadow-sm">
-              Have photos already? Send menu photos, item photos, pricing, and questions to{" "}
-              <a href={photoEmailLink} className="font-black text-brandDark">{questionsEmail}</a>.
+            <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
+              Give customers one clean place to find your menu, hours, location, specials, food photos, and order links without sending them hunting through social posts or blurry menu screenshots.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/pricing" className="min-h-12 rounded-full bg-brand px-6 py-3 text-center font-bold text-white shadow-soft hover:bg-brandDark">
+              <Link href="/m/mellow-moose-burgers" className="rounded-full bg-brand px-7 py-4 text-center font-black text-white shadow-soft transition hover:bg-brandDark">
+                See example menu
+              </Link>
+              <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-black text-ink shadow-sm transition hover:border-brand">
                 View monthly plans
               </Link>
-              <Link href="/menupilot/examples" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
-                See MenuPilot examples
-              </Link>
-              <Link href="/m/mellow-moose-burgers" className="min-h-12 rounded-full border border-line bg-white px-6 py-3 text-center font-bold text-ink hover:border-brand">
-                View example menu
-              </Link>
+            </div>
+            <div className="mt-8 flex flex-wrap gap-5 text-sm font-bold text-muted">
+              {["Mobile-first", "Custom branded", "Update in one click"].map((item) => (
+                <span key={item} className="inline-flex items-center gap-2">
+                  <span className="text-brand">✓</span>
+                  {item}
+                </span>
+              ))}
             </div>
           </div>
-          <div className="rounded-[1.75rem] border border-line bg-white p-4 shadow-soft">
-            <div className="rounded-[1.25rem] bg-cream p-5">
-              <div className="border-b border-line pb-4">
-                <p className="text-sm font-black uppercase tracking-[0.12em] text-brand">Now playing</p>
-                <h2 className="mt-2 text-3xl font-black text-ink">Mellow Moose Burgers</h2>
-                <p className="mt-1 text-sm text-muted">Griffin&apos;s Food Court - Siloam Springs</p>
-              </div>
-              <div className="mt-5 grid gap-3">
-                {sampleMenu.map(([item, price, image, note]) => (
-                  <div key={item} className="grid grid-cols-[76px_1fr] gap-3 rounded-2xl border border-line bg-white p-3">
-                    <img src={image} alt={item} className="h-20 w-20 rounded-xl object-cover" />
-                    <div>
-                      <div className="flex items-start justify-between gap-3">
-                        <span className="font-bold text-ink">{item}</span>
-                        <span className="font-black text-coral">{price}</span>
-                      </div>
-                      <span className="mt-2 inline-flex rounded-full bg-sage px-3 py-1 text-xs font-black text-brandDark">{note}</span>
-                    </div>
-                  </div>
-                ))}
-              </div>
-              <div className="mt-5 rounded-2xl bg-ink p-4 text-white">
-                <p className="text-sm font-bold">Quick actions</p>
-                <div className="mt-3 grid grid-cols-2 gap-2 text-center text-sm font-bold">
-                  <span className="rounded-full bg-white/10 px-3 py-2">Get directions</span>
-                  <span className="rounded-full bg-white/10 px-3 py-2">Leave review</span>
-                  <span className="rounded-full bg-white/10 px-3 py-2">Order link</span>
-                  <span className="rounded-full bg-white/10 px-3 py-2">Share menu</span>
-                </div>
-              </div>
-              <Link href="/m/mellow-moose-burgers" className="mt-4 block rounded-full bg-brand px-5 py-3 text-center font-black text-white transition hover:bg-brandDark">
-                View Mellow Moose menu
-              </Link>
-            </div>
-          </div>
+          <PhonePreview />
         </div>
       </section>
 
-      <section className="bg-white">
+      <section id="how-it-works" className="bg-white">
         <div className="mx-auto max-w-7xl px-5 py-20">
-          <div className="mx-auto max-w-3xl text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Two sides of the product</p>
+          <div className="max-w-3xl">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">How it works</p>
             <h2 className="mt-3 text-4xl font-black leading-tight text-ink md:text-5xl">
-              Customers see a clean menu. Owners get control behind it.
+              One polished page out front. Real controls behind it.
             </h2>
-            <p className="mt-5 leading-7 text-muted">
-              MenuPilot is not just a pretty page. It is a customer-facing menu plus an owner workflow for the details that change during real business life.
-            </p>
           </div>
           <div className="mt-12 grid gap-6 lg:grid-cols-2">
-            <article className="rounded-[1.5rem] border border-line bg-cream p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
-              <div className="flex items-center justify-between gap-4 border-b border-line pb-5">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.14em] text-brand">What the customer sees</p>
-                  <h3 className="mt-2 text-3xl font-black text-ink">The public menu</h3>
-                </div>
-                <span className="rounded-full bg-white px-4 py-2 text-sm font-black text-brandDark shadow-sm">Mobile first</span>
-              </div>
-              <div className="mt-6 grid gap-3">
+            <article className="rounded-[1.75rem] border border-line bg-cream p-7 shadow-sm">
+              <span className="inline-flex rounded-full bg-sage px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-brandDark">
+                What customers see
+              </span>
+              <h3 className="mt-5 text-3xl font-black text-ink">A branded mobile menu</h3>
+              <ul className="mt-6 grid gap-4 text-muted">
                 {customerView.map((item) => (
-                  <div key={item} className="rounded-2xl bg-white p-4 font-bold text-ink shadow-sm">
-                    {item}
-                  </div>
+                  <CheckLine key={item}>{item}</CheckLine>
                 ))}
-              </div>
+              </ul>
             </article>
-            <article className="rounded-[1.5rem] border border-line bg-ink p-6 text-white shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
-              <div className="flex items-center justify-between gap-4 border-b border-white/15 pb-5">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.14em] text-gold">What you see</p>
-                  <h3 className="mt-2 text-3xl font-black">The owner controls</h3>
-                </div>
-                <span className="rounded-full bg-white/10 px-4 py-2 text-sm font-black text-white">Live updates</span>
-              </div>
-              <div className="mt-6 grid gap-3">
+            <article className="rounded-[1.75rem] bg-ink p-7 text-white shadow-soft">
+              <span className="inline-flex rounded-full bg-gold px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-ink">
+                What owners control
+              </span>
+              <h3 className="mt-5 text-3xl font-black">Real updates, no rebuild</h3>
+              <ul className="mt-6 grid gap-4 text-white/90">
                 {ownerView.map((item) => (
-                  <div key={item} className="rounded-2xl bg-white/10 p-4 font-bold text-white">
-                    {item}
-                  </div>
+                  <CheckLine key={item} dark>{item}</CheckLine>
                 ))}
-              </div>
+              </ul>
             </article>
           </div>
         </div>
       </section>
 
-      <section className="mx-auto max-w-7xl px-5 py-20">
-        <div className="mb-10 max-w-3xl">
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Why it fits</p>
-            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              Discovery gets noisy for a lot of small businesses.
-            </h2>
-            <p className="mt-5 leading-7 text-muted">
-            Customers often cannot find the current menu, location, hours, or reliable link. MenuPilot gives them one lightweight signal that can sit on Google, Instagram, QR codes, receipts, and signs while still feeling like the business they came looking for.
-          </p>
-        </div>
-        <div className="grid gap-5 md:grid-cols-2 lg:grid-cols-4">
-          {features.map((feature) => (
-            <article key={feature.title} className="rounded-2xl border border-line bg-white p-6 shadow-sm">
-              <h3 className="text-xl font-black text-ink">{feature.title}</h3>
-              <p className="mt-3 leading-7 text-muted">{feature.text}</p>
-            </article>
-          ))}
-        </div>
-      </section>
-
-      <section className="bg-cream">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
-          <div>
-            <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Admin-side signals</p>
-            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              One click can change what customers need to know today.
-            </h2>
-            <p className="mt-5 leading-7 text-muted">
-              Specials and status notes do not have to live on the menu every day. MenuPilot can give the owner simple switches for low inventory, closed notices, happy hour, popup menus, and early closing alerts.
-            </p>
-            <div className="mt-6 rounded-[1.25rem] border border-line bg-white p-5 shadow-sm">
-              <p className="text-sm font-black uppercase tracking-[0.14em] text-brandDark">Owner control idea</p>
-              <p className="mt-3 leading-7 text-muted">
-                The public page stays polished. Behind it, the business can choose which signal is active, add a short note, and turn it off when the day changes.
+      <section id="controls" className="border-y border-line bg-cream">
+        <div className="mx-auto max-w-7xl px-5 py-20">
+          <div className="grid gap-8 lg:grid-cols-[0.85fr_1fr] lg:items-end">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">Admin controls</p>
+              <h2 className="mt-3 text-4xl font-black leading-tight text-ink md:text-5xl">
+                One click can change what customers need to know today.
+              </h2>
+              <p className="mt-5 max-w-2xl leading-7 text-muted">
+                Your public menu stays polished. Behind it, you can turn on the right signal for the day.
               </p>
             </div>
+            <div className="rounded-full border border-line bg-white px-5 py-3 text-sm font-bold text-muted shadow-sm">
+              Try the toggles - this is how the admin side should feel.
+            </div>
           </div>
-          <div className="grid gap-4 sm:grid-cols-2">
-            {liveBadges.map((badge) => (
-              <article key={badge.label} className="group overflow-hidden rounded-[1.25rem] border-4 border-ink bg-white shadow-sm outline outline-2 outline-offset-4 outline-transparent transition hover:-translate-y-1 hover:border-brand hover:outline-brand/25 hover:shadow-soft">
-                <div className="relative aspect-[4/3] overflow-hidden bg-ink">
-                  <img
-                    src={badge.image}
-                    alt={`${badge.label} menu status example`}
-                    className="h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute left-4 top-4 rounded-full bg-white px-3 py-1 text-xs font-black uppercase tracking-[0.12em] text-brandDark shadow-sm ring-2 ring-ink/10">
-                    {badge.label}
-                  </div>
-                  <div className="absolute bottom-4 right-4 rounded-full bg-ink px-3 py-2 text-xs font-black uppercase tracking-[0.1em] text-white shadow-soft transition group-hover:bg-brand">
-                    Admin click
-                  </div>
-                </div>
-                <div className="p-5">
-                  <div className="flex items-start justify-between gap-4">
-                    <h3 className="text-xl font-black text-ink">{badge.title}</h3>
-                    <span className="mt-1 h-5 w-9 rounded-full border-2 border-ink bg-cream p-0.5 transition group-hover:border-brand group-hover:bg-brand">
-                      <span className="block h-3 w-3 rounded-full bg-ink transition group-hover:translate-x-4 group-hover:bg-white" />
+          <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {adminControls.map((control) => (
+              <article
+                key={control.title}
+                className={`group rounded-[1.5rem] border-2 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-soft ${
+                  control.active ? "border-brand" : "border-line hover:border-brand"
+                }`}
+              >
+                <div className="flex items-start justify-between gap-4">
+                  <div>
+                    <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-black uppercase tracking-[0.12em] ${
+                      control.active ? "bg-brand text-white" : "bg-sage text-brandDark"
+                    }`}>
+                      {control.label}
                     </span>
+                    <h3 className="mt-4 text-xl font-black leading-tight text-ink">{control.title}</h3>
+                    <p className="mt-1 text-sm font-semibold text-muted">{control.text}</p>
                   </div>
-                  <p className="mt-3 leading-7 text-muted">{badge.text}</p>
+                  <span className={`mt-1 h-7 w-12 rounded-full p-1 transition ${
+                    control.active ? "bg-brand" : "bg-line group-hover:bg-brand"
+                  }`}>
+                    <span className={`block h-5 w-5 rounded-full bg-white shadow-sm transition ${
+                      control.active ? "translate-x-5" : "group-hover:translate-x-5"
+                    }`} />
+                  </span>
+                </div>
+                <div className="mt-5 rounded-2xl border border-dashed border-line bg-cream p-4">
+                  <p className="text-[11px] font-black uppercase tracking-[0.14em] text-muted">Customer sees</p>
+                  <p className="mt-2 text-sm font-bold leading-5 text-ink">{control.customerSees}</p>
                 </div>
               </article>
             ))}
@@ -263,49 +365,145 @@ export default function MenuPilotPage() {
         </div>
       </section>
 
-      <section className="bg-sage">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.85fr_1.15fr]">
-          <div>
-            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              Start with a Mic Check.
+      <section id="why" className="bg-white">
+        <div className="mx-auto max-w-7xl px-5 py-20">
+          <div className="max-w-4xl">
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">Why MenuPilot</p>
+            <h2 className="mt-3 text-4xl font-black leading-tight text-ink md:text-5xl">
+              Customers should not have to dig to know if you are open.
             </h2>
-            <p className="mt-5 leading-7 text-muted">
-              Before heavy automation, Resonate needs a clean intake loop: collect the business details, identify what is hard for customers to find, and recommend the low monthly or high monthly plan that actually fits.
+            <p className="mt-5 max-w-2xl leading-7 text-muted">
+              Food trucks and small restaurants change hours, locations, specials, and availability often. People deserve one current place to check before they drive over.
             </p>
           </div>
-          <IntakeForm />
+          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
+            {reasons.map((reason) => (
+              <article key={reason.title} className="rounded-[1.5rem] border border-line bg-cream p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
+                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-sage text-lg font-black text-brandDark">+</span>
+                <h3 className="mt-5 text-xl font-black text-ink">{reason.title}</h3>
+                <p className="mt-3 leading-7 text-muted" dangerouslySetInnerHTML={{ __html: reason.text }} />
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="bg-ink text-white">
+        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-20 lg:grid-cols-[0.85fr_1.15fr]">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-gold">Custom branding</p>
+            <h2 className="mt-3 text-4xl font-black leading-tight md:text-5xl">
+              This is not one menu template for everyone.
+            </h2>
+            <p className="mt-5 max-w-xl leading-7 text-white/80">
+              Your page should use your logo, colors, menu style, food photos, voice, and customer experience. MenuPilot is designed around your business - not around Resonate Solutions.
+            </p>
+            <div className="mt-8 grid gap-3 sm:grid-cols-2">
+              {brandItems.map((item) => (
+                <span key={item} className="rounded-full border border-white/20 bg-white/10 px-5 py-3 font-black text-white">
+                  {item}
+                </span>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-[2rem] bg-cream p-6 text-ink shadow-soft">
+            <div className="flex flex-wrap items-center justify-between gap-3">
+              <div>
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-brandDark">Brand kit sample</p>
+                <h3 className="mt-2 text-3xl font-black">Mellow Moose Burgers</h3>
+              </div>
+              <span className="rounded-full bg-sage px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-brandDark">Live customer</span>
+            </div>
+            <div className="mt-6 grid grid-cols-4 gap-3">
+              {[
+                ["Sage", "bg-brand"],
+                ["Cream", "bg-cream border border-line"],
+                ["Gold", "bg-gold"],
+                ["Coral", "bg-coral"]
+              ].map(([name, color]) => (
+                <div key={name}>
+                  <div className={`h-20 rounded-2xl ${color}`} />
+                  <p className="mt-2 text-xs font-black uppercase tracking-[0.12em] text-muted">{name}</p>
+                </div>
+              ))}
+            </div>
+            <div className="mt-6 grid grid-cols-3 gap-3">
+              {sampleMenu.map((item) => (
+                <img key={item.name} src={item.image} alt={item.name} className="aspect-square rounded-2xl object-cover shadow-sm" />
+              ))}
+            </div>
+            <div className="mt-5 rounded-2xl bg-white px-4 py-3 text-sm text-muted">
+              Menu voice: <span className="font-black text-ink">current, easy to scan, and unmistakably yours.</span>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="plans" className="bg-cream">
+        <div className="mx-auto max-w-7xl px-5 py-20">
+          <div>
+            <p className="text-sm font-black uppercase tracking-[0.16em] text-brand">Plans</p>
+            <h2 className="mt-3 text-4xl font-black leading-tight text-ink md:text-5xl">
+              Two ways to run your MenuPilot page.
+            </h2>
+            <p className="mt-4 leading-7 text-muted">Pick the level of help you want. We build the page either way.</p>
+          </div>
+          <div className="mt-10 grid gap-6 lg:grid-cols-2">
+            {planCards.map((plan) => (
+              <article key={plan.name} className={`rounded-[1.75rem] border-2 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-soft ${
+                plan.featured ? "border-brand" : "border-line"
+              }`}>
+                <div className="flex items-start justify-between gap-4">
+                  <h3 className="text-3xl font-black text-ink">{plan.name}</h3>
+                  <span className="rounded-full bg-sage px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-brandDark">{plan.tag}</span>
+                </div>
+                <p className="mt-4 leading-7 text-muted">{plan.text}</p>
+                <ul className="mt-7 grid gap-3 text-muted">
+                  {plan.items.map((item) => (
+                    <CheckLine key={item}>{item}</CheckLine>
+                  ))}
+                </ul>
+                <div className="mt-8">
+                  <p className="text-3xl font-black text-ink">Monthly plan</p>
+                  <p className="mt-1 text-sm text-muted">
+                    {plan.featured ? "Quoted based on update frequency and menu size." : "Setup fee plus low monthly. Custom quoted per business."}
+                  </p>
+                </div>
+                <Link href={plan.href} className={`mt-7 block rounded-full px-6 py-4 text-center font-black shadow-sm transition ${
+                  plan.featured ? "bg-ink text-white hover:bg-brandDark" : "bg-brand text-white hover:bg-brandDark"
+                }`}>
+                  {plan.cta}
+                </Link>
+              </article>
+            ))}
+          </div>
         </div>
       </section>
 
       <section className="bg-white">
-        <div className="mx-auto grid max-w-7xl gap-10 px-5 py-20 lg:grid-cols-[0.9fr_1.1fr]">
-          <div>
-            <h2 className="mt-3 text-4xl font-black text-ink md:text-5xl">
-              Show the custom work without taking over the customer page.
-            </h2>
-            <p className="mt-5 leading-7 text-muted">
-              Mellow Moose gets a real customer menu they can share. MenuPilot gets a smaller showcase that explains what Resonate customized: brand color, menu structure, food photos, action links, QR code, and popup-ready controls.
-            </p>
-            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
-              <Link href="/m/mellow-moose-burgers" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white shadow-soft hover:bg-brandDark">
-                Open Mellow Moose
-              </Link>
-              <a href={photoEmailLink} className="rounded-full border border-line bg-white px-5 py-3 text-center font-black text-ink hover:border-brand">
-                Send menu details
-              </a>
+        <div className="mx-auto max-w-7xl px-5 py-16">
+          <div className="rounded-[2rem] bg-[linear-gradient(135deg,#4d8b72,#dce9df,#e8a93a)] p-8 shadow-soft md:p-12">
+            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+              <div>
+                <h2 className="text-4xl font-black leading-tight text-ink md:text-5xl">Let&apos;s build your front door.</h2>
+                <p className="mt-4 max-w-2xl text-lg leading-8 text-ink/80">
+                  Send your menu, a few food photos, and your hours. We will send back a custom MenuPilot page that actually looks like your business.
+                </p>
+              </div>
+              <div className="flex flex-col gap-3 sm:flex-row">
+                <Link href="/pricing" className="rounded-full bg-ink px-7 py-4 text-center font-black text-white shadow-sm transition hover:bg-brandDark">
+                  Start your MenuPilot page
+                </Link>
+                <a href={photoEmailLink} className="rounded-full border border-line bg-white px-7 py-4 text-center font-black text-ink shadow-sm transition hover:border-brand">
+                  Send menu details
+                </a>
+              </div>
             </div>
           </div>
-          <div className="rounded-[1.75rem] border border-line bg-cream p-5 shadow-soft">
-            <h3 className="text-2xl font-black text-ink">What the example proves</h3>
-            <div className="mt-5 grid gap-3">
-              {showcaseNotes.map((item, index) => (
-                <div key={item} className="flex gap-3 rounded-2xl border border-line bg-white p-4">
-                  <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-sage text-sm font-black text-brandDark">{index + 1}</span>
-                  <span className="font-bold text-ink">{item}</span>
-                </div>
-              ))}
-            </div>
-          </div>
+          <footer className="mt-12 flex flex-col gap-4 border-t border-line pt-8 text-sm text-muted md:flex-row md:items-center md:justify-between">
+            <p className="font-black text-ink">MenuPilot <span className="font-normal text-muted">by Resonate Solutions</span></p>
+            <p>Custom menu pages for local food businesses. Built in Northwest Arkansas.</p>
+          </footer>
         </div>
       </section>
     </main>
