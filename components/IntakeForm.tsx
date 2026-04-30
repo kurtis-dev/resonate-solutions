@@ -53,7 +53,7 @@ export function IntakeForm() {
   return (
     <form onSubmit={onSubmit} className="grid gap-4 rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
       <div>
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Start with a Mic Check</p>
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Start with a Mic Check</p>
         <h2 className="mt-2 text-3xl font-black text-ink">Find the missing notes in your customer path.</h2>
         <p className="mt-3 leading-7 text-muted">
           Send the basics and Resonate can review what customers see now: menu, hours, location, photos, links, and Google profile signals.
@@ -107,8 +107,9 @@ export function IntakeForm() {
           Interest
           <select required value={form.packageInterest} onChange={(event) => updateField("packageInterest", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
             <option>Free Mic Check audit</option>
-            <option>MenuPilot Core</option>
-            <option>MenuPilot Managed</option>
+            <option>MenuPilot Starter</option>
+            <option>MenuPilot Plus</option>
+            <option>Resonate Managed</option>
           </select>
         </label>
       </div>
@@ -120,12 +121,12 @@ export function IntakeForm() {
 
       <input tabIndex={-1} autoComplete="off" value={form.website} onChange={(event) => updateField("website", event.target.value)} className="hidden" aria-hidden="true" />
 
-      <button disabled={state.status === "submitting"} type="submit" className="rounded-full bg-brand px-6 py-3 font-black text-white shadow-soft hover:bg-brandDark disabled:cursor-not-allowed disabled:opacity-70">
+      <button disabled={state.status === "submitting"} type="submit" className="rounded-full bg-coral px-6 py-3 font-black text-white shadow-soft hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70">
         {state.status === "submitting" ? "Sending..." : "Request Mic Check"}
       </button>
 
       {state.message ? (
-        <p className={`rounded-2xl px-4 py-3 text-sm font-bold ${state.status === "error" ? "bg-red-50 text-red-700" : "bg-sage text-brandDark"}`}>
+        <p className={`rounded-2xl px-4 py-3 text-sm font-bold ${state.status === "error" ? "bg-red-50 text-red-700" : "bg-[#fff0e9] text-coral"}`}>
           {state.message}
         </p>
       ) : null}

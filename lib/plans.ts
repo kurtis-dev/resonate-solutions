@@ -36,23 +36,43 @@ export const plans: Plan[] = [
   },
   {
     id: "core",
-    name: "Owner Managed",
-    price: "$59",
-    description: "For owners who want the custom menu page and the controls to keep it current themselves.",
-    limit: "Best when you want control without another website builder",
+    name: "MenuPilot Starter",
+    price: "$49",
+    description: "For very small trucks and popups that want a clean branded menu page and mostly manage updates themselves.",
+    limit: "$199 setup fee",
     billingPeriod: "mo",
     features: [
-      { label: "Custom branded menu page", detail: "Your logo, colors, food photos, categories, best sellers, specials, and customer actions are built into one mobile-first page." },
-      { label: "Live QR menu link", detail: "Use the same QR code on signs, counters, truck windows, posts, and receipts without reprinting when the menu changes." },
-      { label: "Owner control center", detail: "Change hours, closed notes, sold-out alerts, daily specials, and popup menu mode from a simple admin page." },
-      { label: "Ordering, call, directions, and review links", detail: "Customers can get to the actions they need without digging through Facebook posts or blurry screenshots." },
-      { label: "Unlimited self-serve routine edits", detail: "You are not boxed into two edits per month. If you can update it through the control center, use it as often as needed." },
-      { label: "Resonate support for fixes", detail: "If something breaks or a control needs help, you can reach out by email." }
+      { label: "Custom branded menu page", detail: "A mobile-first page using the business logo, colors, menu, food photos, hours, location, and order links." },
+      { label: "Hours, location, menu, and photos", detail: "The essential customer details live in one clean place instead of scattered posts and old screenshots." },
+      { label: "Clover/order link", detail: "MenuPilot does not replace checkout. It sends ready customers to Clover or another ordering link." },
+      { label: "QR code", detail: "One QR link for the truck, counter, social profiles, printed cards, and signs." },
+      { label: "Mobile-first page", detail: "Built for customers checking late at night or from a parking lot before they drive over." },
+      { label: "Basic admin/status toggles", detail: "Starter includes simple controls for routine visibility updates." },
+      { label: "Email support", detail: "Questions and basic support go through questions@resonate.solutions." }
     ],
-    cta: "Choose Owner Managed",
-    highlighted: true,
+    cta: "Choose Starter",
     checkoutUrl: "/checkout?plan=core",
     stripePriceEnvKey: "STRIPE_PRICE_CORE",
+    paymentMode: "subscription"
+  },
+  {
+    id: "plus",
+    name: "MenuPilot Plus",
+    price: "$99",
+    description: "The main offer for food trucks and small restaurants that want the page plus daily business controls.",
+    limit: "$299 setup fee",
+    billingPeriod: "mo",
+    features: [
+      { label: "Everything in Starter", detail: "Includes the branded menu page, QR code, order link, photos, hours, location, mobile layout, and email support." },
+      { label: "Specials/status controls", detail: "Turn on closed early, sold out, happy hour, popup menu, and changed location notices when customers need to know." },
+      { label: "Best sellers and local favorites", detail: "Guide people toward the items they should try first instead of making every item compete equally." },
+      { label: "Monthly polish/checkup", detail: "A recurring look at the page so obvious stale details, weak labels, and broken customer paths do not sit untouched." },
+      { label: "Google, Clover, and social link help", detail: "Help connecting the public page to the profiles and order links customers already use." }
+    ],
+    cta: "Choose Plus",
+    highlighted: true,
+    checkoutUrl: "/checkout?plan=plus",
+    stripePriceEnvKey: "STRIPE_PRICE_PLUS",
     paymentMode: "subscription"
   },
   {
@@ -60,10 +80,10 @@ export const plans: Plan[] = [
     name: "Resonate Managed",
     price: "$299",
     description: "For owners who want the page kept fresh without logging in, editing controls, or chasing menu details.",
-    limit: "Best when you want me handling the updates",
+    limit: "$499 setup fee",
     billingPeriod: "mo",
     features: [
-      { label: "Everything in Owner Managed", detail: "You still get the custom page, QR link, action buttons, admin controls, and mobile-first customer menu." },
+      { label: "Everything in Plus", detail: "You still get the custom page, QR link, action buttons, admin controls, monthly polish, and mobile-first customer menu." },
       { label: "Resonate handles updates", detail: "Send changes by email or message and I update hours, specials, popup menus, photos, and visible page details for you." },
       { label: "Weekly menu presence check", detail: "I check that the public page still reflects what customers need to know that week." },
       { label: "Specials and event support", detail: "Happy Hour, Fry Day, 2 for $22, popup days, weather closures, and sold-out notices can be surfaced quickly." },

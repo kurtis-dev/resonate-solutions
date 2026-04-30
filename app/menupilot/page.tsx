@@ -128,34 +128,51 @@ const brandItems = ["Your colors", "Your photos", "Your voice", "Your story"];
 
 const planCards = [
   {
-    name: "Owner Managed",
-    tag: "You drive",
-    text: "For businesses that want a custom menu page and simple controls to update hours, specials, sold-out items, and status notes themselves.",
+    name: "MenuPilot Starter",
+    tag: "$49/mo + $199 setup",
+    text: "For very small trucks and popups that want a clean branded menu page and mostly manage updates themselves.",
     cta: "Start your MenuPilot page",
     href: "/pricing",
     featured: false,
     items: [
-      "Custom-branded MenuPilot page",
-      "Self-serve admin for hours and status",
-      "Sold-out, specials, and popup toggles",
-      "Order, call, directions, and share buttons",
+      "Custom branded menu page",
+      "Hours, location, menu, and photos",
+      "Clover/order link",
+      "QR code",
+      "Mobile-first page",
+      "Basic admin/status toggles",
       "Email support"
     ]
   },
   {
-    name: "Resonate Managed",
-    tag: "We drive",
-    text: "For businesses that want Resonate Solutions to handle menu changes, photo swaps, specials, and page improvements for them.",
-    cta: "Send menu photos and details",
-    href: `mailto:${questionsEmail}`,
+    name: "MenuPilot Plus",
+    tag: "$99/mo + $299 setup",
+    text: "The main offer for food trucks and small restaurants that want the page plus daily business controls.",
+    cta: "Choose Plus",
+    href: "/pricing",
     featured: true,
     items: [
-      "Everything in Owner Managed",
-      "We update hours, specials, and sold-out items",
-      "Menu changes and price updates handled for you",
-      "Photo swaps and seasonal refreshes",
-      "Ongoing page improvements",
-      "Priority text and email support"
+      "Everything in Starter",
+      "Closed early, sold out, happy hour, popup menu, and changed location controls",
+      "Best sellers and local favorites",
+      "Monthly polish/checkup",
+      "Help connecting Google Business, Clover, and social links"
+    ]
+  },
+  {
+    name: "Resonate Managed",
+    tag: "$299/mo + $499 setup",
+    text: "For owners who want the page kept fresh without logging in, editing controls, or chasing menu details.",
+    cta: "Send menu photos and details",
+    href: `mailto:${questionsEmail}`,
+    featured: false,
+    items: [
+      "Everything in Plus",
+      "Resonate handles updates",
+      "Weekly menu presence check",
+      "Specials and event support",
+      "Photo swaps and light cleanup",
+      "Priority support"
     ]
   }
 ];
@@ -466,9 +483,11 @@ export default function MenuPilotPage() {
             <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
               Two ways to run your MenuPilot page.
             </h2>
-            <p className="mt-4 leading-7 text-muted">Pick the level of help you want. We build the page either way.</p>
+            <p className="mt-4 leading-7 text-muted">
+              Starter gives you the page. Plus gives you the live business controls. Managed is priced for owners who want Resonate handling the updates.
+            </p>
           </div>
-          <div className="mt-10 grid gap-6 lg:grid-cols-2">
+          <div className="mt-10 grid gap-6 lg:grid-cols-3">
             {planCards.map((plan) => (
               <article key={plan.name} className={`rounded-[1.75rem] border-2 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-soft ${
                 plan.featured ? "border-coral" : "border-line"
@@ -484,10 +503,8 @@ export default function MenuPilotPage() {
                   ))}
                 </ul>
                 <div className="mt-8">
-                  <p className="text-3xl font-extrabold text-ink">Monthly plan</p>
-                  <p className="mt-1 text-sm text-muted">
-                    {plan.featured ? "Quoted based on update frequency and menu size." : "Setup fee plus low monthly. Custom quoted per business."}
-                  </p>
+                  <p className="text-3xl font-extrabold text-ink">{plan.tag.split(" + ")[0]}</p>
+                  <p className="mt-1 text-sm text-muted">{plan.tag.includes("+") ? plan.tag.split(" + ")[1] : plan.tag}</p>
                 </div>
                 <Link href={plan.href} className={`mt-7 block rounded-full px-6 py-4 text-center font-bold shadow-sm transition ${
                   plan.featured ? "bg-ink text-white hover:bg-coral" : "bg-coral text-white hover:bg-ink"

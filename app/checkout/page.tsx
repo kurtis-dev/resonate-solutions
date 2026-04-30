@@ -21,19 +21,19 @@ export default async function CheckoutPage({
   return (
     <main className="mx-auto flex max-w-2xl px-5 py-16">
       <section className="w-full rounded-[1.75rem] border border-line bg-white p-8 shadow-sm">
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Checkout</p>
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Checkout</p>
         <h1 className="mt-3 text-4xl font-black text-ink">Start your monthly MenuPilot plan.</h1>
         <p className="mt-4 leading-7 text-muted">
           You selected <strong>{plan?.name}</strong>. Once Stripe is connected, this button sends customers to a secure Stripe Checkout page and webhook events update your backend.
         </p>
-        {statusMessage ? <p className="mt-5 rounded-2xl bg-sage px-4 py-3 text-sm font-bold text-brandDark">{statusMessage}</p> : null}
+        {statusMessage ? <p className="mt-5 rounded-2xl bg-[#fff0e9] px-4 py-3 text-sm font-bold text-coral">{statusMessage}</p> : null}
         <form action="/api/checkout" method="POST" className="mt-8 grid gap-4">
           <input type="hidden" name="plan" value={plan?.id || "core"} />
           <label className="grid gap-2 text-sm font-bold text-ink">
             Customer email
             <input name="email" type="email" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="owner@example.com" />
           </label>
-          <button type="submit" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white shadow-soft hover:bg-brandDark">
+          <button type="submit" className="rounded-full bg-coral px-5 py-3 text-center font-black text-white shadow-soft hover:bg-ink">
             Continue to secure checkout
           </button>
         </form>
