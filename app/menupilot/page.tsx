@@ -1,4 +1,7 @@
+"use client";
+
 import Link from "next/link";
+import { useState } from "react";
 import { mailtoLink, questionsEmail } from "@/lib/contact";
 
 const sampleMenu = [
@@ -40,91 +43,118 @@ const ownerView = [
 
 const dailyUpdates = [
   {
+    id: "inventory",
     title: "Low inventory warning",
     label: "Almost gone",
     text: "Turn on when an item is almost gone.",
     customerSees: "Almost out of brisket - get it before it is gone.",
-    active: false
+    active: false,
+    icon: "warning"
   },
   {
+    id: "closed",
     title: "Sorry, we are closed",
     label: "Closed",
     text: "Use for unexpected closures.",
     customerSees: "We are closed today. Back tomorrow at 11a.",
-    active: false
+    active: false,
+    icon: "door"
   },
   {
+    id: "happy",
     title: "Happy Hour all day",
     label: "Special",
     text: "Promote a time-based deal.",
     customerSees: "$2 off all baskets today only.",
-    active: true
+    active: false,
+    icon: "spark"
   },
   {
+    id: "early",
     title: "Closing early",
     label: "Hours",
     text: "Let folks know before they drive.",
     customerSees: "Closing at 6p tonight. Last orders at 5:45p.",
-    active: false
+    active: false,
+    icon: "clock"
   },
   {
+    id: "soldout",
     title: "Sold out",
     label: "Sold out",
     text: "Mark items unavailable.",
     customerSees: "Sold out: Cowboy Burger. Back Friday.",
-    active: false
+    active: false,
+    icon: "box"
   },
   {
+    id: "moved",
     title: "Changed location",
     label: "Moved",
     text: "Update where the truck is parked.",
     customerSees: "Today only - parked at Memorial Park.",
-    active: false
+    active: false,
+    icon: "truck"
   },
   {
+    id: "special",
     title: "Daily special",
     label: "Featured",
     text: "Feature one item up top.",
     customerSees: "Today: Slammer Jammer and fries for $13.",
-    active: true
+    active: false,
+    icon: "tag"
   },
   {
+    id: "popup",
     title: "Popup menu active",
     label: "Takeover",
     text: "Switch to a takeover menu.",
     customerSees: "Dos Gordos Takeover - tortas and tacos today.",
-    active: false
+    active: false,
+    icon: "flame"
   }
 ];
 
 const reasons = [
   {
     title: "Facebook posts disappear",
-    text: "Today&apos;s update gets buried under tomorrow&apos;s post. New customers may never see it."
+    text: "Today&apos;s update gets buried under tomorrow&apos;s post. New customers may never see it.",
+    icon: "message"
   },
   {
     title: "Google is not always enough",
-    text: "Hours can go stale, photos can feel random, and specials rarely get the room they need."
+    text: "Hours can go stale, photos can feel random, and specials rarely get the room they need.",
+    icon: "pin"
   },
   {
-    title: "Ordering pages are not storefronts",
-    text: "Clover and delivery links are useful, but they do not always explain who you are or why people should choose you."
+    title: "Ordering pages are for checkout",
+    text: "Clover is useful once someone is ready to order. Your menu page helps them decide first.",
+    icon: "external"
   },
   {
     title: "Screenshots are not a menu",
-    text: "Blurry paper-menu photos make it harder for customers to trust what they are reading."
+    text: "Blurry paper-menu photos make it harder for customers to trust what they are reading.",
+    icon: "camera"
   },
   {
     title: "One front door",
-    text: "Link to ordering, directions, phone, reviews, socials, QR codes, and current updates from one polished page."
+    text: "Put ordering, directions, phone, reviews, socials, QR codes, and current updates in one polished place.",
+    icon: "star"
   },
   {
     title: "Always current",
-    text: "Sold out, closing early, weather closures, popup takeovers, and location changes can be made obvious."
+    text: "Sold out, closing early, weather closures, popup days, and location changes can be made obvious.",
+    icon: "bolt"
   }
 ];
 
-const brandItems = ["Your colors", "Your photos", "Your voice", "Your story"];
+const brandItems = [
+  { label: "Your colors", icon: "palette" },
+  { label: "Your photos", icon: "camera" },
+  { label: "Your voice", icon: "star" },
+  { label: "Your story", icon: "book" }
+];
 
 const planCards = [
   {
@@ -140,7 +170,7 @@ const planCards = [
       "Clover/order link",
       "QR code",
       "Mobile-first page",
-      "Basic update switches",
+      "Open, closed, special hours, and moved location switches",
       "Email support"
     ]
   },
@@ -153,26 +183,25 @@ const planCards = [
     featured: true,
     items: [
       "Everything in Starter",
-      "Closed early, sold out, happy hour, popup menu, and changed location updates",
+      "Closed early, sold out, happy hour, daily special, popup menu, and changed location updates",
       "Best sellers and local favorites",
       "Monthly polish/checkup",
-      "Help connecting Google Business, Clover, and social links"
+      "Ordering, maps, phone, social, and review links placed clearly"
     ]
   },
   {
-    name: "Resonate Managed",
-    tag: "$299/mo + $499 setup",
-    text: "For owners who want the page kept fresh without logging in or chasing menu details.",
-    cta: "Send menu photos and details",
+    name: "Custom Design Buildout",
+    tag: "$499 one-time",
+    text: "For businesses that want a deeper design pass before the monthly page starts.",
+    cta: "Ask about buildout",
     href: `mailto:${questionsEmail}`,
     featured: false,
     items: [
-      "Everything in Plus",
-      "Resonate handles updates",
-      "Weekly menu page check",
-      "Specials and event support",
-      "Photo swaps and light cleanup",
-      "Priority support"
+      "Brand direction",
+      "Page layout and launch structure",
+      "Photo and copy cleanup",
+      "QR and link placement",
+      "Phone and desktop launch check"
     ]
   }
 ];
@@ -184,6 +213,56 @@ function CheckLine({ children, dark = false }: { children: React.ReactNode; dark
       <span>{children}</span>
     </li>
   );
+}
+
+function MiniIcon({ name }: { name: string }) {
+  const common = {
+    width: 18,
+    height: 18,
+    viewBox: "0 0 24 24",
+    fill: "none",
+    stroke: "currentColor",
+    strokeWidth: 2,
+    strokeLinecap: "round" as const,
+    strokeLinejoin: "round" as const
+  };
+
+  switch (name) {
+    case "warning":
+      return <svg {...common}><path d="m12 3 10 18H2L12 3Z" /><path d="M12 9v5" /><path d="M12 18h.01" /></svg>;
+    case "door":
+      return <svg {...common}><path d="M5 21V5a2 2 0 0 1 2-2h10v18" /><path d="M9 12h.01" /><path d="M3 21h18" /></svg>;
+    case "spark":
+      return <svg {...common}><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" /></svg>;
+    case "clock":
+      return <svg {...common}><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></svg>;
+    case "box":
+      return <svg {...common}><path d="m21 8-9-5-9 5 9 5 9-5Z" /><path d="M3 8v8l9 5 9-5V8" /><path d="M12 13v8" /></svg>;
+    case "truck":
+      return <svg {...common}><path d="M3 7h11v10H3z" /><path d="M14 10h4l3 3v4h-7z" /><circle cx="7" cy="18" r="2" /><circle cx="17" cy="18" r="2" /></svg>;
+    case "tag":
+      return <svg {...common}><path d="M20 12 12 20 4 12V4h8l8 8Z" /><path d="M7.5 7.5h.01" /></svg>;
+    case "flame":
+      return <svg {...common}><path d="M12 22c4 0 7-3 7-7 0-3-2-5-4-7 .2 2-.6 3.4-2 4-1-4-4-6-4-6 .5 3-1 5-2.5 6.5A6.4 6.4 0 0 0 5 15c0 4 3 7 7 7Z" /></svg>;
+    case "message":
+      return <svg {...common}><path d="M21 15a4 4 0 0 1-4 4H7l-4 3V7a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z" /></svg>;
+    case "pin":
+      return <svg {...common}><path d="M12 21s7-5 7-12a7 7 0 1 0-14 0c0 7 7 12 7 12Z" /><circle cx="12" cy="9" r="2" /></svg>;
+    case "external":
+      return <svg {...common}><path d="M14 3h7v7" /><path d="M10 14 21 3" /><path d="M21 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5" /></svg>;
+    case "camera":
+      return <svg {...common}><path d="M4 8h3l2-3h6l2 3h3v11H4z" /><circle cx="12" cy="13" r="3" /></svg>;
+    case "star":
+      return <svg {...common}><path d="m12 3 2.8 5.7 6.2.9-4.5 4.4 1.1 6.2L12 17.3l-5.6 2.9 1.1-6.2L3 9.6l6.2-.9L12 3Z" /></svg>;
+    case "bolt":
+      return <svg {...common}><path d="M13 2 4 14h7l-1 8 9-12h-7l1-8Z" /></svg>;
+    case "palette":
+      return <svg {...common}><path d="M12 3a9 9 0 0 0 0 18h1.5a2 2 0 0 0 1.5-3.3 1.8 1.8 0 0 1 1.3-3h1.2A3.5 3.5 0 0 0 21 11.2 9 9 0 0 0 12 3Z" /><circle cx="7.5" cy="10" r=".5" /><circle cx="10" cy="7.5" r=".5" /><circle cx="14" cy="7.5" r=".5" /></svg>;
+    case "book":
+      return <svg {...common}><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" /><path d="M4 4.5A2.5 2.5 0 0 1 6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5z" /></svg>;
+    default:
+      return <svg {...common}><circle cx="12" cy="12" r="8" /></svg>;
+  }
 }
 
 function menuTagClass(tag: string) {
@@ -242,27 +321,21 @@ function PhonePreview() {
 }
 
 export default function MenuPilotPage() {
+  const [activeUpdates, setActiveUpdates] = useState<Record<string, boolean>>(
+    Object.fromEntries(dailyUpdates.map((update) => [update.id, update.active]))
+  );
+
   const photoEmailLink = mailtoLink(
     "MenuPilot photos and menu details",
     "Attach menu photos, food photos, pricing, hours, location, and any updates you want included."
   );
 
+  function toggleUpdate(id: string) {
+    setActiveUpdates((current) => ({ ...current, [id]: !current[id] }));
+  }
+
   return (
     <main className="bg-cream">
-      <section className="border-t-4 border-ink border-b border-line bg-[#fffaf7]">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-5">
-          <Link href="/" aria-label="Resonate Solutions home">
-            <img src="/assets/resonate-logo-transparent.png" alt="Resonate Solutions" className="h-10 w-auto" />
-          </Link>
-          <nav className="hidden items-center gap-8 text-sm font-semibold text-muted md:flex">
-            <Link href="/menupilot" className="hover:text-ink">MenuPilot</Link>
-            <Link href="/pricing" className="hover:text-ink">Pricing</Link>
-          </nav>
-          <Link href="/pricing" className="rounded-full bg-ink px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-coral">
-            Free Menu Review
-          </Link>
-        </div>
-      </section>
       <section className="border-b border-line">
         <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4">
           <Link href="/" className="flex items-center gap-3">
@@ -289,13 +362,13 @@ export default function MenuPilotPage() {
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-[1fr_0.85fr] lg:py-24">
           <div>
             <h1 className="max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.01em] text-ink md:text-7xl">
-              Menu pages that feel like <span className="text-coral">your business</span>, not a checkout link.
+              Menu pages that feel like <span className="text-coral drop-shadow-[0_10px_28px_rgba(217,120,86,0.22)]">your business</span>, not a checkout link.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
-              Give customers one clean place to find your menu, hours, location, specials, food photos, and order links without sending them hunting through social posts or blurry menu screenshots.
+              Give customers one clean place to find your menu, hours, location, specials, food photos, and order links. When they are ready, the page sends them to Clover or whatever ordering link you already use.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/m/mellow-moose-burgers" className="rounded-full bg-coral px-7 py-4 text-center font-bold text-white shadow-soft transition hover:bg-ink">
+              <Link href="/m/mellow-moose-burgers" className="rounded-full bg-coral px-7 py-4 text-center font-bold text-white shadow-[0_18px_50px_rgba(217,120,86,0.28)] transition hover:-translate-y-0.5 hover:bg-ink">
                 See example menu
               </Link>
               <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">
@@ -359,25 +432,33 @@ export default function MenuPilotPage() {
                 Change what customers need to know today.
               </h2>
               <p className="mt-5 max-w-2xl leading-7 text-muted">
-                Your public menu stays polished. Behind it, you can turn on the right message for the day.
+                Your public menu stays polished. Behind it, you can turn on the message customers need that day.
               </p>
             </div>
             <div className="rounded-full border border-line bg-white px-5 py-3 text-sm font-bold text-muted shadow-sm">
-              These are the kinds of updates owners can make without rebuilding the page.
+              Try the switches. This is the kind of quick update screen a business owner would use.
             </div>
           </div>
           <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
             {dailyUpdates.map((control) => (
-              <article
+              <button
+                type="button"
                 key={control.title}
+                onClick={() => toggleUpdate(control.id)}
                 className={`group rounded-[1.5rem] border-2 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-soft ${
-                  control.active ? "border-coral" : "border-line hover:border-coral"
+                  activeUpdates[control.id] ? "border-coral" : "border-line hover:border-coral"
                 }`}
+                aria-pressed={activeUpdates[control.id]}
               >
                 <div className="flex items-start justify-between gap-4">
-                  <div>
+                  <div className="text-left">
+                    <span className={`mb-4 flex h-11 w-11 items-center justify-center rounded-2xl ${
+                      activeUpdates[control.id] ? "bg-[#ffe0d2] text-coral" : "bg-sage text-brandDark"
+                    }`}>
+                      <MiniIcon name={control.icon} />
+                    </span>
                     <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] ${
-                      control.active ? "bg-coral text-white" : "bg-[#fff0e9] text-coral"
+                      activeUpdates[control.id] ? "bg-coral text-white" : "bg-[#fff0e9] text-coral"
                     }`}>
                       {control.label}
                     </span>
@@ -385,10 +466,10 @@ export default function MenuPilotPage() {
                     <p className="mt-1 text-sm font-semibold text-muted">{control.text}</p>
                   </div>
                   <span className={`mt-1 h-7 w-12 rounded-full p-1 transition ${
-                    control.active ? "bg-coral" : "bg-line group-hover:bg-coral"
+                    activeUpdates[control.id] ? "bg-coral" : "bg-line group-hover:bg-coral"
                   }`}>
                     <span className={`block h-5 w-5 rounded-full bg-white shadow-sm transition ${
-                      control.active ? "translate-x-5" : "group-hover:translate-x-5"
+                      activeUpdates[control.id] ? "translate-x-5" : "group-hover:translate-x-5"
                     }`} />
                   </span>
                 </div>
@@ -396,7 +477,7 @@ export default function MenuPilotPage() {
                   <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted">Customer sees</p>
                   <p className="mt-2 text-sm font-bold leading-5 text-ink">{control.customerSees}</p>
                 </div>
-              </article>
+              </button>
             ))}
           </div>
         </div>
@@ -416,7 +497,9 @@ export default function MenuPilotPage() {
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
             {reasons.map((reason) => (
               <article key={reason.title} className="rounded-[1.5rem] border border-line bg-cream p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
-                <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fff0e9] text-lg font-bold text-coral">+</span>
+                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#fff0e9] text-coral">
+                  <MiniIcon name={reason.icon} />
+                </span>
                 <h3 className="mt-5 text-xl font-extrabold text-ink">{reason.title}</h3>
                 <p className="mt-3 leading-7 text-muted" dangerouslySetInnerHTML={{ __html: reason.text }} />
               </article>
@@ -437,8 +520,9 @@ export default function MenuPilotPage() {
             </p>
             <div className="mt-8 grid gap-3 sm:grid-cols-2">
               {brandItems.map((item) => (
-                <span key={item} className="rounded-full border border-white/20 bg-white/10 px-5 py-3 font-bold text-white">
-                  {item}
+                <span key={item.label} className="inline-flex items-center gap-3 rounded-full border border-white/20 bg-white/10 px-5 py-3 font-bold text-white">
+                  <span className="text-gold"><MiniIcon name={item.icon} /></span>
+                  {item.label}
                 </span>
               ))}
             </div>
@@ -453,10 +537,10 @@ export default function MenuPilotPage() {
             </div>
             <div className="mt-6 grid grid-cols-4 gap-3">
               {[
-                ["Ink", "bg-ink"],
-                ["Warm white", "bg-cream border border-line"],
-                ["Coral", "bg-coral"],
-                ["Soft orange", "bg-[#f6a15e]"]
+                ["Orange", "bg-[#ff5a1f]"],
+                ["Cocoa", "bg-[#3a2418]"],
+                ["Gold", "bg-[#f4b52a]"],
+                ["Teal", "bg-[#359690]"]
               ].map(([name, color]) => (
                 <div key={name}>
                   <div className={`h-20 rounded-2xl ${color}`} />
@@ -470,7 +554,7 @@ export default function MenuPilotPage() {
               ))}
             </div>
             <div className="mt-5 rounded-2xl bg-white px-4 py-3 text-sm text-muted">
-              Menu voice: <span className="font-bold text-ink">current, easy to scan, and unmistakably yours.</span>
+              Menu voice: <span className="font-bold text-ink">current, easy to scan, and unmistakably theirs.</span>
             </div>
           </div>
         </div>
@@ -484,7 +568,7 @@ export default function MenuPilotPage() {
               Two ways to run your MenuPilot page.
             </h2>
             <p className="mt-4 leading-7 text-muted">
-              Starter gives you the page. Plus gives you easy daily update tools. Managed is priced for owners who want Resonate handling the updates.
+              Starter gives you the page and the basic daily messages. Plus adds more ways to show specials, sold-out items, popup menus, and changes customers should see right away.
             </p>
           </div>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">

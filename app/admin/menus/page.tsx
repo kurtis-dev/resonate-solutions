@@ -32,7 +32,7 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">MenuPilot product</p>
         <h1 className="mt-3 text-4xl font-black text-ink md:text-6xl">Create a live customer menu.</h1>
         <p className="mt-5 leading-7 text-muted">
-          This is the first operator workflow: enter a local business, publish its menu page, and use the generated QR code anywhere customers need the current details.
+          Enter a local business, publish its menu page, and use the generated QR code anywhere customers need the current details.
         </p>
         <a
           href={mailtoLink("MenuPilot photos and menu details")}

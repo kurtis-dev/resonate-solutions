@@ -8,7 +8,8 @@ export async function GET() {
       stripeConfigured: Boolean(process.env.STRIPE_SECRET_KEY),
       stripeWebhookConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
       corePriceConfigured: Boolean(process.env.STRIPE_PRICE_CORE),
-      managedPriceConfigured: Boolean(process.env.STRIPE_PRICE_MANAGED),
+      plusPriceConfigured: Boolean(process.env.STRIPE_PRICE_PLUS),
+      designPriceConfigured: Boolean(process.env.STRIPE_PRICE_DESIGN),
       adminProtected: Boolean(process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD),
       siteUrlConfigured: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
       questionsEmailConfigured: Boolean(process.env.NEXT_PUBLIC_QUESTIONS_EMAIL)

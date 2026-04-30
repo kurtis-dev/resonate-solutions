@@ -109,7 +109,7 @@ export function IntakeForm() {
             <option>Free Menu Review</option>
             <option>MenuPilot Starter</option>
             <option>MenuPilot Plus</option>
-            <option>Resonate Managed</option>
+            <option>Custom Design Buildout</option>
           </select>
         </label>
       </div>

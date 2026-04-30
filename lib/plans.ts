@@ -28,7 +28,7 @@ export const plans: Plan[] = [
       { label: "Menu and link check", detail: "I look at what a customer can actually find right now: menu, address, ordering, hours, and social links." },
       { label: "Google profile notes", detail: "Basic notes on whether the business profile sends people to the right place." },
       { label: "Photo gap notes", detail: "A quick read on whether the food, space, or service needs better visual proof." },
-      { label: "Plan recommendation", detail: "A plain recommendation for whether you should update the page yourself or have Resonate handle updates." }
+      { label: "Plain next step", detail: "A simple recommendation for what would make the menu easier for customers to use." }
     ],
     cta: "Request Free Review",
     checkoutUrl: "/menupilot",
@@ -47,7 +47,7 @@ export const plans: Plan[] = [
       { label: "Clover/order link", detail: "MenuPilot does not replace checkout. It sends ready customers to Clover or another ordering link." },
       { label: "QR code", detail: "One QR link for the truck, counter, social profiles, printed cards, and signs." },
       { label: "Mobile-first page", detail: "Built for customers checking late at night or from a parking lot before they drive over." },
-      { label: "Basic update switches", detail: "Starter includes simple switches for routine messages like open, closed, or special hours." },
+      { label: "Basic update switches", detail: "Starter includes simple switches for open today, closed today, special hours, and moved location." },
       { label: "Email support", detail: "Questions and basic support go through questions@resonate.solutions." }
     ],
     cta: "Choose Starter",
@@ -64,10 +64,10 @@ export const plans: Plan[] = [
     billingPeriod: "mo",
     features: [
       { label: "Everything in Starter", detail: "Includes the branded menu page, QR code, order link, photos, hours, location, mobile layout, and email support." },
-      { label: "Specials and status updates", detail: "Turn on closed early, sold out, happy hour, popup menu, and changed location notices when customers need to know." },
+      { label: "More update switches", detail: "Turn on closed early, sold out, happy hour, daily special, popup menu, and changed location notices when customers need to know." },
       { label: "Best sellers and local favorites", detail: "Guide people toward the items they should try first instead of making every item compete equally." },
       { label: "Monthly page checkup", detail: "A recurring look at the page so stale details, weak labels, and broken links do not sit untouched." },
-      { label: "Google, Clover, and social link help", detail: "Help connecting the public page to the profiles and order links customers already use." }
+      { label: "Link placement help", detail: "I place the ordering, maps, phone, social, and review links you already have so customers know where to go next." }
     ],
     cta: "Choose Plus",
     highlighted: true,
@@ -76,24 +76,22 @@ export const plans: Plan[] = [
     paymentMode: "subscription"
   },
   {
-    id: "managed",
-    name: "Resonate Managed",
-    price: "$299",
-    description: "For owners who want the page kept fresh without logging in or chasing menu details.",
+    id: "design",
+    name: "Custom Design Buildout",
+    price: "$499",
+    description: "A one-time deeper setup for businesses that want help shaping the look, photos, page sections, and launch details before monthly service starts.",
     limit: "$499 setup fee",
-    billingPeriod: "mo",
+    billingPeriod: "",
     features: [
-      { label: "Everything in Plus", detail: "You still get the custom page, QR link, action buttons, update tools, monthly polish, and mobile-first customer menu." },
-      { label: "Resonate handles updates", detail: "Send changes by email or message and I update hours, specials, popup menus, photos, and visible page details for you." },
-      { label: "Weekly menu page check", detail: "I check that the public page still reflects what customers need to know that week." },
-      { label: "Specials and event support", detail: "Happy Hour, Fry Day, 2 for $22, popup days, weather closures, and sold-out notices can be surfaced quickly." },
-      { label: "Photo swaps and light cleanup", detail: "I can replace weak item images, crop better photos, and keep the page looking intentional." },
-      { label: "Priority support", detail: "This is priced for higher-touch service so urgent changes are not treated like casual favors." }
+      { label: "Brand direction", detail: "We shape the menu page around the business colors, logo, voice, food style, and customer experience." },
+      { label: "Menu page layout", detail: "I organize the page sections, favorites, photos, QR code, location, hours, and ordering path." },
+      { label: "Photo and copy cleanup", detail: "I crop supplied photos, tighten labels, and make the menu easier to scan." },
+      { label: "Launch checklist", detail: "We check the page on phone and desktop before sharing the QR code or link publicly." }
     ],
-    cta: "Choose Resonate Managed",
-    checkoutUrl: "/checkout?plan=managed",
-    stripePriceEnvKey: "STRIPE_PRICE_MANAGED",
-    paymentMode: "subscription"
+    cta: "Ask About Buildout",
+    checkoutUrl: "/checkout?plan=design",
+    stripePriceEnvKey: "STRIPE_PRICE_DESIGN",
+    paymentMode: "payment"
   }
 ];
 

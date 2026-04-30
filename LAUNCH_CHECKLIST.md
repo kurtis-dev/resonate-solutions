@@ -12,27 +12,23 @@ Use this before treating a deployment as customer-ready.
 ## 2. Public Page Click Audit
 
 - [ ] Header logo opens `/`.
-- [ ] Header `Local Presence` opens `/`.
 - [ ] Header `MenuPilot` opens `/menupilot`.
-- [ ] Header `Burger Preview` opens `/m/burger-truck-preview`.
 - [ ] Header `Pricing` opens `/pricing`.
-- [ ] Header `Start kit` opens `/menupilot`.
-- [ ] Homepage `See MenuPilot` opens `/menupilot`.
-- [ ] Homepage `View burger preview` opens `/m/burger-truck-preview`.
-- [ ] Homepage `Open the burger truck preview` opens `/m/burger-truck-preview`.
-- [ ] MenuPilot `View launch plans` opens `/pricing`.
-- [ ] MenuPilot `See full offer` opens `/`.
+- [ ] Header `Free Menu Review` opens `/menupilot`.
+- [ ] Homepage redirects to `/menupilot`.
+- [ ] MenuPilot `See example menu` opens `/m/mellow-moose-burgers`.
+- [ ] MenuPilot `View monthly plans` opens `/pricing`.
 - [ ] Footer links open `/privacy`, `/terms`, `/disclaimer`, and `/pricing`.
 
 ## 2A. MenuPilot Product Audit
 
-- [ ] `/m/burger-truck-preview` loads a public menu page.
+- [ ] `/m/mellow-moose-burgers` loads a public menu page.
 - [ ] Demo menu page shows item photos, descriptions, prices, status note, hours, and location.
 - [ ] Demo menu page action buttons work or use safe placeholder links.
 - [ ] Demo menu item comment form submits and returns to the menu page.
 - [ ] Menu item question appears in `/admin` after database setup.
 - [ ] Photo and questions email link opens `questions@resonate.solutions`.
-- [ ] `/api/qr/burger-truck-preview` returns a QR SVG.
+- [ ] `/api/qr/mellow-moose-burgers` returns a QR SVG.
 - [ ] QR code points to the public menu URL configured by `NEXT_PUBLIC_SITE_URL`.
 - [ ] `/admin/menus` is blocked without Basic Auth.
 - [ ] `/admin/menus` creates a published menu page after database setup.
@@ -41,18 +37,18 @@ Use this before treating a deployment as customer-ready.
 
 ## 3. Lead Intake
 
-- [ ] MenuPilot Soundcheck form rejects missing required fields.
-- [ ] MenuPilot Soundcheck form rejects invalid email.
-- [ ] MenuPilot Soundcheck form submits successfully.
+- [ ] Free Menu Review form rejects missing required fields.
+- [ ] Free Menu Review form rejects invalid email.
+- [ ] Free Menu Review form submits successfully.
 - [ ] New intake appears in `intake_requests`.
 - [ ] Intake appears in `/admin`.
 - [ ] Spam honeypot field blocks bot-style submissions.
 
 ## 4. Payments
 
-- [ ] `Launch Kit` opens `/checkout?plan=launch-kit`.
-- [ ] `Upkeep` opens `/checkout?plan=upkeep`.
-- [ ] `Managed Presence` opens `/checkout?plan=managed`.
+- [ ] `MenuPilot Starter` opens `/checkout?plan=core`.
+- [ ] `MenuPilot Plus` opens `/checkout?plan=plus`.
+- [ ] `Custom Design Buildout` opens `/checkout?plan=design`.
 - [ ] Checkout button redirects to Stripe Checkout when Stripe env vars are configured.
 - [ ] Stripe test card success returns to `/checkout/success`.
 - [ ] `checkout.session.completed` webhook creates a payment/subscription record.
@@ -65,7 +61,7 @@ Use this before treating a deployment as customer-ready.
 
 - [ ] `/admin` is blocked without Basic Auth.
 - [ ] `ADMIN_USERNAME` and `ADMIN_PASSWORD` are configured in Vercel.
-- [ ] `/admin` shows recent Soundcheck requests.
+- [ ] `/admin` shows recent Free Menu Review requests.
 - [ ] `/admin` shows subscription status.
 - [ ] `/admin` shows payment events.
 - [ ] `/admin` links to the menu page creator.
@@ -73,10 +69,10 @@ Use this before treating a deployment as customer-ready.
 
 ## 6. Mobile Quality
 
-- [ ] Homepage works at phone width.
+- [ ] Homepage redirects correctly at phone width.
 - [ ] MenuPilot works at phone width.
 - [ ] Pricing cards stack cleanly on phone.
-- [ ] Soundcheck form is usable on phone.
+- [ ] Free Menu Review form is usable on phone.
 - [ ] Public menu page is usable on phone.
 - [ ] QR code panel does not cause horizontal scrolling.
 - [ ] No text overlaps, clipped buttons, or horizontal scrolling on normal mobile widths.

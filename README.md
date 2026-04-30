@@ -1,6 +1,6 @@
 # Resonate Solutions
 
-Resonate Solutions is a Next.js site for local business presence kits: mobile menu pages, QR codes, customer-facing links, Google profile cleanup, and practical photo support.
+Resonate Solutions is a Next.js site for MenuPilot: custom mobile menu pages, QR codes, customer-facing links, food photos, hours, specials, and practical local business support.
 
 ## File Structure
 
@@ -60,9 +60,9 @@ The app is set up for Stripe Checkout. Add these Vercel environment variables:
 ```text
 STRIPE_SECRET_KEY
 STRIPE_WEBHOOK_SECRET
-STRIPE_PRICE_LAUNCH_KIT
-STRIPE_PRICE_UPKEEP
-STRIPE_PRICE_MANAGED
+STRIPE_PRICE_CORE
+STRIPE_PRICE_PLUS
+STRIPE_PRICE_DESIGN
 NEXT_PUBLIC_SITE_URL
 NEXT_PUBLIC_QUESTIONS_EMAIL
 ```
