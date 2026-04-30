@@ -21,7 +21,7 @@ export function Footer() {
             className="h-12 w-auto max-w-[230px] object-contain"
           />
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
-            Custom menu pages for local food businesses: branded mobile menus, QR links, photos, hours, locations, and current daily status.
+            Customer-ready pages for local service businesses: branded mobile pages, QR links, photos, hours, service details, and clear next steps.
           </p>
           <a className="mt-3 inline-flex text-sm font-black text-coral hover:text-ink" href={`mailto:${questionsEmail}`}>
             {questionsEmail}

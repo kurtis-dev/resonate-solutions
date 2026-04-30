@@ -172,11 +172,11 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
             </button>
           </form>
 
-          <h2 className="mt-8 text-2xl font-black text-ink">Existing menu pages</h2>
+          <h2 className="mt-8 text-2xl font-black text-ink">Existing local pages</h2>
           {!businesses ? (
-            <p className="mt-5 leading-7 text-muted">Connect the database to see customer menu pages created from this admin form.</p>
+            <p className="mt-5 leading-7 text-muted">Connect the database to see customer local pages created from this admin form.</p>
           ) : businesses.length === 0 ? (
-            <p className="mt-5 leading-7 text-muted">No database menu pages yet.</p>
+            <p className="mt-5 leading-7 text-muted">No database local pages yet.</p>
           ) : (
             <div className="mt-5 grid gap-3">
               {businesses.map((business) => (
