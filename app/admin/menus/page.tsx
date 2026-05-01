@@ -20,23 +20,23 @@ function StatusFields({ includeGrid = false }: { includeGrid?: boolean }) {
   const content = (
     <>
       <label className="grid gap-2 text-sm font-bold text-ink">
-        Open / closed status
+        What should customers see?
         <select name="operatingStatus" defaultValue="normal" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal">
           <option value="normal">Normal schedule</option>
           <option value="open">Open now</option>
           <option value="closed">Closed today</option>
-          <option value="closed_until">Closed until...</option>
+          <option value="closed_until">Closed until a specific time</option>
           <option value="sold_out">Sold out for today</option>
           <option value="weather_delay">Weather delay</option>
           <option value="limited_menu">Limited menu</option>
         </select>
       </label>
       <label className="grid gap-2 text-sm font-bold text-ink">
-        Closed until
+        If closed, when should it reopen?
         <input name="statusUntil" type="datetime-local" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" />
       </label>
       <label className="grid gap-2 text-sm font-bold text-ink md:col-span-2">
-        Customer announcement
+        Message customers will see
         <input name="customAnnouncement" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder="Closed for a private event today. Back tomorrow at 11." />
       </label>
     </>
@@ -54,7 +54,7 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
   const businesses = await listMenuBusinesses();
   const statusMessage =
     params.status === "missing-db"
-      ? "Database is not connected yet. Add DATABASE_URL in Vercel and run database/schema.sql."
+      ? "Saved customer pages are not connected yet. The site admin needs to connect the database before pages can be saved."
       : params.status === "missing-name"
         ? "Business name is required."
         : "";
@@ -62,16 +62,16 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
   return (
     <main className="mx-auto max-w-7xl px-5 py-16">
       <div className="mb-10 max-w-3xl">
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Business page admin</p>
-        <h1 className="mt-3 text-4xl font-black text-ink md:text-6xl">Create a live customer menu.</h1>
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Business page dashboard</p>
+        <h1 className="mt-3 text-4xl font-black text-ink md:text-6xl">Create and update customer pages.</h1>
         <p className="mt-5 leading-7 text-muted">
-          Enter a service business, publish its page, and use the generated QR code anywhere customers need the current details.
+          Add a business, publish its customer page, and keep the details current for anyone who opens the QR code, website link, Google profile, or social link.
         </p>
         <a
           href={mailtoLink("Business page photos and details")}
           className="mt-6 inline-flex rounded-full border border-line bg-white px-5 py-3 font-black text-ink hover:border-brand"
         >
-          Photo inbox: {questionsEmail}
+          Send photos or page details: {questionsEmail}
         </a>
       </div>
 
@@ -79,29 +79,29 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
 
       <div className="grid gap-8 lg:grid-cols-[1.05fr_0.95fr]">
         <section className="rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-black text-ink">New menu page</h2>
+          <h2 className="text-2xl font-black text-ink">New customer page</h2>
           <form action={createMenuBusinessAction} className="mt-6 grid gap-4">
             <div className="grid gap-4 md:grid-cols-2">
               <Field label="Business name" name="businessName" placeholder="Mellow Moose Burgers" required />
-              <Field label="Optional slug" name="slug" placeholder="mellow-moose-burgers" />
+              <Field label="Page link ending (optional)" name="slug" placeholder="mellow-moose-burgers" />
               <Field label="Business type" name="businessType" placeholder="Food truck, coffee shop, salon" />
-              <Field label="City" name="city" placeholder="Siloam Springs, AR" />
-              <Field label="Hours summary" name="hoursSummary" placeholder="Tue-Fri 11 AM-2 PM & 4-8 PM" />
-              <Field label="Location summary" name="locationSummary" placeholder="Griffin's Food Court" />
-              <Field label="Address or map search" name="address" placeholder="825 S Mt Olive, Siloam Springs, AR" />
+              <Field label="City or service area" name="city" placeholder="Siloam Springs, AR or Brooklyn, NY" />
+              <Field label="Hours customers should see" name="hoursSummary" placeholder="Tue-Fri 11 AM-2 PM & 4-8 PM" />
+              <Field label="Location or service area note" name="locationSummary" placeholder="Griffin's Food Court or serving North Brooklyn" />
+              <Field label="Address for maps" name="address" placeholder="825 S Mt Olive, Siloam Springs, AR" />
               <Field label="Phone" name="phone" placeholder="(479) 305-2800" />
-              <Field label="Order URL" name="orderingUrl" placeholder="https://..." />
-              <Field label="Review URL" name="reviewUrl" placeholder="https://..." />
-              <Field label="Facebook URL" name="facebookUrl" placeholder="https://..." />
-              <Field label="Instagram URL" name="instagramUrl" placeholder="https://..." />
-              <Field label="Hero image URL" name="heroImageUrl" placeholder="/assets/mellow-moose-logo.jpg" />
-              <Field label="Brand theme" name="brandTheme" placeholder="default or mellow-moose" />
-              <Field label="Active menu key" name="activeMenuKey" placeholder="main, mellow-moose, dos-gordos" />
+              <Field label="Order, booking, or quote link" name="orderingUrl" placeholder="https://..." />
+              <Field label="Review link" name="reviewUrl" placeholder="https://..." />
+              <Field label="Facebook link" name="facebookUrl" placeholder="https://..." />
+              <Field label="Instagram link" name="instagramUrl" placeholder="https://..." />
+              <Field label="Main photo or logo link" name="heroImageUrl" placeholder="/assets/mellow-moose-logo.jpg" />
+              <Field label="Design style (optional)" name="brandTheme" placeholder="default or mellow-moose" />
+              <Field label="Menu or service version" name="activeMenuKey" placeholder="main, regular-menu, event-menu" />
             </div>
 
             <div className="rounded-2xl border border-line bg-sage p-4">
-              <h3 className="font-black text-ink">Opening status</h3>
-              <p className="mt-1 text-sm leading-6 text-muted">These are the first controls that later sync to Google, Clover, Facebook, and other connected channels.</p>
+              <h3 className="font-black text-ink">Today&apos;s customer message</h3>
+              <p className="mt-1 text-sm leading-6 text-muted">Use this when the business is open, closed, delayed, sold out, running a limited menu, or needs a quick note at the top of the page.</p>
               <div className="mt-4">
                 <StatusFields includeGrid />
               </div>
@@ -113,84 +113,84 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
             </label>
 
             <label className="grid gap-2 text-sm font-bold text-ink">
-              Status note
-              <input name="statusNote" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Best of Siloam Springs 2026 Winner: Burger / Local" />
+              Extra note for customers
+              <input name="statusNote" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Best burger winner, new client special, or important reminder" />
             </label>
 
             <label className="grid gap-2 text-sm font-bold text-ink">
-              Popup banner
-              <input name="popupBanner" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Dos Gordos popup is active today." />
+              Top banner message
+              <input name="popupBanner" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Special event menu is active today." />
             </label>
 
             <label className="grid gap-2 text-sm font-bold text-ink">
-              Section name
-              <input name="sectionName" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Today menu" />
+              Menu or service section
+              <input name="sectionName" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="Today menu, Services, Packages, or Featured offers" />
             </label>
 
             <label className="grid gap-2 text-sm font-bold text-ink">
-              Menu items
+              Menu or service items
               <textarea
                 name="menuItems"
                 rows={7}
                 className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal"
                 placeholder={"The OG Smashburger | $9.99 | Grilled onions, American cheese, burger sauce, and pickles | Local favorite\nBlazing Moose Fries | $13.99 | Nacho cheese, grilled peppers, beef patty, bacon, Smokeshow sauce, and ranch | Best seller"}
               />
-              <span className="text-xs font-normal leading-5 text-muted">Format each line as: item name | price | description | badge.</span>
+              <span className="text-xs font-normal leading-5 text-muted">Put one item per line. Format: name | price | short description | label.</span>
             </label>
 
             <label className="flex items-center gap-3 text-sm font-bold text-ink">
               <input name="isPublished" type="checkbox" defaultChecked className="h-4 w-4" />
-              Publish this menu page now
+              Make this page public now
             </label>
 
             <button type="submit" className="rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
-              Create menu page
+              Create customer page
             </button>
           </form>
         </section>
 
         <section className="rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-black text-ink">Customer page controls</h2>
+          <h2 className="text-2xl font-black text-ink">Update a live page</h2>
           <p className="mt-3 leading-7 text-muted">
-            This is the shape of the owner/admin experience: switch the active menu, adjust the banner, review the public page, and keep one QR code pointed at the current customer-facing version.
+            These are the quick controls an owner will use day to day: change what customers see, switch the active menu or service list, update hours, and keep one QR code pointed at the current page.
           </p>
           <div className="mt-5 grid gap-3">
             <Link href="/m/mellow-moose-burgers" className="block rounded-2xl border border-line bg-cream p-4 hover:border-brand">
-              <span className="font-black text-ink">Open Mellow Moose live page</span>
-              <span className="mt-1 block text-sm text-muted">Normal burger menu and local favorites.</span>
+              <span className="font-black text-ink">Open the demo customer page</span>
+              <span className="mt-1 block text-sm text-muted">Shows what a customer sees when they scan or tap the public link.</span>
             </Link>
             <Link href="/m/mellow-moose-burgers?menu=dos-gordos" className="block rounded-2xl border border-line bg-cream p-4 hover:border-brand">
-              <span className="font-black text-ink">Preview Dos Gordos popup mode</span>
-              <span className="mt-1 block text-sm text-muted">Shows the takeover structure without changing the live default.</span>
+              <span className="font-black text-ink">Preview the alternate menu</span>
+              <span className="mt-1 block text-sm text-muted">Shows how an event, popup, or limited menu could look before making it the main version.</span>
             </Link>
           </div>
 
           <form action={updateMenuModeAction} className="mt-6 rounded-2xl border border-line bg-sage p-4">
-            <h3 className="font-black text-ink">Owner control center</h3>
+            <h3 className="font-black text-ink">Quick update controls</h3>
             <p className="mt-2 text-sm leading-6 text-muted">
-              Once a business is stored in the database, this becomes the simple control panel for open/closed status, menu mode, weekly hours, sellout notes, weather closures, and live specials.
+              Choose what customers should see right now. Later, these same controls can also send matching updates to connected tools like Google, Clover, and Facebook.
             </p>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <div className="rounded-2xl bg-white p-4">
-                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Status switch</span>
-                <p className="mt-1 text-sm text-muted">Open, closed, closing early, sold out, low inventory, or weather delay.</p>
+                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Open or closed</span>
+                <p className="mt-1 text-sm text-muted">Tell customers if the business is open, closed, delayed, sold out, or running a limited menu.</p>
               </div>
               <div className="rounded-2xl bg-white p-4">
                 <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Weekly hours</span>
-                <p className="mt-1 text-sm text-muted">Update the week without rebuilding the website.</p>
+                <p className="mt-1 text-sm text-muted">Change the hours customers see without rebuilding the page.</p>
               </div>
               <div className="rounded-2xl bg-white p-4">
-                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Daily specials</span>
-                <p className="mt-1 text-sm text-muted">Happy Hour, 2 for $22, Fry Day, or one-off calendar promos.</p>
+                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Specials or announcements</span>
+                <p className="mt-1 text-sm text-muted">Show a special, opening, policy reminder, cancellation, or one-day update.</p>
               </div>
               <div className="rounded-2xl bg-white p-4">
-                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Menu takeover</span>
-                <p className="mt-1 text-sm text-muted">Swap Mellow Moose to Dos Gordos and back with one menu key.</p>
+                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Menu or service version</span>
+                <p className="mt-1 text-sm text-muted">Switch between a regular menu, event menu, limited list, or seasonal service set.</p>
               </div>
             </div>
             <input type="hidden" name="slug" value="mellow-moose-burgers" />
             <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
-              Active menu key
+              Which menu or service list should show?
               <select name="activeMenuKey" defaultValue="mellow-moose" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal">
                 <option value="mellow-moose">Mellow Moose Burgers</option>
                 <option value="dos-gordos">Dos Gordos popup</option>
@@ -200,27 +200,27 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
               <StatusFields includeGrid />
             </div>
             <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
-              Banner text
-              <input name="popupBanner" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder="Dos Gordos Takeover at Mellow Moose is active today." />
+              Top message
+              <input name="popupBanner" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder="Special event menu is active today." />
             </label>
             <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
-              Live status note
+              Extra customer note
               <input name="statusNote" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder="Closing at 7 PM tonight because of weather." />
             </label>
             <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
-              Hours this week
+              Hours customers should see
               <textarea name="hoursSummary" rows={3} className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder={"Tue 11-2 & 4-8\nWed 11-2 & 4-8\nThu catering lunch; open 4-8"} />
             </label>
             <button type="submit" className="mt-4 rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
-              Save live controls
+              Update customer page
             </button>
           </form>
 
           <h2 className="mt-8 text-2xl font-black text-ink">Existing business pages</h2>
           {!businesses ? (
-            <p className="mt-5 leading-7 text-muted">Connect the database to see customer business pages created from this admin form.</p>
+            <p className="mt-5 leading-7 text-muted">Connect the customer page database to see saved pages here.</p>
           ) : businesses.length === 0 ? (
-            <p className="mt-5 leading-7 text-muted">No database business pages yet.</p>
+            <p className="mt-5 leading-7 text-muted">No saved customer pages yet.</p>
           ) : (
             <div className="mt-5 grid gap-3">
               {businesses.map((business) => (
