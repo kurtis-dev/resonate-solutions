@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 export function SiteNav() {
   const pathname = usePathname();
 
-  if (pathname.startsWith("/m/")) {
+  if (pathname.startsWith("/m/") || pathname.startsWith("/admin")) {
     return null;
   }
 
