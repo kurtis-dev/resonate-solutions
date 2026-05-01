@@ -32,6 +32,128 @@ function FieldShell({ label, children }: { label: string; children: ReactNode })
 }
 
 const inputClass = "rounded-xl border border-[#d8cec0] bg-white px-4 py-3 font-normal shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/15";
+const compactInputClass = "rounded-xl border border-[#d8cec0] bg-white px-3 py-2 text-sm font-normal shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/15";
+
+const weekdays = [
+  { key: "mon", label: "Monday" },
+  { key: "tue", label: "Tuesday" },
+  { key: "wed", label: "Wednesday" },
+  { key: "thu", label: "Thursday" },
+  { key: "fri", label: "Friday" },
+  { key: "sat", label: "Saturday" },
+  { key: "sun", label: "Sunday" }
+];
+
+const timeOptions = [
+  "",
+  "5:00 AM",
+  "5:30 AM",
+  "6:00 AM",
+  "6:30 AM",
+  "7:00 AM",
+  "7:30 AM",
+  "8:00 AM",
+  "8:30 AM",
+  "9:00 AM",
+  "9:30 AM",
+  "10:00 AM",
+  "10:30 AM",
+  "11:00 AM",
+  "11:30 AM",
+  "12:00 PM",
+  "12:30 PM",
+  "1:00 PM",
+  "1:30 PM",
+  "2:00 PM",
+  "2:30 PM",
+  "3:00 PM",
+  "3:30 PM",
+  "4:00 PM",
+  "4:30 PM",
+  "5:00 PM",
+  "5:30 PM",
+  "6:00 PM",
+  "6:30 PM",
+  "7:00 PM",
+  "7:30 PM",
+  "8:00 PM",
+  "8:30 PM",
+  "9:00 PM",
+  "9:30 PM",
+  "10:00 PM",
+  "10:30 PM",
+  "11:00 PM"
+];
+
+type DayHours = {
+  closed: boolean;
+  open1: string;
+  close1: string;
+  open2: string;
+  close2: string;
+};
+
+function defaultHoursForDay(slug: string, dayKey: string): DayHours {
+  const closed = { closed: true, open1: "", close1: "", open2: "", close2: "" };
+
+  if (slug === "mellow-moose-burgers" && ["tue", "wed", "thu", "fri"].includes(dayKey)) {
+    return { closed: false, open1: "11:00 AM", close1: "2:00 PM", open2: "4:00 PM", close2: "8:00 PM" };
+  }
+
+  if (slug === "mellow-moose-burgers" && dayKey === "sat") {
+    return { closed: false, open1: "11:00 AM", close1: "5:00 PM", open2: "", close2: "" };
+  }
+
+  return closed;
+}
+
+function TimeSelect({ name, defaultValue, label }: { name: string; defaultValue: string; label: string }) {
+  return (
+    <label className="grid gap-1 text-xs font-bold text-muted">
+      {label}
+      <select name={name} defaultValue={defaultValue} className={compactInputClass}>
+        {timeOptions.map((time) => (
+          <option key={time || "blank"} value={time}>{time || "Select time"}</option>
+        ))}
+      </select>
+    </label>
+  );
+}
+
+function WeeklyHoursEditor({ slug }: { slug: string }) {
+  return (
+    <div className="rounded-2xl border border-[#d8cec0] bg-white p-4">
+      <input type="hidden" name="hoursInputMode" value="weekly" />
+      <div>
+        <h3 className="font-black text-[#1d2824]">Weekly hours customers should see</h3>
+        <p className="mt-1 text-sm leading-6 text-muted">Set each day separately. Use the second time window for split hours, like lunch and dinner service.</p>
+      </div>
+      <div className="mt-4 grid gap-4">
+        {weekdays.map((day) => {
+          const defaults = defaultHoursForDay(slug, day.key);
+
+          return (
+            <div key={day.key} className="rounded-2xl border border-[#eadfce] bg-[#f9f5ef] p-4">
+              <div className="flex flex-wrap items-center justify-between gap-3">
+                <p className="font-black text-[#1d2824]">{day.label}</p>
+                <label className="flex items-center gap-2 text-sm font-bold text-muted">
+                  <input name={`${day.key}Closed`} type="checkbox" defaultChecked={defaults.closed} className="h-4 w-4" />
+                  Closed
+                </label>
+              </div>
+              <div className="mt-3 grid gap-3 md:grid-cols-4">
+                <TimeSelect name={`${day.key}Open1`} defaultValue={defaults.open1} label="Open" />
+                <TimeSelect name={`${day.key}Close1`} defaultValue={defaults.close1} label="Close" />
+                <TimeSelect name={`${day.key}Open2`} defaultValue={defaults.open2} label="Open again" />
+                <TimeSelect name={`${day.key}Close2`} defaultValue={defaults.close2} label="Close again" />
+              </div>
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
 
 export default async function BusinessDashboardPage({ params, searchParams }: PageProps) {
   const [{ slug }, query] = await Promise.all([params, searchParams]);
@@ -115,9 +237,7 @@ export default async function BusinessDashboardPage({ params, searchParams }: Pa
               <input name="statusNote" defaultValue={business.statusNote || ""} className={inputClass} placeholder="Closing at 7 PM tonight because of weather." />
             </FieldShell>
 
-            <FieldShell label="Hours customers should see">
-              <textarea name="hoursSummary" rows={3} defaultValue={business.hoursSummary || ""} className={inputClass} placeholder={"Tue 11-2 & 4-8\nWed 11-2 & 4-8\nThu catering lunch; open 4-8"} />
-            </FieldShell>
+            <WeeklyHoursEditor slug={business.slug} />
 
             <FieldShell label="Which menu or service list should show?">
               <select name="activeMenuKey" defaultValue={business.activeMenuKey || variants[0]?.key || "main"} className={inputClass}>

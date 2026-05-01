@@ -480,6 +480,50 @@ function operatingStatusValue(value?: string | null): MenuBusiness["operatingSta
   }
 }
 
+const weekdayFields = [
+  { key: "mon", label: "Monday", short: "Mon" },
+  { key: "tue", label: "Tuesday", short: "Tue" },
+  { key: "wed", label: "Wednesday", short: "Wed" },
+  { key: "thu", label: "Thursday", short: "Thu" },
+  { key: "fri", label: "Friday", short: "Fri" },
+  { key: "sat", label: "Saturday", short: "Sat" },
+  { key: "sun", label: "Sunday", short: "Sun" }
+];
+
+function formText(formData: FormData, key: string) {
+  return String(formData.get(key) || "").trim();
+}
+
+function buildWeeklyHoursSummary(formData: FormData) {
+  if (formText(formData, "hoursInputMode") !== "weekly") {
+    return formText(formData, "hoursSummary");
+  }
+
+  return weekdayFields
+    .map((day) => {
+      if (formData.get(`${day.key}Closed`) === "on") {
+        return `${day.short}: Closed`;
+      }
+
+      const firstOpen = formText(formData, `${day.key}Open1`);
+      const firstClose = formText(formData, `${day.key}Close1`);
+      const secondOpen = formText(formData, `${day.key}Open2`);
+      const secondClose = formText(formData, `${day.key}Close2`);
+      const ranges = [];
+
+      if (firstOpen && firstClose) {
+        ranges.push(`${firstOpen}-${firstClose}`);
+      }
+
+      if (secondOpen && secondClose) {
+        ranges.push(`${secondOpen}-${secondClose}`);
+      }
+
+      return `${day.short}: ${ranges.length ? ranges.join(", ") : "Closed"}`;
+    })
+    .join("\n");
+}
+
 export function slugify(value: string) {
   return value
     .toLowerCase()
@@ -756,14 +800,14 @@ export async function updateMenuMode(formData: FormData) {
     return { ok: false, reason: "missing-db" };
   }
 
-  const slug = String(formData.get("slug") || "").trim();
-  const activeMenuKey = String(formData.get("activeMenuKey") || "main").trim();
-  const operatingStatus = operatingStatusValue(String(formData.get("operatingStatus") || "normal").trim());
-  const statusUntil = String(formData.get("statusUntil") || "").trim();
-  const customAnnouncement = String(formData.get("customAnnouncement") || "").trim();
-  const popupBanner = String(formData.get("popupBanner") || "").trim();
-  const statusNote = String(formData.get("statusNote") || "").trim();
-  const hoursSummary = String(formData.get("hoursSummary") || "").trim();
+  const slug = formText(formData, "slug");
+  const activeMenuKey = formText(formData, "activeMenuKey") || "main";
+  const operatingStatus = operatingStatusValue(formText(formData, "operatingStatus") || "normal");
+  const statusUntil = formText(formData, "statusUntil");
+  const customAnnouncement = formText(formData, "customAnnouncement");
+  const popupBanner = formText(formData, "popupBanner");
+  const statusNote = formText(formData, "statusNote");
+  const hoursSummary = buildWeeklyHoursSummary(formData);
 
   if (!slug) {
     return { ok: false, reason: "missing-slug" };
