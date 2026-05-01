@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createMenuBusinessAction, updateMenuModeAction } from "@/app/admin/menus/actions";
+import { createMenuBusinessAction } from "@/app/admin/menus/actions";
 import { listMenuBusinesses } from "@/lib/menu-store";
 import { mailtoLink } from "@/lib/contact";
 
@@ -163,73 +163,26 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
 
         <section className="rounded-2xl border border-white/10 bg-[#f9f5ef] p-6 text-ink shadow-2xl shadow-black/20">
           <div className="-mx-6 -mt-6 mb-6 rounded-t-2xl border-b border-[#d8cec0] bg-[#1f2a26] px-6 py-4 text-white">
-            <p className="text-xs font-black uppercase tracking-[0.14em] text-[#f6a06f]">Live controls</p>
+            <p className="text-xs font-black uppercase tracking-[0.14em] text-[#f6a06f]">Internal account management</p>
           </div>
-          <h2 className="text-2xl font-black text-ink">Update a live page</h2>
+          <h2 className="text-2xl font-black text-ink">Manage customer accounts</h2>
           <p className="mt-3 leading-7 text-muted">
-            These are the quick controls an owner will use day to day: change what customers see, switch the active menu or service list, update hours, and keep one QR code pointed at the current page.
+            This side is for Resonate setup work: open a customer page, hand off the owner dashboard, and keep internal account work separate from the customer&apos;s daily controls.
           </p>
           <div className="mt-5 grid gap-3">
             <Link href="/m/mellow-moose-burgers" className="block rounded-2xl border border-[#d8cec0] bg-white p-4 shadow-sm hover:border-brand">
               <span className="font-black text-ink">Open the demo customer page</span>
               <span className="mt-1 block text-sm text-muted">Shows what a customer sees when they scan or tap the public link.</span>
             </Link>
-            <Link href="/m/mellow-moose-burgers?menu=dos-gordos" className="block rounded-2xl border border-[#d8cec0] bg-white p-4 shadow-sm hover:border-brand">
-              <span className="font-black text-ink">Preview the alternate menu</span>
-              <span className="mt-1 block text-sm text-muted">Shows how an event, popup, or limited menu could look before making it the main version.</span>
+            <Link href="/dashboard/mellow-moose-burgers" className="block rounded-2xl border border-[#d8cec0] bg-white p-4 shadow-sm hover:border-brand">
+              <span className="font-black text-ink">Open the demo owner dashboard</span>
+              <span className="mt-1 block text-sm text-muted">This is where a business owner changes open/closed status, hours, customer messages, and menu or service version.</span>
             </Link>
           </div>
 
-          <form action={updateMenuModeAction} className="mt-6 rounded-2xl border border-[#cdddc3] bg-[#edf5e7] p-4">
-            <h3 className="font-black text-ink">Quick update controls</h3>
-            <p className="mt-2 text-sm leading-6 text-muted">
-              Choose what customers should see right now. Later, these same controls can also send matching updates to connected tools like Google, Clover, and Facebook.
-            </p>
-            <div className="mt-4 grid gap-3 md:grid-cols-2">
-              <div className="rounded-2xl border border-[#d8cec0] bg-white p-4">
-                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Open or closed</span>
-                <p className="mt-1 text-sm text-muted">Tell customers if the business is open, closed, delayed, sold out, or running a limited menu.</p>
-              </div>
-              <div className="rounded-2xl border border-[#d8cec0] bg-white p-4">
-                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Weekly hours</span>
-                <p className="mt-1 text-sm text-muted">Change the hours customers see without rebuilding the page.</p>
-              </div>
-              <div className="rounded-2xl border border-[#d8cec0] bg-white p-4">
-                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Specials or announcements</span>
-                <p className="mt-1 text-sm text-muted">Show a special, opening, policy reminder, cancellation, or one-day update.</p>
-              </div>
-              <div className="rounded-2xl border border-[#d8cec0] bg-white p-4">
-                <span className="text-xs font-black uppercase tracking-[0.12em] text-brand">Menu or service version</span>
-                <p className="mt-1 text-sm text-muted">Switch between a regular menu, event menu, limited list, or seasonal service set.</p>
-              </div>
-            </div>
-            <input type="hidden" name="slug" value="mellow-moose-burgers" />
-            <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
-              Which menu or service list should show?
-              <select name="activeMenuKey" defaultValue="mellow-moose" className="rounded-xl border border-[#d8cec0] bg-white px-4 py-3 font-normal shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/15">
-                <option value="mellow-moose">Mellow Moose Burgers</option>
-                <option value="dos-gordos">Dos Gordos popup</option>
-              </select>
-            </label>
-            <div className="mt-4">
-              <StatusFields includeGrid />
-            </div>
-            <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
-              Top message
-              <input name="popupBanner" className="rounded-xl border border-[#d8cec0] bg-white px-4 py-3 font-normal shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" placeholder="Special event menu is active today." />
-            </label>
-            <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
-              Extra customer note
-              <input name="statusNote" className="rounded-xl border border-[#d8cec0] bg-white px-4 py-3 font-normal shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" placeholder="Closing at 7 PM tonight because of weather." />
-            </label>
-            <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
-              Hours customers should see
-              <textarea name="hoursSummary" rows={3} className="rounded-xl border border-[#d8cec0] bg-white px-4 py-3 font-normal shadow-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/15" placeholder={"Tue 11-2 & 4-8\nWed 11-2 & 4-8\nThu catering lunch; open 4-8"} />
-            </label>
-            <button type="submit" className="mt-4 rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
-              Update customer page
-            </button>
-          </form>
+          <div className="mt-6 rounded-2xl border border-[#f6a06f]/35 bg-[#fff2e9] p-4 text-sm leading-6 text-brandDark">
+            <span className="font-black text-ink">Important split:</span> owners should use their dashboard for daily customer updates. This admin area is for setup, support, account review, and internal management.
+          </div>
 
           <h2 className="mt-8 text-2xl font-black text-ink">Existing business pages</h2>
           {!businesses ? (
@@ -239,12 +192,16 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
           ) : (
             <div className="mt-5 grid gap-3">
               {businesses.map((business) => (
-                <Link key={business.slug} href={`/m/${business.slug}`} className="rounded-2xl border border-[#d8cec0] bg-white p-4 shadow-sm hover:border-brand">
+                <div key={business.slug} className="rounded-2xl border border-[#d8cec0] bg-white p-4 shadow-sm">
                   <span className="font-black text-ink">{business.businessName}</span>
                   <span className="mt-1 block text-sm text-muted">
                     {business.businessType} {business.city ? `in ${business.city}` : ""} - {business.itemCount} items - {business.isPublished ? "Published" : "Draft"}
                   </span>
-                </Link>
+                  <div className="mt-3 flex flex-wrap gap-2">
+                    <Link href={`/m/${business.slug}`} className="rounded-full border border-[#d8cec0] px-3 py-2 text-xs font-black text-ink hover:border-brand">Public page</Link>
+                    <Link href={`/dashboard/${business.slug}`} className="rounded-full bg-[#1f2a26] px-3 py-2 text-xs font-black text-white hover:bg-brandDark">Owner dashboard</Link>
+                  </div>
+                </div>
               ))}
             </div>
           )}

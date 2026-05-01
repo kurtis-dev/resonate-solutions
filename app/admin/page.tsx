@@ -61,22 +61,29 @@ export default async function AdminPage() {
   ]);
 
   return (
-    <main className="mx-auto max-w-7xl px-5 py-16">
+    <main className="min-h-screen bg-[#101513] px-5 py-12 text-white">
+      <div className="mx-auto max-w-7xl">
       <div className="mb-10 max-w-3xl">
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Internal dashboard</p>
-        <h1 className="mt-3 text-4xl font-black text-ink md:text-6xl">Resonate operations.</h1>
-        <p className="mt-5 leading-7 text-muted">
-          This is the first internal view for free business page review requests, Stripe subscription status, and payment events. Add authentication before sharing this URL publicly.
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-[#f6a06f]">Resonate internal admin</p>
+        <h1 className="mt-3 text-4xl font-black md:text-6xl">Operations and account setup.</h1>
+        <p className="mt-5 leading-7 text-white/72">
+          This area is for Resonate: review leads, check payments, create customer pages, and manage setup work. Business owners should use their own dashboard for day-to-day customer updates.
         </p>
-        <Link href="/admin/menus" className="mt-6 inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
-          Create customer menu
-        </Link>
+        <div className="mt-6 flex flex-wrap gap-3">
+          <Link href="/admin/menus" className="inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
+            Create customer page
+          </Link>
+          <Link href="/dashboard/mellow-moose-burgers" className="inline-flex rounded-full border border-white/15 bg-white px-5 py-3 font-black text-[#111815] hover:bg-[#fff2e9]">
+            View owner dashboard demo
+          </Link>
+        </div>
       </div>
       <div className="grid gap-6">
         <DataTable title="Recent free business page review requests" rows={intakes} columns={["created_at", "business_name", "contact_name", "email", "business_type", "city", "main_need", "package_interest"]} />
         <DataTable title="Menu item questions" rows={menuQuestions} columns={["created_at", "business_name", "item_name", "customer_name", "customer_email", "comment"]} />
         <DataTable title="Subscription status" rows={subscriptions} columns={["customer_email", "plan_id", "status", "current_period_end", "updated_at"]} />
         <DataTable title="Payment events" rows={payments} columns={["created_at", "customer_email", "type", "status", "amount_paid", "currency"]} />
+      </div>
       </div>
     </main>
   );
