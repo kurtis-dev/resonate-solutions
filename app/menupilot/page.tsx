@@ -31,7 +31,7 @@ type BusinessTheme = {
 const businessThemes: BusinessTheme[] = [
   {
     id: "food",
-    name: "MenuPilot",
+    name: "Food & menu",
     label: "Food",
     icon: "menu",
     eyebrow: "Food trucks, restaurants, and popups",
@@ -83,11 +83,11 @@ const businessThemes: BusinessTheme[] = [
   },
   {
     id: "lawn",
-    name: "LawnPilot",
+    name: "Lawn care",
     label: "Lawn",
     icon: "leaf",
     eyebrow: "Lawn care and landscaping",
-    title: "A local lawn care page that turns yard work into easy quote requests.",
+    title: "A lawn care page that turns yard work into easy quote requests.",
     description: "Show mowing, edging, cleanup, seasonal services, service areas, photos, and a simple way to request a quote.",
     sampleName: "Greenline Lawn Care",
     sampleMeta: "Mowing, cleanup, and seasonal lawn help",
@@ -135,7 +135,7 @@ const businessThemes: BusinessTheme[] = [
   },
   {
     id: "cleaning",
-    name: "CleanPilot",
+    name: "Cleaning",
     label: "Cleaning",
     icon: "spark",
     eyebrow: "Maids and cleaning services",
@@ -187,7 +187,7 @@ const businessThemes: BusinessTheme[] = [
   },
   {
     id: "detailing",
-    name: "DetailPilot",
+    name: "Car detailing",
     label: "Detailing",
     icon: "car",
     eyebrow: "Mobile car detailers",
@@ -239,7 +239,7 @@ const businessThemes: BusinessTheme[] = [
   },
   {
     id: "beauty",
-    name: "BeautyPilot",
+    name: "Beauty",
     label: "Beauty",
     icon: "spark",
     eyebrow: "Nail techs and beauty pros",
@@ -291,7 +291,7 @@ const businessThemes: BusinessTheme[] = [
   },
   {
     id: "wellness",
-    name: "WellnessPilot",
+    name: "Wellness",
     label: "Wellness",
     icon: "star",
     eyebrow: "Massage therapists and wellness providers",
@@ -343,13 +343,13 @@ const businessThemes: BusinessTheme[] = [
   },
   {
     id: "other",
-    name: "Other local service",
+    name: "Other service business",
     label: "Other",
     icon: "star",
     eyebrow: "Custom services, photos, booking",
-    title: "A flexible local page for the business you actually run.",
+    title: "A flexible business page for the company you actually run.",
     description: "Show what you offer, who you help, where you work, what it costs to get started, and the easiest way for customers to contact or book you.",
-    sampleName: "Your Local Service",
+    sampleName: "Your Service Business",
     sampleMeta: "Services, photos, proof, and booking details",
     status: "Now accepting new customers",
     actions: ["Book", "Quote", "Call", "Details"],
@@ -516,14 +516,14 @@ const brandedExamples = [
 
 const planCards = [
   {
-    name: "Resonate Local Starter",
+    name: "Business Page Starter",
     tag: "$49/mo + $199 setup",
-    text: "For local businesses that need one clean, customer-ready page with services, photos, contact details, and next steps.",
-    cta: "Start your local page",
+    text: "For service businesses that need one clean, customer-ready page with services, photos, contact details, and next steps.",
+    cta: "Start your business page",
     href: "/pricing",
     featured: false,
     items: [
-      "Custom branded local business page",
+      "Custom branded business page",
       "Services, hours, location, pricing notes, and photos",
       "Booking, quote, call, map, or order link",
       "QR code",
@@ -533,7 +533,7 @@ const planCards = [
     ]
   },
   {
-    name: "Resonate Local Plus",
+    name: "Business Page Plus",
     tag: "$99/mo + $299 setup",
     text: "The main offer for businesses that want the page plus quick update tools for openings, delays, specials, and availability.",
     cta: "Choose Plus",
@@ -644,7 +644,7 @@ function PhonePreview({ theme }: { theme: BusinessTheme }) {
       </div>
       <div className="flex items-center justify-between rounded-t-[1.85rem] bg-[#3a2418] px-6 py-3 text-xs font-black uppercase tracking-[0.14em] text-white">
         <span>9:41</span>
-        <span>Local page</span>
+        <span>Business page</span>
         <span>...</span>
       </div>
       <div className="bg-[linear-gradient(135deg,#ff5a1f,#f8b737)] px-6 py-7 text-ink">
@@ -721,7 +721,7 @@ function BrandedExampleCard({ example }: { example: (typeof brandedExamples)[num
         <div className="p-5">
           <div className="flex flex-wrap gap-2">
             <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${example.accent}`}>{example.status}</span>
-            <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${example.accent}`}>Trusted local</span>
+            <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${example.accent}`}>Trusted service</span>
           </div>
           <p className="mt-4 text-sm leading-6 opacity-80">{example.description}</p>
           <div className="mt-4 grid grid-cols-3 gap-2">
@@ -759,7 +759,7 @@ export default function MenuPilotPage() {
   );
 
   const photoEmailLink = mailtoLink(
-    "Resonate Local business details",
+    "Business page details",
     "Send your services, photos, pricing, hours, location, booking link, and anything customers ask before they buy."
   );
 
@@ -774,7 +774,7 @@ export default function MenuPilotPage() {
           <Link href="/" className="flex items-center gap-3">
             <span className="flex h-10 w-10 items-center justify-center rounded-full bg-coral text-lg font-bold text-white">R</span>
             <span>
-              <span className="block text-lg font-bold leading-none text-ink">Resonate Local</span>
+              <span className="block text-lg font-bold leading-none text-ink">Business Page</span>
               <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-muted">by Resonate Solutions</span>
             </span>
           </Link>
@@ -796,21 +796,21 @@ export default function MenuPilotPage() {
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-[1fr_0.85fr] lg:py-24">
           <div>
             <h1 className="max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.01em] text-ink md:text-7xl">
-              Customer-ready pages for <span className="text-coral drop-shadow-[0_10px_28px_rgba(217,120,86,0.22)]">local service</span> businesses.
+              Customer-ready pages for <span className="text-coral drop-shadow-[0_10px_28px_rgba(217,120,86,0.22)]">service</span> businesses.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
-              Resonate Local is the umbrella for simple, customer-ready pages. MenuPilot, LawnPilot, CleanPilot, DetailPilot, BeautyPilot, and WellnessPilot each use language that fits the kind of business you run.
+              A simple page customers can open from a QR code, text, Google profile, or social link. Built around your services, photos, hours, booking info, and the questions people ask before they call or visit.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/m/mellow-moose-burgers" className="group relative overflow-hidden rounded-full bg-ink px-7 py-4 text-center font-black text-white shadow-[0_20px_55px_rgba(32,35,32,0.28)] ring-4 ring-gold/35 transition hover:-translate-y-0.5 hover:bg-coral hover:shadow-[0_24px_65px_rgba(217,120,86,0.34)]">
+              <Link href="/m/mellow-moose-burgers" className="group relative overflow-hidden rounded-full border-2 border-gold bg-coral px-7 py-4 text-center font-black text-white shadow-[0_18px_45px_rgba(217,120,86,0.28)] ring-4 ring-coral/10 transition hover:-translate-y-0.5 hover:border-coral hover:bg-[#e56f4c] hover:shadow-[0_24px_65px_rgba(217,120,86,0.34)]">
                 <span className="absolute inset-y-0 left-0 w-1/3 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.22),transparent)] transition group-hover:translate-x-[220%]" />
                 <span className="relative">See a live example page</span>
               </Link>
               <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">
-                View Resonate Local plans
+                View business page plans
               </Link>
             </div>
-            <p className="mt-3 text-sm font-bold text-coral">Built from a real food business sample so you can see the finished page, not just the pitch.</p>
+            <p className="mt-3 text-sm font-bold text-coral">See the kind of simple, polished page your customers can open from a QR code, text, or link.</p>
             <div className="mt-8 flex flex-wrap gap-5 text-sm font-bold text-muted">
               {["Mobile-first", "Custom branded", "Built around your trade"].map((item) => (
                 <span key={item} className="inline-flex items-center gap-2">
@@ -830,10 +830,10 @@ export default function MenuPilotPage() {
             <div>
               <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Choose your business type</p>
               <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-                One Resonate Local system. Different Pilot for each trade.
+                Choose the business type that fits you best.
               </h2>
               <p className="mt-5 leading-7 text-muted">
-                MenuPilot handles food. LawnPilot handles landscaping. CleanPilot handles cleaning. DetailPilot, BeautyPilot, and WellnessPilot each shape the page around what customers need to see before they reach out.
+                Each page uses the right layout, words, buttons, photos, and update options for what your customers need to see before they call, book, request a quote, or visit.
               </p>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
@@ -892,7 +892,7 @@ export default function MenuPilotPage() {
               <span className="inline-flex rounded-full bg-[#fff0e9] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-coral">
                 What customers see
               </span>
-              <h3 className="mt-5 text-3xl font-extrabold text-ink">A branded local page</h3>
+              <h3 className="mt-5 text-3xl font-extrabold text-ink">A branded business page</h3>
               <ul className="mt-6 grid gap-4 text-muted">
                 {customerView.map((item) => (
                   <CheckLine key={item}>{item}</CheckLine>
@@ -977,12 +977,12 @@ export default function MenuPilotPage() {
       <section id="why" className="bg-white">
         <div className="mx-auto max-w-7xl px-5 py-20">
           <div className="max-w-4xl">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Why Resonate Local</p>
+            <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Why it works</p>
             <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
               Customers should not have to dig to know what you do.
             </h2>
             <p className="mt-5 max-w-2xl leading-7 text-muted">
-              Local business owners need something simpler than a full website and more useful than a scattered social profile. This gives customers one clean place to understand, trust, and contact you.
+              Service business owners need something simpler than a full website and more useful than a scattered social profile. This gives customers one clean place to understand, trust, and contact you.
             </p>
           </div>
           <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
@@ -1007,7 +1007,7 @@ export default function MenuPilotPage() {
               Custom branded pages for the business <span className="italic text-white/70">you actually run.</span>
             </h2>
             <p className="mx-auto mt-5 max-w-2xl leading-7 text-white/75">
-              Each Resonate Local page is shaped around the trade, not forced into one generic template. LawnPilot needs quotes and service areas. CleanPilot needs packages and trust. DetailPilot needs galleries, packages, and booking.
+              Each business page is shaped around the trade, not forced into one generic template. Lawn care needs quote requests and service areas. Cleaning needs packages and trust. Detailing needs galleries, packages, and booking.
             </p>
             <div className="mx-auto mt-8 grid max-w-xl gap-3 sm:grid-cols-4">
               {brandItems.map((item) => (
@@ -1036,7 +1036,7 @@ export default function MenuPilotPage() {
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Plans</p>
             <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-              Two ways to run your local page.
+              Two ways to run your business page.
             </h2>
             <p className="mt-4 leading-7 text-muted">
               Starter gives you the customer-ready page. Plus adds fast update tools when the business needs availability, weather, specials, policy notes, or promotions to change without a rebuild.
@@ -1079,12 +1079,12 @@ export default function MenuPilotPage() {
               <div>
                 <h2 className="text-4xl font-extrabold leading-tight tracking-[-0.01em] text-white md:text-5xl">Let&apos;s build the page customers need.</h2>
                 <p className="mt-4 max-w-2xl text-lg leading-8 text-white/85">
-                  Send your services, photos, hours, and booking link. We will shape it into a local page customers can understand fast.
+                  Send your services, photos, hours, and booking link. We will shape it into a business page customers can understand fast.
                 </p>
               </div>
               <div className="flex flex-col gap-3 sm:flex-row">
                 <Link href="/pricing" className="rounded-full bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:bg-cream">
-                  Start your local page
+                  Start your business page
                 </Link>
                 <a href={photoEmailLink} className="rounded-full border border-white/50 bg-ink px-7 py-4 text-center font-bold text-white shadow-sm transition hover:bg-coral">
                   Send business details
@@ -1093,8 +1093,8 @@ export default function MenuPilotPage() {
             </div>
           </div>
           <footer className="mt-12 flex flex-col gap-4 border-t border-line pt-8 text-sm text-muted md:flex-row md:items-center md:justify-between">
-            <p className="font-bold text-ink">Resonate Local <span className="font-normal text-muted">by Resonate Solutions</span></p>
-            <p>Customer-ready pages for local service businesses. Built in Northwest Arkansas.</p>
+            <p className="font-bold text-ink">Business Page <span className="font-normal text-muted">by Resonate Solutions</span></p>
+            <p>Customer-ready pages for service businesses. Built in Northwest Arkansas.</p>
           </footer>
         </div>
       </section>

@@ -15,8 +15,8 @@ const initialForm = {
   businessType: "",
   city: "",
   currentMenuLink: "",
-  mainNeed: "Customers cannot find our current menu",
-  packageInterest: "Free Menu Review",
+  mainNeed: "Customers cannot find our current services",
+  packageInterest: "Free Page Review",
   notes: "",
   website: ""
 };
@@ -27,7 +27,7 @@ export function IntakeForm() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setState({ status: "submitting", message: "Sending your menu review request..." });
+    setState({ status: "submitting", message: "Sending your page review request..." });
 
     const response = await fetch("/api/intake", {
       method: "POST",
@@ -53,10 +53,10 @@ export function IntakeForm() {
   return (
     <form onSubmit={onSubmit} className="grid gap-4 rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
       <div>
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Start with a free menu review</p>
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Start with a free page review</p>
         <h2 className="mt-2 text-3xl font-black text-ink">Find what customers cannot easily see today.</h2>
         <p className="mt-3 leading-7 text-muted">
-          Send the basics and Resonate can review what customers see now: menu, hours, location, photos, links, and Google profile signals.
+          Send the basics and Resonate can review what customers see now: services, hours, location or service area, photos, links, and Google profile signals.
         </p>
       </div>
 
@@ -88,7 +88,7 @@ export function IntakeForm() {
       </div>
 
       <label className="grid gap-2 text-sm font-bold text-ink">
-        Current menu, website, or social link
+        Current website, menu, booking, or social link
         <input value={form.currentMenuLink} onChange={(event) => updateField("currentMenuLink", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
       </label>
 
@@ -96,7 +96,7 @@ export function IntakeForm() {
         <label className="grid gap-2 text-sm font-bold text-ink">
           Main need
           <select required value={form.mainNeed} onChange={(event) => updateField("mainNeed", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
-            <option>Customers cannot find our current menu</option>
+            <option>Customers cannot find our current services</option>
             <option>Customers cannot find our location or hours</option>
             <option>Our photos do not help people choose</option>
             <option>Our Google profile needs cleanup</option>
@@ -106,9 +106,9 @@ export function IntakeForm() {
         <label className="grid gap-2 text-sm font-bold text-ink">
           Interest
           <select required value={form.packageInterest} onChange={(event) => updateField("packageInterest", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
-            <option>Free Menu Review</option>
-            <option>MenuPilot Starter</option>
-            <option>MenuPilot Plus</option>
+            <option>Free Page Review</option>
+            <option>Business Page Starter</option>
+            <option>Business Page Plus</option>
             <option>Custom Design Buildout</option>
           </select>
         </label>

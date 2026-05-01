@@ -16,6 +16,39 @@ function Field({ label, name, placeholder, required }: { label: string; name: st
   );
 }
 
+function StatusFields({ includeGrid = false }: { includeGrid?: boolean }) {
+  const content = (
+    <>
+      <label className="grid gap-2 text-sm font-bold text-ink">
+        Open / closed status
+        <select name="operatingStatus" defaultValue="normal" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal">
+          <option value="normal">Normal schedule</option>
+          <option value="open">Open now</option>
+          <option value="closed">Closed today</option>
+          <option value="closed_until">Closed until...</option>
+          <option value="sold_out">Sold out for today</option>
+          <option value="weather_delay">Weather delay</option>
+          <option value="limited_menu">Limited menu</option>
+        </select>
+      </label>
+      <label className="grid gap-2 text-sm font-bold text-ink">
+        Closed until
+        <input name="statusUntil" type="datetime-local" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" />
+      </label>
+      <label className="grid gap-2 text-sm font-bold text-ink md:col-span-2">
+        Customer announcement
+        <input name="customAnnouncement" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder="Closed for a private event today. Back tomorrow at 11." />
+      </label>
+    </>
+  );
+
+  if (includeGrid) {
+    return <div className="grid gap-3 md:grid-cols-2">{content}</div>;
+  }
+
+  return content;
+}
+
 export default async function AdminMenusPage({ searchParams }: PageProps) {
   const params = await searchParams;
   const businesses = await listMenuBusinesses();
@@ -29,13 +62,13 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
   return (
     <main className="mx-auto max-w-7xl px-5 py-16">
       <div className="mb-10 max-w-3xl">
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">MenuPilot product</p>
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Business page admin</p>
         <h1 className="mt-3 text-4xl font-black text-ink md:text-6xl">Create a live customer menu.</h1>
         <p className="mt-5 leading-7 text-muted">
-          Enter a local business, publish its menu page, and use the generated QR code anywhere customers need the current details.
+          Enter a service business, publish its page, and use the generated QR code anywhere customers need the current details.
         </p>
         <a
-          href={mailtoLink("MenuPilot photos and menu details")}
+          href={mailtoLink("Business page photos and details")}
           className="mt-6 inline-flex rounded-full border border-line bg-white px-5 py-3 font-black text-ink hover:border-brand"
         >
           Photo inbox: {questionsEmail}
@@ -64,6 +97,14 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
               <Field label="Hero image URL" name="heroImageUrl" placeholder="/assets/mellow-moose-logo.jpg" />
               <Field label="Brand theme" name="brandTheme" placeholder="default or mellow-moose" />
               <Field label="Active menu key" name="activeMenuKey" placeholder="main, mellow-moose, dos-gordos" />
+            </div>
+
+            <div className="rounded-2xl border border-line bg-sage p-4">
+              <h3 className="font-black text-ink">Opening status</h3>
+              <p className="mt-1 text-sm leading-6 text-muted">These are the first controls that later sync to Google, Clover, Facebook, and other connected channels.</p>
+              <div className="mt-4">
+                <StatusFields includeGrid />
+              </div>
             </div>
 
             <label className="grid gap-2 text-sm font-bold text-ink">
@@ -127,7 +168,7 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
           <form action={updateMenuModeAction} className="mt-6 rounded-2xl border border-line bg-sage p-4">
             <h3 className="font-black text-ink">Owner control center</h3>
             <p className="mt-2 text-sm leading-6 text-muted">
-              Once Mellow Moose is stored in the database, this becomes the simple control panel for menu mode, weekly hours, sellout notes, weather closures, and live specials.
+              Once a business is stored in the database, this becomes the simple control panel for open/closed status, menu mode, weekly hours, sellout notes, weather closures, and live specials.
             </p>
             <div className="mt-4 grid gap-3 md:grid-cols-2">
               <div className="rounded-2xl bg-white p-4">
@@ -155,6 +196,9 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
                 <option value="dos-gordos">Dos Gordos popup</option>
               </select>
             </label>
+            <div className="mt-4">
+              <StatusFields includeGrid />
+            </div>
             <label className="mt-4 grid gap-2 text-sm font-bold text-ink">
               Banner text
               <input name="popupBanner" className="rounded-2xl border border-line bg-white px-4 py-3 font-normal" placeholder="Dos Gordos Takeover at Mellow Moose is active today." />
@@ -172,11 +216,11 @@ export default async function AdminMenusPage({ searchParams }: PageProps) {
             </button>
           </form>
 
-          <h2 className="mt-8 text-2xl font-black text-ink">Existing local pages</h2>
+          <h2 className="mt-8 text-2xl font-black text-ink">Existing business pages</h2>
           {!businesses ? (
-            <p className="mt-5 leading-7 text-muted">Connect the database to see customer local pages created from this admin form.</p>
+            <p className="mt-5 leading-7 text-muted">Connect the database to see customer business pages created from this admin form.</p>
           ) : businesses.length === 0 ? (
-            <p className="mt-5 leading-7 text-muted">No database local pages yet.</p>
+            <p className="mt-5 leading-7 text-muted">No database business pages yet.</p>
           ) : (
             <div className="mt-5 grid gap-3">
               {businesses.map((business) => (

@@ -91,6 +91,48 @@ function cleanPrice(price?: string | null) {
   return price.split("/")[0].trim();
 }
 
+function formatStatusUntil(value?: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const date = new Date(value);
+
+  if (Number.isNaN(date.getTime())) {
+    return value;
+  }
+
+  return new Intl.DateTimeFormat("en-US", {
+    month: "short",
+    day: "numeric",
+    hour: "numeric",
+    minute: "2-digit"
+  }).format(date);
+}
+
+function businessStatusLabel(business: MenuBusiness) {
+  if (business.customAnnouncement) {
+    return business.customAnnouncement;
+  }
+
+  switch (business.operatingStatus) {
+    case "open":
+      return "Open now";
+    case "closed":
+      return "Closed today";
+    case "closed_until":
+      return `Closed until ${formatStatusUntil(business.statusUntil) || "later"}`;
+    case "sold_out":
+      return "Sold out for today";
+    case "weather_delay":
+      return "Weather delay today";
+    case "limited_menu":
+      return "Limited menu today";
+    default:
+      return business.statusNote || null;
+  }
+}
+
 function FeaturedFavoriteCard({ item, index }: { item: MenuItem; index: number }) {
   const badge = item.badge || (index === 0 ? "Best seller" : "Local favorite");
 
@@ -233,6 +275,7 @@ function MellowMooseShell({
   const mappedAddress = business.address || business.locationSummary || business.city || business.businessName;
   const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(mappedAddress)}&output=embed`;
   const isDosGordos = activeMenu.key === "dos-gordos";
+  const liveStatus = businessStatusLabel(business);
   const todaySpecials = isDosGordos
     ? [
         { label: "Special event", title: "Dos Gordos Takeover", body: "Birria tacos, Cali fries, and the Birria Moose Burger are running today." },
@@ -260,7 +303,7 @@ function MellowMooseShell({
       <section id="top" className="mx-auto grid max-w-5xl gap-10 px-5 py-14 md:grid-cols-[1.05fr_0.95fr] md:items-center md:py-20">
         <div>
           <span className="inline-flex rounded-full bg-[#4a3324] px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-white">
-            {isDosGordos ? "Special event - Siloam Springs" : "Now serving - Siloam Springs"}
+            {liveStatus || (isDosGordos ? "Special event - Siloam Springs" : "Now serving - Siloam Springs")}
           </span>
           <h1 className="mt-5 text-6xl font-black leading-[0.9] tracking-tight [text-wrap:balance] md:text-7xl">
             {isDosGordos ? (
@@ -314,10 +357,10 @@ function MellowMooseShell({
         </div>
       </section>
 
-      {activeMenu.banner ? (
+      {activeMenu.banner || liveStatus ? (
         <section className="mx-auto max-w-5xl px-5 pb-8">
           <div className="rounded-[1.25rem] border border-dashed border-[#bba995] bg-[#fffaf3] px-5 py-4 text-lg font-black text-[#3a2418]">
-            <span>{activeMenu.banner}</span>
+            <span>{activeMenu.banner || liveStatus}</span>
           </div>
         </section>
       ) : null}
@@ -386,9 +429,9 @@ function MellowMooseShell({
         <article className="rounded-[1.25rem] border border-[#dfd2c3] bg-[#fffaf3] p-6 shadow-[0_16px_35px_rgba(55,34,22,.10)]">
           <p className="text-xs font-black uppercase tracking-[0.16em] text-[#2f9c96]">When we&apos;re slingin&apos;</p>
           <h2 className="mt-2 text-3xl font-black text-[#21140d]">Hours</h2>
-          {business.statusNote ? (
+          {liveStatus ? (
             <p className="mt-4 rounded-xl bg-[#3a2418] px-4 py-3 text-sm font-black leading-6 text-white">
-              {business.statusNote}
+              {liveStatus}
             </p>
           ) : null}
           <div className="mt-5 divide-y divide-[#dfd2c3]">
@@ -470,6 +513,7 @@ export default async function PublicMenuPage({ params, searchParams }: PageProps
   }
 
   const activeMenu = getActiveMenu(business, query.menu);
+  const liveStatus = businessStatusLabel(business);
   const menuUrl = publicMenuUrl(business.slug);
   const directionsUrl = actionUrl("directions", business.address || business.locationSummary);
   const phoneUrl = actionUrl("phone", business.phone);
@@ -550,7 +594,7 @@ export default async function PublicMenuPage({ params, searchParams }: PageProps
                   </div>
                 ) : null}
               </div>
-              {activeMenu.banner || business.statusNote ? <p className="mt-5 rounded-2xl bg-sage px-4 py-3 font-bold text-brandDark">{activeMenu.banner || business.statusNote}</p> : null}
+              {activeMenu.banner || liveStatus ? <p className="mt-5 rounded-2xl bg-sage px-4 py-3 font-bold text-brandDark">{activeMenu.banner || liveStatus}</p> : null}
             </div>
 
             <div className="rounded-2xl border border-line bg-cream p-4">

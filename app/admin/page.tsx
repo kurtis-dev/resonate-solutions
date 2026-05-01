@@ -66,14 +66,14 @@ export default async function AdminPage() {
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Internal dashboard</p>
         <h1 className="mt-3 text-4xl font-black text-ink md:text-6xl">Resonate operations.</h1>
         <p className="mt-5 leading-7 text-muted">
-          This is the first internal view for free Resonate Local review requests, Stripe subscription status, and payment events. Add authentication before sharing this URL publicly.
+          This is the first internal view for free business page review requests, Stripe subscription status, and payment events. Add authentication before sharing this URL publicly.
         </p>
         <Link href="/admin/menus" className="mt-6 inline-flex rounded-full bg-brand px-5 py-3 font-black text-white shadow-soft hover:bg-brandDark">
           Create customer menu
         </Link>
       </div>
       <div className="grid gap-6">
-        <DataTable title="Recent free Resonate Local review requests" rows={intakes} columns={["created_at", "business_name", "contact_name", "email", "business_type", "city", "main_need", "package_interest"]} />
+        <DataTable title="Recent free business page review requests" rows={intakes} columns={["created_at", "business_name", "contact_name", "email", "business_type", "city", "main_need", "package_interest"]} />
         <DataTable title="Menu item questions" rows={menuQuestions} columns={["created_at", "business_name", "item_name", "customer_name", "customer_email", "comment"]} />
         <DataTable title="Subscription status" rows={subscriptions} columns={["customer_email", "plan_id", "status", "current_period_end", "updated_at"]} />
         <DataTable title="Payment events" rows={payments} columns={["created_at", "customer_email", "type", "status", "amount_paid", "currency"]} />

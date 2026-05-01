@@ -9,10 +9,10 @@ export default function PricingPage() {
           <div className="max-w-4xl">
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Pricing</p>
             <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-6xl">
-              Pick the level of Resonate Local help your business actually needs.
+              Pick the level of business page help your company actually needs.
             </h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">
-              Resonate Local gives customers one clean place to see what you offer, trust your business, and take the next step. MenuPilot, LawnPilot, CleanPilot, DetailPilot, BeautyPilot, and WellnessPilot each shape that page around the business type.
+              A business page gives customers one clean place to see what you offer, trust your company, and take the next step. Choose the business type that fits you best, then shape the page around what customers need before they call, book, request a quote, or visit.
             </p>
           </div>
         </div>

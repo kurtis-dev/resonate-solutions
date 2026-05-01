@@ -50,6 +50,9 @@ create table if not exists businesses (
   brand_theme text,
   description text,
   city text,
+  operating_status text not null default 'normal',
+  status_until timestamptz,
+  custom_announcement text,
   status_note text,
   popup_banner text,
   hours_summary text,
@@ -114,7 +117,42 @@ create table if not exists menu_item_questions (
 create index if not exists businesses_slug_idx on businesses (slug);
 create index if not exists businesses_published_idx on businesses (is_published);
 create index if not exists businesses_active_menu_idx on businesses (active_menu_key);
+create index if not exists businesses_operating_status_idx on businesses (operating_status);
 create index if not exists menu_variants_business_idx on menu_variants (business_id);
 create index if not exists menu_sections_business_idx on menu_sections (business_id);
 create index if not exists menu_items_business_idx on menu_items (business_id);
 create index if not exists menu_item_questions_business_idx on menu_item_questions (business_slug);
+
+alter table businesses add column if not exists operating_status text not null default 'normal';
+alter table businesses add column if not exists status_until timestamptz;
+alter table businesses add column if not exists custom_announcement text;
+
+create table if not exists business_integrations (
+  id text primary key,
+  business_id text not null references businesses(id) on delete cascade,
+  provider text not null,
+  provider_account_name text,
+  provider_account_id text,
+  access_token_encrypted text,
+  refresh_token_encrypted text,
+  scopes text,
+  is_connected boolean not null default false,
+  last_sync_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  unique (business_id, provider)
+);
+
+create table if not exists business_sync_events (
+  id text primary key,
+  business_id text not null references businesses(id) on delete cascade,
+  provider text not null,
+  action_type text not null,
+  status text not null,
+  message text,
+  payload jsonb,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists business_integrations_business_idx on business_integrations (business_id);
+create index if not exists business_sync_events_business_idx on business_sync_events (business_id, created_at desc);

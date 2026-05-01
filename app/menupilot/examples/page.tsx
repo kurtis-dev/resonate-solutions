@@ -33,7 +33,7 @@ export default function MenuPilotExamplesPage() {
     <main className="bg-cream">
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand">MenuPilot examples</p>
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand">Business page examples</p>
           <h1 className="mt-3 max-w-3xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
             Show what changes without cluttering the customer menu.
           </h1>
@@ -99,7 +99,7 @@ export default function MenuPilotExamplesPage() {
             This is the part the owner pays for.
           </h2>
           <p className="mt-5 leading-7 text-muted">
-            A static menu is easy to forget. MenuPilot is useful because the public page can respond to real operations: weather, sellouts, hours, popups, specials, and new photos.
+            A static menu is easy to forget. A business page is useful because the public page can respond to real operations: weather, sellouts, hours, popups, specials, and new photos.
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">

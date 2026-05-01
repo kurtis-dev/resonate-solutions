@@ -19,9 +19,9 @@ export type Plan = {
 export const plans: Plan[] = [
   {
     id: "audit",
-    name: "Free Local Review",
+    name: "Free Page Review",
     price: "$0",
-    description: "A quick review for a local business that wants to know what customers cannot find before paying monthly.",
+    description: "A quick review for a service business that wants to know what customers cannot find before paying monthly.",
     limit: "Free discovery review",
     billingPeriod: "",
     features: [
@@ -36,13 +36,13 @@ export const plans: Plan[] = [
   },
   {
     id: "core",
-    name: "Resonate Local Starter",
+    name: "Business Page Starter",
     price: "$49",
-    description: "For local businesses that want one clean branded page and mostly manage updates themselves.",
+    description: "For service businesses that want one clean branded page and mostly manage updates themselves.",
     limit: "$199 setup fee",
     billingPeriod: "mo",
     features: [
-      { label: "Custom branded local page", detail: "A mobile-first page using the business logo, colors, services, photos, hours, location, and next-step links." },
+      { label: "Custom branded business page", detail: "A mobile-first page using the business logo, colors, services, photos, hours, location, and next-step links." },
       { label: "Hours, location, services, and photos", detail: "The essential customer details live in one clean place instead of scattered posts and old screenshots." },
       { label: "Booking, quote, or order link", detail: "The page does not replace the tools you already use. It sends ready customers to the right next step." },
       { label: "QR code", detail: "One QR link for the truck, counter, social profiles, printed cards, and signs." },
@@ -57,13 +57,13 @@ export const plans: Plan[] = [
   },
   {
     id: "plus",
-    name: "Resonate Local Plus",
+    name: "Business Page Plus",
     price: "$99",
     description: "The main offer for businesses that want the page plus easy update tools for availability, specials, delays, policies, or promotions.",
     limit: "$299 setup fee",
     billingPeriod: "mo",
     features: [
-      { label: "Everything in Starter", detail: "Includes the branded local page, QR code, next-step links, photos, hours, location, mobile layout, and email support." },
+      { label: "Everything in Starter", detail: "Includes the branded business page, QR code, next-step links, photos, hours, location, mobile layout, and email support." },
       { label: "Business-specific updates", detail: "Show openings, delays, specials, availability, policy reminders, service area changes, or promotions when customers need to know." },
       { label: "Featured services or offers", detail: "Guide people toward the service, package, or offer you want them to notice first." },
       { label: "Monthly page checkup", detail: "A recurring look at the page so stale details, weak labels, and broken links do not sit untouched." },

@@ -28,6 +28,6 @@ export async function POST(request: Request) {
     ok: true,
     id: record.id,
     storage,
-    message: "Thanks. Resonate received your free menu review request."
+    message: "Thanks. Resonate received your free page review request."
   });
 }

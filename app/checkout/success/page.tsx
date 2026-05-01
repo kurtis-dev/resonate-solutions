@@ -10,7 +10,7 @@ export default function CheckoutSuccessPage() {
           Stripe confirmed checkout. Once Stripe and the database are connected, this page can also record payment status for follow-up.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/menupilot" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Request Free Menu Review</Link>
+          <Link href="/menupilot" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Request Free Page Review</Link>
           <Link href="/" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back home</Link>
         </div>
       </section>

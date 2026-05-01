@@ -29,6 +29,9 @@ export type MenuBusiness = {
   brandTheme?: "default" | "mellow-moose";
   description?: string | null;
   city?: string | null;
+  operatingStatus: "normal" | "open" | "closed" | "closed_until" | "sold_out" | "weather_delay" | "limited_menu";
+  statusUntil?: string | null;
+  customAnnouncement?: string | null;
   statusNote?: string | null;
   popupBanner?: string | null;
   hoursSummary?: string | null;
@@ -78,6 +81,9 @@ const mellowMooseBurgers: MenuBusiness = {
   brandTheme: "mellow-moose",
   description: "Smashed fresh beef burgers, loaded fries, salads, kids meals, and rotating specials from Griffin's Food Court in Siloam Springs.",
   city: "Siloam Springs, AR",
+  operatingStatus: "normal",
+  statusUntil: null,
+  customAnnouncement: null,
   statusNote: "Best of Siloam Springs 2026 Winner: Burger / Local",
   popupBanner: null,
   hoursSummary: "Tue-Fri 11 AM-2 PM & 4-8 PM; Sat 11 AM-5 PM",
@@ -460,6 +466,20 @@ function numberValue(row: Row, key: string) {
   return typeof raw === "number" ? raw : Number(raw || 0);
 }
 
+function operatingStatusValue(value?: string | null): MenuBusiness["operatingStatus"] {
+  switch (value) {
+    case "open":
+    case "closed":
+    case "closed_until":
+    case "sold_out":
+    case "weather_delay":
+    case "limited_menu":
+      return value;
+    default:
+      return "normal";
+  }
+}
+
 export function slugify(value: string) {
   return value
     .toLowerCase()
@@ -566,6 +586,9 @@ async function hydrateBusiness(row: Row): Promise<MenuBusiness> {
     brandTheme: text(row, "brand_theme") === "mellow-moose" ? "mellow-moose" : "default",
     description: text(row, "description"),
     city: text(row, "city"),
+    operatingStatus: operatingStatusValue(text(row, "operating_status")),
+    statusUntil: text(row, "status_until"),
+    customAnnouncement: text(row, "custom_announcement"),
     statusNote: text(row, "status_note"),
     popupBanner: text(row, "popup_banner"),
     hoursSummary: text(row, "hours_summary"),
@@ -646,6 +669,9 @@ export async function createMenuBusiness(formData: FormData) {
       brand_theme,
       description,
       city,
+      operating_status,
+      status_until,
+      custom_announcement,
       status_note,
       popup_banner,
       hours_summary,
@@ -665,11 +691,14 @@ export async function createMenuBusiness(formData: FormData) {
       ${businessId},
       ${slug},
       ${businessName},
-      ${String(formData.get("businessType") || "Local business").trim()},
+      ${String(formData.get("businessType") || "Service business").trim()},
       ${String(formData.get("activeMenuKey") || "main").trim()},
       ${String(formData.get("brandTheme") || "default").trim()},
       ${String(formData.get("description") || "").trim() || null},
       ${String(formData.get("city") || "").trim() || null},
+      ${String(formData.get("operatingStatus") || "normal").trim()},
+      ${String(formData.get("statusUntil") || "").trim() || null},
+      ${String(formData.get("customAnnouncement") || "").trim() || null},
       ${String(formData.get("statusNote") || "").trim() || null},
       ${String(formData.get("popupBanner") || "").trim() || null},
       ${String(formData.get("hoursSummary") || "").trim() || null},
@@ -729,6 +758,9 @@ export async function updateMenuMode(formData: FormData) {
 
   const slug = String(formData.get("slug") || "").trim();
   const activeMenuKey = String(formData.get("activeMenuKey") || "main").trim();
+  const operatingStatus = operatingStatusValue(String(formData.get("operatingStatus") || "normal").trim());
+  const statusUntil = String(formData.get("statusUntil") || "").trim();
+  const customAnnouncement = String(formData.get("customAnnouncement") || "").trim();
   const popupBanner = String(formData.get("popupBanner") || "").trim();
   const statusNote = String(formData.get("statusNote") || "").trim();
   const hoursSummary = String(formData.get("hoursSummary") || "").trim();
@@ -740,12 +772,48 @@ export async function updateMenuMode(formData: FormData) {
   await sql`
     update businesses
     set active_menu_key = ${activeMenuKey},
+        operating_status = ${operatingStatus},
+        status_until = ${statusUntil || null},
+        custom_announcement = ${customAnnouncement || null},
         popup_banner = ${popupBanner || null},
         status_note = ${statusNote || null},
         hours_summary = ${hoursSummary || null},
         updated_at = now()
     where slug = ${slug}
   `;
+
+  const rows = (await sql`
+    select id
+    from businesses
+    where slug = ${slug}
+    limit 1
+  `) as Row[];
+  const businessId = text(rows[0] || {}, "id");
+
+  if (businessId) {
+    await sql`
+      insert into business_sync_events (
+        id,
+        business_id,
+        provider,
+        action_type,
+        status,
+        message,
+        payload,
+        created_at
+      )
+      values (
+        ${crypto.randomUUID()},
+        ${businessId},
+        'resonate',
+        'business_controls_update',
+        'success',
+        'Business page controls updated on Resonate.',
+        ${JSON.stringify({ activeMenuKey, operatingStatus, statusUntil: statusUntil || null, customAnnouncement: customAnnouncement || null })},
+        now()
+      )
+    `;
+  }
 
   return { ok: true, slug };
 }
