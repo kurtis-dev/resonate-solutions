@@ -31,15 +31,15 @@ export const plans: Plan[] = [
       { label: "Recommended next step", detail: "You get a plain recommendation for the setup and monthly option that fits the business." }
     ],
     cta: "Request Fit Check",
-    checkoutUrl: "/menupilot",
+    checkoutUrl: "/menupilot#fit-check",
     paymentMode: "none"
   },
   {
     id: "setup",
-    name: "Page/Menu Build",
+    name: "Launch Build",
     price: "$399",
-    description: "The required one-time setup to turn the business details into a polished page, food menu, service list, or combined customer page.",
-    limit: "One-time setup",
+    description: "The required one-time setup that turns the business details into a polished page, food menu, services list, or combined customer page.",
+    limit: "Required setup",
     billingPeriod: "",
     features: [
       { label: "Custom business page", detail: "A mobile-first page shaped around the business, not a generic template." },
@@ -48,7 +48,7 @@ export const plans: Plan[] = [
       { label: "QR-ready public link", detail: "One customer-ready URL for QR codes, counters, trucks, signs, texts, profiles, and printed materials." },
       { label: "Launch check", detail: "We review the page on phone and desktop before it is shared publicly." }
     ],
-    cta: "Start Setup",
+    cta: "Start Launch Build",
     highlighted: true,
     checkoutUrl: "/checkout?plan=setup",
     stripePriceEnvKey: "STRIPE_PRICE_SETUP",
@@ -56,10 +56,10 @@ export const plans: Plan[] = [
   },
   {
     id: "care",
-    name: "Care Plan",
+    name: "Keep Current",
     price: "$79",
     description: "For businesses that want the page kept current after launch without paying for a rebuild every time small details change.",
-    limit: "After setup",
+    limit: "Monthly care",
     billingPeriod: "mo",
     features: [
       { label: "Hosting and page care", detail: "The page stays available and Resonate remains the place to request changes." },
@@ -67,26 +67,26 @@ export const plans: Plan[] = [
       { label: "Monthly link check", detail: "We check the main call, map, booking, order, quote, and social/profile links." },
       { label: "Email support", detail: "Simple support for page questions and update requests." }
     ],
-    cta: "Choose Care",
+    cta: "Choose Keep Current",
     checkoutUrl: "/checkout?plan=care",
     stripePriceEnvKey: "STRIPE_PRICE_CORE",
     paymentMode: "subscription"
   },
   {
     id: "care-plus",
-    name: "Care Plus",
+    name: "Managed Updates",
     price: "$149",
-    description: "For restaurants, food trucks, and service businesses that change more often and want priority help keeping the page useful.",
-    limit: "After setup",
+    description: "For restaurants, food trucks, and service businesses that change often and want Resonate to keep the page useful without counting every small edit.",
+    limit: "Priority monthly care",
     billingPeriod: "mo",
     features: [
-      { label: "Everything in Care", detail: "Includes hosting, link checks, update handling, and page support." },
-      { label: "Eight update requests per month", detail: "Useful for specials, seasonal menus, service changes, sold-out items, availability, and featured offers." },
+      { label: "Everything in Keep Current", detail: "Includes hosting, link checks, update handling, and page support." },
+      { label: "Unlimited standard updates", detail: "Useful for specials, seasonal menus, service changes, sold-out items, availability, featured offers, hours, links, and small copy/photo swaps. Larger rebuilds are quoted separately." },
       { label: "Monthly page polish", detail: "A recurring pass to improve labels, ordering, photos, and the customer path." },
       { label: "Priority turnaround", detail: "Update requests are treated ahead of standard care requests when the page needs to stay current." },
       { label: "Menu/service refresh help", detail: "We help reorganize supplied menu or service updates so customers can understand them quickly." }
     ],
-    cta: "Choose Care Plus",
+    cta: "Choose Managed Updates",
     checkoutUrl: "/checkout?plan=care-plus",
     stripePriceEnvKey: "STRIPE_PRICE_PLUS",
     paymentMode: "subscription"

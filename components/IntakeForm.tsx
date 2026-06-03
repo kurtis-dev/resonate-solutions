@@ -108,9 +108,9 @@ export function IntakeForm() {
           Likely next step
           <select required value={form.packageInterest} onChange={(event) => updateField("packageInterest", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
             <option>Free Fit Check</option>
-            <option>Page/Menu Build</option>
-            <option>Care Plan after launch</option>
-            <option>Care Plus after launch</option>
+            <option>Launch Build</option>
+            <option>Keep Current after launch</option>
+            <option>Managed Updates after launch</option>
           </select>
         </label>
       </div>

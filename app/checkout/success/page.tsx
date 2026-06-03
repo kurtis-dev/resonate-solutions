@@ -10,7 +10,7 @@ export default function CheckoutSuccessPage() {
           Stripe confirmed checkout. Resonate can now match this payment to the setup or monthly care step and follow up with the next customer action.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/menupilot" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Request Fit Check</Link>
+          <Link href="/menupilot#fit-check" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Request Fit Check</Link>
           <Link href="/" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back home</Link>
         </div>
       </section>

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { mailtoLink } from "@/lib/contact";
+import { IntakeForm } from "@/components/IntakeForm";
 
 type BusinessTheme = {
   id: string;
@@ -516,10 +517,10 @@ const brandedExamples = [
 
 const planCards = [
   {
-    name: "Page/Menu Build",
+    name: "Launch Build",
     tag: "$399 one-time",
     text: "The first paid step: a polished customer page, food menu, services list, or combined page built from the business details.",
-    cta: "Start setup",
+    cta: "Start launch build",
     href: "/checkout?plan=setup",
     featured: true,
     items: [
@@ -532,10 +533,10 @@ const planCards = [
     ]
   },
   {
-    name: "Care Plan",
+    name: "Keep Current",
     tag: "$79/mo",
     text: "For businesses that want the page kept current after launch without asking for a rebuild every time small details change.",
-    cta: "Choose Care",
+    cta: "Choose Keep Current",
     href: "/checkout?plan=care",
     featured: false,
     items: [
@@ -547,18 +548,19 @@ const planCards = [
     ]
   },
   {
-    name: "Care Plus",
+    name: "Managed Updates",
     tag: "$149/mo",
-    text: "For restaurants, food trucks, and service businesses that change often and want priority help keeping the page useful.",
-    cta: "Choose Care Plus",
+    text: "For restaurants, food trucks, and service businesses that change often and want Resonate to keep the page useful without counting every small edit.",
+    cta: "Choose Managed Updates",
     href: "/checkout?plan=care-plus",
     featured: false,
     items: [
-      "Everything in Care",
-      "Eight update requests per month",
+      "Everything in Keep Current",
+      "Unlimited standard updates",
       "Specials, sold-out items, seasonal services, and featured offers",
       "Monthly page polish",
-      "Priority turnaround"
+      "Priority turnaround",
+      "Larger rebuilds quoted separately"
     ]
   }
 ];
@@ -1037,7 +1039,7 @@ export default function MenuPilotPage() {
               Build once. Choose how much help you want after launch.
             </h2>
             <p className="mt-4 leading-7 text-muted">
-              Start with the one-time Page/Menu Build. After launch, Care keeps the basics current and Care Plus adds more frequent priority updates for menus, specials, services, and availability.
+              Start with the one-time Launch Build. After launch, Keep Current covers occasional edits, while Managed Updates gives active businesses unlimited standard updates with priority help.
             </p>
           </div>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
@@ -1055,10 +1057,6 @@ export default function MenuPilotPage() {
                     <CheckLine key={item}>{item}</CheckLine>
                   ))}
                 </ul>
-                <div className="mt-8">
-                  <p className="text-3xl font-extrabold text-ink">{plan.tag.split(" + ")[0]}</p>
-                  <p className="mt-1 text-sm text-muted">{plan.tag.includes("+") ? plan.tag.split(" + ")[1] : plan.tag}</p>
-                </div>
                 <Link href={plan.href} className={`mt-7 block rounded-full px-6 py-4 text-center font-bold shadow-sm transition ${
                   plan.featured ? "bg-ink text-white hover:bg-coral" : "bg-coral text-white hover:bg-ink"
                 }`}>
@@ -1072,6 +1070,9 @@ export default function MenuPilotPage() {
 
       <section className="bg-white">
         <div className="mx-auto max-w-7xl px-5 py-16">
+          <div id="fit-check" className="mb-12 scroll-mt-28">
+            <IntakeForm />
+          </div>
           <div className="rounded-[2rem] bg-[linear-gradient(135deg,#202320,#f17855,#f6a15e)] p-8 shadow-soft md:p-12">
             <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
               <div>

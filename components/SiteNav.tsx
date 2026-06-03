@@ -24,7 +24,7 @@ export function SiteNav() {
           <Link className="hover:text-ink" href="/menupilot">Business Pages</Link>
           <Link className="hover:text-ink" href="/pricing">Pricing</Link>
         </nav>
-        <Link href="/menupilot" className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-coral">
+        <Link href="/menupilot#fit-check" className="rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white hover:bg-coral">
           Free Fit Check
         </Link>
       </div>
