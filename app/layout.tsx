@@ -5,7 +5,7 @@ import { SiteNav } from "@/components/SiteNav";
 
 export const metadata: Metadata = {
   title: "Business Pages by Resonate Solutions",
-  description: "Customer-ready pages for service businesses, with plain business-type options for food, lawn care, cleaning, detailing, beauty, wellness, and more.",
+  description: "Customer-ready pages, food menus, and service listings for small businesses that need one clear link customers can use.",
   metadataBase: new URL("https://resonate.solutions"),
   icons: {
     icon: "/assets/resonate-icon-primary.png",
@@ -13,7 +13,7 @@ export const metadata: Metadata = {
   },
   openGraph: {
     title: "Business Pages by Resonate Solutions",
-    description: "Customer-ready pages for service businesses, with trade-specific layouts for food, lawn care, cleaning, detailing, beauty, and wellness.",
+    description: "Customer-ready business pages, food menus, and service listings built around what customers need before they call, order, book, or visit.",
     images: ["/assets/resonate-logo-flat.png"]
   }
 };

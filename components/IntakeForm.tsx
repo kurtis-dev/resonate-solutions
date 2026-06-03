@@ -15,8 +15,8 @@ const initialForm = {
   businessType: "",
   city: "",
   currentMenuLink: "",
-  mainNeed: "Customers cannot find our current services",
-  packageInterest: "Free Page Review",
+  mainNeed: "We need a food menu",
+  packageInterest: "Free Fit Check",
   notes: "",
   website: ""
 };
@@ -53,10 +53,10 @@ export function IntakeForm() {
   return (
     <form onSubmit={onSubmit} className="grid gap-4 rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
       <div>
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Start with a free page review</p>
-        <h2 className="mt-2 text-3xl font-black text-ink">Find what customers cannot easily see today.</h2>
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Start with a free fit check</p>
+        <h2 className="mt-2 text-3xl font-black text-ink">Tell us what kind of page, menu, or services list you need.</h2>
         <p className="mt-3 leading-7 text-muted">
-          Send the basics and Resonate can review what customers see now: services, hours, location or service area, photos, links, and Google profile signals.
+          Send the basics and Resonate can recommend the right setup before you pay: a food menu, services list, simple business page, or a combination.
         </p>
       </div>
 
@@ -79,50 +79,51 @@ export function IntakeForm() {
         </label>
         <label className="grid gap-2 text-sm font-bold text-ink">
           Business type
-          <input required value={form.businessType} onChange={(event) => updateField("businessType", event.target.value)} placeholder="Food truck, coffee shop, salon..." className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+          <input required value={form.businessType} onChange={(event) => updateField("businessType", event.target.value)} placeholder="Restaurant, food truck, salon, lawn care..." className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
         </label>
         <label className="grid gap-2 text-sm font-bold text-ink">
-          City
+          City or service area
           <input required value={form.city} onChange={(event) => updateField("city", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
         </label>
       </div>
 
       <label className="grid gap-2 text-sm font-bold text-ink">
-        Current website, menu, booking, or social link
+        Current website, menu, social, or Google profile link
         <input value={form.currentMenuLink} onChange={(event) => updateField("currentMenuLink", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
       </label>
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="grid gap-2 text-sm font-bold text-ink">
-          Main need
+          What do you need built or updated?
           <select required value={form.mainNeed} onChange={(event) => updateField("mainNeed", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
-            <option>Customers cannot find our current services</option>
-            <option>Customers cannot find our location or hours</option>
-            <option>Our photos do not help people choose</option>
-            <option>Our Google profile needs cleanup</option>
-            <option>We need a QR code and one clean link</option>
+            <option>We need a food menu</option>
+            <option>We need a services list</option>
+            <option>We need both menu and services</option>
+            <option>We need a simple business page</option>
+            <option>We need an existing page/menu cleaned up</option>
+            <option>Not sure yet</option>
           </select>
         </label>
         <label className="grid gap-2 text-sm font-bold text-ink">
-          Interest
+          Likely next step
           <select required value={form.packageInterest} onChange={(event) => updateField("packageInterest", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
-            <option>Free Page Review</option>
-            <option>Business Page Starter</option>
-            <option>Business Page Plus</option>
-            <option>Custom Design Buildout</option>
+            <option>Free Fit Check</option>
+            <option>Page/Menu Build</option>
+            <option>Care Plan after launch</option>
+            <option>Care Plus after launch</option>
           </select>
         </label>
       </div>
 
       <label className="grid gap-2 text-sm font-bold text-ink">
-        Notes
+        What should be created or updated?
         <textarea value={form.notes} onChange={(event) => updateField("notes", event.target.value)} rows={4} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
       </label>
 
       <input tabIndex={-1} autoComplete="off" value={form.website} onChange={(event) => updateField("website", event.target.value)} className="hidden" aria-hidden="true" />
 
       <button disabled={state.status === "submitting"} type="submit" className="rounded-full bg-coral px-6 py-3 font-black text-white shadow-soft hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70">
-        {state.status === "submitting" ? "Sending..." : "Request Free Review"}
+        {state.status === "submitting" ? "Sending..." : "Request Fit Check"}
       </button>
 
       {state.message ? (

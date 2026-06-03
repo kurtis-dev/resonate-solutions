@@ -1,9 +1,33 @@
 import { plans } from "@/lib/plans";
 
 export function PricingCards() {
+  const reviewPlan = plans.find((plan) => plan.paymentMode === "none");
+  const paidPlans = plans.filter((plan) => plan.paymentMode !== "none");
+
   return (
-    <div className="grid gap-6 lg:grid-cols-4">
-      {plans.map((plan) => (
+    <div className="grid gap-6">
+      {reviewPlan ? (
+        <article className="grid gap-5 rounded-[1.75rem] border-2 border-coral/30 bg-white p-6 shadow-sm lg:grid-cols-[1fr_auto] lg:items-center">
+          <div>
+            <div className="flex flex-wrap items-center gap-3">
+              <h3 className="text-2xl font-extrabold text-ink">{reviewPlan.name}</h3>
+              <span className="rounded-full bg-[#fff0e9] px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-coral">{reviewPlan.limit}</span>
+            </div>
+            <p className="mt-3 max-w-3xl leading-7 text-muted">{reviewPlan.description}</p>
+            <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-muted">
+              {reviewPlan.features.map((feature) => (
+                <span key={feature.label} className="rounded-full border border-line bg-cream px-3 py-2">{feature.label}</span>
+              ))}
+            </div>
+          </div>
+          <a href={reviewPlan.checkoutUrl} className="inline-flex justify-center rounded-full bg-ink px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-coral">
+            {reviewPlan.cta}
+          </a>
+        </article>
+      ) : null}
+
+      <div className="grid gap-6 lg:grid-cols-3">
+      {paidPlans.map((plan) => (
         <article
           key={plan.name}
           className={`group flex min-h-full flex-col rounded-[1.75rem] border-2 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-soft ${plan.highlighted ? "border-coral shadow-soft" : "border-line hover:border-coral/40"}`}
@@ -41,6 +65,7 @@ export function PricingCards() {
           </a>
         </article>
       ))}
+      </div>
     </div>
   );
 }

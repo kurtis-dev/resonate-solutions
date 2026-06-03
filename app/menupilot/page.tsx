@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { mailtoLink, questionsEmail } from "@/lib/contact";
+import { mailtoLink } from "@/lib/contact";
 
 type BusinessTheme = {
   id: string;
@@ -516,51 +516,49 @@ const brandedExamples = [
 
 const planCards = [
   {
-    name: "Business Page Starter",
-    tag: "$49/mo + $199 setup",
-    text: "For service businesses that need one clean, customer-ready page with services, photos, contact details, and next steps.",
-    cta: "Start your business page",
-    href: "/pricing",
+    name: "Page/Menu Build",
+    tag: "$399 one-time",
+    text: "The first paid step: a polished customer page, food menu, services list, or combined page built from the business details.",
+    cta: "Start setup",
+    href: "/checkout?plan=setup",
+    featured: true,
+    items: [
+      "Custom branded page",
+      "Food menu or services list structure",
+      "Hours, location or service area, photos, and links",
+      "Order, booking, quote, call, map, social, or review buttons",
+      "QR-ready public link",
+      "Phone and desktop launch check"
+    ]
+  },
+  {
+    name: "Care Plan",
+    tag: "$79/mo",
+    text: "For businesses that want the page kept current after launch without asking for a rebuild every time small details change.",
+    cta: "Choose Care",
+    href: "/checkout?plan=care",
     featured: false,
     items: [
-      "Custom branded business page",
-      "Services, hours, location, pricing notes, and photos",
-      "Booking, quote, call, map, or order link",
-      "QR code",
-      "Mobile-first page",
-      "Business-type language and layout",
+      "Hosting and page care",
+      "Two update requests per month",
+      "Hours, links, small menu/service edits, and photo swaps",
+      "Monthly link check",
       "Email support"
     ]
   },
   {
-    name: "Business Page Plus",
-    tag: "$99/mo + $299 setup",
-    text: "The main offer for businesses that want the page plus quick update tools for openings, delays, specials, and availability.",
-    cta: "Choose Plus",
-    href: "/pricing",
-    featured: true,
-    items: [
-      "Everything in Starter",
-      "Business-specific update controls",
-      "Availability, weather, special, policy, and promotion messages",
-      "Featured services or offers",
-      "Monthly polish/checkup",
-      "Booking, maps, phone, social, and review links placed clearly"
-    ]
-  },
-  {
-    name: "Custom Design Buildout",
-    tag: "$499 one-time",
-    text: "For businesses that want a deeper design pass before the monthly page starts.",
-    cta: "Ask about buildout",
-    href: `mailto:${questionsEmail}`,
+    name: "Care Plus",
+    tag: "$149/mo",
+    text: "For restaurants, food trucks, and service businesses that change often and want priority help keeping the page useful.",
+    cta: "Choose Care Plus",
+    href: "/checkout?plan=care-plus",
     featured: false,
     items: [
-      "Brand direction",
-      "Page layout and launch structure",
-      "Photo and copy cleanup",
-      "QR and link placement",
-      "Phone and desktop launch check"
+      "Everything in Care",
+      "Eight update requests per month",
+      "Specials, sold-out items, seasonal services, and featured offers",
+      "Monthly page polish",
+      "Priority turnaround"
     ]
   }
 ];
@@ -1036,10 +1034,10 @@ export default function MenuPilotPage() {
           <div>
             <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Plans</p>
             <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-              Two ways to run your business page.
+              Build once. Choose how much help you want after launch.
             </h2>
             <p className="mt-4 leading-7 text-muted">
-              Starter gives you the customer-ready page. Plus adds fast update tools when the business needs availability, weather, specials, policy notes, or promotions to change without a rebuild.
+              Start with the one-time Page/Menu Build. After launch, Care keeps the basics current and Care Plus adds more frequent priority updates for menus, specials, services, and availability.
             </p>
           </div>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">

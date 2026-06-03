@@ -7,10 +7,10 @@ export default function CheckoutSuccessPage() {
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Payment received</p>
         <h1 className="mt-3 text-4xl font-black text-ink">Your Resonate package is queued.</h1>
         <p className="mt-4 leading-7 text-muted">
-          Stripe confirmed checkout. Once Stripe and the database are connected, this page can also record payment status for follow-up.
+          Stripe confirmed checkout. Resonate can now match this payment to the setup or monthly care step and follow up with the next customer action.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/menupilot" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Request Free Page Review</Link>
+          <Link href="/menupilot" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Request Fit Check</Link>
           <Link href="/" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back home</Link>
         </div>
       </section>

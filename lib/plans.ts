@@ -18,80 +18,78 @@ export type Plan = {
 
 export const plans: Plan[] = [
   {
-    id: "audit",
-    name: "Free Page Review",
+    id: "review",
+    name: "Free Fit Check",
     price: "$0",
-    description: "A quick review for a service business that wants to know what customers cannot find before paying monthly.",
-    limit: "Free discovery review",
+    description: "A quick review to understand whether you need a food menu, service list, or simple business page before you pay.",
+    limit: "No payment required",
     billingPeriod: "",
     features: [
-      { label: "Page and link check", detail: "I look at what a customer can actually find right now: services, address, booking or ordering links, hours, and social links." },
-      { label: "Google profile notes", detail: "Basic notes on whether the business profile sends people to the right place." },
-      { label: "Photo gap notes", detail: "A quick read on whether the food, space, or service needs better visual proof." },
-      { label: "Plain next step", detail: "A simple recommendation for what would make the business easier for customers to understand and contact." }
+      { label: "Need fit", detail: "We identify whether the first project is a menu, services list, business page, or a combination." },
+      { label: "Current link review", detail: "We look at the current website, menu, social page, or Google profile link if one exists." },
+      { label: "Missing content notes", detail: "We flag the basics needed before build: photos, menu items, service list, hours, links, and contact details." },
+      { label: "Recommended next step", detail: "You get a plain recommendation for the setup and monthly option that fits the business." }
     ],
-    cta: "Request Free Review",
+    cta: "Request Fit Check",
     checkoutUrl: "/menupilot",
     paymentMode: "none"
   },
   {
-    id: "core",
-    name: "Business Page Starter",
-    price: "$49",
-    description: "For service businesses that want one clean branded page and mostly manage updates themselves.",
-    limit: "$199 setup fee",
+    id: "setup",
+    name: "Page/Menu Build",
+    price: "$399",
+    description: "The required one-time setup to turn the business details into a polished page, food menu, service list, or combined customer page.",
+    limit: "One-time setup",
+    billingPeriod: "",
+    features: [
+      { label: "Custom business page", detail: "A mobile-first page shaped around the business, not a generic template." },
+      { label: "Menu or service structure", detail: "Food menus, service categories, packages, pricing notes, specials, photos, and next-step buttons are organized for scanning." },
+      { label: "Core business details", detail: "Hours, service area or location, contact links, ordering, booking, quote, social, and review links are placed clearly." },
+      { label: "QR-ready public link", detail: "One customer-ready URL for QR codes, counters, trucks, signs, texts, profiles, and printed materials." },
+      { label: "Launch check", detail: "We review the page on phone and desktop before it is shared publicly." }
+    ],
+    cta: "Start Setup",
+    highlighted: true,
+    checkoutUrl: "/checkout?plan=setup",
+    stripePriceEnvKey: "STRIPE_PRICE_SETUP",
+    paymentMode: "payment"
+  },
+  {
+    id: "care",
+    name: "Care Plan",
+    price: "$79",
+    description: "For businesses that want the page kept current after launch without paying for a rebuild every time small details change.",
+    limit: "After setup",
     billingPeriod: "mo",
     features: [
-      { label: "Custom branded business page", detail: "A mobile-first page using the business logo, colors, services, photos, hours, location, and next-step links." },
-      { label: "Hours, location, services, and photos", detail: "The essential customer details live in one clean place instead of scattered posts and old screenshots." },
-      { label: "Booking, quote, or order link", detail: "The page does not replace the tools you already use. It sends ready customers to the right next step." },
-      { label: "QR code", detail: "One QR link for the truck, counter, social profiles, printed cards, and signs." },
-      { label: "Mobile-first page", detail: "Built for customers checking from their phone before they call, book, order, or drive over." },
-      { label: "Business-type layout", detail: "The page language is shaped around the kind of business, not a one-size-fits-all template." },
-      { label: "Email support", detail: "Questions and basic support go through questions@resonate.solutions." }
+      { label: "Hosting and page care", detail: "The page stays available and Resonate remains the place to request changes." },
+      { label: "Two update requests per month", detail: "Good for hours, links, small menu/service edits, price note changes, and photo swaps." },
+      { label: "Monthly link check", detail: "We check the main call, map, booking, order, quote, and social/profile links." },
+      { label: "Email support", detail: "Simple support for page questions and update requests." }
     ],
-    cta: "Choose Starter",
-    checkoutUrl: "/checkout?plan=core",
+    cta: "Choose Care",
+    checkoutUrl: "/checkout?plan=care",
     stripePriceEnvKey: "STRIPE_PRICE_CORE",
     paymentMode: "subscription"
   },
   {
-    id: "plus",
-    name: "Business Page Plus",
-    price: "$99",
-    description: "The main offer for businesses that want the page plus easy update tools for availability, specials, delays, policies, or promotions.",
-    limit: "$299 setup fee",
+    id: "care-plus",
+    name: "Care Plus",
+    price: "$149",
+    description: "For restaurants, food trucks, and service businesses that change more often and want priority help keeping the page useful.",
+    limit: "After setup",
     billingPeriod: "mo",
     features: [
-      { label: "Everything in Starter", detail: "Includes the branded business page, QR code, next-step links, photos, hours, location, mobile layout, and email support." },
-      { label: "Business-specific updates", detail: "Show openings, delays, specials, availability, policy reminders, service area changes, or promotions when customers need to know." },
-      { label: "Featured services or offers", detail: "Guide people toward the service, package, or offer you want them to notice first." },
-      { label: "Monthly page checkup", detail: "A recurring look at the page so stale details, weak labels, and broken links do not sit untouched." },
-      { label: "Link placement help", detail: "I place the booking, quote, ordering, maps, phone, social, and review links you already have so customers know where to go next." }
+      { label: "Everything in Care", detail: "Includes hosting, link checks, update handling, and page support." },
+      { label: "Eight update requests per month", detail: "Useful for specials, seasonal menus, service changes, sold-out items, availability, and featured offers." },
+      { label: "Monthly page polish", detail: "A recurring pass to improve labels, ordering, photos, and the customer path." },
+      { label: "Priority turnaround", detail: "Update requests are treated ahead of standard care requests when the page needs to stay current." },
+      { label: "Menu/service refresh help", detail: "We help reorganize supplied menu or service updates so customers can understand them quickly." }
     ],
-    cta: "Choose Plus",
-    highlighted: true,
-    checkoutUrl: "/checkout?plan=plus",
+    cta: "Choose Care Plus",
+    checkoutUrl: "/checkout?plan=care-plus",
     stripePriceEnvKey: "STRIPE_PRICE_PLUS",
     paymentMode: "subscription"
-  },
-  {
-    id: "design",
-    name: "Custom Design Buildout",
-    price: "$499",
-    description: "A one-time deeper setup for businesses that want help shaping the look, photos, page sections, and launch details before monthly service starts.",
-    limit: "$499 setup fee",
-    billingPeriod: "",
-    features: [
-      { label: "Brand direction", detail: "We shape the page around the business colors, logo, voice, service style, and customer experience." },
-      { label: "Page layout", detail: "I organize the page sections, featured services, photos, QR code, location, hours, and next-step path." },
-      { label: "Photo and copy cleanup", detail: "I crop supplied photos, tighten labels, and make the page easier to scan." },
-      { label: "Launch checklist", detail: "We check the page on phone and desktop before sharing the QR code or link publicly." }
-    ],
-    cta: "Ask About Buildout",
-    checkoutUrl: "/checkout?plan=design",
-    stripePriceEnvKey: "STRIPE_PRICE_DESIGN",
-    paymentMode: "payment"
   }
 ];
 
