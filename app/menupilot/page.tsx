@@ -764,25 +764,13 @@ export default function MenuPilotPage() {
 
   return (
     <main className="bg-cream">
-      <section className="border-b border-line">
-        <div className="mx-auto flex max-w-7xl items-center justify-between gap-5 px-5 py-4">
-          <Link href="/" className="flex items-center gap-3">
-            <span className="flex h-10 w-10 items-center justify-center rounded-full bg-coral text-lg font-bold text-white">R</span>
-            <span>
-              <span className="block text-lg font-bold leading-none text-ink">Business Page</span>
-              <span className="text-[11px] font-bold uppercase tracking-[0.22em] text-muted">by Resonate Solutions</span>
-            </span>
-          </Link>
-          <nav className="hidden items-center gap-8 text-sm font-semibold text-muted md:flex">
-            <a href="#how-it-works" className="hover:text-ink">How it works</a>
-            <a href="#business-types" className="hover:text-ink">Business types</a>
-            <a href="#daily-updates" className="hover:text-ink">Managed updates</a>
-            <a href="#why" className="hover:text-ink">Why it matters</a>
-            <a href="#plans" className="hover:text-ink">Plans</a>
-          </nav>
-          <Link href="/pricing" className="rounded-full bg-coral px-5 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-ink">
-            Start your page
-          </Link>
+      <section className="border-b border-line bg-white/70">
+        <div className="mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-5 py-3 text-sm font-semibold text-muted">
+          <a href="#how-it-works" className="shrink-0 hover:text-ink">How it works</a>
+          <a href="#business-types" className="shrink-0 hover:text-ink">Services</a>
+          <a href="#daily-updates" className="shrink-0 hover:text-ink">Managed updates</a>
+          <a href="#why" className="shrink-0 hover:text-ink">Why it matters</a>
+          <a href="#plans" className="shrink-0 hover:text-ink">Plans</a>
         </div>
       </section>
 
@@ -802,7 +790,7 @@ export default function MenuPilotPage() {
                 <span className="relative">See a live example page</span>
               </Link>
               <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">
-                View business page plans
+                View Plans
               </Link>
             </div>
             <p className="mt-3 text-sm font-bold text-coral">See the kind of simple, polished page your customers can open from a QR code, text, or link.</p>
@@ -1113,7 +1101,7 @@ export default function MenuPilotPage() {
             </div>
           </div>
           <footer className="mt-12 flex flex-col gap-4 border-t border-line pt-8 text-sm text-muted md:flex-row md:items-center md:justify-between">
-            <p className="font-bold text-ink">Business Page <span className="font-normal text-muted">by Resonate Solutions</span></p>
+            <p className="font-bold text-ink">Resonate Solutions</p>
             <p>Customer-ready pages for service businesses. Built in Northwest Arkansas.</p>
           </footer>
         </div>

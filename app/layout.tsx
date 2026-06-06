@@ -4,7 +4,7 @@ import { Footer } from "@/components/Footer";
 import { SiteNav } from "@/components/SiteNav";
 
 export const metadata: Metadata = {
-  title: "Business Pages by Resonate Solutions",
+  title: "Pages, Menus, and Service Lists | Resonate Solutions",
   description: "Customer-ready pages, food menus, and service listings for small businesses that need one clear link customers can use.",
   metadataBase: new URL("https://resonate.solutions"),
   icons: {
@@ -12,7 +12,7 @@ export const metadata: Metadata = {
     apple: "/assets/resonate-icon-primary.png"
   },
   openGraph: {
-    title: "Business Pages by Resonate Solutions",
+    title: "Pages, Menus, and Service Lists | Resonate Solutions",
     description: "Customer-ready business pages, food menus, and service listings built around what customers need before they call, order, book, or visit.",
     images: ["/assets/resonate-logo-flat.png"]
   }

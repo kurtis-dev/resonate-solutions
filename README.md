@@ -14,7 +14,7 @@ app/
   globals.css            Tailwind base styles
   layout.tsx             Shared app layout
   m/[slug]/page.tsx      Public customer menu pages
-  menupilot/page.tsx     Business Pages product page
+  menupilot/page.tsx     Services page for pages, menus, and service lists
   page.tsx               Homepage
   pricing/page.tsx       Pricing page
   privacy/page.tsx       Privacy Policy
@@ -120,7 +120,7 @@ Make your local business easier to find, choose, and trust.
 Current product direction:
 
 ```text
-Business Pages by Resonate: customer-ready pages for local service businesses.
+Resonate Solutions: customer-ready pages, menus, and service lists for local service businesses.
 ```
 
 Launch services and plans:

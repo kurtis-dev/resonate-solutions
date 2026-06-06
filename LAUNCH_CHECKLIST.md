@@ -12,12 +12,13 @@ Use this before treating a deployment as customer-ready.
 ## 2. Public Page Click Audit
 
 - [ ] Header logo opens `/`.
-- [ ] Header `Business Pages` opens `/menupilot`.
+- [ ] Header `Services` opens `/menupilot`.
+- [ ] Header `Examples` opens `/menupilot/examples`.
 - [ ] Header `Pricing` opens `/pricing`.
 - [ ] Header `Free Page Plan` opens `/menupilot#fit-check`.
 - [ ] Homepage redirects to `/menupilot`.
 - [ ] Business Pages `See a live example page` opens `/m/mellow-moose-burgers`.
-- [ ] Business Pages `View business page plans` opens `/pricing`.
+- [ ] Business Pages `View Plans` opens `/pricing`.
 - [ ] Footer links open `/privacy`, `/terms`, `/disclaimer`, and `/pricing`.
 
 ## 2A. Business Pages Product Audit
