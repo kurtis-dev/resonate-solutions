@@ -27,7 +27,7 @@ export function IntakeForm() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setState({ status: "submitting", message: "Sending your page review request..." });
+    setState({ status: "submitting", message: "Sending your free page plan request..." });
 
     const response = await fetch("/api/intake", {
       method: "POST",

@@ -4,7 +4,7 @@ const exampleFeatures = [
   {
     label: "Customer-facing menu",
     title: "The restaurant page stays clean",
-    text: "Mellow Moose customers see food, hours, location, ordering, QR sharing, and current specials. They should not see Resonate sales copy."
+    text: "Mellow Moose customers see food, hours, location, ordering, QR sharing, and current specials without extra sales copy getting in the way."
   },
   {
     label: "Event mode",
@@ -38,7 +38,7 @@ export default function MenuPilotExamplesPage() {
             Show what changes without cluttering the customer menu.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-            This page is for Resonate customers. It explains the system behind a real menu page: branded public menu, event takeover mode, owner controls, and daily updates.
+            See how one customer page can handle a regular menu, a special event, owner updates, and daily changes without confusing customers.
           </p>
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
             <Link href="/m/mellow-moose-burgers" className="rounded-full bg-brand px-6 py-3 text-center font-black text-white shadow-soft hover:bg-brandDark">
@@ -71,7 +71,7 @@ export default function MenuPilotExamplesPage() {
               </div>
             </div>
             <div className="mt-4 rounded-2xl bg-[#3a2418] p-5 text-white">
-              <p className="text-xs font-black uppercase tracking-[0.14em] text-[#ffc22e]">What this proves</p>
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[#ffc22e]">Why this matters</p>
               <p className="mt-2 text-lg font-black">The page can match the day, the menu, and the business without reprinting QR codes.</p>
             </div>
           </div>
@@ -96,7 +96,7 @@ export default function MenuPilotExamplesPage() {
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand">Behind the menu</p>
           <h2 className="mt-3 text-4xl font-black leading-tight text-ink md:text-5xl">
-            This is the part the owner pays for.
+            Monthly care keeps the page useful after launch.
           </h2>
           <p className="mt-5 leading-7 text-muted">
             A static menu is easy to forget. A business page is useful because the public page can respond to real operations: weather, sellouts, hours, popups, specials, and new photos.

@@ -55,7 +55,6 @@ export function PricingCards() {
               ))}
             </ul>
             <div className="flex-1" />
-            {/* STRIPE CHECKOUT: Replace checkoutUrl values in lib/plans.ts with live Stripe Checkout links or call your own checkout API route here. */}
             <a
               href={plan.checkoutUrl}
               className={`mt-7 inline-flex w-full justify-center rounded-full px-4 py-3 text-sm font-bold shadow-sm transition ${plan.highlighted ? "bg-coral text-white hover:bg-ink" : "bg-ink text-white hover:bg-coral"}`}

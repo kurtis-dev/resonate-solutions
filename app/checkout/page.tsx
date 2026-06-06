@@ -12,11 +12,11 @@ export default async function CheckoutPage({
   const isOneTime = plan?.paymentMode === "payment";
   const statusMessage =
     params.status === "missing-stripe"
-      ? "Stripe is not connected yet. Add STRIPE_SECRET_KEY and the matching Stripe Price ID environment variable in Vercel."
+      ? "Online checkout is not available right now. Please request a Free Page Plan or contact Resonate to complete payment."
       : params.status === "cancelled"
         ? "Checkout was cancelled. You can restart when ready."
         : params.status === "checkout-error"
-          ? "Stripe did not return a checkout URL. Please try again."
+          ? "Checkout could not start. Please try again or contact Resonate for help."
           : "";
 
   return (
