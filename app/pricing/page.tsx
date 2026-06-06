@@ -12,7 +12,7 @@ export default function PricingPage() {
               Build the page first. Keep it current when the business changes.
             </h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">
-              Resonate is built for small businesses that need a clean customer page, food menu, or services list without turning it into a full website project. Start with a fit check, pay once for the Launch Build, then choose whether you want monthly help after launch.
+              Resonate is built for small businesses that need a clean customer page, food menu, or services list without turning it into a full website project. Start with a fit review, pay once for Launch, then choose whether you want monthly help after launch.
             </p>
           </div>
         </div>
@@ -23,7 +23,7 @@ export default function PricingPage() {
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">How payment works</p>
           <h2 className="mt-3 text-3xl font-extrabold text-ink">Setup is required before production work starts.</h2>
           <p className="mt-4 max-w-3xl leading-7 text-muted">
-            The free fit check helps clarify what the business needs. The one-time Launch Build starts the real page/menu/services work. Monthly support is separate and keeps the page current after launch.
+            The free fit review helps clarify what the business needs. The one-time Launch plan starts the real page, menu, or services work. Monthly support is separate and keeps the page current after launch.
           </p>
         </div>
       </section>

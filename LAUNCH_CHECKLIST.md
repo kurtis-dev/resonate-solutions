@@ -12,15 +12,15 @@ Use this before treating a deployment as customer-ready.
 ## 2. Public Page Click Audit
 
 - [ ] Header logo opens `/`.
-- [ ] Header `MenuPilot` opens `/menupilot`.
+- [ ] Header `Business Pages` opens `/menupilot`.
 - [ ] Header `Pricing` opens `/pricing`.
-- [ ] Header `Free Menu Review` opens `/menupilot`.
+- [ ] Header `Free Fit Review` opens `/menupilot#fit-check`.
 - [ ] Homepage redirects to `/menupilot`.
-- [ ] MenuPilot `See example menu` opens `/m/mellow-moose-burgers`.
-- [ ] MenuPilot `View monthly plans` opens `/pricing`.
+- [ ] Business Pages `See a live example page` opens `/m/mellow-moose-burgers`.
+- [ ] Business Pages `View business page plans` opens `/pricing`.
 - [ ] Footer links open `/privacy`, `/terms`, `/disclaimer`, and `/pricing`.
 
-## 2A. MenuPilot Product Audit
+## 2A. Business Pages Product Audit
 
 - [ ] `/m/mellow-moose-burgers` loads a public menu page.
 - [ ] Demo menu page shows item photos, descriptions, prices, status note, hours, and location.
@@ -37,18 +37,18 @@ Use this before treating a deployment as customer-ready.
 
 ## 3. Lead Intake
 
-- [ ] Free Menu Review form rejects missing required fields.
-- [ ] Free Menu Review form rejects invalid email.
-- [ ] Free Menu Review form submits successfully.
+- [ ] Free Fit Review form rejects missing required fields.
+- [ ] Free Fit Review form rejects invalid email.
+- [ ] Free Fit Review form submits successfully.
 - [ ] New intake appears in `intake_requests`.
 - [ ] Intake appears in `/admin`.
 - [ ] Spam honeypot field blocks bot-style submissions.
 
 ## 4. Payments
 
-- [ ] `MenuPilot Starter` opens `/checkout?plan=core`.
-- [ ] `MenuPilot Plus` opens `/checkout?plan=plus`.
-- [ ] `Custom Design Buildout` opens `/checkout?plan=design`.
+- [ ] `Launch` opens `/checkout?plan=setup`.
+- [ ] `Maintain` opens `/checkout?plan=care`.
+- [ ] `Managed` opens `/checkout?plan=care-plus`.
 - [ ] Checkout button redirects to Stripe Checkout when Stripe env vars are configured.
 - [ ] Stripe test card success returns to `/checkout/success`.
 - [ ] `checkout.session.completed` webhook creates a payment/subscription record.
@@ -61,7 +61,7 @@ Use this before treating a deployment as customer-ready.
 
 - [ ] `/admin` is blocked without Basic Auth.
 - [ ] `ADMIN_USERNAME` and `ADMIN_PASSWORD` are configured in Vercel.
-- [ ] `/admin` shows recent Free Menu Review requests.
+- [ ] `/admin` shows recent Free Fit Review requests.
 - [ ] `/admin` shows subscription status.
 - [ ] `/admin` shows payment events.
 - [ ] `/admin` links to the menu page creator.
@@ -70,9 +70,9 @@ Use this before treating a deployment as customer-ready.
 ## 6. Mobile Quality
 
 - [ ] Homepage redirects correctly at phone width.
-- [ ] MenuPilot works at phone width.
+- [ ] Business Pages works at phone width.
 - [ ] Pricing cards stack cleanly on phone.
-- [ ] Free Menu Review form is usable on phone.
+- [ ] Free Fit Review form is usable on phone.
 - [ ] Public menu page is usable on phone.
 - [ ] QR code panel does not cause horizontal scrolling.
 - [ ] No text overlaps, clipped buttons, or horizontal scrolling on normal mobile widths.
@@ -96,7 +96,7 @@ Use this before treating a deployment as customer-ready.
 
 - [ ] Analytics is installed or Vercel Web Analytics is enabled.
 - [ ] Error monitoring or Vercel runtime logs are checked after first submissions.
-- [ ] A manual follow-up process exists for new Soundcheck requests.
+- [ ] A manual follow-up process exists for new Free Fit Review requests.
 - [ ] A manual process exists for failed payments.
 - [ ] Database backup/retention plan is understood.
 

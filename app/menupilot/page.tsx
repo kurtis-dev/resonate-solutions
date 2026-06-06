@@ -517,10 +517,10 @@ const brandedExamples = [
 
 const planCards = [
   {
-    name: "Launch Build",
+    name: "Launch",
     tag: "$399 one-time",
     text: "The first paid step: a polished customer page, food menu, services list, or combined page built from the business details.",
-    cta: "Start launch build",
+    cta: "Start launch",
     href: "/checkout?plan=setup",
     featured: true,
     items: [
@@ -533,10 +533,10 @@ const planCards = [
     ]
   },
   {
-    name: "Keep Current",
+    name: "Maintain",
     tag: "$79/mo",
     text: "For businesses that want the page kept current after launch without asking for a rebuild every time small details change.",
-    cta: "Choose Keep Current",
+    cta: "Choose Maintain",
     href: "/checkout?plan=care",
     featured: false,
     items: [
@@ -548,14 +548,14 @@ const planCards = [
     ]
   },
   {
-    name: "Managed Updates",
+    name: "Managed",
     tag: "$149/mo",
     text: "For restaurants, food trucks, and service businesses that change often and want Resonate to keep the page useful without counting every small edit.",
-    cta: "Choose Managed Updates",
+    cta: "Choose Managed",
     href: "/checkout?plan=care-plus",
     featured: false,
     items: [
-      "Everything in Keep Current",
+      "Everything in Maintain",
       "Unlimited standard updates",
       "Specials, sold-out items, seasonal services, and featured offers",
       "Monthly page polish",
@@ -781,7 +781,7 @@ export default function MenuPilotPage() {
           <nav className="hidden items-center gap-8 text-sm font-semibold text-muted md:flex">
             <a href="#how-it-works" className="hover:text-ink">How it works</a>
             <a href="#business-types" className="hover:text-ink">Business types</a>
-            <a href="#daily-updates" className="hover:text-ink">Premium updates</a>
+            <a href="#daily-updates" className="hover:text-ink">Managed updates</a>
             <a href="#why" className="hover:text-ink">Why it matters</a>
             <a href="#plans" className="hover:text-ink">Plans</a>
           </nav>
@@ -918,7 +918,7 @@ export default function MenuPilotPage() {
         <div className="mx-auto max-w-7xl px-5 py-20">
           <div className="grid gap-8 lg:grid-cols-[0.85fr_1fr] lg:items-end">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Premium updates</p>
+              <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Managed updates</p>
               <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
                 Add quick updates when the business needs them.
               </h2>
@@ -1039,7 +1039,7 @@ export default function MenuPilotPage() {
               Build once. Choose how much help you want after launch.
             </h2>
             <p className="mt-4 leading-7 text-muted">
-              Start with the one-time Launch Build. After launch, Keep Current covers occasional edits, while Managed Updates gives active businesses unlimited standard updates with priority help.
+              Start with the one-time Launch plan. After launch, Maintain covers occasional edits, while Managed gives active businesses unlimited standard updates with priority help.
             </p>
           </div>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">

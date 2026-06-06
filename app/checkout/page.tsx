@@ -25,7 +25,7 @@ export default async function CheckoutPage({
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Checkout</p>
         <h1 className="mt-3 text-4xl font-black text-ink">{isOneTime ? "Start your page/menu setup." : "Start monthly page care."}</h1>
         <p className="mt-4 leading-7 text-muted">
-          You selected <strong>{plan?.name}</strong>. The Launch Build is the one-time setup payment. Monthly support keeps the page, menu, or services list current after launch.
+          You selected <strong>{plan?.name}</strong>. Launch is the one-time setup payment. Monthly support keeps the page, menu, or services list current after launch.
         </p>
         {statusMessage ? <p className="mt-5 rounded-2xl bg-[#fff0e9] px-4 py-3 text-sm font-bold text-coral">{statusMessage}</p> : null}
         <form action="/api/checkout" method="POST" className="mt-8 grid gap-4">
@@ -40,7 +40,7 @@ export default async function CheckoutPage({
         </form>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link href="/pricing" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back to pricing</Link>
-          <Link href="/menupilot#fit-check" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Fit Check</Link>
+          <Link href="/menupilot#fit-check" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Free Review</Link>
         </div>
       </section>
     </main>

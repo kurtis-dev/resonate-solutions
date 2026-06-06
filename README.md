@@ -1,6 +1,6 @@
 # Resonate Solutions
 
-Resonate Solutions is a Next.js site for MenuPilot: custom mobile menu pages, QR codes, customer-facing links, food photos, hours, specials, and practical local business support.
+Resonate Solutions is a Next.js site for customer-ready business pages: food menus, service lists, QR-ready public links, customer-facing actions, hours, photos, and practical local business support.
 
 ## File Structure
 
@@ -14,7 +14,7 @@ app/
   globals.css            Tailwind base styles
   layout.tsx             Shared app layout
   m/[slug]/page.tsx      Public customer menu pages
-  menupilot/page.tsx     MenuPilot product page
+  menupilot/page.tsx     Business Pages product page
   page.tsx               Homepage
   pricing/page.tsx       Pricing page
   privacy/page.tsx       Privacy Policy
@@ -60,9 +60,9 @@ The app is set up for Stripe Checkout. Add these Vercel environment variables:
 ```text
 STRIPE_SECRET_KEY
 STRIPE_WEBHOOK_SECRET
+STRIPE_PRICE_SETUP
 STRIPE_PRICE_CORE
 STRIPE_PRICE_PLUS
-STRIPE_PRICE_DESIGN
 NEXT_PUBLIC_SITE_URL
 NEXT_PUBLIC_QUESTIONS_EMAIL
 ```
@@ -120,11 +120,15 @@ Make your local business easier to find, choose, and trust.
 Current product direction:
 
 ```text
-Resonate Local: customer-ready pages for local service businesses.
+Business Pages by Resonate: customer-ready pages for local service businesses.
 ```
 
-Launch services:
+Launch services and plans:
 
+- Free Fit Review before payment
+- Launch: one-time page, menu, or services-list setup
+- Maintain: monthly care for occasional edits and link checks
+- Managed: monthly care with unlimited standard updates and priority help
 - Mobile menu and customer pages
 - QR codes
 - Basic food, service, or product photos

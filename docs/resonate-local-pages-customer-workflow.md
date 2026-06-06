@@ -37,9 +37,9 @@ If details are missing, make reasonable placeholders for the Lovable concept onl
 
 ## Business Type Mapping
 
-Use the closest Resonate Local track:
+Use the closest Business Pages track. MenuPilot can still describe food-specific builds, but the public product offer should stay broader than menus:
 
-- MenuPilot: food trucks, restaurants, popups, menus, specials, ordering, sold-out items, location changes
+- Food/menu page: food trucks, restaurants, popups, menus, specials, ordering, sold-out items, location changes
 - LawnPilot: lawn care, landscaping, quotes, service areas, mowing, cleanup, mulch, weather delays
 - CleanPilot: maids, cleaning services, packages, checklists, recurring cleans, open slots, trust signals
 - DetailPilot: mobile car detailers, packages, before/after photos, mobile booking, promos

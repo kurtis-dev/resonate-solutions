@@ -19,7 +19,7 @@ export type Plan = {
 export const plans: Plan[] = [
   {
     id: "review",
-    name: "Free Fit Check",
+    name: "Free Fit Review",
     price: "$0",
     description: "A quick review to understand whether you need a food menu, service list, or simple business page before you pay.",
     limit: "No payment required",
@@ -30,15 +30,15 @@ export const plans: Plan[] = [
       { label: "Missing content notes", detail: "We flag the basics needed before build: photos, menu items, service list, hours, links, and contact details." },
       { label: "Recommended next step", detail: "You get a plain recommendation for the setup and monthly option that fits the business." }
     ],
-    cta: "Request Fit Check",
+    cta: "Request Free Review",
     checkoutUrl: "/menupilot#fit-check",
     paymentMode: "none"
   },
   {
     id: "setup",
-    name: "Launch Build",
+    name: "Launch",
     price: "$399",
-    description: "The required one-time setup that turns the business details into a polished page, food menu, services list, or combined customer page.",
+    description: "The required one-time build that turns the business details into a polished page, food menu, services list, or combined customer page.",
     limit: "Required setup",
     billingPeriod: "",
     features: [
@@ -48,7 +48,7 @@ export const plans: Plan[] = [
       { label: "QR-ready public link", detail: "One customer-ready URL for QR codes, counters, trucks, signs, texts, profiles, and printed materials." },
       { label: "Launch check", detail: "We review the page on phone and desktop before it is shared publicly." }
     ],
-    cta: "Start Launch Build",
+    cta: "Start Launch",
     highlighted: true,
     checkoutUrl: "/checkout?plan=setup",
     stripePriceEnvKey: "STRIPE_PRICE_SETUP",
@@ -56,7 +56,7 @@ export const plans: Plan[] = [
   },
   {
     id: "care",
-    name: "Keep Current",
+    name: "Maintain",
     price: "$79",
     description: "For businesses that want the page kept current after launch without paying for a rebuild every time small details change.",
     limit: "Monthly care",
@@ -67,26 +67,26 @@ export const plans: Plan[] = [
       { label: "Monthly link check", detail: "We check the main call, map, booking, order, quote, and social/profile links." },
       { label: "Email support", detail: "Simple support for page questions and update requests." }
     ],
-    cta: "Choose Keep Current",
+    cta: "Choose Maintain",
     checkoutUrl: "/checkout?plan=care",
     stripePriceEnvKey: "STRIPE_PRICE_CORE",
     paymentMode: "subscription"
   },
   {
     id: "care-plus",
-    name: "Managed Updates",
+    name: "Managed",
     price: "$149",
     description: "For restaurants, food trucks, and service businesses that change often and want Resonate to keep the page useful without counting every small edit.",
     limit: "Priority monthly care",
     billingPeriod: "mo",
     features: [
-      { label: "Everything in Keep Current", detail: "Includes hosting, link checks, update handling, and page support." },
+      { label: "Everything in Maintain", detail: "Includes hosting, link checks, update handling, and page support." },
       { label: "Unlimited standard updates", detail: "Useful for specials, seasonal menus, service changes, sold-out items, availability, featured offers, hours, links, and small copy/photo swaps. Larger rebuilds are quoted separately." },
       { label: "Monthly page polish", detail: "A recurring pass to improve labels, ordering, photos, and the customer path." },
       { label: "Priority turnaround", detail: "Update requests are treated ahead of standard care requests when the page needs to stay current." },
       { label: "Menu/service refresh help", detail: "We help reorganize supplied menu or service updates so customers can understand them quickly." }
     ],
-    cta: "Choose Managed Updates",
+    cta: "Choose Managed",
     checkoutUrl: "/checkout?plan=care-plus",
     stripePriceEnvKey: "STRIPE_PRICE_PLUS",
     paymentMode: "subscription"
