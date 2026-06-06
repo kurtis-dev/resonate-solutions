@@ -125,8 +125,8 @@ Business Pages by Resonate: customer-ready pages for local service businesses.
 
 Launch services and plans:
 
-- Free Fit Review before payment
-- Launch: one-time page, menu, or services-list setup
+- Free Page Plan before payment
+- Launch: one-time page, menu, or services-list build after payment, with a private preview before public launch
 - Maintain: monthly care for occasional edits and link checks
 - Managed: monthly care with unlimited standard updates and priority help
 - Mobile menu and customer pages

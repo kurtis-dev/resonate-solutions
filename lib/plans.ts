@@ -19,18 +19,18 @@ export type Plan = {
 export const plans: Plan[] = [
   {
     id: "review",
-    name: "Free Fit Review",
+    name: "Free Page Plan",
     price: "$0",
-    description: "A quick review to understand whether you need a food menu, service list, or simple business page before you pay.",
+    description: "A clear recommendation for the page, menu, or services list your business needs before you pay for a custom build.",
     limit: "No payment required",
     billingPeriod: "",
     features: [
-      { label: "Need fit", detail: "We identify whether the first project is a menu, services list, business page, or a combination." },
+      { label: "Page recommendation", detail: "We identify whether the first project is a menu, services list, business page, or a combination." },
       { label: "Current link review", detail: "We look at the current website, menu, social page, or Google profile link if one exists." },
       { label: "Missing content notes", detail: "We flag the basics needed before build: photos, menu items, service list, hours, links, and contact details." },
-      { label: "Recommended next step", detail: "You get a plain recommendation for the setup and monthly option that fits the business." }
+      { label: "Recommended next step", detail: "You get a plain recommendation for Launch and any monthly care that fits the business." }
     ],
-    cta: "Request Free Review",
+    cta: "Request Free Page Plan",
     checkoutUrl: "/menupilot#fit-check",
     paymentMode: "none"
   },
@@ -38,7 +38,7 @@ export const plans: Plan[] = [
     id: "setup",
     name: "Launch",
     price: "$399",
-    description: "The required one-time build that turns the business details into a polished page, food menu, services list, or combined customer page.",
+    description: "The required one-time build that turns the approved plan into a polished page, food menu, services list, or combined customer page.",
     limit: "Required setup",
     billingPeriod: "",
     features: [
@@ -46,7 +46,8 @@ export const plans: Plan[] = [
       { label: "Menu or service structure", detail: "Food menus, service categories, packages, pricing notes, specials, photos, and next-step buttons are organized for scanning." },
       { label: "Core business details", detail: "Hours, service area or location, contact links, ordering, booking, quote, social, and review links are placed clearly." },
       { label: "QR-ready public link", detail: "One customer-ready URL for QR codes, counters, trucks, signs, texts, profiles, and printed materials." },
-      { label: "Launch check", detail: "We review the page on phone and desktop before it is shared publicly." }
+      { label: "Private preview", detail: "You review the page before it is shared publicly." },
+      { label: "Launch check", detail: "We review the page on phone and desktop before the public link is used." }
     ],
     cta: "Start Launch",
     highlighted: true,

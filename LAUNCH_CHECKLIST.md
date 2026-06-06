@@ -14,7 +14,7 @@ Use this before treating a deployment as customer-ready.
 - [ ] Header logo opens `/`.
 - [ ] Header `Business Pages` opens `/menupilot`.
 - [ ] Header `Pricing` opens `/pricing`.
-- [ ] Header `Free Fit Review` opens `/menupilot#fit-check`.
+- [ ] Header `Free Page Plan` opens `/menupilot#fit-check`.
 - [ ] Homepage redirects to `/menupilot`.
 - [ ] Business Pages `See a live example page` opens `/m/mellow-moose-burgers`.
 - [ ] Business Pages `View business page plans` opens `/pricing`.
@@ -37,9 +37,9 @@ Use this before treating a deployment as customer-ready.
 
 ## 3. Lead Intake
 
-- [ ] Free Fit Review form rejects missing required fields.
-- [ ] Free Fit Review form rejects invalid email.
-- [ ] Free Fit Review form submits successfully.
+- [ ] Free Page Plan form rejects missing required fields.
+- [ ] Free Page Plan form rejects invalid email.
+- [ ] Free Page Plan form submits successfully.
 - [ ] New intake appears in `intake_requests`.
 - [ ] Intake appears in `/admin`.
 - [ ] Spam honeypot field blocks bot-style submissions.
@@ -51,6 +51,8 @@ Use this before treating a deployment as customer-ready.
 - [ ] `Managed` opens `/checkout?plan=care-plus`.
 - [ ] Checkout button redirects to Stripe Checkout when Stripe env vars are configured.
 - [ ] Stripe test card success returns to `/checkout/success`.
+- [ ] Launch payment copy makes clear that custom build work starts after payment.
+- [ ] Launch flow includes private preview before public launch.
 - [ ] `checkout.session.completed` webhook creates a payment/subscription record.
 - [ ] `invoice.payment_succeeded` webhook creates a payment event.
 - [ ] `invoice.payment_failed` webhook creates a failed payment event.
@@ -61,7 +63,7 @@ Use this before treating a deployment as customer-ready.
 
 - [ ] `/admin` is blocked without Basic Auth.
 - [ ] `ADMIN_USERNAME` and `ADMIN_PASSWORD` are configured in Vercel.
-- [ ] `/admin` shows recent Free Fit Review requests.
+- [ ] `/admin` shows recent Free Page Plan requests.
 - [ ] `/admin` shows subscription status.
 - [ ] `/admin` shows payment events.
 - [ ] `/admin` links to the menu page creator.
@@ -72,7 +74,7 @@ Use this before treating a deployment as customer-ready.
 - [ ] Homepage redirects correctly at phone width.
 - [ ] Business Pages works at phone width.
 - [ ] Pricing cards stack cleanly on phone.
-- [ ] Free Fit Review form is usable on phone.
+- [ ] Free Page Plan form is usable on phone.
 - [ ] Public menu page is usable on phone.
 - [ ] QR code panel does not cause horizontal scrolling.
 - [ ] No text overlaps, clipped buttons, or horizontal scrolling on normal mobile widths.
@@ -96,7 +98,7 @@ Use this before treating a deployment as customer-ready.
 
 - [ ] Analytics is installed or Vercel Web Analytics is enabled.
 - [ ] Error monitoring or Vercel runtime logs are checked after first submissions.
-- [ ] A manual follow-up process exists for new Free Fit Review requests.
+- [ ] A manual follow-up process exists for new Free Page Plan requests.
 - [ ] A manual process exists for failed payments.
 - [ ] Database backup/retention plan is understood.
 

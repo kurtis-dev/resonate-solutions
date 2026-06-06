@@ -16,7 +16,7 @@ const initialForm = {
   city: "",
   currentMenuLink: "",
   mainNeed: "We need a food menu",
-  packageInterest: "Free Fit Review",
+  packageInterest: "Free Page Plan",
   notes: "",
   website: ""
 };
@@ -53,10 +53,10 @@ export function IntakeForm() {
   return (
     <form onSubmit={onSubmit} className="grid gap-4 rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
       <div>
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Start with a free fit review</p>
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Start with a free page plan</p>
         <h2 className="mt-2 text-3xl font-black text-ink">Tell us what kind of page, menu, or services list you need.</h2>
         <p className="mt-3 leading-7 text-muted">
-          Send the basics and Resonate can recommend the right setup before you pay: a food menu, services list, simple business page, or a combination.
+          Send the basics and Resonate will recommend the right page setup before you pay. Custom build work starts after the Launch payment.
         </p>
       </div>
 
@@ -107,7 +107,7 @@ export function IntakeForm() {
         <label className="grid gap-2 text-sm font-bold text-ink">
           Likely next step
           <select required value={form.packageInterest} onChange={(event) => updateField("packageInterest", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
-            <option>Free Fit Review</option>
+            <option>Free Page Plan</option>
             <option>Launch</option>
             <option>Maintain after launch</option>
             <option>Managed after launch</option>
@@ -123,7 +123,7 @@ export function IntakeForm() {
       <input tabIndex={-1} autoComplete="off" value={form.website} onChange={(event) => updateField("website", event.target.value)} className="hidden" aria-hidden="true" />
 
       <button disabled={state.status === "submitting"} type="submit" className="rounded-full bg-coral px-6 py-3 font-black text-white shadow-soft hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70">
-        {state.status === "submitting" ? "Sending..." : "Request Free Review"}
+        {state.status === "submitting" ? "Sending..." : "Request Free Page Plan"}
       </button>
 
       {state.message ? (

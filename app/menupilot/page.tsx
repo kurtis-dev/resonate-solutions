@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { mailtoLink } from "@/lib/contact";
 import { IntakeForm } from "@/components/IntakeForm";
 
 type BusinessTheme = {
@@ -519,7 +518,7 @@ const planCards = [
   {
     name: "Launch",
     tag: "$399 one-time",
-    text: "The first paid step: a polished customer page, food menu, services list, or combined page built from the business details.",
+    text: "The first paid step: a polished customer page, food menu, services list, or combined page built from the approved plan.",
     cta: "Start launch",
     href: "/checkout?plan=setup",
     featured: true,
@@ -528,6 +527,7 @@ const planCards = [
       "Food menu or services list structure",
       "Hours, location or service area, photos, and links",
       "Order, booking, quote, call, map, social, or review buttons",
+      "Private preview before the page goes public",
       "QR-ready public link",
       "Phone and desktop launch check"
     ]
@@ -756,11 +756,6 @@ export default function MenuPilotPage() {
   const selectedTheme = businessThemes.find((theme) => theme.id === selectedThemeId) ?? businessThemes[0];
   const [activeUpdates, setActiveUpdates] = useState<Record<string, boolean>>(
     Object.fromEntries(businessThemes.flatMap((theme) => theme.updates.map((update) => [update.id, update.active])))
-  );
-
-  const photoEmailLink = mailtoLink(
-    "Business page details",
-    "Send your services, photos, pricing, hours, location, booking link, and anything customers ask before they buy."
   );
 
   function toggleUpdate(id: string) {
@@ -1039,7 +1034,7 @@ export default function MenuPilotPage() {
               Build once. Choose how much help you want after launch.
             </h2>
             <p className="mt-4 leading-7 text-muted">
-              Start with the one-time Launch plan. After launch, Maintain covers occasional edits, while Managed gives active businesses unlimited standard updates with priority help.
+              Start with a free page plan so everyone agrees on the work. The one-time Launch payment starts the custom build. After launch, Maintain covers occasional edits, while Managed gives active businesses unlimited standard updates with priority help.
             </p>
           </div>
           <div className="mt-10 grid gap-6 lg:grid-cols-3">
@@ -1073,21 +1068,47 @@ export default function MenuPilotPage() {
           <div id="fit-check" className="mb-12 scroll-mt-28">
             <IntakeForm />
           </div>
-          <div className="rounded-[2rem] bg-[linear-gradient(135deg,#202320,#f17855,#f6a15e)] p-8 shadow-soft md:p-12">
-            <div className="grid gap-8 lg:grid-cols-[1fr_auto] lg:items-center">
+          <div className="overflow-hidden rounded-[1.75rem] border border-line bg-[#fffaf4] shadow-soft">
+            <div className="grid gap-0 lg:grid-cols-[1fr_0.74fr]">
               <div>
-                <h2 className="text-4xl font-extrabold leading-tight tracking-[-0.01em] text-white md:text-5xl">Let&apos;s build the page customers need.</h2>
-                <p className="mt-4 max-w-2xl text-lg leading-8 text-white/85">
-                  Send your services, photos, hours, and booking link. We will shape it into a business page customers can understand fast.
-                </p>
+                <div className="p-8 md:p-12">
+                  <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Clear next step</p>
+                  <h2 className="mt-3 max-w-2xl text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
+                    Start with a plan. Build after payment.
+                  </h2>
+                  <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
+                    Send your business name, menu or services, photos, hours, and links. Resonate will recommend the right page setup first. Custom design, preview, and hosting begin after the Launch payment.
+                  </p>
+                  <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+                    <Link href="#fit-check" className="rounded-full bg-coral px-7 py-4 text-center font-bold text-white shadow-sm transition hover:bg-ink">
+                      Request Free Page Plan
+                    </Link>
+                    <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">
+                      View Plans
+                    </Link>
+                  </div>
+                </div>
               </div>
-              <div className="flex flex-col gap-3 sm:flex-row">
-                <Link href="/pricing" className="rounded-full bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:bg-cream">
-                  Start your business page
-                </Link>
-                <a href={photoEmailLink} className="rounded-full border border-white/50 bg-ink px-7 py-4 text-center font-bold text-white shadow-sm transition hover:bg-coral">
-                  Send business details
-                </a>
+              <div className="border-t border-line bg-white p-6 lg:border-l lg:border-t-0">
+                <div className="rounded-[1.25rem] border border-line bg-cream p-5 shadow-sm">
+                  <p className="text-xs font-bold uppercase tracking-[0.16em] text-coral">How it moves forward</p>
+                  <ol className="mt-5 grid gap-4">
+                    {[
+                      ["01", "Free Page Plan", "We review the business details and recommend the right page, menu, or services setup."],
+                      ["02", "Launch Payment", "$399 starts the custom build. This is when production work begins."],
+                      ["03", "Private Preview", "The customer reviews the page before the public link is shared."],
+                      ["04", "Go Live + Care", "Choose Launch only, Maintain, or Managed before the page becomes the customer-facing link."]
+                    ].map(([number, title, text]) => (
+                      <li key={number} className="grid grid-cols-[auto_1fr] gap-4 rounded-2xl border border-line bg-white p-4">
+                        <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff0e9] text-xs font-black text-coral">{number}</span>
+                        <span>
+                          <span className="block font-extrabold text-ink">{title}</span>
+                          <span className="mt-1 block text-sm leading-6 text-muted">{text}</span>
+                        </span>
+                      </li>
+                    ))}
+                  </ol>
+                </div>
               </div>
             </div>
           </div>
