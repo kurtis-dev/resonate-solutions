@@ -142,7 +142,7 @@ Customer onboarding records are stored in:
 customer_onboarding
 ```
 
-Free Page Plan, Launch, Maintain, and Managed all create or update this same onboarding record. Softr should read this table directly where possible, or receive the same payload through Zapier using `SOFTR_INTAKE_WEBHOOK_URL` or `ZAPIER_INTAKE_WEBHOOK_URL`.
+Free Page Plan, Launch, Maintain, and Managed all create or update this same onboarding record. Softr should read only a portal-safe mirror of this record, or receive that limited mirror through Zapier using `SOFTR_INTAKE_WEBHOOK_URL` or `ZAPIER_INTAKE_WEBHOOK_URL`.
 
 The first internal menu builder is:
 

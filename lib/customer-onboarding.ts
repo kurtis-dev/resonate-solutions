@@ -40,6 +40,22 @@ export type CustomerOnboardingInput = Partial<CustomerOnboardingRecord> & {
   source: OnboardingSource;
 };
 
+export type SoftrPortalMirrorRecord = {
+  portalCustomerId: string;
+  businessName: string;
+  ownerEmail: string;
+  contactName: string;
+  businessType: string;
+  city: string;
+  currentMenuLink: string;
+  mainNeed: string;
+  planId: string;
+  planName: string;
+  paymentStatus: string;
+  onboardingStatus: OnboardingStatus;
+  portalAccess: boolean;
+};
+
 function clean(value: unknown, max = 1200) {
   return typeof value === "string" ? value.trim().slice(0, max) : "";
 }
@@ -119,6 +135,24 @@ export function buildCustomerOnboardingRecord(input: CustomerOnboardingInput): C
   };
 }
 
+export function buildSoftrPortalMirror(record: CustomerOnboardingRecord): SoftrPortalMirrorRecord {
+  return {
+    portalCustomerId: record.id,
+    businessName: record.businessName,
+    ownerEmail: record.email,
+    contactName: record.contactName,
+    businessType: record.businessType,
+    city: record.city,
+    currentMenuLink: record.currentMenuLink || "",
+    mainNeed: record.mainNeed,
+    planId: record.planId,
+    planName: record.planName,
+    paymentStatus: record.paymentStatus,
+    onboardingStatus: record.onboardingStatus,
+    portalAccess: record.portalAccess
+  };
+}
+
 export async function notifyOnboardingWebhook(record: CustomerOnboardingRecord, eventType: string) {
   const webhookUrl = process.env.SOFTR_INTAKE_WEBHOOK_URL || process.env.ZAPIER_INTAKE_WEBHOOK_URL || "";
 
@@ -135,11 +169,12 @@ export async function notifyOnboardingWebhook(record: CustomerOnboardingRecord, 
       },
       body: JSON.stringify({
         eventType,
-        customer: record,
+        customer: buildSoftrPortalMirror(record),
         softr: {
           action: "upsert_customer_onboarding",
           permissionEmail: record.email,
-          portalAccess: record.portalAccess
+          portalAccess: record.portalAccess,
+          visibilityRule: "logged_in_user_email_matches_owner_email_and_portal_access_is_true"
         }
       })
     });

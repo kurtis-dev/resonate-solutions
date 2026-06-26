@@ -161,15 +161,19 @@ Shows:
 
 ## Softr Permission Rule
 
-Each customer should only see records tied to their email/contact.
+Each customer should only see records tied to their own linked business.
 
 Minimum viable setup:
 
-- Contacts table has Email.
-- Contacts table links to Business.
-- Softr logged-in user email filters visible records.
+- Users table has Email.
+- Users table links to exactly one customer Business unless the user is a Resonate admin.
+- Customer-facing blocks filter records to the logged-in user's linked Business.
+- Private portal pages require `portal_access = true` before the customer can see them.
+- Resonate admin-only pages are the only pages allowed to show all records.
 
 Do not use one shared customer login for real customers.
+
+Do not mirror private operational fields into Softr. Softr should get only the portal-safe customer mirror: business name, owner email, contact name, business type, city, current link, main need, plan/status fields, and portal access. Keep Stripe IDs, raw private notes, channel credentials, API keys, and payment event details in the website database or Stripe only.
 
 ## Update Request Routing Automation
 
