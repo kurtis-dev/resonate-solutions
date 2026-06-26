@@ -10,7 +10,12 @@ async function getRows(query: TemplateStringsArray) {
     return null;
   }
 
-  return (await sql(query)) as Row[];
+  try {
+    return (await sql(query)) as Row[];
+  } catch (error) {
+    console.error("Admin query failed", error);
+    return null;
+  }
 }
 
 function value(row: Row, key: string) {
@@ -53,7 +58,8 @@ function DataTable({ title, rows, columns }: { title: string; rows: Row[] | null
 }
 
 export default async function AdminPage() {
-  const [intakes, subscriptions, payments, menuQuestions] = await Promise.all([
+  const [onboarding, intakes, subscriptions, payments, menuQuestions] = await Promise.all([
+    getRows`select updated_at, business_name, contact_name, email, plan_name, payment_status, onboarding_status, portal_access from customer_onboarding order by updated_at desc limit 15`,
     getRows`select created_at, business_name, contact_name, email, business_type, city, main_need, package_interest from intake_requests order by created_at desc limit 10`,
     getRows`select customer_email, plan_id, status, current_period_end, updated_at from customer_subscriptions order by updated_at desc limit 10`,
     getRows`select created_at, customer_email, type, status, amount_paid, currency from payment_events order by created_at desc limit 10`,
@@ -79,6 +85,7 @@ export default async function AdminPage() {
         </div>
       </div>
       <div className="grid gap-6">
+        <DataTable title="Customer onboarding" rows={onboarding} columns={["updated_at", "business_name", "contact_name", "email", "plan_name", "payment_status", "onboarding_status", "portal_access"]} />
         <DataTable title="Recent free page plan requests" rows={intakes} columns={["created_at", "business_name", "contact_name", "email", "business_type", "city", "main_need", "package_interest"]} />
         <DataTable title="Menu item questions" rows={menuQuestions} columns={["created_at", "business_name", "item_name", "customer_name", "customer_email", "comment"]} />
         <DataTable title="Subscription status" rows={subscriptions} columns={["customer_email", "plan_id", "status", "current_period_end", "updated_at"]} />

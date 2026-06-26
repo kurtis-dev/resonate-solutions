@@ -1,4 +1,6 @@
 import { NextResponse } from "next/server";
+import { buildCustomerOnboardingRecord, notifyOnboardingWebhook } from "@/lib/customer-onboarding";
+import { upsertCustomerOnboarding } from "@/lib/customer-store";
 import { getConfiguredPaymentLink, getPlanById } from "@/lib/plans";
 import { getStripe } from "@/lib/stripe";
 
@@ -9,12 +11,36 @@ function redirectTo(request: Request, path: string) {
 export async function POST(request: Request) {
   const formData = await request.formData();
   const planId = String(formData.get("plan") || "");
-  const email = String(formData.get("email") || "");
+  const email = String(formData.get("email") || "").trim().toLowerCase();
   const plan = getPlanById(planId);
 
   if (!plan || plan.paymentMode === "none") {
     return redirectTo(request, "/pricing?checkout=invalid-plan");
   }
+
+  if (!email) {
+    return redirectTo(request, `/checkout?plan=${plan.id}&status=missing-email`);
+  }
+
+  const onboarding = buildCustomerOnboardingRecord({
+    source: "website_checkout",
+    businessName: String(formData.get("businessName") || ""),
+    contactName: String(formData.get("contactName") || ""),
+    email,
+    phone: String(formData.get("phone") || ""),
+    businessType: String(formData.get("businessType") || ""),
+    city: String(formData.get("city") || ""),
+    currentMenuLink: String(formData.get("currentMenuLink") || ""),
+    mainNeed: String(formData.get("mainNeed") || ""),
+    packageInterest: plan.name,
+    planId: plan.id,
+    planName: plan.name,
+    paymentStatus: "pending",
+    onboardingStatus: "payment_pending",
+    notes: String(formData.get("notes") || "")
+  });
+  await upsertCustomerOnboarding(onboarding);
+  await notifyOnboardingWebhook(onboarding, "paid_plan_started");
 
   const stripe = getStripe();
   const priceId = plan.stripePriceEnvKey ? process.env[plan.stripePriceEnvKey] : "";
@@ -37,8 +63,11 @@ export async function POST(request: Request) {
     customer_creation: plan.paymentMode === "payment" ? "always" : undefined,
     allow_promotion_codes: true,
     metadata: {
+      onboardingId: onboarding.id,
       planId: plan.id,
-      planName: plan.name
+      planName: plan.name,
+      businessName: onboarding.businessName,
+      contactName: onboarding.contactName
     },
     subscription_data: plan.paymentMode === "subscription" ? { metadata: { planId: plan.id } } : undefined,
     success_url: `${origin}/checkout/success?session_id={CHECKOUT_SESSION_ID}`,

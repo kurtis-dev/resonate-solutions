@@ -12,7 +12,9 @@ export async function GET() {
       plusPriceConfigured: Boolean(process.env.STRIPE_PRICE_PLUS),
       adminProtected: Boolean(process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD),
       siteUrlConfigured: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
-      questionsEmailConfigured: Boolean(process.env.NEXT_PUBLIC_QUESTIONS_EMAIL)
+      questionsEmailConfigured: Boolean(process.env.NEXT_PUBLIC_QUESTIONS_EMAIL),
+      softrPortalConfigured: Boolean(process.env.NEXT_PUBLIC_SOFTR_PORTAL_URL),
+      onboardingHandoffConfigured: Boolean(process.env.SOFTR_INTAKE_WEBHOOK_URL || process.env.ZAPIER_INTAKE_WEBHOOK_URL)
     }
   });
 }

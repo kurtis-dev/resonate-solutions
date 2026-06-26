@@ -13,6 +13,8 @@ export default async function CheckoutPage({
   const statusMessage =
     params.status === "missing-stripe"
       ? "Secure checkout is not connected yet. Resonate can still send a Stripe payment link or invoice when your plan is ready."
+      : params.status === "missing-email"
+        ? "Please enter your email so Resonate can match your payment to your business details."
       : params.status === "cancelled"
         ? "Checkout was cancelled. You can restart when ready."
         : params.status === "checkout-error"
@@ -20,19 +22,60 @@ export default async function CheckoutPage({
           : "";
 
   return (
-    <main className="mx-auto flex max-w-2xl px-5 py-16">
-      <section className="w-full rounded-[1.75rem] border border-line bg-white p-8 shadow-sm">
+    <main className="mx-auto flex max-w-2xl overflow-x-hidden px-4 py-12 sm:px-5 sm:py-16">
+      <section className="w-full overflow-hidden rounded-[1.75rem] border border-line bg-white p-5 shadow-sm sm:p-8">
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Checkout</p>
         <h1 className="mt-3 text-4xl font-black text-ink">{isOneTime ? "Start your page/menu setup." : "Start monthly page care."}</h1>
         <p className="mt-4 leading-7 text-muted">
-          You selected <strong>{plan?.name}</strong>. Launch is the one-time payment that starts the custom build. Monthly support keeps the page, menu, or services list current after launch. Payment is handled through Stripe secure checkout.
+          You selected <strong>{plan?.name}</strong>. Add the business details once, then continue to secure payment. Resonate uses this to match your order to the right page, menu, or services setup.
         </p>
         {statusMessage ? <p className="mt-5 rounded-2xl bg-[#fff0e9] px-4 py-3 text-sm font-bold text-coral">{statusMessage}</p> : null}
         <form action="/api/checkout" method="POST" className="mt-8 grid gap-4">
           <input type="hidden" name="plan" value={plan?.id || "setup"} />
+          <div className="grid gap-4 md:grid-cols-2">
+            <label className="grid gap-2 text-sm font-bold text-ink">
+              Business name
+              <input required name="businessName" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+            </label>
+            <label className="grid gap-2 text-sm font-bold text-ink">
+              Contact name
+              <input required name="contactName" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+            </label>
+            <label className="grid gap-2 text-sm font-bold text-ink">
+              Email
+              <input required name="email" type="email" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="owner@example.com" />
+            </label>
+            <label className="grid gap-2 text-sm font-bold text-ink">
+              Phone
+              <input name="phone" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+            </label>
+            <label className="grid gap-2 text-sm font-bold text-ink">
+              Business type
+              <input required name="businessType" placeholder="Restaurant, food truck, salon, lawn care..." className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+            </label>
+            <label className="grid gap-2 text-sm font-bold text-ink">
+              City or service area
+              <input required name="city" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+            </label>
+          </div>
           <label className="grid gap-2 text-sm font-bold text-ink">
-            Customer email
-            <input name="email" type="email" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="owner@example.com" />
+            Current website, menu, social, or Google profile link
+            <input name="currentMenuLink" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-ink">
+            What do you need built or maintained?
+            <select required name="mainNeed" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
+              <option>We need a food menu</option>
+              <option>We need a services list</option>
+              <option>We need both menu and services</option>
+              <option>We need a simple business page</option>
+              <option>We need an existing page/menu cleaned up</option>
+              <option>Not sure yet</option>
+            </select>
+          </label>
+          <label className="grid gap-2 text-sm font-bold text-ink">
+            Anything Resonate should know before starting?
+            <textarea name="notes" rows={4} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
           </label>
           <button type="submit" className="rounded-full bg-coral px-5 py-3 text-center font-black text-white shadow-soft hover:bg-ink">
             Continue to secure Stripe checkout

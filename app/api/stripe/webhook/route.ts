@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { savePaymentEvent, upsertSubscriptionStatus } from "@/lib/customer-store";
+import { buildCustomerOnboardingRecord, notifyOnboardingWebhook } from "@/lib/customer-onboarding";
+import { savePaymentEvent, upsertCustomerOnboarding, upsertSubscriptionStatus } from "@/lib/customer-store";
 import { getStripe } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
@@ -34,23 +35,46 @@ export async function POST(request: Request) {
   if (event.type === "checkout.session.completed") {
     const session = event.data.object;
     const stripeCustomerId = session.customer ? String(session.customer) : "";
+    const customerEmail = session.customer_details?.email || session.customer_email || "";
+    const planId = session.metadata?.planId || "setup";
+    const onboarding = customerEmail
+      ? buildCustomerOnboardingRecord({
+          id: session.metadata?.onboardingId || undefined,
+          source: "stripe_webhook",
+          businessName: session.metadata?.businessName || "",
+          contactName: session.metadata?.contactName || "",
+          email: customerEmail,
+          planId,
+          packageInterest: session.metadata?.planName || "",
+          paymentStatus: session.payment_status || "paid",
+          onboardingStatus: session.subscription ? "subscription_active" : "paid_needs_review",
+          stripeCustomerId,
+          stripeSubscriptionId: session.subscription ? String(session.subscription) : undefined,
+          stripeCheckoutSessionId: session.id
+        })
+      : null;
 
     if (stripeCustomerId) {
       await upsertSubscriptionStatus({
         stripeCustomerId,
         stripeSubscriptionId: session.subscription ? String(session.subscription) : undefined,
         stripeCheckoutSessionId: session.id,
-        customerEmail: session.customer_details?.email || session.customer_email || undefined,
-        planId: session.metadata?.planId,
+        customerEmail: customerEmail || undefined,
+        planId,
         status: session.payment_status || "completed"
       });
+    }
+
+    if (onboarding) {
+      await upsertCustomerOnboarding(onboarding);
+      await notifyOnboardingWebhook(onboarding, "payment_completed");
     }
 
     await savePaymentEvent({
       stripeEventId: event.id,
       stripeCustomerId: stripeCustomerId || undefined,
       stripeSubscriptionId: session.subscription ? String(session.subscription) : undefined,
-      customerEmail: session.customer_details?.email || session.customer_email || undefined,
+      customerEmail: customerEmail || undefined,
       type: event.type,
       status: session.payment_status || "completed",
       amountPaid: session.amount_total || undefined,

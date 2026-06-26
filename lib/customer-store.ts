@@ -1,4 +1,5 @@
 import { getSql } from "@/lib/db";
+import type { CustomerOnboardingRecord } from "@/lib/customer-onboarding";
 import type { IntakeRecord } from "@/lib/intake";
 
 export type SubscriptionStatus = {
@@ -62,6 +63,95 @@ export async function saveIntakeRecord(record: IntakeRecord) {
       ${record.source || "website"}
     )
   `;
+
+  return { persisted: true };
+}
+
+export async function upsertCustomerOnboarding(record: CustomerOnboardingRecord) {
+  const sql = await getSql();
+
+  if (!sql) {
+    console.info("DATABASE_URL not configured. Customer onboarding was not persisted.", record);
+    return { persisted: false };
+  }
+
+  try {
+    await sql`
+      insert into customer_onboarding (
+        id,
+        created_at,
+        updated_at,
+        source,
+        business_name,
+        contact_name,
+        email,
+        phone,
+        business_type,
+        city,
+        current_menu_link,
+        main_need,
+        package_interest,
+        plan_id,
+        plan_name,
+        payment_status,
+        onboarding_status,
+        notes,
+        stripe_customer_id,
+        stripe_subscription_id,
+        stripe_checkout_session_id,
+        portal_access
+      )
+      values (
+        ${record.id},
+        ${record.createdAt},
+        ${record.updatedAt},
+        ${record.source},
+        ${record.businessName || null},
+        ${record.contactName || null},
+        ${record.email},
+        ${record.phone || null},
+        ${record.businessType || null},
+        ${record.city || null},
+        ${record.currentMenuLink || null},
+        ${record.mainNeed || null},
+        ${record.packageInterest || null},
+        ${record.planId},
+        ${record.planName},
+        ${record.paymentStatus},
+        ${record.onboardingStatus},
+        ${record.notes || null},
+        ${record.stripeCustomerId || null},
+        ${record.stripeSubscriptionId || null},
+        ${record.stripeCheckoutSessionId || null},
+        ${record.portalAccess}
+      )
+      on conflict (id)
+      do update set
+        updated_at = now(),
+        source = excluded.source,
+        business_name = coalesce(nullif(excluded.business_name, ''), customer_onboarding.business_name),
+        contact_name = coalesce(nullif(excluded.contact_name, ''), customer_onboarding.contact_name),
+        email = excluded.email,
+        phone = coalesce(nullif(excluded.phone, ''), customer_onboarding.phone),
+        business_type = coalesce(nullif(excluded.business_type, ''), customer_onboarding.business_type),
+        city = coalesce(nullif(excluded.city, ''), customer_onboarding.city),
+        current_menu_link = coalesce(nullif(excluded.current_menu_link, ''), customer_onboarding.current_menu_link),
+        main_need = coalesce(nullif(excluded.main_need, ''), customer_onboarding.main_need),
+        package_interest = coalesce(nullif(excluded.package_interest, ''), customer_onboarding.package_interest),
+        plan_id = excluded.plan_id,
+        plan_name = excluded.plan_name,
+        payment_status = excluded.payment_status,
+        onboarding_status = excluded.onboarding_status,
+        notes = coalesce(nullif(excluded.notes, ''), customer_onboarding.notes),
+        stripe_customer_id = coalesce(nullif(excluded.stripe_customer_id, ''), customer_onboarding.stripe_customer_id),
+        stripe_subscription_id = coalesce(nullif(excluded.stripe_subscription_id, ''), customer_onboarding.stripe_subscription_id),
+        stripe_checkout_session_id = coalesce(nullif(excluded.stripe_checkout_session_id, ''), customer_onboarding.stripe_checkout_session_id),
+        portal_access = customer_onboarding.portal_access or excluded.portal_access
+    `;
+  } catch (error) {
+    console.error("Customer onboarding was not persisted.", error);
+    return { persisted: false, error: "customer_onboarding_write_failed" };
+  }
 
   return { persisted: true };
 }

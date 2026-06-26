@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
-import { saveIntakeRecord } from "@/lib/customer-store";
+import { buildCustomerOnboardingRecord, notifyOnboardingWebhook, planIdFromInterest } from "@/lib/customer-onboarding";
+import { saveIntakeRecord, upsertCustomerOnboarding } from "@/lib/customer-store";
 import { createIntakeRecord, parseIntakePayload } from "@/lib/intake";
 
 export async function POST(request: Request) {
@@ -19,6 +20,16 @@ export async function POST(request: Request) {
 
   const record = createIntakeRecord(parsed.payload);
   const storage = await saveIntakeRecord(record);
+  const onboarding = buildCustomerOnboardingRecord({
+    ...parsed.payload,
+    createdAt: record.createdAt,
+    source: "website_intake",
+    planId: planIdFromInterest(parsed.payload.packageInterest),
+    paymentStatus: "not_required",
+    onboardingStatus: "intake_received"
+  });
+  const onboardingStorage = await upsertCustomerOnboarding(onboarding);
+  const handoff = await notifyOnboardingWebhook(onboarding, "customer_intake_submitted");
 
   // EMAIL: Send `record` to your inbox here with Resend, Postmark, or another email provider.
   // CRM: Later, this can also create a lead in a lightweight CRM or client workspace.
@@ -28,6 +39,8 @@ export async function POST(request: Request) {
     ok: true,
     id: record.id,
     storage,
+    onboardingStorage,
+    handoff,
     message: "Thanks. Resonate received your free page plan request."
   });
 }

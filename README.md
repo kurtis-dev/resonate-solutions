@@ -108,11 +108,14 @@ Configure:
 
 ```text
 ZAPIER_WEBHOOK_SECRET
+ZAPIER_INTAKE_WEBHOOK_URL
+SOFTR_INTAKE_WEBHOOK_URL
 ```
 
 Setup notes:
 
 ```text
+docs/customer-onboarding-softr-handoff.md
 docs/menupilot-channel-automation-workflows.md
 docs/zapier-softr-setup.md
 ```
@@ -132,6 +135,14 @@ The first internal operations view is:
 ```text
 /admin
 ```
+
+Customer onboarding records are stored in:
+
+```text
+customer_onboarding
+```
+
+Free Page Plan, Launch, Maintain, and Managed all create or update this same onboarding record. Softr should read this table directly where possible, or receive the same payload through Zapier using `SOFTR_INTAKE_WEBHOOK_URL` or `ZAPIER_INTAKE_WEBHOOK_URL`.
 
 The first internal menu builder is:
 

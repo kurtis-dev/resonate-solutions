@@ -41,6 +41,35 @@ create index if not exists intake_requests_email_idx on intake_requests (email);
 create index if not exists customer_subscriptions_status_idx on customer_subscriptions (status);
 create index if not exists payment_events_customer_idx on payment_events (stripe_customer_id);
 
+create table if not exists customer_onboarding (
+  id text primary key,
+  created_at timestamptz not null,
+  updated_at timestamptz not null default now(),
+  source text not null,
+  business_name text,
+  contact_name text,
+  email text not null,
+  phone text,
+  business_type text,
+  city text,
+  current_menu_link text,
+  main_need text,
+  package_interest text,
+  plan_id text not null default 'review',
+  plan_name text not null default 'Free Page Plan',
+  payment_status text not null default 'not_required',
+  onboarding_status text not null default 'intake_received',
+  notes text,
+  stripe_customer_id text,
+  stripe_subscription_id text,
+  stripe_checkout_session_id text,
+  portal_access boolean not null default false
+);
+
+create index if not exists customer_onboarding_email_idx on customer_onboarding (email);
+create index if not exists customer_onboarding_status_idx on customer_onboarding (onboarding_status);
+create index if not exists customer_onboarding_plan_idx on customer_onboarding (plan_id);
+
 create table if not exists businesses (
   id text primary key,
   slug text not null unique,
