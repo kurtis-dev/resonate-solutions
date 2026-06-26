@@ -1,578 +1,168 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
 import { IntakeForm } from "@/components/IntakeForm";
+import { PricingCards } from "@/components/PricingCards";
 
 type BusinessTheme = {
-  id: string;
-  name: string;
   label: string;
   icon: string;
-  eyebrow: string;
-  title: string;
-  description: string;
   sampleName: string;
   sampleMeta: string;
   status: string;
+  previewImage?: string;
+  previewImageAlt?: string;
+  heroClass: string;
+  heroOverlayClass: string;
+  accentClass: string;
+  buttonClass: string;
+  chipClass: string;
   actions: string[];
   highlights: string[];
-  updates: Array<{
-    id: string;
-    title: string;
-    label: string;
-    text: string;
-    customerSees: string;
-    active: boolean;
-    icon: string;
-  }>;
 };
 
-const businessThemes: BusinessTheme[] = [
-  {
-    id: "food",
-    name: "Food & menu",
-    label: "Food",
-    icon: "menu",
-    eyebrow: "Food trucks, restaurants, and popups",
-    title: "A clean menu page that helps people decide before they order.",
-    description: "Show your menu, photos, specials, hours, location, and ordering links in one place that feels like your business.",
-    sampleName: "Mellow Moose Burgers",
-    sampleMeta: "Smash burgers - Siloam Springs, AR",
-    status: "Open today - 11a-8p",
-    actions: ["Order", "Map", "Call", "Share"],
-    highlights: ["Menu", "Specials", "Photos"],
-    updates: [
-      {
-        id: "food-soldout",
-        title: "Sold out",
-        label: "Sold out",
-        text: "Mark an item unavailable before customers ask.",
-        customerSees: "Sold out: Cowboy Burger. Back Friday.",
-        active: false,
-        icon: "box"
-      },
-      {
-        id: "food-special",
-        title: "Daily special",
-        label: "Featured",
-        text: "Feature one offer at the top of the page.",
-        customerSees: "Today: Slammer Jammer and fries for $13.",
-        active: false,
-        icon: "tag"
-      },
-      {
-        id: "food-moved",
-        title: "Changed location",
-        label: "Moved",
-        text: "Update where the truck is parked.",
-        customerSees: "Today only - parked at Memorial Park.",
-        active: false,
-        icon: "truck"
-      },
-      {
-        id: "food-popup",
-        title: "Popup menu active",
-        label: "Takeover",
-        text: "Switch to a takeover or event menu.",
-        customerSees: "Dos Gordos Takeover - tortas and tacos today.",
-        active: false,
-        icon: "flame"
-      }
-    ]
-  },
-  {
-    id: "lawn",
-    name: "Lawn care",
-    label: "Lawn",
-    icon: "leaf",
-    eyebrow: "Lawn care and landscaping",
-    title: "A lawn care page that turns yard work into easy quote requests.",
-    description: "Show mowing, edging, cleanup, seasonal services, service areas, photos, and a simple way to request a quote.",
-    sampleName: "Greenline Lawn Care",
-    sampleMeta: "Mowing, cleanup, and seasonal lawn help",
-    status: "Booking spring cleanups",
-    actions: ["Quote", "Call", "Areas", "Photos"],
-    highlights: ["Mowing", "Cleanups", "Mulch"],
-    updates: [
-      {
-        id: "lawn-weather",
-        title: "Rain delay",
-        label: "Weather",
-        text: "Let customers know when routes move because of weather.",
-        customerSees: "Rain delay today. Thursday routes move to Friday.",
-        active: false,
-        icon: "cloud"
-      },
-      {
-        id: "lawn-openings",
-        title: "Quote openings",
-        label: "Open slots",
-        text: "Promote available estimate times.",
-        customerSees: "Two quote openings left this week.",
-        active: false,
-        icon: "clock"
-      },
-      {
-        id: "lawn-seasonal",
-        title: "Seasonal offer",
-        label: "Spring",
-        text: "Push seasonal services when demand spikes.",
-        customerSees: "Spring cleanup and mulch bookings are open.",
-        active: false,
-        icon: "leaf"
-      },
-      {
-        id: "lawn-area",
-        title: "Service area note",
-        label: "Areas",
-        text: "Clarify where you are accepting new customers.",
-        customerSees: "Now quoting Siloam Springs and nearby neighborhoods.",
-        active: false,
-        icon: "pin"
-      }
-    ]
-  },
-  {
-    id: "cleaning",
-    name: "Cleaning",
-    label: "Cleaning",
-    icon: "spark",
-    eyebrow: "Maids and cleaning services",
-    title: "A cleaning page that makes your services feel clear and trustworthy.",
-    description: "Show deep cleans, recurring options, move-out cleaning, checklists, service areas, and booking details.",
-    sampleName: "Bright Home Cleaning",
-    sampleMeta: "Recurring, deep, and move-out cleans",
-    status: "New client spots available",
-    actions: ["Book", "Call", "Checklist", "Areas"],
-    highlights: ["Deep clean", "Weekly", "Move-out"],
-    updates: [
-      {
-        id: "cleaning-openings",
-        title: "Open cleaning slots",
-        label: "Available",
-        text: "Show the next openings without a back-and-forth message.",
-        customerSees: "Openings available Tuesday and Friday afternoon.",
-        active: false,
-        icon: "clock"
-      },
-      {
-        id: "cleaning-special",
-        title: "Deep clean special",
-        label: "Special",
-        text: "Feature a limited-time package.",
-        customerSees: "$25 off first deep clean this month.",
-        active: false,
-        icon: "tag"
-      },
-      {
-        id: "cleaning-checklist",
-        title: "Checklist highlight",
-        label: "Includes",
-        text: "Make scope clear before someone books.",
-        customerSees: "Deep cleans include baseboards, fans, and appliance fronts.",
-        active: false,
-        icon: "check"
-      },
-      {
-        id: "cleaning-recurring",
-        title: "Recurring spots",
-        label: "Recurring",
-        text: "Push the jobs you want more of.",
-        customerSees: "Two biweekly cleaning spots just opened.",
-        active: false,
-        icon: "star"
-      }
-    ]
-  },
-  {
-    id: "detailing",
-    name: "Car detailing",
-    label: "Detailing",
-    icon: "car",
-    eyebrow: "Mobile car detailers",
-    title: "A detailing page that shows the shine before customers book.",
-    description: "Show interior, exterior, ceramic, mobile service areas, before-and-after photos, and package pricing.",
-    sampleName: "Mirror Finish Detailing",
-    sampleMeta: "Mobile interior and exterior details",
-    status: "Mobile appointments open",
-    actions: ["Book", "Packages", "Photos", "Call"],
-    highlights: ["Interior", "Exterior", "Ceramic"],
-    updates: [
-      {
-        id: "detail-mobile",
-        title: "Mobile day",
-        label: "Mobile",
-        text: "Let people know where you are booking mobile jobs.",
-        customerSees: "Mobile detailing in Bentonville this Thursday.",
-        active: false,
-        icon: "truck"
-      },
-      {
-        id: "detail-package",
-        title: "Package promo",
-        label: "Promo",
-        text: "Feature the package you want to sell.",
-        customerSees: "Interior refresh package is $30 off this week.",
-        active: false,
-        icon: "tag"
-      },
-      {
-        id: "detail-gallery",
-        title: "Fresh gallery",
-        label: "Photos",
-        text: "Point customers to recent before-and-after work.",
-        customerSees: "New before-and-after photos added today.",
-        active: false,
-        icon: "camera"
-      },
-      {
-        id: "detail-weather",
-        title: "Weather note",
-        label: "Weather",
-        text: "Set expectations for exterior work.",
-        customerSees: "Exterior details may move if storms arrive.",
-        active: false,
-        icon: "cloud"
-      }
-    ]
-  },
-  {
-    id: "beauty",
-    name: "Beauty",
-    label: "Beauty",
-    icon: "spark",
-    eyebrow: "Nail techs and beauty pros",
-    title: "A beauty page that makes your work easy to browse and book.",
-    description: "Show sets, services, pricing, policies, location, booking links, and the openings you want filled.",
-    sampleName: "Studio Rose Nails",
-    sampleMeta: "Gel sets, fills, art, and appointments",
-    status: "Open slots this week",
-    actions: ["Book", "Gallery", "Policies", "DM"],
-    highlights: ["Gel sets", "Art", "Fills"],
-    updates: [
-      {
-        id: "beauty-slots",
-        title: "Open appointment",
-        label: "Open slot",
-        text: "Fill cancellations without posting everywhere.",
-        customerSees: "Last-minute opening Friday at 2:30.",
-        active: false,
-        icon: "clock"
-      },
-      {
-        id: "beauty-gallery",
-        title: "New set gallery",
-        label: "Gallery",
-        text: "Show the latest work customers ask about.",
-        customerSees: "New spring set photos are live.",
-        active: false,
-        icon: "camera"
-      },
-      {
-        id: "beauty-policy",
-        title: "Policy reminder",
-        label: "Policy",
-        text: "Keep booking expectations visible.",
-        customerSees: "Please book fills within 3 weeks for returning pricing.",
-        active: false,
-        icon: "book"
-      },
-      {
-        id: "beauty-offer",
-        title: "New client offer",
-        label: "Offer",
-        text: "Feature a first-time client reason to book.",
-        customerSees: "$10 off first gel set for new clients.",
-        active: false,
-        icon: "tag"
-      }
-    ]
-  },
-  {
-    id: "wellness",
-    name: "Wellness",
-    label: "Wellness",
-    icon: "star",
-    eyebrow: "Massage therapists and wellness providers",
-    title: "A wellness page that helps clients choose the right session.",
-    description: "Show massage types, session lengths, new-client offers, location, availability, and a clean booking path.",
-    sampleName: "Stillwater Massage",
-    sampleMeta: "Therapeutic, relaxation, and prenatal massage",
-    status: "New clients welcome",
-    actions: ["Book", "Sessions", "Call", "Location"],
-    highlights: ["60 min", "90 min", "Prenatal"],
-    updates: [
-      {
-        id: "wellness-availability",
-        title: "Availability note",
-        label: "Openings",
-        text: "Show the next windows clients can book.",
-        customerSees: "Openings available Wednesday morning and Saturday.",
-        active: false,
-        icon: "clock"
-      },
-      {
-        id: "wellness-new-client",
-        title: "New client offer",
-        label: "New client",
-        text: "Give first-time clients a simple next step.",
-        customerSees: "New clients can book a 60-minute intro session.",
-        active: false,
-        icon: "tag"
-      },
-      {
-        id: "wellness-session",
-        title: "Session focus",
-        label: "Focus",
-        text: "Feature a service type people may not know you offer.",
-        customerSees: "Prenatal massage appointments are available this month.",
-        active: false,
-        icon: "star"
-      },
-      {
-        id: "wellness-location",
-        title: "Location reminder",
-        label: "Location",
-        text: "Make arrival details easy before the appointment.",
-        customerSees: "Please use the west entrance for evening sessions.",
-        active: false,
-        icon: "pin"
-      }
-    ]
-  },
-  {
-    id: "other",
-    name: "Other service business",
-    label: "Other",
-    icon: "star",
-    eyebrow: "Custom services, photos, booking",
-    title: "A flexible business page for the company you actually run.",
-    description: "Show what you offer, who you help, where you work, what it costs to get started, and the easiest way for customers to contact or book you.",
-    sampleName: "Your Service Business",
-    sampleMeta: "Services, photos, proof, and booking details",
-    status: "Now accepting new customers",
-    actions: ["Book", "Quote", "Call", "Details"],
-    highlights: ["Services", "Photos", "Reviews"],
-    updates: [
-      {
-        id: "other-availability",
-        title: "Availability update",
-        label: "Available",
-        text: "Tell customers when you can take new work.",
-        customerSees: "Now accepting new customers for next week.",
-        active: false,
-        icon: "clock"
-      },
-      {
-        id: "other-service",
-        title: "Featured service",
-        label: "Featured",
-        text: "Put one offer or service in front of customers.",
-        customerSees: "Featured service: quick-start package for new customers.",
-        active: false,
-        icon: "star"
-      },
-      {
-        id: "other-area",
-        title: "Service area note",
-        label: "Areas",
-        text: "Clarify where you are currently booking.",
-        customerSees: "Serving Siloam Springs and nearby areas this month.",
-        active: false,
-        icon: "pin"
-      },
-      {
-        id: "other-promo",
-        title: "Simple promotion",
-        label: "Promo",
-        text: "Share a limited-time reason to reach out.",
-        customerSees: "New customers can request a free intro quote.",
-        active: false,
-        icon: "tag"
-      }
-    ]
-  }
-];
+const heroTheme: BusinessTheme = {
+  label: "Food",
+  icon: "menu",
+  sampleName: "Mellow Moose Burgers",
+  sampleMeta: "Smash burgers - Siloam Springs, AR",
+  status: "Open today - 11a-8p",
+  previewImage: "/assets/mellow-moose-og-smashburger.jpg",
+  previewImageAlt: "Mellow Moose smash burger with melted cheese",
+  heroClass: "bg-[linear-gradient(135deg,#ff5a1f,#f8b737)]",
+  heroOverlayClass: "bg-[linear-gradient(180deg,rgba(58,36,24,0.18),rgba(58,36,24,0.72)),radial-gradient(circle_at_18%_18%,rgba(255,255,255,0.18),transparent_28%)]",
+  accentClass: "bg-[#fff0e9] text-[#ff5a1f]",
+  buttonClass: "bg-[#ff5a1f] text-white",
+  chipClass: "bg-[#3a2418] text-white",
+  actions: ["Order", "Map", "Call", "Share"],
+  highlights: ["Menu", "Specials", "Photos"]
+};
 
-const customerView = [
-  "A customer-ready page that feels like your business",
-  "Services, photos, hours, pricing, location, and booking links",
-  "Call, directions, quote, booking, review, and social buttons",
-  "Optional updates for openings, delays, specials, policies, and availability"
-];
-
-const ownerView = [
-  "Start with a clean page that explains what you do",
-  "Choose the business type so the language matches your services",
-  "Add premium update tools when the business needs frequent changes",
-  "Keep booking, quote, call, map, and review links in one place",
-  "Use photos and proof without making customers dig through social posts",
-  "Refresh the page as the business grows without rebuilding from scratch"
-];
-
-const reasons = [
+const controlWorkflowSteps = [
   {
-    title: "Social posts disappear",
-    text: "Customers should not have to scroll through old posts to find your services, prices, hours, or booking link.",
+    number: "01",
+    title: "Send the change",
+    text: "Use the portal, text, or email. One clear request is enough: closed early today, new special, changed menu price, or updated photo.",
     icon: "message"
   },
   {
-    title: "Google is not always enough",
-    text: "Your profile matters, but it rarely explains your offers, photos, policies, and next steps the way your own page can.",
-    icon: "pin"
+    number: "02",
+    title: "We review it",
+    text: "We check the wording, timing, access, and details before the change is sent out.",
+    icon: "check"
   },
   {
-    title: "Booking links need context",
-    text: "A booking or quote form is useful after someone decides. Your page helps them understand what they are choosing first.",
+    number: "03",
+    title: "We route it",
+    text: "Your MenuPilot page is updated first. Then we handle connected places like Google, Facebook, Instagram, and ordering links.",
     icon: "external"
   },
   {
-    title: "Screenshots are not a business page",
-    text: "Blurry price lists, flyers, and old graphics make it harder for customers to trust what they are reading.",
+    number: "04",
+    title: "You get confirmation",
+    text: "You get a short confirmation showing what changed, where it changed, and what still needs review.",
+    icon: "star"
+  }
+];
+
+const managedChannels = [
+  {
+    name: "MenuPilot page",
+    status: "Always on",
+    text: "Your branded customer page, updated first every time.",
+    icon: "menu",
+    badgeClass: "bg-[#244235] text-[#bce8ce]",
+    iconClass: "bg-[#402014] text-coral"
+  },
+  {
+    name: "Google profile",
+    status: "Auto when connected",
+    text: "Hours, posts, offers, and key details when profile access is confirmed.",
+    icon: "pin",
+    badgeClass: "bg-[#173f3b] text-[#9de7dc]",
+    iconClass: "bg-[#123d3a] text-[#87d9d0]"
+  },
+  {
+    name: "Facebook + Instagram",
+    status: "Auto when connected",
+    text: "Matching posts, stories, photos, and captions after public copy is approved.",
+    icon: "camera",
+    badgeClass: "bg-[#1d3c2a] text-[#afe3bf]",
+    iconClass: "bg-[#173927] text-[#a7dfb9]"
+  },
+  {
+    name: "Ordering + delivery",
+    status: "Managed support",
+    text: "Ordering links and delivery platforms handled carefully where the platform allows.",
+    icon: "truck",
+    badgeClass: "bg-[#5a3b12] text-[#f7ce67]",
+    iconClass: "bg-[#4a3318] text-gold"
+  }
+];
+
+const ownerPortalActions = [
+  {
+    title: "Change hours",
+    text: "Early close, holiday hours, weather delay",
+    icon: "clock"
+  },
+  {
+    title: "Spotlight item",
+    text: "Feature a special, popup item, or seasonal offer",
+    icon: "flame"
+  },
+  {
+    title: "Menu or price edit",
+    text: "Send the exact item and price to review",
+    icon: "menu"
+  },
+  {
+    title: "Photo update",
+    text: "Add or swap the images customers see first",
     icon: "camera"
   },
   {
-    title: "One clear place",
-    text: "Put services, photos, hours, phone, maps, reviews, social links, QR codes, and booking paths in one polished place.",
-    icon: "star"
+    title: "Google post",
+    text: "Queue a reviewed update for connected profiles",
+    icon: "pin"
   },
   {
-    title: "Room to grow",
-    text: "Start simple, then add availability updates, seasonal offers, route changes, policies, and promotions when they matter.",
-    icon: "bolt"
+    title: "Ask for reviews",
+    text: "Get the right review link or request copy",
+    icon: "star"
   }
+];
+
+const reviewQueue = [
+  ["Needs review", "Saturday hours change", "Google + MenuPilot"],
+  ["Ready to send", "Brisket burger spotlight", "MenuPilot + Facebook"],
+  ["Done", "New loaded fries photo", "Customer page"]
 ];
 
 const brandItems = [
   { label: "Your colors", icon: "palette" },
   { label: "Your photos", icon: "camera" },
-  { label: "Your voice", icon: "star" },
-  { label: "Your story", icon: "book" }
+  { label: "Your menu", icon: "menu" },
+  { label: "Your buttons", icon: "external" }
 ];
 
-const brandedExamples = [
+const brandKitImages = [
   {
-    number: "01",
-    label: "Brand sample - lawn care",
-    name: "Greenline Lawn Care",
-    tagline: "Healthy lawns, on schedule.",
-    description: "Mowing, cleanup, mulch, and seasonal lawn help.",
-    status: "Booking spring cleanups",
-    update: "Rain delay today. Thursday routes move to Friday.",
-    image: "/assets/lovable-lawn-care.jpg",
-    imageAlt: "Freshly mowed striped lawn",
-    actions: ["Request Quote", "Call", "Service Areas"],
-    highlights: ["Weekly mowing", "Spring cleanup", "Mulch installs"],
-    shell: "border-[#c7dfca] bg-[#f8fff5] text-[#17251b]",
-    labelClass: "border-[#b7d8ba] bg-[#eaf7e8] text-[#176a37]",
-    hero: "bg-[radial-gradient(circle_at_20%_20%,rgba(255,255,255,0.7),transparent_18%),linear-gradient(135deg,#1f7a38,#7dbc42)]",
-    heroOverlay: "bg-[linear-gradient(120deg,rgba(255,255,255,0.12)_0_18%,transparent_18%_34%,rgba(255,255,255,0.1)_34%_47%,transparent_47%_100%)]",
-    button: "bg-[#176a37] text-white",
-    accent: "bg-[#e6f5df] text-[#176a37]",
-    updateClass: "bg-[#2e7d32] text-white"
+    src: "/assets/mellow-moose-og-smashburger.jpg",
+    alt: "Mellow Moose cheeseburger brand photo",
+    label: "Hero item"
   },
   {
-    number: "02",
-    label: "Customer page preview - cleaning",
-    name: "Bright Home Cleaning",
-    tagline: "A cleaner home, on your schedule.",
-    description: "Recurring, deep, and move-out cleans.",
-    status: "New client spots available",
-    update: "Openings available Tuesday and Friday afternoon.",
-    image: "/assets/lovable-cleaning.jpg",
-    imageAlt: "Bright spotless living room",
-    actions: ["Book Cleaning", "Call", "Checklist"],
-    highlights: ["Deep cleans", "Weekly service", "Move-out clean"],
-    shell: "border-[#c9dff4] bg-[#f8fbff] text-[#102033]",
-    labelClass: "border-[#b9d9f4] bg-[#eaf5ff] text-[#1769b3]",
-    hero: "bg-[linear-gradient(135deg,#eaf7ff,#ffffff_42%,#b7dcf4)]",
-    heroOverlay: "bg-[radial-gradient(circle_at_84%_18%,rgba(47,156,151,0.22),transparent_12%),linear-gradient(100deg,rgba(255,255,255,0.7),transparent_38%)]",
-    button: "bg-[#1769b3] text-white",
-    accent: "bg-[#edf6ff] text-[#1769b3]",
-    updateClass: "bg-[#fff4cf] text-[#684f00]"
+    src: "/assets/mellow-moose-blazing-fries.jpg",
+    alt: "Loaded fries brand photo",
+    label: "Menu photo"
   },
   {
-    number: "03",
-    label: "Brand sample - detailing",
-    name: "Mirror Finish Detailing",
-    tagline: "A showroom shine, in your driveway.",
-    description: "Mobile interior and exterior details.",
-    status: "Mobile appointments open",
-    update: "Interior refresh package is $30 off this week.",
-    image: "/assets/lovable-detailing.jpg",
-    imageAlt: "Glossy black car paint with water beading",
-    actions: ["Book Detail", "Packages", "Before/After"],
-    highlights: ["Interior refresh", "Exterior wash", "Ceramic coating"],
-    shell: "border-[#263241] bg-[#171d25] text-white",
-    labelClass: "border-[#104e87] bg-[#082d52] text-[#38aaf5]",
-    hero: "bg-[radial-gradient(circle_at_72%_25%,rgba(56,170,245,0.55),transparent_16%),linear-gradient(135deg,#101820,#263241_45%,#05070a)]",
-    heroOverlay: "bg-[linear-gradient(120deg,transparent_0_35%,rgba(255,255,255,0.22)_36%,transparent_38%_100%)]",
-    button: "bg-[#22a8f2] text-white",
-    accent: "bg-[#27303c] text-[#6ec9ff]",
-    updateClass: "bg-[#174866] text-[#8fddff]"
+    src: "/assets/mellow-moose-jalapeno-ranch-bacon.jpg",
+    alt: "Mellow Moose burger with jalapeno and bacon",
+    label: "Spotlight"
   }
 ];
-
-const planCards = [
-  {
-    name: "Launch",
-    tag: "$399 one-time",
-    text: "The first paid step: a polished customer page, food menu, services list, or combined page built from the approved plan.",
-    cta: "Start launch",
-    href: "/checkout?plan=setup",
-    featured: true,
-    items: [
-      "Custom branded page",
-      "Food menu or services list structure",
-      "Hours, location or service area, photos, and links",
-      "Order, booking, quote, call, map, social, or review buttons",
-      "Private preview before the page goes public",
-      "QR-ready public link",
-      "Phone and desktop launch check"
-    ]
-  },
-  {
-    name: "Maintain",
-    tag: "$79/mo",
-    text: "For businesses that want the page kept current after launch without asking for a rebuild every time small details change.",
-    cta: "Choose Maintain",
-    href: "/checkout?plan=care",
-    featured: false,
-    items: [
-      "Hosting and page care",
-      "Two update requests per month",
-      "Hours, links, small menu/service edits, and photo swaps",
-      "Monthly link check",
-      "Email support"
-    ]
-  },
-  {
-    name: "Managed",
-    tag: "$149/mo",
-    text: "For restaurants, food trucks, and service businesses that change often and want Resonate to keep the page useful without counting every small edit.",
-    cta: "Choose Managed",
-    href: "/checkout?plan=care-plus",
-    featured: false,
-    items: [
-      "Everything in Maintain",
-      "Unlimited standard updates",
-      "Specials, sold-out items, seasonal services, and featured offers",
-      "Monthly page polish",
-      "Priority turnaround",
-      "Larger rebuilds quoted separately"
-    ]
-  }
-];
-
-function CheckLine({ children, dark = false }: { children: React.ReactNode; dark?: boolean }) {
-  return (
-    <li className="flex gap-3">
-      <span className={dark ? "font-bold text-gold" : "font-bold text-coral"}>{"\u2713"}</span>
-      <span>{children}</span>
-    </li>
-  );
-}
 
 function MiniIcon({ name }: { name: string }) {
   const common = {
@@ -636,6 +226,22 @@ function MiniIcon({ name }: { name: string }) {
   }
 }
 
+function MenuPilotMark({ compact = false }: { compact?: boolean }) {
+  return (
+    <span className="inline-flex items-center gap-3">
+      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3a2418] text-lg font-black text-white shadow-[0_12px_30px_rgba(58,36,24,0.22)] ring-4 ring-[#ff5a1f]/10">
+        M
+      </span>
+      {compact ? null : (
+        <span className="leading-none">
+          <span className="block text-base font-black text-ink">MenuPilot</span>
+          <span className="mt-1 block text-[10px] font-black uppercase tracking-[0.18em] text-muted">By Resonate Solutions</span>
+        </span>
+      )}
+    </span>
+  );
+}
+
 function PhonePreview({ theme }: { theme: BusinessTheme }) {
   return (
     <div className="relative mx-auto max-w-[360px] rounded-[2.35rem] border-[7px] border-[#3a2418] bg-white shadow-soft">
@@ -644,21 +250,32 @@ function PhonePreview({ theme }: { theme: BusinessTheme }) {
       </div>
       <div className="flex items-center justify-between rounded-t-[1.85rem] bg-[#3a2418] px-6 py-3 text-xs font-black uppercase tracking-[0.14em] text-white">
         <span>9:41</span>
-        <span>Business page</span>
+        <span>MenuPilot page</span>
         <span>...</span>
       </div>
-      <div className="bg-[linear-gradient(135deg,#ff5a1f,#f8b737)] px-6 py-7 text-ink">
-        <span className="rounded-full bg-[#3a2418] px-3 py-1 text-xs font-black uppercase tracking-[0.1em] text-white">
-          {theme.status}
-        </span>
-        <h2 className="mt-4 text-3xl font-black leading-none">{theme.sampleName}</h2>
-        <p className="mt-2 text-sm font-semibold">{theme.sampleMeta}</p>
-        <div className="mt-5 grid grid-cols-4 gap-2 text-center text-xs font-black">
-          {theme.actions.map((action) => (
-            <span key={action} className="rounded-2xl bg-white/95 px-2 py-3 shadow-sm">
-              {action}
-            </span>
-          ))}
+      <div className={`relative overflow-hidden px-6 py-7 text-white ${theme.heroClass}`}>
+        {theme.previewImage ? (
+          <img
+            src={theme.previewImage}
+            alt={theme.previewImageAlt ?? theme.sampleName}
+            className="absolute inset-0 h-full w-full object-cover"
+            loading="lazy"
+          />
+        ) : null}
+        <div className={`absolute inset-0 ${theme.heroOverlayClass}`} />
+        <div className="relative">
+          <span className={`rounded-full px-3 py-1 text-xs font-black uppercase tracking-[0.1em] shadow-sm ${theme.chipClass}`}>
+            {theme.status}
+          </span>
+          <h2 className="mt-4 text-3xl font-black leading-none drop-shadow-[0_2px_12px_rgba(0,0,0,0.22)]">{theme.sampleName}</h2>
+          <p className="mt-2 text-sm font-semibold text-white/90">{theme.sampleMeta}</p>
+          <div className="mt-5 grid grid-cols-4 gap-2 text-center text-xs font-black">
+            {theme.actions.map((action, index) => (
+              <span key={action} className={`rounded-2xl px-2 py-3 shadow-sm ${index === 0 ? theme.buttonClass : "bg-white/95 text-ink"}`}>
+                {action}
+              </span>
+            ))}
+          </div>
         </div>
       </div>
       <div className="rounded-b-[1.85rem] bg-cream px-5 py-5">
@@ -673,7 +290,7 @@ function PhonePreview({ theme }: { theme: BusinessTheme }) {
                 <MiniIcon name={index === 0 ? theme.icon : index === 1 ? "camera" : "star"} />
               </span>
               <div className="min-w-0">
-                <span className="inline-flex rounded-full bg-gold px-2 py-1 text-[10px] font-black uppercase tracking-[0.08em] text-ink">
+                <span className={`inline-flex rounded-full px-2 py-1 text-[10px] font-black uppercase tracking-[0.08em] ${theme.accentClass}`}>
                   {theme.label}
                 </span>
                 <p className="mt-1 truncate font-black text-ink">{item}</p>
@@ -687,105 +304,40 @@ function PhonePreview({ theme }: { theme: BusinessTheme }) {
   );
 }
 
-function BrandedExampleCard({ example }: { example: (typeof brandedExamples)[number] }) {
-  return (
-    <article className="min-w-0">
-      <div className="mb-4 flex items-center justify-between gap-3">
-        <span className={`rounded-full border px-3 py-1 text-[10px] font-black uppercase tracking-[0.16em] ${example.labelClass}`}>
-          {example.label}
-        </span>
-        <span className="text-xs font-bold text-white/45">{example.number}</span>
-      </div>
-      <div className={`overflow-hidden rounded-[1.75rem] border shadow-soft ${example.shell}`}>
-        <div className="py-3 text-center text-[10px] font-black tracking-[0.12em] opacity-45">resonate.page</div>
-        <div className={`relative min-h-[150px] overflow-hidden ${example.hero}`}>
-          <img
-            src={example.image}
-            alt={example.imageAlt}
-            className="absolute inset-0 h-full w-full object-cover"
-            loading="lazy"
-          />
-          <div className={`absolute inset-0 ${example.heroOverlay}`} />
-          <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/15 to-transparent" />
-          <div className="relative flex h-full min-h-[150px] flex-col justify-end p-5">
-            <span className="mb-8 inline-flex w-fit items-center gap-2 rounded-full bg-black/55 px-3 py-2 text-[10px] font-black text-white shadow-sm">
-              <span className="flex h-5 w-5 items-center justify-center rounded-full bg-white/20">
-                <MiniIcon name={example.name.includes("Lawn") ? "leaf" : example.name.includes("Cleaning") ? "spark" : "car"} />
-              </span>
-              {example.name}
-            </span>
-            <p className="text-[10px] font-black uppercase tracking-[0.16em] text-white/80">{example.label.split(" - ").pop()}</p>
-            <h3 className="mt-1 text-2xl font-black leading-tight text-white">{example.tagline}</h3>
-          </div>
-        </div>
-        <div className="p-5">
-          <div className="flex flex-wrap gap-2">
-            <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${example.accent}`}>{example.status}</span>
-            <span className={`rounded-full px-3 py-1 text-[11px] font-bold ${example.accent}`}>Trusted service</span>
-          </div>
-          <p className="mt-4 text-sm leading-6 opacity-80">{example.description}</p>
-          <div className="mt-4 grid grid-cols-3 gap-2">
-            {example.actions.map((action, index) => (
-              <span key={action} className={`rounded-xl border px-2 py-3 text-center text-[11px] font-black ${index === 0 ? example.button : "border-current/15 bg-white/10"}`}>
-                {action}
-              </span>
-            ))}
-          </div>
-          <div className="mt-3 grid grid-cols-3 gap-2">
-            {example.highlights.map((highlight, index) => (
-              <span key={highlight} className="rounded-xl border border-current/10 bg-white/10 p-3 text-[11px] font-bold leading-tight">
-                <span className="mb-2 block opacity-80">
-                  <MiniIcon name={index === 0 ? "star" : index === 1 ? "calendar" : "check"} />
-                </span>
-                {highlight}
-              </span>
-            ))}
-          </div>
-          <div className={`mt-4 rounded-xl px-4 py-3 text-xs font-black ${example.updateClass}`}>
-            <span className="block text-[10px] uppercase tracking-[0.16em] opacity-75">Premium update</span>
-            {example.update}
-          </div>
-        </div>
-      </div>
-    </article>
-  );
-}
-
 export default function MenuPilotPage() {
-  const [selectedThemeId, setSelectedThemeId] = useState(businessThemes[0].id);
-  const selectedTheme = businessThemes.find((theme) => theme.id === selectedThemeId) ?? businessThemes[0];
-  const [activeUpdates, setActiveUpdates] = useState<Record<string, boolean>>(
-    Object.fromEntries(businessThemes.flatMap((theme) => theme.updates.map((update) => [update.id, update.active])))
-  );
-
-  function toggleUpdate(id: string) {
-    setActiveUpdates((current) => ({ ...current, [id]: !current[id] }));
-  }
-
   return (
     <main className="bg-cream">
-      <section className="border-b border-line bg-white/70">
-        <div className="mx-auto flex max-w-7xl items-center gap-6 overflow-x-auto px-5 py-3 text-sm font-semibold text-muted">
-          <a href="#how-it-works" className="shrink-0 hover:text-ink">How it works</a>
-          <a href="#business-types" className="shrink-0 hover:text-ink">Services</a>
-          <a href="#daily-updates" className="shrink-0 hover:text-ink">Managed updates</a>
-          <a href="#why" className="shrink-0 hover:text-ink">Why it matters</a>
-          <a href="#plans" className="shrink-0 hover:text-ink">Plans</a>
+      <section className="sticky top-0 z-30 border-b border-line bg-[#f7f0e8]/92 backdrop-blur-xl">
+        <div className="mx-auto flex max-w-7xl items-center gap-5 px-5 py-3">
+          <Link href="/menupilot" className="shrink-0">
+            <MenuPilotMark />
+          </Link>
+          <div className="ml-auto flex min-w-0 items-center gap-5 overflow-x-auto text-sm font-bold text-muted">
+            <a href="#owner-portal" className="shrink-0 hover:text-ink">Owner portal</a>
+            <a href="#managed-channels" className="shrink-0 hover:text-ink">Where updates go</a>
+            <a href="#custom-branding" className="shrink-0 hover:text-ink">Branding</a>
+            <a href="#plans" className="shrink-0 hover:text-ink">Plans</a>
+          </div>
+          <Link href="#fit-check" className="hidden shrink-0 rounded-full bg-[#ff5a1f] px-5 py-3 text-sm font-black text-white shadow-[0_14px_35px_rgba(255,90,31,0.28)] transition hover:-translate-y-0.5 hover:bg-[#3a2418] sm:inline-flex">
+            Free preview
+          </Link>
         </div>
       </section>
 
       <section className="relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#202320,#f17855,#f6a15e,#202320)]" />
+        <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#202320,#ff5a1f,#f8b737,#202320)]" />
+        <div className="absolute -right-28 top-20 h-80 w-80 rounded-full bg-[#ff5a1f]/12 blur-3xl" />
+        <div className="absolute left-1/3 top-12 h-52 w-52 rounded-full bg-[#f8b737]/12 blur-3xl" />
         <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-[1fr_0.85fr] lg:py-24">
           <div>
             <h1 className="max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.01em] text-ink md:text-7xl">
-              Customer-ready pages for <span className="text-coral drop-shadow-[0_10px_28px_rgba(217,120,86,0.22)]">service</span> businesses.
+              MenuPilot pages for <span className="text-[#ff5a1f] drop-shadow-[0_16px_34px_rgba(255,90,31,0.28)]">service</span> businesses.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
-              A simple page customers can open from a QR code, text, Google profile, or social link. Built around your services, photos, hours, booking info, and the questions people ask before they call or visit.
+              MenuPilot by Resonate Solutions gives customers one simple page they can open from a QR code, text, Google profile, or social link. Built around your services, photos, hours, booking info, and the questions people ask before they call or visit.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/m/mellow-moose-burgers" className="group relative overflow-hidden rounded-full border-2 border-gold bg-coral px-7 py-4 text-center font-black text-white shadow-[0_18px_45px_rgba(217,120,86,0.28)] ring-4 ring-coral/10 transition hover:-translate-y-0.5 hover:border-coral hover:bg-[#e56f4c] hover:shadow-[0_24px_65px_rgba(217,120,86,0.34)]">
+              <Link href="/m/mellow-moose-burgers" className="group relative overflow-hidden rounded-full border-2 border-[#ffcf7a] bg-[#ff5a1f] px-7 py-4 text-center font-black text-white shadow-[0_18px_45px_rgba(255,90,31,0.32)] ring-4 ring-[#ff5a1f]/12 transition hover:-translate-y-0.5 hover:border-[#ff5a1f] hover:bg-[#3a2418] hover:shadow-[0_24px_65px_rgba(255,90,31,0.38)]">
                 <span className="absolute inset-y-0 left-0 w-1/3 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.22),transparent)] transition group-hover:translate-x-[220%]" />
                 <span className="relative">See a live example page</span>
               </Link>
@@ -803,221 +355,225 @@ export default function MenuPilotPage() {
               ))}
             </div>
           </div>
-          <PhonePreview theme={selectedTheme} />
+          <PhonePreview theme={heroTheme} />
         </div>
       </section>
 
-      <section id="business-types" className="border-y border-line bg-white">
+      <section id="owner-portal" className="bg-white">
         <div className="mx-auto max-w-7xl px-5 py-16">
-          <div className="grid gap-8 lg:grid-cols-[0.75fr_1fr] lg:items-end">
+          <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
             <div>
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Choose your business type</p>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-coral">Owner portal</p>
               <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-                Choose the business type that fits you best.
+                A simple review dashboard before anything goes live.
               </h2>
               <p className="mt-5 leading-7 text-muted">
-                Each page uses the right layout, words, buttons, photos, and update options for what your customers need to see before they call, book, request a quote, or visit.
+                Customers sign in to the MenuPilot portal, choose the kind of change they need, and send the details once. Resonate reviews the request before it reaches the public page or connected channels.
               </p>
             </div>
-            <div className="grid gap-3 sm:grid-cols-2">
-              {businessThemes.map((theme) => (
-                <button
-                  type="button"
-                  key={theme.id}
-                  onClick={() => setSelectedThemeId(theme.id)}
-                  aria-pressed={selectedTheme.id === theme.id}
-                  className={`flex items-start gap-4 rounded-2xl border-2 p-4 text-left shadow-sm transition hover:-translate-y-0.5 ${
-                    selectedTheme.id === theme.id ? "border-coral bg-[#fff0e9]" : "border-line bg-cream hover:border-coral"
-                  }`}
-                >
-                  <span className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-2xl ${
-                    selectedTheme.id === theme.id ? "bg-coral text-white" : "bg-white text-coral"
-                  }`}>
-                    <MiniIcon name={theme.icon} />
-                  </span>
-                  <span>
-                    <span className="block text-base font-extrabold text-ink">{theme.name}</span>
-                    <span className="mt-1 block text-sm font-semibold leading-5 text-muted">{theme.eyebrow}</span>
-                  </span>
-                </button>
-              ))}
-            </div>
-          </div>
-          <div className="mt-10 rounded-[2rem] bg-ink p-7 text-white shadow-soft">
-            <div className="grid gap-6 lg:grid-cols-[0.8fr_1fr] lg:items-center">
-              <div>
-                <p className="text-xs font-bold uppercase tracking-[0.16em] text-gold">{selectedTheme.name}</p>
-                <h3 className="mt-3 text-3xl font-extrabold leading-tight">{selectedTheme.title}</h3>
-                <p className="mt-4 leading-7 text-white/80">{selectedTheme.description}</p>
-              </div>
-              <div className="grid gap-3 sm:grid-cols-3">
-                {selectedTheme.highlights.map((highlight) => (
-                  <span key={highlight} className="rounded-2xl border border-white/15 bg-white/10 px-4 py-4 text-center font-bold">
-                    {highlight}
-                  </span>
-                ))}
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
 
-      <section id="how-it-works" className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-20">
-          <div className="max-w-3xl">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">How it works</p>
-            <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-              One polished page customers can use. Clear setup behind it.
-            </h2>
-          </div>
-          <div className="mt-12 grid gap-6 lg:grid-cols-2">
-            <article className="rounded-[1.75rem] border border-line bg-cream p-7 shadow-sm">
-              <span className="inline-flex rounded-full bg-[#fff0e9] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-coral">
-                What customers see
-              </span>
-              <h3 className="mt-5 text-3xl font-extrabold text-ink">A branded business page</h3>
-              <ul className="mt-6 grid gap-4 text-muted">
-                {customerView.map((item) => (
-                  <CheckLine key={item}>{item}</CheckLine>
-                ))}
-              </ul>
-            </article>
-            <article className="rounded-[1.75rem] bg-ink p-7 text-white shadow-soft">
-              <span className="inline-flex rounded-full bg-gold px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-ink">
-                What owners can update
-              </span>
-              <h3 className="mt-5 text-3xl font-extrabold">Simple now. More powerful when needed.</h3>
-              <ul className="mt-6 grid gap-4 text-white/90">
-                {ownerView.map((item) => (
-                  <CheckLine key={item} dark>{item}</CheckLine>
-                ))}
-              </ul>
-            </article>
-          </div>
-        </div>
-      </section>
+            <div className="overflow-hidden rounded-[1.75rem] border border-line bg-[#fffaf4] shadow-soft">
+              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line bg-white px-5 py-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-muted">Signed in</p>
+                  <h3 className="mt-1 text-xl font-black text-ink">Mellow Moose dashboard</h3>
+                </div>
+                <span className="rounded-full bg-[#e7f4f1] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#2f7d72]">
+                  Review first
+                </span>
+              </div>
 
-      <section id="daily-updates" className="border-y border-line bg-cream">
-        <div className="mx-auto max-w-7xl px-5 py-20">
-          <div className="grid gap-8 lg:grid-cols-[0.85fr_1fr] lg:items-end">
-            <div>
-              <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Managed updates</p>
-              <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-                Add quick updates when the business needs them.
-              </h2>
-              <p className="mt-5 max-w-2xl leading-7 text-muted">
-                The starter page can stay steady. The higher monthly plan adds business-specific messages for openings, delays, specials, policies, and availability.
-              </p>
-            </div>
-            <div className="rounded-full border border-line bg-white px-5 py-3 text-sm font-bold text-muted shadow-sm">
-              Pick a business type above, then turn on the updates its customers would actually care about.
-            </div>
-          </div>
-          <div className="mt-12 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
-            {selectedTheme.updates.map((control) => (
-              <button
-                type="button"
-                key={control.id}
-                onClick={() => toggleUpdate(control.id)}
-                className={`group rounded-[1.5rem] border-2 bg-white p-5 shadow-sm transition hover:-translate-y-1 hover:shadow-soft ${
-                  activeUpdates[control.id] ? "border-coral" : "border-line hover:border-coral"
-                }`}
-                aria-pressed={activeUpdates[control.id]}
-              >
-                <div className="flex items-start justify-between gap-4">
-                  <div className="text-left">
-                    <span className={`mb-4 flex h-11 w-11 items-center justify-center rounded-2xl ${
-                      activeUpdates[control.id] ? "bg-[#ffe0d2] text-coral" : "bg-sage text-brandDark"
-                    }`}>
-                      <MiniIcon name={control.icon} />
-                    </span>
-                    <span className={`inline-flex rounded-full px-3 py-1 text-[11px] font-bold uppercase tracking-[0.14em] ${
-                      activeUpdates[control.id] ? "bg-coral text-white" : "bg-[#fff0e9] text-coral"
-                    }`}>
-                      {control.label}
-                    </span>
-                    <h3 className="mt-4 text-xl font-extrabold leading-tight text-ink">{control.title}</h3>
-                    <p className="mt-1 text-sm font-semibold text-muted">{control.text}</p>
+              <div className="grid gap-0 lg:grid-cols-[1fr_0.72fr]">
+                <div className="grid gap-3 p-5 sm:grid-cols-2">
+                  {ownerPortalActions.map((action) => (
+                    <button key={action.title} type="button" className="group rounded-[1.15rem] border border-line bg-white p-4 text-left shadow-sm transition hover:border-coral hover:bg-[#fff7f2]">
+                      <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fff0e9] text-coral transition group-hover:bg-coral group-hover:text-white">
+                        <MiniIcon name={action.icon} />
+                      </span>
+                      <span className="mt-4 block font-black text-ink">{action.title}</span>
+                      <span className="mt-1 block text-sm leading-5 text-muted">{action.text}</span>
+                    </button>
+                  ))}
+                </div>
+
+                <aside className="border-t border-line bg-[#2d1b12] p-5 text-white lg:border-l lg:border-t-0">
+                  <p className="text-xs font-black uppercase tracking-[0.16em] text-gold">Review queue</p>
+                  <div className="mt-4 grid gap-3">
+                    {reviewQueue.map(([status, title, channel]) => (
+                      <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.07] p-4">
+                        <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-gold">
+                          {status}
+                        </span>
+                        <p className="mt-3 font-black leading-5">{title}</p>
+                        <p className="mt-1 text-sm text-white/62">{channel}</p>
+                      </div>
+                    ))}
                   </div>
-                  <span className={`mt-1 h-7 w-12 rounded-full p-1 transition ${
-                    activeUpdates[control.id] ? "bg-coral" : "bg-line group-hover:bg-coral"
-                  }`}>
-                    <span className={`block h-5 w-5 rounded-full bg-white shadow-sm transition ${
-                      activeUpdates[control.id] ? "translate-x-5" : "group-hover:translate-x-5"
-                    }`} />
-                  </span>
-                </div>
-                <div className="mt-5 rounded-2xl border border-dashed border-line bg-cream p-4">
-                  <p className="text-[11px] font-bold uppercase tracking-[0.16em] text-muted">Customer sees</p>
-                  <p className="mt-2 text-sm font-bold leading-5 text-ink">{control.customerSees}</p>
-                </div>
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="why" className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-20">
-          <div className="max-w-4xl">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Why it works</p>
-            <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-              Customers should not have to dig to know what you do.
-            </h2>
-            <p className="mt-5 max-w-2xl leading-7 text-muted">
-              Service business owners need something simpler than a full website and more useful than a scattered social profile. This gives customers one clean place to understand, trust, and contact you.
-            </p>
-          </div>
-          <div className="mt-12 grid gap-5 md:grid-cols-2 lg:grid-cols-3">
-            {reasons.map((reason) => (
-              <article key={reason.title} className="rounded-[1.5rem] border border-line bg-cream p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-soft">
-                <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-[#fff0e9] text-coral">
-                  <MiniIcon name={reason.icon} />
-                </span>
-                <h3 className="mt-5 text-xl font-extrabold text-ink">{reason.title}</h3>
-                <p className="mt-3 leading-7 text-muted" dangerouslySetInnerHTML={{ __html: reason.text }} />
-              </article>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      <section id="custom-branding" className="bg-ink text-white">
-        <div className="mx-auto max-w-7xl px-5 py-20">
-          <div className="mx-auto max-w-4xl text-center">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Custom branding</p>
-            <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] md:text-5xl">
-              Custom branded pages for the business <span className="italic text-white/70">you actually run.</span>
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl leading-7 text-white/75">
-              Each business page is shaped around the trade, not forced into one generic template. Lawn care needs quote requests and service areas. Cleaning needs packages and trust. Detailing needs galleries, packages, and booking.
-            </p>
-            <div className="mx-auto mt-8 grid max-w-xl gap-3 sm:grid-cols-4">
-              {brandItems.map((item) => (
-                <span key={item.label} className="inline-flex items-center justify-center gap-2 rounded-full border border-white/20 bg-white/10 px-4 py-3 text-sm font-bold text-white">
-                  <span className="text-gold"><MiniIcon name={item.icon} /></span>
-                  {item.label}
-                </span>
-              ))}
+                </aside>
+              </div>
             </div>
           </div>
-
-          <div className="mt-12 grid gap-6 lg:grid-cols-3">
-            {brandedExamples.map((example) => (
-              <BrandedExampleCard key={example.name} example={example} />
-            ))}
-          </div>
-
-          <p className="mx-auto mt-10 max-w-2xl text-center text-sm leading-6 text-white/65">
-            Every page is hand-tuned to the trade: colors, language, actions, proof, and the updates customers actually want to see.
-          </p>
         </div>
       </section>
 
-      <section id="plans" className="bg-cream">
+      <section id="managed-channels" className="relative overflow-hidden bg-[#2d1b12] text-white">
+        <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:72px_72px]" />
+        <div className="absolute -bottom-32 -right-24 h-80 w-80 rounded-full bg-[#2f7d72]/25 blur-3xl" />
+        <div className="absolute -top-28 left-1/4 h-72 w-72 rounded-full bg-coral/20 blur-3xl" />
+        <div className="relative mx-auto max-w-7xl px-5 py-14">
+          <div className="grid gap-8 lg:grid-cols-[0.9fr_1fr] lg:items-end">
+            <div>
+              <p className="inline-flex rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-gold">
+                Where updates go
+              </p>
+              <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight tracking-[-0.01em]">
+                Reviewed push-button updates for the places customers check first.
+              </h2>
+            </div>
+            <p className="max-w-2xl text-base leading-7 text-white/75">
+              Customers get one simple place to request the change. Resonate checks the details, then updates the MenuPilot page and the approved channels connected to that business.
+            </p>
+          </div>
+
+          <div className="mt-8 grid gap-5 lg:grid-cols-[0.82fr_1fr]">
+            <div className="relative grid gap-3">
+              <div className="absolute bottom-10 left-5 top-10 hidden w-px bg-[linear-gradient(#dba63a,rgba(219,166,58,0.08))] sm:block" />
+              {controlWorkflowSteps.map((step) => (
+                <article key={step.number} className="relative grid gap-3 rounded-[1.25rem] border border-white/10 bg-white/[0.055] p-4 shadow-[0_20px_60px_rgba(0,0,0,0.16)] backdrop-blur sm:grid-cols-[auto_1fr]">
+                  <span className="z-10 flex h-10 w-10 items-center justify-center rounded-xl border border-gold/50 bg-[#3d281b] text-gold">
+                    <MiniIcon name={step.icon} />
+                  </span>
+                  <div>
+                    <div className="flex flex-wrap items-center gap-3">
+                      <span className="text-xs font-black uppercase tracking-[0.18em] text-gold">{step.number}</span>
+                      <h3 className="text-lg font-extrabold">{step.title}</h3>
+                    </div>
+                    <p className="mt-1 text-sm leading-6 text-white/72">{step.text}</p>
+                  </div>
+                </article>
+              ))}
+            </div>
+
+            <aside className="rounded-[1.5rem] border border-gold/25 bg-[#24160f]/85 p-4 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur">
+              <div className="rounded-[1.1rem] border border-gold/35 bg-[linear-gradient(135deg,rgba(219,166,58,0.12),rgba(255,255,255,0.045))] p-4">
+                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-gold">Owner request</p>
+                <p className="mt-2 text-lg font-extrabold leading-7">
+                  "Closing two hours early for the storm. Back tomorrow at 11."
+                </p>
+                <p className="mt-2 text-xs font-bold text-white/55">Received 3:42 PM - reviewed by Resonate</p>
+              </div>
+
+              <div className="mt-4 flex items-center gap-3">
+                <span className="h-px flex-1 bg-white/12" />
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/45">Routed to</span>
+                <span className="h-px flex-1 bg-white/12" />
+              </div>
+
+              <div className="mt-4 grid gap-2">
+                {managedChannels.map((channel) => (
+                  <article key={channel.name} className="grid gap-3 rounded-2xl border border-white/8 bg-black/16 p-3 sm:grid-cols-[auto_1fr_auto] sm:items-center">
+                    <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${channel.iconClass}`}>
+                      <MiniIcon name={channel.icon} />
+                    </span>
+                    <span>
+                      <span className="block font-extrabold">{channel.name}</span>
+                      <span className="mt-1 block text-xs leading-5 text-white/62">{channel.text}</span>
+                    </span>
+                    <span className={`w-fit rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${channel.badgeClass}`}>
+                      {channel.status}
+                    </span>
+                  </article>
+                ))}
+              </div>
+
+              <div className="mt-4 rounded-[1.1rem] border border-[#2f7d72]/45 bg-[#163b35]/70 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#9de7dc]">Confirmation sent - 3:47 PM</p>
+                <p className="mt-2 text-sm font-bold leading-5 text-white/82">
+                  MenuPilot page and Google updated. Facebook post queued. Ordering link marked for managed support.
+                </p>
+              </div>
+
+              <p className="mt-3 text-xs leading-5 text-white/50">
+                Ordering and delivery channels stay marked as managed support until account access and platform behavior are confirmed.
+              </p>
+            </aside>
+          </div>
+        </div>
+      </section>
+
+      <section id="custom-branding" className="border-y border-line bg-[#fffaf4]">
+        <div className="mx-auto max-w-7xl px-5 py-16">
+          <div className="grid gap-10 lg:grid-cols-[0.82fr_1fr] lg:items-center">
+            <div>
+              <p className="text-sm font-black uppercase tracking-[0.18em] text-coral">Custom branding</p>
+              <h2 className="mt-4 max-w-2xl text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
+                This is not one menu template for everyone.
+              </h2>
+              <p className="mt-5 max-w-xl leading-7 text-muted">
+                Your page should use your colors, photos, menu structure, and ordering buttons. MenuPilot is shaped around your business, not around Resonate Solutions.
+              </p>
+              <div className="mt-8 grid max-w-xl gap-3 sm:grid-cols-2">
+                {brandItems.map((item) => (
+                  <span key={item.label} className="inline-flex items-center gap-3 rounded-2xl border border-line bg-white px-5 py-4 text-sm font-black text-ink shadow-sm">
+                    <span className="text-coral"><MiniIcon name={item.icon} /></span>
+                    {item.label}
+                  </span>
+                ))}
+              </div>
+            </div>
+
+            <div className="rounded-[1.75rem] border border-line bg-white p-5 text-ink shadow-soft">
+              <div className="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-[#3a2418]/70">Brand kit sample</p>
+                  <h3 className="mt-3 text-2xl font-black">Mellow Moose Burgers</h3>
+                </div>
+                <span className="rounded-full bg-[#ffe5d8] px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-[#ff5a1f]">Live customer</span>
+              </div>
+
+              <div className="mt-5 grid grid-cols-4 gap-2 sm:gap-3">
+                {[
+                  ["Orange", "bg-[#ff5a1f]"],
+                  ["Cocoa", "bg-[#3a2418]"],
+                  ["Gold", "bg-[#f8b737]"],
+                  ["Teal", "bg-[#319a94]"]
+                ].map(([label, color]) => (
+                  <div key={label}>
+                    <span className={`block aspect-square rounded-2xl ${color} shadow-[0_14px_35px_rgba(58,36,24,0.12)]`} />
+                    <span className="mt-2 block text-[10px] font-black uppercase tracking-[0.12em] text-[#3a2418]/75">{label}</span>
+                  </div>
+                ))}
+              </div>
+
+              <div className="mt-5 grid grid-cols-3 gap-3">
+                {brandKitImages.map((image) => (
+                  <figure key={image.src} className="group relative aspect-square overflow-hidden rounded-2xl bg-[#3a2418]/10 shadow-[0_12px_35px_rgba(58,36,24,0.16)]">
+                    <img
+                      src={image.src}
+                      alt={image.alt}
+                      className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
+                      loading="eager"
+                      decoding="async"
+                    />
+                    <figcaption className="absolute inset-x-2 bottom-2 rounded-full bg-[#3a2418]/82 px-3 py-1.5 text-center text-[10px] font-black uppercase tracking-[0.12em] text-white shadow-sm">
+                      {image.label}
+                    </figcaption>
+                  </figure>
+                ))}
+              </div>
+
+              <div className="mt-5 rounded-2xl bg-[#f1eadf] px-5 py-4 text-sm text-[#3a2418]">
+                <span className="text-[#8b7463]">Headline:</span> <span className="font-black">Smashed fresh. Mellow vibes.</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <section id="plans" className="bg-[#fffaf4]">
         <div className="mx-auto max-w-7xl px-5 py-20">
           <div>
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Plans</p>
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#ff5a1f]">Plans</p>
             <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
               Build once. Choose how much help you want after launch.
             </h2>
@@ -1025,28 +581,8 @@ export default function MenuPilotPage() {
               Start with a free page plan so everyone agrees on the work. The one-time Launch payment starts the custom build. After launch, Maintain covers occasional edits, while Managed gives active businesses unlimited standard updates with priority help.
             </p>
           </div>
-          <div className="mt-10 grid gap-6 lg:grid-cols-3">
-            {planCards.map((plan) => (
-              <article key={plan.name} className={`rounded-[1.75rem] border-2 bg-white p-7 shadow-sm transition hover:-translate-y-1 hover:shadow-soft ${
-                plan.featured ? "border-coral" : "border-line"
-              }`}>
-                <div className="flex items-start justify-between gap-4">
-                  <h3 className="text-3xl font-extrabold text-ink">{plan.name}</h3>
-                  <span className="rounded-full bg-[#fff0e9] px-4 py-2 text-xs font-bold uppercase tracking-[0.14em] text-coral">{plan.tag}</span>
-                </div>
-                <p className="mt-4 leading-7 text-muted">{plan.text}</p>
-                <ul className="mt-7 grid gap-3 text-muted">
-                  {plan.items.map((item) => (
-                    <CheckLine key={item}>{item}</CheckLine>
-                  ))}
-                </ul>
-                <Link href={plan.href} className={`mt-7 block rounded-full px-6 py-4 text-center font-bold shadow-sm transition ${
-                  plan.featured ? "bg-ink text-white hover:bg-coral" : "bg-coral text-white hover:bg-ink"
-                }`}>
-                  {plan.cta}
-                </Link>
-              </article>
-            ))}
+          <div className="mt-10">
+            <PricingCards />
           </div>
         </div>
       </section>
@@ -1062,10 +598,10 @@ export default function MenuPilotPage() {
                 <div className="p-8 md:p-12">
                   <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Clear next step</p>
                   <h2 className="mt-3 max-w-2xl text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-                    Start with a plan. Build after payment.
+                    Start with a MenuPilot plan. Build after payment.
                   </h2>
                   <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
-                    Send your business name, menu or services, photos, hours, and links. Resonate will recommend the right page setup first. Custom design, preview, and hosting begin after the Launch payment.
+                    Send your business name, menu or services, photos, hours, and links. Resonate will recommend the right MenuPilot setup first. Custom design, preview, and hosting begin after the Launch payment.
                   </p>
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                     <Link href="#fit-check" className="rounded-full bg-coral px-7 py-4 text-center font-bold text-white shadow-sm transition hover:bg-ink">
@@ -1082,7 +618,7 @@ export default function MenuPilotPage() {
                   <p className="text-xs font-bold uppercase tracking-[0.16em] text-coral">How it moves forward</p>
                   <ol className="mt-5 grid gap-4">
                     {[
-                      ["01", "Free Page Plan", "We review the business details and recommend the right page, menu, or services setup."],
+                      ["01", "Free Page Plan", "We review the business details and recommend the right MenuPilot page, menu, or services setup."],
                       ["02", "Launch Payment", "$399 starts the custom build. This is when production work begins."],
                       ["03", "Private Preview", "The customer reviews the page before the public link is shared."],
                       ["04", "Go Live + Care", "Choose Launch only, Maintain, or Managed before the page becomes the customer-facing link."]
@@ -1101,7 +637,7 @@ export default function MenuPilotPage() {
             </div>
           </div>
           <footer className="mt-12 flex flex-col gap-4 border-t border-line pt-8 text-sm text-muted md:flex-row md:items-center md:justify-between">
-            <p className="font-bold text-ink">Resonate Solutions</p>
+            <p className="font-bold text-ink">MenuPilot by Resonate Solutions</p>
             <p>Customer-ready pages for service businesses. Built in Northwest Arkansas.</p>
           </footer>
         </div>

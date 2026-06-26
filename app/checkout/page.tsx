@@ -12,7 +12,7 @@ export default async function CheckoutPage({
   const isOneTime = plan?.paymentMode === "payment";
   const statusMessage =
     params.status === "missing-stripe"
-      ? "Online checkout is not available right now. Please request a Free Page Plan or contact Resonate to complete payment."
+      ? "Secure checkout is not connected yet. Resonate can still send a Stripe payment link or invoice when your plan is ready."
       : params.status === "cancelled"
         ? "Checkout was cancelled. You can restart when ready."
         : params.status === "checkout-error"
@@ -25,7 +25,7 @@ export default async function CheckoutPage({
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Checkout</p>
         <h1 className="mt-3 text-4xl font-black text-ink">{isOneTime ? "Start your page/menu setup." : "Start monthly page care."}</h1>
         <p className="mt-4 leading-7 text-muted">
-          You selected <strong>{plan?.name}</strong>. Launch is the one-time payment that starts the custom build. Monthly support keeps the page, menu, or services list current after launch.
+          You selected <strong>{plan?.name}</strong>. Launch is the one-time payment that starts the custom build. Monthly support keeps the page, menu, or services list current after launch. Payment is handled through Stripe secure checkout.
         </p>
         {statusMessage ? <p className="mt-5 rounded-2xl bg-[#fff0e9] px-4 py-3 text-sm font-bold text-coral">{statusMessage}</p> : null}
         <form action="/api/checkout" method="POST" className="mt-8 grid gap-4">
@@ -35,9 +35,13 @@ export default async function CheckoutPage({
             <input name="email" type="email" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="owner@example.com" />
           </label>
           <button type="submit" className="rounded-full bg-coral px-5 py-3 text-center font-black text-white shadow-soft hover:bg-ink">
-            Continue to secure checkout
+            Continue to secure Stripe checkout
           </button>
         </form>
+        <div className="mt-6 grid gap-3 rounded-2xl border border-line bg-cream p-4 text-sm leading-6 text-muted">
+          <p><strong className="text-ink">Debit and credit cards are accepted through Stripe.</strong> Resonate does not collect or store card numbers on this website.</p>
+          <p>Monthly plans can be managed through Stripe after checkout, including card updates and subscription changes.</p>
+        </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link href="/pricing" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back to pricing</Link>
           <Link href="/menupilot#fit-check" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Free Page Plan</Link>

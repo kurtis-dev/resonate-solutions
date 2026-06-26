@@ -13,6 +13,7 @@ export type Plan = {
   highlighted?: boolean;
   checkoutUrl: string;
   stripePriceEnvKey?: string;
+  stripePaymentLinkEnvKey?: string;
   paymentMode: "none" | "payment" | "subscription";
 };
 
@@ -21,11 +22,11 @@ export const plans: Plan[] = [
     id: "review",
     name: "Free Page Plan",
     price: "$0",
-    description: "A clear recommendation for the page, menu, or services list your business needs before you pay for a custom build.",
+    description: "A clear recommendation for the MenuPilot page, menu, or services list your business needs before you pay for a custom build.",
     limit: "No payment required",
     billingPeriod: "",
     features: [
-      { label: "Page recommendation", detail: "We identify whether the first project is a menu, services list, business page, or a combination." },
+      { label: "MenuPilot recommendation", detail: "We identify whether the first project is a menu, services list, business page, or a combination." },
       { label: "Current link review", detail: "We look at the current website, menu, social page, or Google profile link if one exists." },
       { label: "Missing content notes", detail: "We flag the basics needed before build: photos, menu items, service list, hours, links, and contact details." },
       { label: "Recommended next step", detail: "You get a plain recommendation for Launch and any monthly care that fits the business." }
@@ -38,7 +39,7 @@ export const plans: Plan[] = [
     id: "setup",
     name: "Launch",
     price: "$399",
-    description: "The required one-time build that turns the approved plan into a polished page, food menu, services list, or combined customer page.",
+    description: "The required one-time build that turns the approved MenuPilot plan into a polished page, food menu, services list, or combined customer page.",
     limit: "Required setup",
     billingPeriod: "",
     features: [
@@ -53,6 +54,7 @@ export const plans: Plan[] = [
     highlighted: true,
     checkoutUrl: "/checkout?plan=setup",
     stripePriceEnvKey: "STRIPE_PRICE_SETUP",
+    stripePaymentLinkEnvKey: "STRIPE_PAYMENT_LINK_SETUP",
     paymentMode: "payment"
   },
   {
@@ -71,6 +73,7 @@ export const plans: Plan[] = [
     cta: "Choose Maintain",
     checkoutUrl: "/checkout?plan=care",
     stripePriceEnvKey: "STRIPE_PRICE_CORE",
+    stripePaymentLinkEnvKey: "STRIPE_PAYMENT_LINK_CORE",
     paymentMode: "subscription"
   },
   {
@@ -90,10 +93,15 @@ export const plans: Plan[] = [
     cta: "Choose Managed",
     checkoutUrl: "/checkout?plan=care-plus",
     stripePriceEnvKey: "STRIPE_PRICE_PLUS",
+    stripePaymentLinkEnvKey: "STRIPE_PAYMENT_LINK_PLUS",
     paymentMode: "subscription"
   }
 ];
 
 export function getPlanById(id: string) {
   return plans.find((plan) => plan.id === id);
+}
+
+export function getConfiguredPaymentLink(plan: Plan) {
+  return plan.stripePaymentLinkEnvKey ? process.env[plan.stripePaymentLinkEnvKey] || "" : "";
 }

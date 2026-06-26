@@ -1,69 +1,73 @@
 import { plans } from "@/lib/plans";
 
 export function PricingCards() {
-  const reviewPlan = plans.find((plan) => plan.paymentMode === "none");
-  const paidPlans = plans.filter((plan) => plan.paymentMode !== "none");
-
   return (
-    <div className="grid gap-6">
-      {reviewPlan ? (
-        <article className="grid gap-5 rounded-[1.75rem] border-2 border-coral/30 bg-white p-6 shadow-sm lg:grid-cols-[1fr_auto] lg:items-center">
-          <div>
-            <div className="flex flex-wrap items-center gap-3">
-              <h3 className="text-2xl font-extrabold text-ink">{reviewPlan.name}</h3>
-              <span className="rounded-full bg-[#fff0e9] px-3 py-1 text-xs font-bold uppercase tracking-[0.14em] text-coral">{reviewPlan.limit}</span>
-            </div>
-            <p className="mt-3 max-w-3xl leading-7 text-muted">{reviewPlan.description}</p>
-            <div className="mt-4 flex flex-wrap gap-2 text-xs font-bold text-muted">
-              {reviewPlan.features.map((feature) => (
-                <span key={feature.label} className="rounded-full border border-line bg-cream px-3 py-2">{feature.label}</span>
-              ))}
-            </div>
-          </div>
-          <a href={reviewPlan.checkoutUrl} className="inline-flex justify-center rounded-full bg-ink px-6 py-3 text-sm font-bold text-white shadow-sm transition hover:bg-coral">
-            {reviewPlan.cta}
-          </a>
-        </article>
-      ) : null}
+    <div className="grid auto-rows-fr gap-6 md:grid-cols-2 xl:grid-cols-4">
+      {plans.map((plan) => {
+        const isFree = plan.paymentMode === "none";
+        const isManaged = plan.id === "care-plus";
+        const isHighlighted = plan.highlighted || isManaged;
 
-      <div className="grid gap-6 lg:grid-cols-3">
-        {paidPlans.map((plan) => (
+        return (
           <article
             key={plan.name}
-            className={`group flex min-h-full flex-col rounded-[1.75rem] border-2 bg-white p-6 shadow-sm transition duration-200 hover:-translate-y-1 hover:shadow-soft ${plan.highlighted ? "border-coral shadow-soft" : "border-line hover:border-coral/40"}`}
+            className={`relative flex min-h-[520px] flex-col rounded-[1.75rem] border-2 bg-white p-6 shadow-sm transition-colors duration-200 ${
+              isHighlighted
+                ? "border-[#ff5a1f] shadow-[0_22px_65px_rgba(255,90,31,0.14)]"
+                : "border-line hover:border-[#ff5a1f]/40"
+            }`}
           >
-            <div className="flex items-center justify-between gap-3">
-              <h3 className="text-xl font-extrabold text-ink">{plan.name}</h3>
-              <span className="rounded-full bg-[#fff0e9] px-3 py-1 text-xs font-bold uppercase tracking-[0.12em] text-coral">{plan.limit}</span>
+            {isManaged ? (
+              <span className="absolute -top-3 right-7 rounded-full bg-[#ff5a1f] px-4 py-1.5 text-[10px] font-black uppercase tracking-[0.14em] text-white shadow-[0_12px_28px_rgba(255,90,31,0.28)]">
+                Most hands-off
+              </span>
+            ) : null}
+
+            <div className="min-h-[148px]">
+              <span className={`inline-flex rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.14em] ${
+                isHighlighted ? "bg-[#ffe6da] text-[#ff5a1f]" : "bg-[#e8f6f3] text-[#17877d]"
+              }`}>
+                {isFree ? "Start here" : plan.limit}
+              </span>
+              <h3 className="mt-5 text-2xl font-black text-ink">{plan.name}</h3>
+              <p className="mt-4 text-sm leading-6 text-muted">{plan.description}</p>
             </div>
-            <p className="mt-4 text-sm leading-6 text-muted">{plan.description}</p>
-            <p className="mt-6 text-4xl font-black text-ink">
-              {plan.price}
-              {plan.billingPeriod ? <span className="text-base font-semibold text-muted">/{plan.billingPeriod}</span> : null}
+
+            <p className="mt-6 flex min-h-[52px] items-end gap-2 text-4xl font-black text-ink">
+              {isFree ? "Free" : plan.price}
+              {plan.billingPeriod ? <span className="pb-1 text-sm font-semibold text-muted">per {plan.billingPeriod === "mo" ? "month" : plan.billingPeriod}</span> : isFree ? <span className="pb-1 text-sm font-semibold text-muted">Preview & decide</span> : <span className="pb-1 text-sm font-semibold text-muted">one-time</span>}
             </p>
-            <ul className="mt-6 space-y-3 text-sm text-muted">
+
+            <ul className="mt-6 grid gap-2.5 text-sm text-muted">
               {plan.features.map((feature) => (
-                <li key={feature.label} className="group/feature rounded-xl border border-transparent p-3 transition hover:border-coral/30 hover:bg-[#fff0e9]">
-                  <div className="flex gap-2">
-                    <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-coral" />
-                    <span className="font-bold text-ink">{feature.label}</span>
+                <li
+                  key={feature.label}
+                  title={feature.detail}
+                  className="rounded-xl border border-transparent p-3 transition-colors hover:border-[#ff5a1f]/25 hover:bg-[#fff7f1]"
+                >
+                  <div className="flex gap-3">
+                    <span className="mt-1 text-[#ff5a1f]">{"\u2713"}</span>
+                    <span className="font-semibold leading-5 text-ink">{feature.label}</span>
                   </div>
-                  <p className="mt-2 max-h-0 overflow-hidden pl-4 text-xs leading-5 text-muted opacity-0 transition-all duration-200 group-hover/feature:max-h-32 group-hover/feature:opacity-100">
-                    {feature.detail}
-                  </p>
                 </li>
               ))}
             </ul>
+
             <div className="flex-1" />
             <a
               href={plan.checkoutUrl}
-              className={`mt-7 inline-flex w-full justify-center rounded-full px-4 py-3 text-sm font-bold shadow-sm transition ${plan.highlighted ? "bg-coral text-white hover:bg-ink" : "bg-ink text-white hover:bg-coral"}`}
+              className={`mt-8 inline-flex w-full items-center justify-center gap-2 rounded-full px-4 py-3.5 text-sm font-black shadow-sm transition ${
+                isHighlighted
+                  ? "bg-[#ff5a1f] text-white shadow-[0_16px_35px_rgba(255,90,31,0.22)] hover:bg-[#3a2418]"
+                  : "bg-[#3a2418] text-white hover:bg-[#ff5a1f]"
+              }`}
             >
               {plan.cta}
+              <span aria-hidden="true">{"\u2192"}</span>
             </a>
           </article>
-        ))}
-      </div>
+        );
+      })}
     </div>
   );
 }

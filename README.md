@@ -1,6 +1,6 @@
 # Resonate Solutions
 
-Resonate Solutions is a Next.js site for customer-ready business pages: food menus, service lists, QR-ready public links, customer-facing actions, hours, photos, and practical local business support.
+Resonate Solutions is a Next.js site for MenuPilot, a customer-ready page/app layer for food menus, service lists, QR-ready public links, customer-facing actions, hours, photos, and practical local business support.
 
 ## File Structure
 
@@ -9,6 +9,7 @@ app/
   admin/page.tsx         Internal operations dashboard
   admin/menus/page.tsx   Internal menu page creator
   api/qr/[slug]/route.ts QR code image endpoint
+  billing/page.tsx       Customer billing and Stripe checkout entry point
   checkout/page.tsx      Payment placeholder
   disclaimer/page.tsx    Disclaimer page
   globals.css            Tailwind base styles
@@ -67,6 +68,55 @@ NEXT_PUBLIC_SITE_URL
 NEXT_PUBLIC_QUESTIONS_EMAIL
 ```
 
+For the quickest no-code start, create Stripe Payment Links and add these fallback variables:
+
+```text
+STRIPE_PAYMENT_LINK_SETUP
+STRIPE_PAYMENT_LINK_CORE
+STRIPE_PAYMENT_LINK_PLUS
+NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL
+```
+
+If both Checkout price IDs and Payment Links are configured, the site uses Stripe Checkout first. If Checkout is not configured but a Payment Link exists, `/api/checkout` redirects to the matching Stripe Payment Link.
+
+The Softr Billing page can link customers to:
+
+```text
+https://www.resonate.solutions/billing
+https://www.resonate.solutions/checkout?plan=setup
+https://www.resonate.solutions/checkout?plan=care
+https://www.resonate.solutions/checkout?plan=care-plus
+```
+
+Full setup notes:
+
+```text
+docs/stripe-billing-setup.md
+```
+
+## Zapier Automation
+
+The first safe automation layer is the update route planner:
+
+```text
+POST /api/automation/route-update
+```
+
+Zapier can call this endpoint after a Softr update request or Google Sheets `Update Desk` row. The endpoint returns channel-specific tasks such as auto-ready, validate-first, manual-support, or blocked. Use it before publishing to external channels so payment, permission, approval, public copy, and access gates stay in place.
+
+Configure:
+
+```text
+ZAPIER_WEBHOOK_SECRET
+```
+
+Setup notes:
+
+```text
+docs/menupilot-channel-automation-workflows.md
+docs/zapier-softr-setup.md
+```
+
 ## Database
 
 The database schema is in:
@@ -120,7 +170,7 @@ Make your local business easier to find, choose, and trust.
 Current product direction:
 
 ```text
-Resonate Solutions: customer-ready pages, menus, and service lists for local service businesses.
+MenuPilot by Resonate Solutions: customer-ready pages, menus, and service lists for local service businesses.
 ```
 
 Launch services and plans:

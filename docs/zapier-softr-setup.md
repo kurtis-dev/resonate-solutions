@@ -171,6 +171,61 @@ Minimum viable setup:
 
 Do not use one shared customer login for real customers.
 
+## Update Request Routing Automation
+
+This is the next automation pass after basic intake/upload.
+
+Purpose:
+
+Let a customer submit one update request, then automatically create the right internal channel tasks without blindly publishing the change.
+
+Route planner endpoint:
+
+```text
+POST https://www.resonate.solutions/api/automation/route-update
+```
+
+Local test endpoint:
+
+```text
+POST http://localhost:PORT/api/automation/route-update
+```
+
+Zapier setup:
+
+1. Trigger from Softr `Update Request` form submission or a new Google Sheets `Update Desk` row.
+2. Add Webhooks by Zapier.
+3. Use `POST`.
+4. Send JSON fields:
+   - `businessName`
+   - `requestType`
+   - `whatShouldChange`
+   - `plan`
+   - `paymentStatus`
+   - `permissionVerified`
+   - `approvalStatus`
+   - `publicCopyApproved`
+   - `approvedPublicCopy`
+   - `requestedChannels`
+   - `connectedChannels`
+   - `goLiveAt`
+   - `effectiveDate`
+   - `endDate`
+   - `sourceMaterialUrl`
+5. Add header:
+   - `x-zapier-secret: ZAPIER_WEBHOOK_SECRET`
+6. Loop over the returned `tasks`.
+7. Create one task row per returned task.
+
+Returned task modes:
+
+- `auto_ready`: possible to automate after approval/access/copy gates pass.
+- `validate_first`: high-risk; prepare but do not run live without final review.
+- `manual_support`: create a Resonate work task; do not promise instant automation.
+- `blocked`: missing payment, approval, permission, copy, or access.
+
+Do this before direct Facebook/Google publishing Zaps. The route planner is the control layer that prevents messy one-off automations.
+
 ## What Not To Build Yet
 
 Do not build these in custom code until the workflow is proven:
@@ -183,4 +238,3 @@ Do not build these in custom code until the workflow is proven:
 - Full Google/Facebook/Clover sync
 
 Build the workflow manually first. Automate the parts that repeat.
-

@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { getPlanById } from "@/lib/plans";
+import { getConfiguredPaymentLink, getPlanById } from "@/lib/plans";
 import { getStripe } from "@/lib/stripe";
 
 function redirectTo(request: Request, path: string) {
@@ -20,6 +20,12 @@ export async function POST(request: Request) {
   const priceId = plan.stripePriceEnvKey ? process.env[plan.stripePriceEnvKey] : "";
 
   if (!stripe || !priceId) {
+    const paymentLink = getConfiguredPaymentLink(plan);
+
+    if (paymentLink) {
+      return NextResponse.redirect(paymentLink, { status: 303 });
+    }
+
     return redirectTo(request, `/checkout?plan=${plan.id}&status=missing-stripe`);
   }
 

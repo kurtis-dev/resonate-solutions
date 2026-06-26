@@ -10,6 +10,7 @@ export default function CheckoutSuccessPage() {
           Thank you. Resonate will review your order and follow up with the next step. Launch customers receive a private preview before the public page goes live.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Link href="/billing" className="rounded-full bg-ink px-5 py-3 text-center font-black text-white">Open billing</Link>
           <Link href="/menupilot#fit-check" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Request Free Page Plan</Link>
           <Link href="/" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back home</Link>
         </div>
