@@ -9,7 +9,17 @@ export default async function CheckoutPage({
   const params = await searchParams;
   const planId = params.plan || "setup";
   const plan = getPlanById(planId) || getPlanById("setup");
+  const isFree = plan?.paymentMode === "none";
   const isOneTime = plan?.paymentMode === "payment";
+  const heading = isFree
+    ? "Request your free page plan."
+    : isOneTime
+      ? "Start your page/menu setup."
+      : "Start monthly page care.";
+  const intro = isFree
+    ? "Add the business details once. Resonate will review the business, recommend the right MenuPilot setup, and tell you what is needed before any paid build starts."
+    : "Add the business details once, then continue to secure payment. Resonate uses this to match your order to the right page, menu, or services setup.";
+  const buttonText = isFree ? "Send free page plan request" : "Continue to secure Stripe checkout";
   const statusMessage =
     params.status === "missing-stripe"
       ? "Secure checkout is not connected yet. Resonate can still send a Stripe payment link or invoice when your plan is ready."
@@ -24,10 +34,10 @@ export default async function CheckoutPage({
   return (
     <main className="mx-auto flex max-w-2xl overflow-x-hidden px-4 py-12 sm:px-5 sm:py-16">
       <section className="w-full overflow-hidden rounded-[1.75rem] border border-line bg-white p-5 shadow-sm sm:p-8">
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Checkout</p>
-        <h1 className="mt-3 text-4xl font-black text-ink">{isOneTime ? "Start your page/menu setup." : "Start monthly page care."}</h1>
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">{isFree ? "Free Page Plan" : "Checkout"}</p>
+        <h1 className="mt-3 text-4xl font-black text-ink">{heading}</h1>
         <p className="mt-4 leading-7 text-muted">
-          You selected <strong>{plan?.name}</strong>. Add the business details once, then continue to secure payment. Resonate uses this to match your order to the right page, menu, or services setup.
+          You selected <strong>{plan?.name}</strong>. {intro}
         </p>
         {statusMessage ? <p className="mt-5 rounded-2xl bg-[#fff0e9] px-4 py-3 text-sm font-bold text-coral">{statusMessage}</p> : null}
         <form action="/api/checkout" method="POST" className="mt-8 grid gap-4">
@@ -78,16 +88,20 @@ export default async function CheckoutPage({
             <textarea name="notes" rows={4} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
           </label>
           <button type="submit" className="rounded-full bg-coral px-5 py-3 text-center font-black text-white shadow-soft hover:bg-ink">
-            Continue to secure Stripe checkout
+            {buttonText}
           </button>
         </form>
         <div className="mt-6 grid gap-3 rounded-2xl border border-line bg-cream p-4 text-sm leading-6 text-muted">
-          <p><strong className="text-ink">Debit and credit cards are accepted through Stripe.</strong> Resonate does not collect or store card numbers on this website.</p>
-          <p>After review, customer portal access is handled at app.resonate.solutions. Monthly billing is still managed securely through Stripe.</p>
+          {isFree ? (
+            <p><strong className="text-ink">No payment is required for the Free Page Plan.</strong> Paid build work begins only after you choose Launch.</p>
+          ) : (
+            <p><strong className="text-ink">Debit and credit cards are accepted through Stripe.</strong> Resonate does not collect or store card numbers on this website.</p>
+          )}
+          <p>After review, customer portal access is handled at app.resonate.solutions. Monthly billing is managed securely through Stripe.</p>
         </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link href="/pricing" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back to pricing</Link>
-          <Link href="/menupilot#fit-check" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Free Page Plan</Link>
+          {!isFree ? <Link href="/checkout?plan=review" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Free Page Plan</Link> : null}
         </div>
       </section>
     </main>

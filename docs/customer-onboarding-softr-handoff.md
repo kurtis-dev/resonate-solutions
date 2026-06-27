@@ -22,8 +22,8 @@ All four paths use the same onboarding shape:
 
 1. Customer chooses Free Page Plan, Launch, Maintain, or Managed.
 2. Customer enters business and contact details once.
-3. Free Page Plan submits immediately.
-4. Paid plans create an onboarding record, then continue to Stripe.
+3. Free Page Plan uses `/checkout?plan=review` and submits without payment.
+4. Paid plans use the same business-details flow, create an onboarding record, then continue to Stripe.
 5. Stripe webhook updates the same onboarding record after payment.
 6. Resonate reviews the customer, creates or confirms the customer page, connects the Softr user to the correct Business record, and grants portal access when ready.
 
@@ -102,7 +102,12 @@ Practical no-code bridge:
    - Free Page Plan is submitted.
    - Paid checkout is started.
    - Stripe confirms payment.
-3. Zapier upserts the row into Softr's connected source table.
+3. Free and paid starts now share the same `/checkout?plan=...` business-details flow:
+   - `/checkout?plan=review`
+   - `/checkout?plan=setup`
+   - `/checkout?plan=care`
+   - `/checkout?plan=care-plus`
+4. Zapier upserts the row into Softr's connected source table.
 
 ## Required Zapier Upsert Behavior
 

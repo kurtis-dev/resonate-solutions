@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { IntakeForm } from "@/components/IntakeForm";
 import { PricingCards } from "@/components/PricingCards";
 import { customerPortalUrl } from "@/lib/portal";
 
@@ -319,7 +318,7 @@ export default function MenuPilotPage() {
             <a href="#custom-branding" className="shrink-0 hover:text-ink">Branding</a>
             <a href="#plans" className="shrink-0 hover:text-ink">Plans</a>
           </div>
-          <Link href="#fit-check" className="hidden shrink-0 rounded-full bg-[#ff5a1f] px-5 py-3 text-sm font-black text-white shadow-[0_14px_35px_rgba(255,90,31,0.28)] transition hover:-translate-y-0.5 hover:bg-[#3a2418] sm:inline-flex">
+          <Link href="/checkout?plan=review" className="hidden shrink-0 rounded-full bg-[#ff5a1f] px-5 py-3 text-sm font-black text-white shadow-[0_14px_35px_rgba(255,90,31,0.28)] transition hover:-translate-y-0.5 hover:bg-[#3a2418] sm:inline-flex">
             Free preview
           </Link>
         </div>
@@ -593,8 +592,15 @@ export default function MenuPilotPage() {
 
       <section className="bg-white">
         <div className="mx-auto max-w-7xl px-5 py-16">
-          <div id="fit-check" className="mb-12 scroll-mt-28">
-            <IntakeForm />
+          <div id="fit-check" className="mb-12 scroll-mt-28 overflow-hidden rounded-[1.75rem] border border-line bg-[#202320] p-7 text-white shadow-soft md:p-10">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6a15e]">Free Page Plan</p>
+            <h2 className="mt-3 max-w-3xl text-3xl font-black leading-tight md:text-5xl">Send the business details once. We recommend the right build before you pay.</h2>
+            <p className="mt-5 max-w-3xl leading-7 text-white/78">
+              Use the same short business-details form whether you start free, pay for Launch, or choose monthly care. Free Page Plan requests do not ask for payment.
+            </p>
+            <Link href="/checkout?plan=review" className="mt-8 inline-flex rounded-full bg-[#ff5a1f] px-7 py-4 text-center font-black text-white shadow-[0_16px_40px_rgba(255,90,31,0.28)] transition hover:bg-white hover:text-[#202320]">
+              Request Free Page Plan
+            </Link>
           </div>
           <div className="overflow-hidden rounded-[1.75rem] border border-line bg-[#fffaf4] shadow-soft">
             <div className="grid gap-0 lg:grid-cols-[1fr_0.74fr]">
@@ -608,7 +614,7 @@ export default function MenuPilotPage() {
                     Send your business name, menu or services, photos, hours, and links. Resonate will recommend the right MenuPilot setup first. Custom design, preview, and hosting begin after the Launch payment.
                   </p>
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                    <Link href="#fit-check" className="rounded-full bg-coral px-7 py-4 text-center font-bold text-white shadow-sm transition hover:bg-ink">
+                    <Link href="/checkout?plan=review" className="rounded-full bg-coral px-7 py-4 text-center font-bold text-white shadow-sm transition hover:bg-ink">
                       Request Free Page Plan
                     </Link>
                     <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">

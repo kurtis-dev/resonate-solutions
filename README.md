@@ -10,7 +10,7 @@ app/
   admin/menus/page.tsx   Internal menu page creator
   api/qr/[slug]/route.ts QR code image endpoint
   billing/page.tsx       Customer billing and Stripe checkout entry point
-  checkout/page.tsx      Payment placeholder
+  checkout/page.tsx      Shared free/paid business-details and checkout flow
   disclaimer/page.tsx    Disclaimer page
   globals.css            Tailwind base styles
   layout.tsx             Shared app layout
@@ -83,6 +83,7 @@ The Softr Billing page can link customers to:
 
 ```text
 https://www.resonate.solutions/billing
+https://www.resonate.solutions/checkout?plan=review
 https://www.resonate.solutions/checkout?plan=setup
 https://www.resonate.solutions/checkout?plan=care
 https://www.resonate.solutions/checkout?plan=care-plus
@@ -143,7 +144,7 @@ Customer onboarding records are stored in:
 customer_onboarding
 ```
 
-Free Page Plan, Launch, Maintain, and Managed all create or update this same onboarding record. Softr should read only a portal-safe mirror of this record, or receive that limited mirror through Zapier using `SOFTR_INTAKE_WEBHOOK_URL` or `ZAPIER_INTAKE_WEBHOOK_URL`.
+Free Page Plan, Launch, Maintain, and Managed all use the same `/checkout?plan=...` business-details flow and create or update this same onboarding record. The Free Page Plan submits without payment; paid plans continue to Stripe. Softr should read only a portal-safe mirror of this record, or receive that limited mirror through Zapier using `SOFTR_INTAKE_WEBHOOK_URL` or `ZAPIER_INTAKE_WEBHOOK_URL`.
 
 Customer portal access should live at:
 

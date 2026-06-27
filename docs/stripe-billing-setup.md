@@ -50,6 +50,7 @@ NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL=https://billing.stripe.com/p/...
 
 ```text
 /pricing
+/checkout?plan=review
 /checkout?plan=setup
 /checkout?plan=care
 /checkout?plan=care-plus
@@ -63,6 +64,7 @@ NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL=https://billing.stripe.com/p/...
 
 Add buttons on the Softr Billing page:
 
+- `Request Free Page Plan` -> `https://www.resonate.solutions/checkout?plan=review`
 - `Pay Launch setup` -> `https://www.resonate.solutions/checkout?plan=setup`
 - `Start Maintain` -> `https://www.resonate.solutions/checkout?plan=care`
 - `Start Managed` -> `https://www.resonate.solutions/checkout?plan=care-plus`

@@ -32,7 +32,7 @@ export const plans: Plan[] = [
       { label: "Recommended next step", detail: "You get a plain recommendation for Launch and any monthly care that fits the business." }
     ],
     cta: "Request Free Page Plan",
-    checkoutUrl: "/menupilot#fit-check",
+    checkoutUrl: "/checkout?plan=review",
     paymentMode: "none"
   },
   {
