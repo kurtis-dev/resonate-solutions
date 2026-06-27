@@ -2,6 +2,12 @@
 
 This is the source-of-truth flow for new MenuPilot customers from the website into operations and Softr.
 
+Detailed Stage 4 Zapier/Vercel wiring steps live in:
+
+```text
+docs/stage-4-onboarding-mirror-runbook.md
+```
+
 Customer portal domain:
 
 ```text

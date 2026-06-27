@@ -118,6 +118,7 @@ Setup notes:
 
 ```text
 docs/customer-onboarding-softr-handoff.md
+docs/stage-4-onboarding-mirror-runbook.md
 docs/menupilot-channel-automation-workflows.md
 docs/zapier-softr-setup.md
 ```
