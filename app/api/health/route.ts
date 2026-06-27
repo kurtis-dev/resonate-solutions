@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { adminCredentialStatus, hasConfiguredAdminAuth } from "@/lib/admin-auth";
 import { customerPortalUrl } from "@/lib/portal";
 
 export async function GET() {
@@ -11,7 +12,8 @@ export async function GET() {
       setupPriceConfigured: Boolean(process.env.STRIPE_PRICE_SETUP),
       corePriceConfigured: Boolean(process.env.STRIPE_PRICE_CORE),
       plusPriceConfigured: Boolean(process.env.STRIPE_PRICE_PLUS),
-      adminProtected: Boolean(process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD),
+      adminProtected: hasConfiguredAdminAuth(),
+      adminCredentialStatus: adminCredentialStatus(),
       siteUrlConfigured: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
       questionsEmailConfigured: Boolean(process.env.NEXT_PUBLIC_QUESTIONS_EMAIL),
       softrPortalConfigured: Boolean(customerPortalUrl),

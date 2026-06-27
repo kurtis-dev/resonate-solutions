@@ -15,26 +15,46 @@ the website should create/update the internal onboarding record and send only th
 
 ## Current Live Health Check
 
-Checked on 2026-06-26:
+Checked on 2026-06-27 after Neon setup and production redeploy:
 
 ```json
 {
-  "databaseConfigured": false,
+  "databaseConfigured": true,
   "stripeConfigured": false,
   "stripeWebhookConfigured": false,
   "setupPriceConfigured": false,
   "corePriceConfigured": false,
   "plusPriceConfigured": false,
   "adminProtected": true,
-  "siteUrlConfigured": false,
-  "questionsEmailConfigured": false,
+  "siteUrlConfigured": true,
+  "questionsEmailConfigured": true,
   "softrPortalConfigured": true,
   "softrPortalUrl": "https://app.resonate.solutions",
-  "onboardingHandoffConfigured": false
+  "onboardingHandoffConfigured": true
 }
 ```
 
-This means the production site is ready in code, but Vercel still needs the production environment variables before real customer intake can persist and hand off.
+This means the production site can now persist customer intake to Postgres and attempt the Zapier/Softr onboarding handoff. Stripe is still intentionally incomplete until the billing setup pass.
+
+## Database Setup Completed
+
+Completed on 2026-06-27:
+
+- Vercel Marketplace Neon integration installed.
+- Database resource: `resonate-solutions-db`.
+- Neon Auth disabled because Softr remains the customer login layer.
+- Vercel env prefix set to `DATABASE`, creating the expected `DATABASE_URL`.
+- Environments selected: Production, Preview, Development.
+- `database/schema.sql` ran successfully in Neon SQL Editor.
+- Verification confirmed all 11 expected public tables exist.
+- Production redeployed after env attachment.
+
+Live smoke test:
+
+- Submitted fake Free Page Plan lead through `POST /api/checkout`.
+- Result: `/checkout/success?plan=review&status=free-requested`.
+- Verified rows in both `customer_onboarding` and `intake_requests`.
+- Smoke-test customer email: `smoke-test-20260627@resonate.solutions`.
 
 ## Required Vercel Environment Variables
 

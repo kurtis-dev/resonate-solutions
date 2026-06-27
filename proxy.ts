@@ -1,4 +1,5 @@
 import { NextResponse, type NextRequest } from "next/server";
+import { hasConfiguredAdminAuth } from "./lib/admin-auth";
 
 function unauthorized() {
   return new NextResponse("Authentication required.", {
@@ -13,8 +14,8 @@ export function proxy(request: NextRequest) {
   const username = process.env.ADMIN_USERNAME;
   const password = process.env.ADMIN_PASSWORD;
 
-  if (!username || !password) {
-    return new NextResponse("Admin is locked until ADMIN_USERNAME and ADMIN_PASSWORD are configured.", { status: 503 });
+  if (!hasConfiguredAdminAuth()) {
+    return new NextResponse("Admin is locked until strong ADMIN_USERNAME and ADMIN_PASSWORD values are configured.", { status: 503 });
   }
 
   const authHeader = request.headers.get("authorization");
