@@ -26,6 +26,7 @@ Checked on 2026-06-27 after Neon setup and production redeploy:
   "corePriceConfigured": false,
   "plusPriceConfigured": false,
   "adminProtected": true,
+  "adminCredentialStatus": "configured",
   "siteUrlConfigured": true,
   "questionsEmailConfigured": true,
   "softrPortalConfigured": true,
