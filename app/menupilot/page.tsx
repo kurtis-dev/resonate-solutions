@@ -319,7 +319,7 @@ export default function MenuPilotPage() {
             <a href="#plans" className="shrink-0 hover:text-ink">Plans</a>
           </div>
           <Link href="/checkout?plan=review" className="hidden shrink-0 rounded-full bg-[#ff5a1f] px-5 py-3 text-sm font-black text-white shadow-[0_14px_35px_rgba(255,90,31,0.28)] transition hover:-translate-y-0.5 hover:bg-[#3a2418] sm:inline-flex">
-            Free preview
+            Free Page Plan
           </Link>
         </div>
       </section>
@@ -592,7 +592,7 @@ export default function MenuPilotPage() {
 
       <section className="bg-white">
         <div className="mx-auto max-w-7xl px-5 py-16">
-          <div id="fit-check" className="mb-12 scroll-mt-28 overflow-hidden rounded-[1.75rem] border border-line bg-[#202320] p-7 text-white shadow-soft md:p-10">
+          <div id="free-page-plan" className="mb-12 scroll-mt-28 overflow-hidden rounded-[1.75rem] border border-line bg-[#202320] p-7 text-white shadow-soft md:p-10">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6a15e]">Free Page Plan</p>
             <h2 className="mt-3 max-w-3xl text-3xl font-black leading-tight md:text-5xl">Send the business details once. We recommend the right build before you pay.</h2>
             <p className="mt-5 max-w-3xl leading-7 text-white/78">

@@ -26,7 +26,7 @@ components/
   SiteNav.tsx
 lib/
   menu-store.ts          Business, menu, and QR data helpers
-  plans.ts               Pricing and checkout destination placeholders
+  plans.ts               Pricing, plan metadata, and checkout destinations
 package.json
 tailwind.config.ts
 ```

@@ -15,7 +15,7 @@ Use this before treating a deployment as customer-ready.
 - [ ] Header `Services` opens `/menupilot`.
 - [ ] Header `Examples` opens `/menupilot/examples`.
 - [ ] Header `Pricing` opens `/pricing`.
-- [ ] Header `Free Page Plan` opens `/menupilot#fit-check`.
+- [ ] Header `Free Page Plan` opens `/menupilot#free-page-plan`.
 - [ ] Homepage redirects to `/menupilot`.
 - [ ] Business Pages `See a live example page` opens `/m/mellow-moose-burgers`.
 - [ ] Business Pages `View Plans` opens `/pricing`.
@@ -25,7 +25,7 @@ Use this before treating a deployment as customer-ready.
 
 - [ ] `/m/mellow-moose-burgers` loads a public menu page.
 - [ ] Demo menu page shows item photos, descriptions, prices, status note, hours, and location.
-- [ ] Demo menu page action buttons work or use safe placeholder links.
+- [ ] Demo menu page action buttons work or use clearly labeled non-final links.
 - [ ] Demo menu item comment form submits and returns to the menu page.
 - [ ] Menu item question appears in `/admin` after database setup.
 - [ ] Photo and questions email link opens `questions@resonate.solutions`.
