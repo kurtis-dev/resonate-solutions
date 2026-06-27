@@ -83,7 +83,7 @@ export default async function CheckoutPage({
         </form>
         <div className="mt-6 grid gap-3 rounded-2xl border border-line bg-cream p-4 text-sm leading-6 text-muted">
           <p><strong className="text-ink">Debit and credit cards are accepted through Stripe.</strong> Resonate does not collect or store card numbers on this website.</p>
-          <p>Monthly plans can be managed through Stripe after checkout, including card updates and subscription changes.</p>
+          <p>After review, customer portal access is handled at app.resonate.solutions. Monthly billing is still managed securely through Stripe.</p>
         </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link href="/pricing" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back to pricing</Link>

@@ -12,8 +12,9 @@ This site is ready for Stripe without collecting card numbers in Resonate code.
    - `Managed` - monthly subscription, `$149/mo`
 4. Add Stripe values in Vercel environment variables.
 5. Link Softr Billing buttons to `https://www.resonate.solutions/billing` or the plan-specific checkout URLs.
-6. Draft Zapier payment workflows before taking live payments.
-7. Connect the Resonate business bank account before processing real customer payments.
+6. Link customer portal/sign-in buttons to `https://app.resonate.solutions` or the website redirect `https://www.resonate.solutions/portal`.
+7. Draft Zapier payment workflows before taking live payments.
+8. Connect the Resonate business bank account before processing real customer payments.
 
 ## Environment Variables
 
@@ -26,6 +27,7 @@ STRIPE_PRICE_SETUP=price_...
 STRIPE_PRICE_CORE=price_...
 STRIPE_PRICE_PLUS=price_...
 NEXT_PUBLIC_SITE_URL=https://resonate.solutions
+NEXT_PUBLIC_SOFTR_PORTAL_URL=https://app.resonate.solutions
 ```
 
 Use Stripe Payment Links as the lighter no-code fallback:
@@ -65,6 +67,7 @@ Add buttons on the Softr Billing page:
 - `Start Maintain` -> `https://www.resonate.solutions/checkout?plan=care`
 - `Start Managed` -> `https://www.resonate.solutions/checkout?plan=care-plus`
 - `Manage billing` -> `https://www.resonate.solutions/billing`
+- `Customer portal` -> `https://app.resonate.solutions`
 
 Do not collect debit or credit card numbers in Softr forms.
 

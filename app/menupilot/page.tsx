@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { IntakeForm } from "@/components/IntakeForm";
 import { PricingCards } from "@/components/PricingCards";
+import { customerPortalUrl } from "@/lib/portal";
 
 type BusinessTheme = {
   label: string;
@@ -370,6 +371,9 @@ export default function MenuPilotPage() {
               <p className="mt-5 leading-7 text-muted">
                 Customers sign in to the MenuPilot portal, choose the kind of change they need, and send the details once. Resonate reviews the request before it reaches the public page or connected channels.
               </p>
+              <a href={customerPortalUrl} className="mt-7 inline-flex rounded-full border border-line px-5 py-3 font-black text-ink shadow-sm transition hover:border-coral hover:text-coral">
+                Open app.resonate.solutions
+              </a>
             </div>
 
             <div className="overflow-hidden rounded-[1.75rem] border border-line bg-[#fffaf4] shadow-soft">

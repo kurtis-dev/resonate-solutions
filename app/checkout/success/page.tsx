@@ -7,11 +7,11 @@ export default function CheckoutSuccessPage() {
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">Payment received</p>
         <h1 className="mt-3 text-4xl font-black text-ink">Your Resonate package is confirmed.</h1>
         <p className="mt-4 leading-7 text-muted">
-          Thank you. Resonate will review your order and follow up with the next step. Launch customers receive a private preview before the public page goes live.
+          Thank you. Resonate will review your order, match it to your business details, and follow up with the next step. When your portal is ready, you will sign in at app.resonate.solutions.
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <Link href="/portal" className="rounded-full bg-coral px-5 py-3 text-center font-black text-white">Open customer portal</Link>
           <Link href="/billing" className="rounded-full bg-ink px-5 py-3 text-center font-black text-white">Open billing</Link>
-          <Link href="/menupilot#fit-check" className="rounded-full bg-brand px-5 py-3 text-center font-black text-white">Request Free Page Plan</Link>
           <Link href="/" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back home</Link>
         </div>
       </section>

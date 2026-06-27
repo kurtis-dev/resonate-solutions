@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server";
+import { customerPortalUrl } from "@/lib/portal";
 
 export async function GET() {
   return NextResponse.json({
@@ -13,7 +14,8 @@ export async function GET() {
       adminProtected: Boolean(process.env.ADMIN_USERNAME && process.env.ADMIN_PASSWORD),
       siteUrlConfigured: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
       questionsEmailConfigured: Boolean(process.env.NEXT_PUBLIC_QUESTIONS_EMAIL),
-      softrPortalConfigured: Boolean(process.env.NEXT_PUBLIC_SOFTR_PORTAL_URL),
+      softrPortalConfigured: Boolean(customerPortalUrl),
+      softrPortalUrl: customerPortalUrl,
       onboardingHandoffConfigured: Boolean(process.env.SOFTR_INTAKE_WEBHOOK_URL || process.env.ZAPIER_INTAKE_WEBHOOK_URL)
     }
   });

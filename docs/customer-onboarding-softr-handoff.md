@@ -2,6 +2,20 @@
 
 This is the source-of-truth flow for new MenuPilot customers from the website into operations and Softr.
 
+Customer portal domain:
+
+```text
+https://app.resonate.solutions
+```
+
+The Resonate website also exposes:
+
+```text
+/portal
+```
+
+This route redirects to the configured Softr customer portal URL.
+
 ## Customer-Facing Flow
 
 All four paths use the same onboarding shape:
@@ -11,7 +25,7 @@ All four paths use the same onboarding shape:
 3. Free Page Plan submits immediately.
 4. Paid plans create an onboarding record, then continue to Stripe.
 5. Stripe webhook updates the same onboarding record after payment.
-6. Resonate reviews the customer, creates or confirms the customer page, and grants portal access when ready.
+6. Resonate reviews the customer, creates or confirms the customer page, connects the Softr user to the correct Business record, and grants portal access when ready.
 
 Customer-facing pages should not mention Softr, Zapier, webhooks, internal table names, payment gates, or automation status.
 
@@ -118,9 +132,12 @@ If the row does not exist:
 - Run `database/schema.sql` in the production database.
 - Add `DATABASE_URL` in Vercel.
 - Add Stripe environment variables in Vercel.
+- Add `NEXT_PUBLIC_SOFTR_PORTAL_URL=https://app.resonate.solutions` in Vercel.
 - Add `SOFTR_INTAKE_WEBHOOK_URL` or `ZAPIER_INTAKE_WEBHOOK_URL` in Vercel.
 - Build the Zapier step that writes the payload into Softr's connected data source.
 - Confirm Softr user permissions filter by customer email and `portal_access`.
+- In Softr, connect the custom domain/subdomain `app.resonate.solutions`.
+- In DNS, point `app.resonate.solutions` to Softr using the CNAME/value Softr provides.
 
 ## Current Softr Security Review
 

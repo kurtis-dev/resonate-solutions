@@ -110,6 +110,7 @@ Configure:
 ZAPIER_WEBHOOK_SECRET
 ZAPIER_INTAKE_WEBHOOK_URL
 SOFTR_INTAKE_WEBHOOK_URL
+NEXT_PUBLIC_SOFTR_PORTAL_URL=https://app.resonate.solutions
 ```
 
 Setup notes:
@@ -143,6 +144,14 @@ customer_onboarding
 ```
 
 Free Page Plan, Launch, Maintain, and Managed all create or update this same onboarding record. Softr should read only a portal-safe mirror of this record, or receive that limited mirror through Zapier using `SOFTR_INTAKE_WEBHOOK_URL` or `ZAPIER_INTAKE_WEBHOOK_URL`.
+
+Customer portal access should live at:
+
+```text
+https://app.resonate.solutions
+```
+
+The website `/portal` route redirects to the configured Softr portal URL.
 
 The first internal menu builder is:
 
