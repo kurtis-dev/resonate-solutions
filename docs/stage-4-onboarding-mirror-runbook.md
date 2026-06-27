@@ -140,6 +140,12 @@ onboardingStatus = paid_needs_review or subscription_active
 
 ## Zapier Upsert Logic
 
+Important 2026-06-27 finding:
+
+- Zapier did not see an `Owner Email` field in the Softr-connected `Businesses` table during setup.
+- Add `Owner Email` to `Businesses` before publishing this Zap.
+- Do not use `Business Name` as the match field for real customers; it is not unique enough and can create duplicate or incorrect updates.
+
 Use this matching order:
 
 1. Find existing row by `portalCustomerId`.
@@ -238,4 +244,3 @@ Portal Access = false
 6. Confirm Softr portal does not show that row to an unrelated customer user.
 
 7. Delete or archive the fake test row after validation.
-
