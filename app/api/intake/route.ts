@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import { buildCustomerOnboardingRecord, notifyOnboardingWebhook, planIdFromInterest } from "@/lib/customer-onboarding";
 import { saveIntakeRecord, upsertCustomerOnboarding } from "@/lib/customer-store";
 import { createIntakeRecord, parseIntakePayload } from "@/lib/intake";
+import { notifyOpsAlert } from "@/lib/ops-alerts";
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -30,9 +31,21 @@ export async function POST(request: Request) {
   });
   const onboardingStorage = await upsertCustomerOnboarding(onboarding);
   const handoff = await notifyOnboardingWebhook(onboarding, "customer_intake_submitted");
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
+  const alert = await notifyOpsAlert({
+    eventType: "customer_signup",
+    priority: "high",
+    title: "New MenuPilot signup",
+    message: `${onboarding.businessName || "A new business"} requested the ${onboarding.planName}.`,
+    businessName: onboarding.businessName,
+    contactName: onboarding.contactName,
+    email: onboarding.email,
+    phone: onboarding.phone,
+    planName: onboarding.planName,
+    source: "website_intake",
+    actionUrl: `${origin}/admin`
+  });
 
-  // EMAIL: Send `record` to your inbox here with Resend, Postmark, or another email provider.
-  // CRM: Later, this can also create a lead in a lightweight CRM or client workspace.
   console.info("New Resonate intake", record);
 
   return NextResponse.json({
@@ -41,6 +54,7 @@ export async function POST(request: Request) {
     storage,
     onboardingStorage,
     handoff,
+    alert,
     message: "Thanks. Resonate received your free page plan request."
   });
 }

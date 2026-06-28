@@ -18,7 +18,8 @@ export async function GET() {
       questionsEmailConfigured: Boolean(process.env.NEXT_PUBLIC_QUESTIONS_EMAIL),
       softrPortalConfigured: Boolean(customerPortalUrl),
       softrPortalUrl: customerPortalUrl,
-      onboardingHandoffConfigured: Boolean(process.env.SOFTR_INTAKE_WEBHOOK_URL || process.env.ZAPIER_INTAKE_WEBHOOK_URL)
+      onboardingHandoffConfigured: Boolean(process.env.SOFTR_INTAKE_WEBHOOK_URL || process.env.ZAPIER_INTAKE_WEBHOOK_URL),
+      opsAlertWebhookConfigured: Boolean(process.env.ZAPIER_ALERT_WEBHOOK_URL || process.env.OPS_ALERT_WEBHOOK_URL)
     }
   });
 }

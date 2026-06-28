@@ -73,7 +73,8 @@ Checked after Neon setup and production redeploy on 2026-06-27:
   "questionsEmailConfigured": true,
   "softrPortalConfigured": true,
   "softrPortalUrl": "https://app.resonate.solutions",
-  "onboardingHandoffConfigured": true
+  "onboardingHandoffConfigured": true,
+  "opsAlertWebhookConfigured": false
 }
 ```
 
@@ -82,6 +83,7 @@ Interpretation:
 - Website database persistence is live.
 - Admin credentials are configured and no longer accepted if they are the unsafe `admin/admin` default.
 - Website-to-Zapier handoff URL is configured.
+- Operations phone-alert webhook code exists, but production still needs `ZAPIER_ALERT_WEBHOOK_URL`.
 - Stripe is not configured yet.
 
 ## Tech Stack
@@ -137,6 +139,7 @@ lib/db.ts                            lazy Neon SQL client
 docs/stage-4-onboarding-mirror-runbook.md
 docs/customer-onboarding-softr-handoff.md
 docs/softr-portal-audit.md
+docs/ops-alert-notifications.md
 ```
 
 Admin and menu/customer pages:
@@ -157,8 +160,10 @@ Automation:
 ```text
 app/api/automation/route-update/route.ts
 lib/channel-automation.ts
+lib/ops-alerts.ts
 docs/menupilot-channel-automation-workflows.md
 docs/zapier-softr-setup.md
+docs/ops-alert-notifications.md
 ```
 
 Security:

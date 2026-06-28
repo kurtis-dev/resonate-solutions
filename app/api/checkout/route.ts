@@ -3,6 +3,7 @@ import { buildCustomerOnboardingRecord, notifyOnboardingWebhook } from "@/lib/cu
 import { saveIntakeRecord, upsertCustomerOnboarding } from "@/lib/customer-store";
 import { createIntakeRecord, type IntakePayload } from "@/lib/intake";
 import { getConfiguredPaymentLink, getPlanById } from "@/lib/plans";
+import { notifyOpsAlert } from "@/lib/ops-alerts";
 import { getStripe } from "@/lib/stripe";
 
 function redirectTo(request: Request, path: string) {
@@ -19,6 +20,7 @@ function metadataValue(value: string | undefined) {
 
 export async function POST(request: Request) {
   const formData = await request.formData();
+  const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
   const planId = formValue(formData, "plan");
   const email = formValue(formData, "email").toLowerCase();
   const plan = getPlanById(planId);
@@ -63,12 +65,38 @@ export async function POST(request: Request) {
     await saveIntakeRecord(intake);
     await upsertCustomerOnboarding(freeOnboarding);
     await notifyOnboardingWebhook(freeOnboarding, "customer_intake_submitted");
+    await notifyOpsAlert({
+      eventType: "customer_signup",
+      priority: "high",
+      title: "New MenuPilot signup",
+      message: `${freeOnboarding.businessName || "A new business"} requested the ${freeOnboarding.planName}.`,
+      businessName: freeOnboarding.businessName,
+      contactName: freeOnboarding.contactName,
+      email: freeOnboarding.email,
+      phone: freeOnboarding.phone,
+      planName: freeOnboarding.planName,
+      source: "website_checkout",
+      actionUrl: `${origin}/admin`
+    });
 
     return redirectTo(request, `/checkout/success?plan=${plan.id}&status=free-requested`);
   }
 
   await upsertCustomerOnboarding(onboarding);
   await notifyOnboardingWebhook(onboarding, "paid_plan_started");
+  await notifyOpsAlert({
+    eventType: "paid_plan_started",
+    priority: "high",
+    title: "Paid plan started",
+    message: `${onboarding.businessName || "A customer"} started ${onboarding.planName}. Stripe may still need to complete.`,
+    businessName: onboarding.businessName,
+    contactName: onboarding.contactName,
+    email: onboarding.email,
+    phone: onboarding.phone,
+    planName: onboarding.planName,
+    source: "website_checkout",
+    actionUrl: `${origin}/admin`
+  });
 
   const stripe = getStripe();
   const priceId = plan.stripePriceEnvKey ? process.env[plan.stripePriceEnvKey] : "";
@@ -83,7 +111,6 @@ export async function POST(request: Request) {
     return redirectTo(request, `/checkout?plan=${plan.id}&status=missing-stripe`);
   }
 
-  const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
   const session = await stripe.checkout.sessions.create({
     mode: plan.paymentMode,
     line_items: [{ price: priceId, quantity: 1 }],

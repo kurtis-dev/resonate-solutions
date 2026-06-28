@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { buildCustomerOnboardingRecord, notifyOnboardingWebhook } from "@/lib/customer-onboarding";
 import { savePaymentEvent, upsertCustomerOnboarding, upsertSubscriptionStatus } from "@/lib/customer-store";
+import { notifyOpsAlert } from "@/lib/ops-alerts";
 import { getStripe } from "@/lib/stripe";
 
 export const dynamic = "force-dynamic";
@@ -73,6 +74,26 @@ export async function POST(request: Request) {
     if (onboarding) {
       await upsertCustomerOnboarding(onboarding);
       await notifyOnboardingWebhook(onboarding, "payment_completed");
+      await notifyOpsAlert({
+        eventType: "payment_completed",
+        priority: "high",
+        title: "Payment completed",
+        message: `${onboarding.businessName || onboarding.email} completed payment for ${onboarding.planName}.`,
+        businessName: onboarding.businessName,
+        contactName: onboarding.contactName,
+        email: onboarding.email,
+        phone: onboarding.phone,
+        planName: onboarding.planName,
+        source: "stripe_webhook",
+        actionUrl: `${process.env.NEXT_PUBLIC_SITE_URL || "https://www.resonate.solutions"}/admin`,
+        metadata: {
+          stripeCheckoutSessionId: session.id,
+          stripeCustomerId,
+          stripeSubscriptionId: session.subscription ? String(session.subscription) : "",
+          amountTotal: session.amount_total,
+          currency: session.currency
+        }
+      });
     }
 
     await savePaymentEvent({
