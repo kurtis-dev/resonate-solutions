@@ -152,13 +152,20 @@ If the row does not exist:
 
 ## Current Softr Security Review
 
-Observed in the Softr Studio preview:
+Detailed current portal audit lives in:
+
+```text
+docs/softr-portal-audit.md
+```
+
+Observed in the Softr Studio and preview checks:
 
 - The Users table has `Email`, `Role`, and linked `Business` fields.
 - Kurtis is an Admin linked to Resonate Solutions.
 - Jack is a Customer linked to Excellent Pins & Badges Factory Inc.
 - The Businesses table currently includes Mellow Moose Burgers, Resonate Solutions, and Excellent Pins & Badges Factory Inc.
-- The customer-facing Business Profile block rendered multiple businesses in one portal view during preview.
+- Jack preview showed only Excellent Pins on the main customer business/review pages.
+- The customer-facing Business Profile block previously rendered multiple businesses in one admin/Kurtis preview, so each block still needs explicit filter verification.
 
 Required correction:
 
@@ -167,3 +174,11 @@ Required correction:
 3. Add `portal_access = true` as a second condition before private portal pages are visible.
 4. Keep all-record tables only on Resonate admin pages.
 5. Test as Jack's customer user after publishing. Jack should see only Excellent Pins records. He should not see Mellow Moose or Resonate Solutions.
+
+Current customer-facing cleanup items:
+
+- Fix `Files & Photos` error: `Field not found: wkgG0`.
+- Connect `app.resonate.solutions`; it did not resolve during the audit.
+- Improve `/start` intake wording and fields before using it for new leads.
+- Convert Quick Update from a catch-all form into type-specific follow-up flows.
+- Hide or remove test/sandbox records from customer-accessible views.

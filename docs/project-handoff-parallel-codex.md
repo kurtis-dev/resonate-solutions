@@ -136,6 +136,7 @@ database/schema.sql                  production schema
 lib/db.ts                            lazy Neon SQL client
 docs/stage-4-onboarding-mirror-runbook.md
 docs/customer-onboarding-softr-handoff.md
+docs/softr-portal-audit.md
 ```
 
 Admin and menu/customer pages:
@@ -242,6 +243,12 @@ Softr app/customer portal:
 https://app.resonate.solutions
 ```
 
+Detailed Softr audit:
+
+```text
+docs/softr-portal-audit.md
+```
+
 Known Softr data fix completed:
 
 - Added `Owner Email` field to the Softr `Businesses` table.
@@ -256,6 +263,15 @@ Required Softr rules:
 - Private content should also require `portal_access=true`.
 - All-record views belong only on Resonate admin pages.
 - Test as Jack/customer user: Jack should only see Excellent Pins, not Mellow Moose or Resonate.
+
+Latest Softr audit notes from 2026-06-27:
+
+- Jack preview showed only `Excellent Pins & Badges Factory Inc.` on main customer pages.
+- `Files & Photos` has a visible broken field error: `Field not found: wkgG0`.
+- The public `/start` intake page exists, but needs cleaner wording and more complete fields.
+- `app.resonate.solutions` did not resolve during audit; DNS/Softr custom-domain setup remains open.
+- The Softr badge is still visible on customer pages.
+- Test/sandbox records should be hidden from customers or cleaned before sales screenshots.
 
 ## Zapier Status
 
