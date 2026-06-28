@@ -98,8 +98,11 @@ Steps:
    - `customer_signup`: high-priority text.
    - `paid_plan_started`: high-priority text.
    - `payment_completed`: high-priority text.
-   - `customer_question`: normal-priority text or email.
-4. Action: SMS by Zapier, Twilio, Gmail, or Slack.
+   - `customer_question`: normal-priority email, with optional text.
+4. Action 1: send email to Kurtis.
+5. Action 2: send SMS/push for high-priority alerts.
+
+Use Gmail, Email by Zapier, or another email app for the email copy. Use SMS by Zapier, Twilio, Gmail carrier email-to-text, or Slack/mobile push for the phone ping.
 
 Suggested SMS body:
 
@@ -111,10 +114,33 @@ MenuPilot alert: {{title}}
 Admin: {{actionUrl}}
 ```
 
+Suggested email subject:
+
+```text
+MenuPilot alert: {{title}} - {{businessName}}
+```
+
+Suggested email body:
+
+```text
+Event: {{eventType}}
+Priority: {{priority}}
+Business: {{businessName}}
+Contact: {{contactName}}
+Email: {{email}}
+Phone: {{phone}}
+Plan: {{planName}}
+
+{{message}}
+
+Admin: {{actionUrl}}
+Created: {{createdAt}}
+```
+
 ## Recommended Alert Rules
 
-- Text immediately for signups and payments.
-- Text or email for public questions.
+- Email every signup, payment, and customer question.
+- Text immediately for signups, paid plan starts, and payments.
+- Email customer questions by default; add SMS for questions later if volume stays low.
 - Do not send alerts for casual page views yet; add analytics separately if needed.
 - Do not send card/bank data through Zapier or SMS.
-
