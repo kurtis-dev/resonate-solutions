@@ -19,6 +19,14 @@ export async function GET() {
       softrPortalConfigured: Boolean(customerPortalUrl),
       softrPortalUrl: customerPortalUrl,
       onboardingHandoffConfigured: Boolean(process.env.SOFTR_INTAKE_WEBHOOK_URL || process.env.ZAPIER_INTAKE_WEBHOOK_URL),
+      opsAlertDatabaseConfigured: Boolean(process.env.DATABASE_URL),
+      opsAlertEmailConfigured: Boolean(process.env.RESEND_API_KEY && (process.env.OPS_ALERT_EMAIL_TO || process.env.ADMIN_ALERT_EMAIL)),
+      opsAlertSmsConfigured: Boolean(
+        process.env.TWILIO_ACCOUNT_SID &&
+          process.env.TWILIO_AUTH_TOKEN &&
+          process.env.TWILIO_FROM_PHONE &&
+          process.env.OPS_ALERT_SMS_TO
+      ),
       opsAlertWebhookConfigured: Boolean(process.env.ZAPIER_ALERT_WEBHOOK_URL || process.env.OPS_ALERT_WEBHOOK_URL)
     }
   });

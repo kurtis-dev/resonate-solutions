@@ -58,7 +58,8 @@ function DataTable({ title, rows, columns }: { title: string; rows: Row[] | null
 }
 
 export default async function AdminPage() {
-  const [onboarding, intakes, subscriptions, payments, menuQuestions] = await Promise.all([
+  const [alerts, onboarding, intakes, subscriptions, payments, menuQuestions] = await Promise.all([
+    getRows`select created_at, priority, event_type, title, business_name, contact_name, email, phone, plan_name, source from ops_alerts order by created_at desc limit 20`,
     getRows`select updated_at, business_name, contact_name, email, plan_name, payment_status, onboarding_status, portal_access from customer_onboarding order by updated_at desc limit 15`,
     getRows`select created_at, business_name, contact_name, email, business_type, city, main_need, package_interest from intake_requests order by created_at desc limit 10`,
     getRows`select customer_email, plan_id, status, current_period_end, updated_at from customer_subscriptions order by updated_at desc limit 10`,
@@ -85,6 +86,7 @@ export default async function AdminPage() {
         </div>
       </div>
       <div className="grid gap-6">
+        <DataTable title="Operations alerts" rows={alerts} columns={["created_at", "priority", "event_type", "title", "business_name", "contact_name", "email", "phone", "plan_name", "source"]} />
         <DataTable title="Customer onboarding" rows={onboarding} columns={["updated_at", "business_name", "contact_name", "email", "plan_name", "payment_status", "onboarding_status", "portal_access"]} />
         <DataTable title="Recent free page plan requests" rows={intakes} columns={["created_at", "business_name", "contact_name", "email", "business_type", "city", "main_need", "package_interest"]} />
         <DataTable title="Menu item questions" rows={menuQuestions} columns={["created_at", "business_name", "item_name", "customer_name", "customer_email", "comment"]} />

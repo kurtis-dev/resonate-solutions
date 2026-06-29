@@ -185,3 +185,25 @@ create table if not exists business_sync_events (
 
 create index if not exists business_integrations_business_idx on business_integrations (business_id);
 create index if not exists business_sync_events_business_idx on business_sync_events (business_id, created_at desc);
+
+create table if not exists ops_alerts (
+  id text primary key,
+  created_at timestamptz not null,
+  event_type text not null,
+  priority text not null default 'normal',
+  title text not null,
+  message text not null,
+  business_name text,
+  contact_name text,
+  email text,
+  phone text,
+  plan_name text,
+  source text,
+  action_url text,
+  metadata jsonb not null default '{}'::jsonb,
+  notification_results jsonb not null default '[]'::jsonb
+);
+
+create index if not exists ops_alerts_created_idx on ops_alerts (created_at desc);
+create index if not exists ops_alerts_event_idx on ops_alerts (event_type, created_at desc);
+create index if not exists ops_alerts_priority_idx on ops_alerts (priority, created_at desc);
