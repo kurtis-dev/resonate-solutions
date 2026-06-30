@@ -1,6 +1,6 @@
 import { getPlanById } from "@/lib/plans";
 
-export type OnboardingSource = "website_intake" | "website_checkout" | "stripe_webhook";
+export type OnboardingSource = "website_intake" | "website_checkout" | "stripe_webhook" | "email_inquiry";
 
 export type OnboardingStatus =
   | "intake_received"

@@ -12,6 +12,7 @@ Entry points:
 
 - `/api/intake`
 - `/api/checkout` when the selected plan has `paymentMode: "none"`
+- `/api/email-leads` when a protected email automation posts a new free-plan inquiry
 
 The request creates or updates:
 
@@ -19,6 +20,7 @@ The request creates or updates:
 - `customer_onboarding`
 - `lead_tasks`
 - `ops_alerts`
+- `email_lead_messages` for email-originated requests
 
 The customer also receives a receipt email when Resend is configured.
 
@@ -74,7 +76,51 @@ Health check:
 
 ```text
 /api/health -> checks.customerReceiptEmailConfigured
+/api/health -> checks.emailLeadWebhookConfigured
 ```
+
+## Email-to-lead ingestion
+
+The email path is intentionally webhook-based. Gmail, Zapier, or Google Apps Script can forward a new inquiry to:
+
+```text
+POST /api/email-leads
+Authorization: Bearer [EMAIL_LEAD_WEBHOOK_SECRET]
+```
+
+or:
+
+```text
+x-resonate-email-secret: [EMAIL_LEAD_WEBHOOK_SECRET]
+```
+
+Recommended payload:
+
+```json
+{
+  "messageId": "gmail-message-id",
+  "threadId": "gmail-thread-id",
+  "fromEmail": "owner@example.com",
+  "fromName": "Business Owner",
+  "subject": "Free Page Plan request",
+  "body": "Customer message body",
+  "receivedAt": "2026-06-29T22:00:00.000Z",
+  "intent": "free_plan_request",
+  "businessName": "Example Business",
+  "contactName": "Business Owner",
+  "phone": "555-0100",
+  "businessType": "Restaurant",
+  "city": "Pineville, MO"
+}
+```
+
+Safety rules:
+
+- Duplicate `messageId` values do not create duplicate leads.
+- Replies are detected through `Re:`, `Fwd:`, `inReplyTo`, or `references`.
+- Replies are logged but do not create a fresh lead task and do not send the welcome receipt.
+- Internal Resonate emails and `MenuPilot alert:` emails are ignored so owner notifications cannot loop back into new leads.
+- Auto-reply only happens for a new, non-reply `free_plan_request` when `EMAIL_LEAD_AUTO_REPLY` is not set to `false`.
 
 ## Step 5: Kurtis reviews task
 

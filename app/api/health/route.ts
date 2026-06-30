@@ -25,6 +25,7 @@ export async function GET() {
         process.env.RESEND_API_KEY &&
           (process.env.CUSTOMER_EMAIL_FROM || process.env.OPS_ALERT_EMAIL_FROM)
       ),
+      emailLeadWebhookConfigured: Boolean(process.env.EMAIL_LEAD_WEBHOOK_SECRET),
       opsAlertSmsConfigured: Boolean(
         process.env.TWILIO_ACCOUNT_SID &&
           process.env.TWILIO_AUTH_TOKEN &&

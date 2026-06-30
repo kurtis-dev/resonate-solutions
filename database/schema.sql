@@ -97,6 +97,26 @@ create index if not exists lead_tasks_email_idx on lead_tasks (email);
 create index if not exists lead_tasks_customer_idx on lead_tasks (customer_id);
 create index if not exists lead_tasks_type_idx on lead_tasks (task_type);
 
+create table if not exists email_lead_messages (
+  message_id text primary key,
+  thread_id text,
+  received_at timestamptz not null,
+  from_email text not null,
+  from_name text,
+  subject text,
+  body_preview text,
+  is_reply boolean not null default false,
+  intent text not null default 'general_inquiry',
+  action_taken text not null default 'logged_no_lead',
+  customer_id text,
+  lead_task_id text,
+  auto_reply_sent boolean not null default false,
+  created_at timestamptz not null default now()
+);
+
+create index if not exists email_lead_messages_thread_idx on email_lead_messages (thread_id);
+create index if not exists email_lead_messages_from_idx on email_lead_messages (from_email, received_at desc);
+
 create table if not exists businesses (
   id text primary key,
   slug text not null unique,
