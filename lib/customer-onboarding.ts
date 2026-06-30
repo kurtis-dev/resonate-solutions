@@ -153,6 +153,17 @@ export function buildSoftrPortalMirror(record: CustomerOnboardingRecord): SoftrP
   };
 }
 
+async function fetchWithTimeout(url: string, init: RequestInit, timeoutMs = 5000) {
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), timeoutMs);
+
+  try {
+    return await fetch(url, { ...init, signal: controller.signal });
+  } finally {
+    clearTimeout(timeout);
+  }
+}
+
 export async function notifyOnboardingWebhook(record: CustomerOnboardingRecord, eventType: string) {
   const webhookUrl = process.env.SOFTR_INTAKE_WEBHOOK_URL || process.env.ZAPIER_INTAKE_WEBHOOK_URL || "";
 
@@ -161,7 +172,7 @@ export async function notifyOnboardingWebhook(record: CustomerOnboardingRecord, 
   }
 
   try {
-    const response = await fetch(webhookUrl, {
+    const response = await fetchWithTimeout(webhookUrl, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -182,6 +193,6 @@ export async function notifyOnboardingWebhook(record: CustomerOnboardingRecord, 
     return { sent: response.ok, status: response.status };
   } catch (error) {
     console.error("Customer onboarding webhook failed", error);
-    return { sent: false, reason: "request_failed" };
+    return { sent: false, reason: error instanceof DOMException && error.name === "AbortError" ? "request_timeout" : "request_failed" };
   }
 }

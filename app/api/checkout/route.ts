@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { buildCustomerOnboardingRecord, notifyOnboardingWebhook } from "@/lib/customer-onboarding";
-import { saveIntakeRecord, upsertCustomerOnboarding } from "@/lib/customer-store";
+import { sendCustomerEmail } from "@/lib/customer-emails";
+import { saveIntakeRecord, upsertCustomerOnboarding, upsertLeadTask } from "@/lib/customer-store";
 import { createIntakeRecord, type IntakePayload } from "@/lib/intake";
+import { buildFreePlanReceiptEmail, createFreePlanLeadTask } from "@/lib/lead-tasks";
 import { getConfiguredPaymentLink, getPlanById } from "@/lib/plans";
 import { notifyOpsAlert } from "@/lib/ops-alerts";
 import { getStripe } from "@/lib/stripe";
@@ -64,7 +66,14 @@ export async function POST(request: Request) {
 
     await saveIntakeRecord(intake);
     await upsertCustomerOnboarding(freeOnboarding);
-    await notifyOnboardingWebhook(freeOnboarding, "customer_intake_submitted");
+    const leadTask = createFreePlanLeadTask(freeOnboarding, intake);
+    await upsertLeadTask(leadTask);
+    const receipt = buildFreePlanReceiptEmail(freeOnboarding, leadTask);
+    await sendCustomerEmail({
+      to: freeOnboarding.email,
+      subject: receipt.subject,
+      text: receipt.text
+    });
     await notifyOpsAlert({
       eventType: "customer_signup",
       priority: "high",
@@ -78,6 +87,7 @@ export async function POST(request: Request) {
       source: "website_checkout",
       actionUrl: `${origin}/admin`
     });
+    await notifyOnboardingWebhook(freeOnboarding, "customer_intake_submitted");
 
     return redirectTo(request, `/checkout/success?plan=${plan.id}&status=free-requested`);
   }

@@ -1,7 +1,9 @@
 import { NextResponse } from "next/server";
 import { buildCustomerOnboardingRecord, notifyOnboardingWebhook, planIdFromInterest } from "@/lib/customer-onboarding";
-import { saveIntakeRecord, upsertCustomerOnboarding } from "@/lib/customer-store";
+import { sendCustomerEmail } from "@/lib/customer-emails";
+import { saveIntakeRecord, upsertCustomerOnboarding, upsertLeadTask } from "@/lib/customer-store";
 import { createIntakeRecord, parseIntakePayload } from "@/lib/intake";
+import { buildFreePlanReceiptEmail, createFreePlanLeadTask } from "@/lib/lead-tasks";
 import { notifyOpsAlert } from "@/lib/ops-alerts";
 
 export async function POST(request: Request) {
@@ -30,7 +32,14 @@ export async function POST(request: Request) {
     onboardingStatus: "intake_received"
   });
   const onboardingStorage = await upsertCustomerOnboarding(onboarding);
-  const handoff = await notifyOnboardingWebhook(onboarding, "customer_intake_submitted");
+  const leadTask = createFreePlanLeadTask(onboarding, record);
+  const taskStorage = await upsertLeadTask(leadTask);
+  const receipt = buildFreePlanReceiptEmail(onboarding, leadTask);
+  const customerEmail = await sendCustomerEmail({
+    to: onboarding.email,
+    subject: receipt.subject,
+    text: receipt.text
+  });
   const origin = process.env.NEXT_PUBLIC_SITE_URL || new URL(request.url).origin;
   const alert = await notifyOpsAlert({
     eventType: "customer_signup",
@@ -45,6 +54,7 @@ export async function POST(request: Request) {
     source: "website_intake",
     actionUrl: `${origin}/admin`
   });
+  const handoff = await notifyOnboardingWebhook(onboarding, "customer_intake_submitted");
 
   console.info("New Resonate intake", record);
 
@@ -53,6 +63,8 @@ export async function POST(request: Request) {
     id: record.id,
     storage,
     onboardingStorage,
+    taskStorage,
+    customerEmail,
     handoff,
     alert,
     message: "Thanks. Resonate received your free page plan request."

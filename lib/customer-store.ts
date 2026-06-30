@@ -1,6 +1,7 @@
 import { getSql } from "@/lib/db";
 import type { CustomerOnboardingRecord } from "@/lib/customer-onboarding";
 import type { IntakeRecord } from "@/lib/intake";
+import type { LeadTask } from "@/lib/lead-tasks";
 
 export type SubscriptionStatus = {
   stripeCustomerId: string;
@@ -151,6 +152,111 @@ export async function upsertCustomerOnboarding(record: CustomerOnboardingRecord)
   } catch (error) {
     console.error("Customer onboarding was not persisted.", error);
     return { persisted: false, error: "customer_onboarding_write_failed" };
+  }
+
+  return { persisted: true };
+}
+
+export async function upsertLeadTask(task: LeadTask) {
+  const sql = await getSql();
+
+  if (!sql) {
+    console.info("DATABASE_URL not configured. Lead task was not persisted.", task);
+    return { persisted: false };
+  }
+
+  try {
+    await sql`
+      create table if not exists lead_tasks (
+        id text primary key,
+        created_at timestamptz not null,
+        updated_at timestamptz not null default now(),
+        intake_id text,
+        customer_id text not null,
+        business_name text,
+        contact_name text,
+        email text not null,
+        phone text,
+        task_type text not null,
+        stage text not null default 'new_request',
+        priority text not null default 'normal',
+        title text not null,
+        summary text,
+        checklist jsonb not null default '[]'::jsonb,
+        next_action text,
+        assigned_to text,
+        due_at timestamptz,
+        source text not null default 'website'
+      )
+    `;
+    await sql`create index if not exists lead_tasks_stage_idx on lead_tasks (stage, due_at)`;
+    await sql`create index if not exists lead_tasks_email_idx on lead_tasks (email)`;
+    await sql`create index if not exists lead_tasks_customer_idx on lead_tasks (customer_id)`;
+    await sql`create index if not exists lead_tasks_type_idx on lead_tasks (task_type)`;
+
+    await sql`
+      insert into lead_tasks (
+        id,
+        created_at,
+        updated_at,
+        intake_id,
+        customer_id,
+        business_name,
+        contact_name,
+        email,
+        phone,
+        task_type,
+        stage,
+        priority,
+        title,
+        summary,
+        checklist,
+        next_action,
+        assigned_to,
+        due_at,
+        source
+      )
+      values (
+        ${task.id},
+        ${task.createdAt},
+        ${task.updatedAt},
+        ${task.intakeId || null},
+        ${task.customerId},
+        ${task.businessName || null},
+        ${task.contactName || null},
+        ${task.email},
+        ${task.phone || null},
+        ${task.taskType},
+        ${task.stage},
+        ${task.priority},
+        ${task.title},
+        ${task.summary || null},
+        ${JSON.stringify(task.checklist)}::jsonb,
+        ${task.nextAction},
+        ${task.assignedTo},
+        ${task.dueAt},
+        ${task.source}
+      )
+      on conflict (id)
+      do update set
+        updated_at = now(),
+        business_name = coalesce(nullif(excluded.business_name, ''), lead_tasks.business_name),
+        contact_name = coalesce(nullif(excluded.contact_name, ''), lead_tasks.contact_name),
+        email = excluded.email,
+        phone = coalesce(nullif(excluded.phone, ''), lead_tasks.phone),
+        task_type = excluded.task_type,
+        priority = excluded.priority,
+        title = excluded.title,
+        summary = coalesce(nullif(excluded.summary, ''), lead_tasks.summary),
+        checklist = excluded.checklist,
+        next_action = excluded.next_action,
+        assigned_to = excluded.assigned_to,
+        due_at = excluded.due_at,
+        source = excluded.source
+    `;
+  } catch (error) {
+    console.error("Lead task was not persisted.", error);
+    return { persisted: false, error: "lead_task_write_failed" };
   }
 
   return { persisted: true };

@@ -21,6 +21,10 @@ export async function GET() {
       onboardingHandoffConfigured: Boolean(process.env.SOFTR_INTAKE_WEBHOOK_URL || process.env.ZAPIER_INTAKE_WEBHOOK_URL),
       opsAlertDatabaseConfigured: Boolean(process.env.DATABASE_URL),
       opsAlertEmailConfigured: Boolean(process.env.RESEND_API_KEY && (process.env.OPS_ALERT_EMAIL_TO || process.env.ADMIN_ALERT_EMAIL)),
+      customerReceiptEmailConfigured: Boolean(
+        process.env.RESEND_API_KEY &&
+          (process.env.CUSTOMER_EMAIL_FROM || process.env.OPS_ALERT_EMAIL_FROM)
+      ),
       opsAlertSmsConfigured: Boolean(
         process.env.TWILIO_ACCOUNT_SID &&
           process.env.TWILIO_AUTH_TOKEN &&
