@@ -40,6 +40,22 @@ export type LeadTask = {
   source: string;
 };
 
+export const leadTaskStages: LeadTaskStage[] = [
+  "new_request",
+  "needs_info",
+  "qualified",
+  "preview_planning",
+  "proposal_sent",
+  "waiting_on_payment",
+  "active_build",
+  "launched",
+  "closed"
+];
+
+export function formatLeadLabel(value: string) {
+  return value.replaceAll("_", " ");
+}
+
 function includesAny(value: string, terms: string[]) {
   const text = value.toLowerCase();
   return terms.some((term) => text.includes(term));
@@ -171,9 +187,9 @@ export function buildFreePlanReceiptEmail(record: CustomerOnboardingRecord, task
       "",
       `Thanks for reaching out to Resonate Solutions. We received your Free Page Plan request for ${record.businessName || "your business"}.`,
       "",
-      "The first step is a review, not a generic template build. I’ll look at what you sent, figure out what kind of customer-facing page makes sense, and follow up with a few focused questions if anything important is missing.",
+      "The first step is a review, not a generic template build. I will look at what you sent, figure out what kind of customer-facing page makes sense, and follow up with a few focused questions if anything important is missing.",
       "",
-      `Current review path: ${task.taskType.replaceAll("_", " ")}`,
+      `Current review path: ${formatLeadLabel(task.taskType)}`,
       `Next step: ${task.nextAction}`,
       "",
       "If you already have photos, menus, product examples, service lists, or artwork, you can reply here with those links or files.",
@@ -185,3 +201,88 @@ export function buildFreePlanReceiptEmail(record: CustomerOnboardingRecord, task
   };
 }
 
+export function followUpTemplateFor(taskType: LeadWorkflowType, businessName?: string, contactName?: string) {
+  const greeting = `Hi ${contactName || "there"},`;
+  const business = businessName || "your business";
+
+  if (taskType === "custom_quote_catalog") {
+    return [
+      greeting,
+      "",
+      `I reviewed the request for ${business}. This looks like it may work best as a guided custom quote page instead of fixed pricing everywhere.`,
+      "",
+      "To shape the first version correctly, could you send me:",
+      "",
+      "- The main product or service categories customers should choose from",
+      "- Any photos or examples you want used on the page",
+      "- Whether customers should upload artwork, request a quote, or both",
+      "- The details that usually change pricing, such as size, quantity, finish, backing, packaging, or deadline",
+      "- Any order types that need extra documentation or review before quoting",
+      "",
+      "Once I have that, I can map the page structure and recommend the cleanest next step.",
+      "",
+      "Thanks,",
+      "Kurtis"
+    ].join("\n");
+  }
+
+  if (taskType === "food_menu_page") {
+    return [
+      greeting,
+      "",
+      `I reviewed the request for ${business}. To build the right page plan, I need the current customer-facing details you want people to see first.`,
+      "",
+      "Could you send me:",
+      "",
+      "- Current menu or menu photos",
+      "- Hours and location",
+      "- Ordering, booking, phone, social, or review links",
+      "- A few food/product photos if you have them",
+      "- Any specials, sold-out items, popup menus, or seasonal updates you expect to change often",
+      "",
+      "Once I have that, I can recommend the simplest page structure and next step.",
+      "",
+      "Thanks,",
+      "Kurtis"
+    ].join("\n");
+  }
+
+  if (taskType === "local_service_page") {
+    return [
+      greeting,
+      "",
+      `I reviewed the request for ${business}. This looks like it may work best as a service page built around what customers need to decide before they call, book, or request a quote.`,
+      "",
+      "Could you send me:",
+      "",
+      "- Main services or packages",
+      "- Service area",
+      "- Best customer action: call, book, request quote, or message",
+      "- Photos or proof examples",
+      "- Any seasonal or recurring updates that change often",
+      "",
+      "Once I have that, I can recommend the simplest page structure and next step.",
+      "",
+      "Thanks,",
+      "Kurtis"
+    ].join("\n");
+  }
+
+  return [
+    greeting,
+    "",
+    `I reviewed the request for ${business}. I want to make sure I recommend the right page structure instead of forcing this into a generic template.`,
+    "",
+    "Could you send me a little more about:",
+    "",
+    "- What customers should be able to understand or do from the page",
+    "- Any existing website, menu, product list, service list, or photos",
+    "- The most important next action for customers",
+    "- Anything that changes often and needs to be easy to update",
+    "",
+    "Once I have that, I can recommend the next step.",
+    "",
+    "Thanks,",
+    "Kurtis"
+  ].join("\n");
+}

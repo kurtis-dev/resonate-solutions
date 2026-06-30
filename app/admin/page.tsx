@@ -1,4 +1,5 @@
 import { getSql } from "@/lib/db";
+import { ensureLeadTasksTable } from "@/lib/lead-task-store";
 import Link from "next/link";
 
 type Row = Record<string, unknown>;
@@ -57,9 +58,58 @@ function DataTable({ title, rows, columns }: { title: string; rows: Row[] | null
   );
 }
 
+function LeadTasksTable({ rows }: { rows: Row[] | null }) {
+  return (
+    <section className="rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
+      <h2 className="text-2xl font-black text-ink">Lead review tasks</h2>
+      {!rows ? (
+        <p className="mt-4 leading-7 text-muted">Database is not connected yet.</p>
+      ) : rows.length === 0 ? (
+        <p className="mt-4 leading-7 text-muted">No active lead tasks yet.</p>
+      ) : (
+        <div className="mt-5 overflow-x-auto">
+          <table className="w-full min-w-[900px] border-collapse text-left text-sm">
+            <thead>
+              <tr className="border-b border-line text-muted">
+                {["due", "priority", "stage", "type", "lead", "contact", "next action", "assignee"].map((column) => (
+                  <th key={column} className="px-3 py-3 font-black capitalize">{column}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {rows.map((row) => (
+                <tr key={String(row.id)} className="border-b border-line last:border-0">
+                  <td className="px-3 py-3 text-ink">{value(row, "due_at")}</td>
+                  <td className="px-3 py-3 text-ink">{value(row, "priority")}</td>
+                  <td className="px-3 py-3 text-ink">{value(row, "stage")}</td>
+                  <td className="px-3 py-3 text-ink">{value(row, "task_type")}</td>
+                  <td className="px-3 py-3">
+                    <Link href={`/admin/leads/${row.id}`} className="font-black text-brand hover:text-brandDark">
+                      {value(row, "business_name")}
+                    </Link>
+                    <div className="text-xs text-muted">{value(row, "title")}</div>
+                  </td>
+                  <td className="px-3 py-3 text-ink">
+                    <div>{value(row, "contact_name")}</div>
+                    <div className="text-xs text-muted">{value(row, "email")}</div>
+                  </td>
+                  <td className="px-3 py-3 text-ink">{value(row, "next_action")}</td>
+                  <td className="px-3 py-3 text-ink">{value(row, "assigned_to")}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      )}
+    </section>
+  );
+}
+
 export default async function AdminPage() {
+  await ensureLeadTasksTable();
+
   const [leadTasks, alerts, onboarding, intakes, subscriptions, payments, menuQuestions] = await Promise.all([
-    getRows`select due_at, priority, stage, task_type, title, business_name, contact_name, email, next_action, assigned_to from lead_tasks where stage not in ('launched', 'closed') order by due_at asc nulls last, created_at desc limit 20`,
+    getRows`select id, due_at, priority, stage, task_type, title, business_name, contact_name, email, next_action, assigned_to from lead_tasks where stage not in ('launched', 'closed') order by due_at asc nulls last, created_at desc limit 20`,
     getRows`select created_at, priority, event_type, title, business_name, contact_name, email, phone, plan_name, source from ops_alerts order by created_at desc limit 20`,
     getRows`select updated_at, business_name, contact_name, email, plan_name, payment_status, onboarding_status, portal_access from customer_onboarding order by updated_at desc limit 15`,
     getRows`select created_at, business_name, contact_name, email, business_type, city, main_need, package_interest from intake_requests order by created_at desc limit 10`,
@@ -87,7 +137,7 @@ export default async function AdminPage() {
         </div>
       </div>
       <div className="grid gap-6">
-        <DataTable title="Lead review tasks" rows={leadTasks} columns={["due_at", "priority", "stage", "task_type", "title", "business_name", "contact_name", "email", "next_action", "assigned_to"]} />
+        <LeadTasksTable rows={leadTasks} />
         <DataTable title="Operations alerts" rows={alerts} columns={["created_at", "priority", "event_type", "title", "business_name", "contact_name", "email", "phone", "plan_name", "source"]} />
         <DataTable title="Customer onboarding" rows={onboarding} columns={["updated_at", "business_name", "contact_name", "email", "plan_name", "payment_status", "onboarding_status", "portal_access"]} />
         <DataTable title="Recent free page plan requests" rows={intakes} columns={["created_at", "business_name", "contact_name", "email", "business_type", "city", "main_need", "package_interest"]} />

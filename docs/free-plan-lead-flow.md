@@ -84,6 +84,21 @@ Admin queue:
 /admin -> Lead review tasks
 ```
 
+Each task links to a lead detail page:
+
+```text
+/admin/leads/[leadTaskId]
+```
+
+The detail page shows:
+
+- Lead context and contact info.
+- Workflow type and current stage.
+- Next best action.
+- Review checklist.
+- Stage update control.
+- A focused follow-up template based on the lead type.
+
 Best-practice review:
 
 1. Confirm the business/request is a good fit.
@@ -132,4 +147,3 @@ Internal review should capture:
 ## External handoff behavior
 
 Softr/Zapier handoff is still attempted after local persistence, task creation, customer receipt, and owner alert. The handoff has a short timeout so a slow external automation cannot block the customer request.
-

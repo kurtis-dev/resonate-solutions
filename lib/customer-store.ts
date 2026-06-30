@@ -2,6 +2,7 @@ import { getSql } from "@/lib/db";
 import type { CustomerOnboardingRecord } from "@/lib/customer-onboarding";
 import type { IntakeRecord } from "@/lib/intake";
 import type { LeadTask } from "@/lib/lead-tasks";
+import { ensureLeadTasksTable } from "@/lib/lead-task-store";
 
 export type SubscriptionStatus = {
   stripeCustomerId: string;
@@ -166,33 +167,7 @@ export async function upsertLeadTask(task: LeadTask) {
   }
 
   try {
-    await sql`
-      create table if not exists lead_tasks (
-        id text primary key,
-        created_at timestamptz not null,
-        updated_at timestamptz not null default now(),
-        intake_id text,
-        customer_id text not null,
-        business_name text,
-        contact_name text,
-        email text not null,
-        phone text,
-        task_type text not null,
-        stage text not null default 'new_request',
-        priority text not null default 'normal',
-        title text not null,
-        summary text,
-        checklist jsonb not null default '[]'::jsonb,
-        next_action text,
-        assigned_to text,
-        due_at timestamptz,
-        source text not null default 'website'
-      )
-    `;
-    await sql`create index if not exists lead_tasks_stage_idx on lead_tasks (stage, due_at)`;
-    await sql`create index if not exists lead_tasks_email_idx on lead_tasks (email)`;
-    await sql`create index if not exists lead_tasks_customer_idx on lead_tasks (customer_id)`;
-    await sql`create index if not exists lead_tasks_type_idx on lead_tasks (task_type)`;
+    await ensureLeadTasksTable();
 
     await sql`
       insert into lead_tasks (
