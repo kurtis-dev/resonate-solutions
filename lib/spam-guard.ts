@@ -46,6 +46,13 @@ function hasMixedCase(value: string) {
   return /[a-z]/.test(value) && /[A-Z]/.test(value);
 }
 
+function hasDenseMixedCase(value: string) {
+  const uppercaseCount = (value.match(/[A-Z]/g) || []).length;
+  const lowercaseCount = (value.match(/[a-z]/g) || []).length;
+
+  return value.length >= 12 && uppercaseCount >= 3 && lowercaseCount >= 3;
+}
+
 function hasLongConsonantRun(value: string) {
   return /[bcdfghjklmnpqrstvwxyz]{5,}/i.test(value);
 }
@@ -61,10 +68,11 @@ function looksRandomToken(value: string) {
 
   const digitCount = (token.match(/\d/g) || []).length;
   const mixedCaseSignal = hasMixedCase(token);
+  const denseMixedCaseSignal = hasDenseMixedCase(token);
   const lowVowelSignal = vowelRatio(token) < 0.34;
   const consonantSignal = hasLongConsonantRun(token);
 
-  return [mixedCaseSignal, lowVowelSignal, consonantSignal, digitCount > 0].filter(Boolean).length >= 2;
+  return [mixedCaseSignal, denseMixedCaseSignal, lowVowelSignal, consonantSignal, digitCount > 0].filter(Boolean).length >= 2;
 }
 
 function hasMeaningfulHumanText(value?: string) {
