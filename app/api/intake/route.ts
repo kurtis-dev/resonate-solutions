@@ -5,6 +5,7 @@ import { saveIntakeRecord, upsertCustomerOnboarding, upsertLeadTask } from "@/li
 import { createIntakeRecord, parseIntakePayload } from "@/lib/intake";
 import { buildFreePlanReceiptEmail, createFreePlanLeadTask } from "@/lib/lead-tasks";
 import { notifyOpsAlert } from "@/lib/ops-alerts";
+import { assessLeadSpam, quietSpamResponseMessage } from "@/lib/spam-guard";
 
 export async function POST(request: Request) {
   let body: unknown;
@@ -19,6 +20,16 @@ export async function POST(request: Request) {
 
   if (!parsed.payload) {
     return NextResponse.json({ error: parsed.error || "Invalid intake request." }, { status: 400 });
+  }
+
+  const spam = assessLeadSpam(parsed.payload);
+
+  if (spam.isSpam) {
+    console.info("Blocked Resonate intake spam", { score: spam.score, reasons: spam.reasons });
+    return NextResponse.json({
+      ok: true,
+      message: quietSpamResponseMessage()
+    });
   }
 
   const record = createIntakeRecord(parsed.payload);

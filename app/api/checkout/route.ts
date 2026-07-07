@@ -6,6 +6,7 @@ import { createIntakeRecord, type IntakePayload } from "@/lib/intake";
 import { buildFreePlanReceiptEmail, createFreePlanLeadTask } from "@/lib/lead-tasks";
 import { getConfiguredPaymentLink, getPlanById } from "@/lib/plans";
 import { notifyOpsAlert } from "@/lib/ops-alerts";
+import { assessLeadSpam } from "@/lib/spam-guard";
 import { getStripe } from "@/lib/stripe";
 
 function redirectTo(request: Request, path: string) {
@@ -46,8 +47,20 @@ export async function POST(request: Request) {
     mainNeed: formValue(formData, "mainNeed"),
     packageInterest: plan.name,
     notes: formValue(formData, "notes"),
-    source: plan.paymentMode === "none" ? "website_free_page_plan" : "website_checkout"
+    source: plan.paymentMode === "none" ? "website_free_page_plan" : "website_checkout",
+    website: formValue(formData, "website"),
+    companyWebsite: formValue(formData, "companyWebsite"),
+    confirmEmail: formValue(formData, "confirmEmail"),
+    startedAt: formValue(formData, "startedAt")
   };
+
+  const spam = assessLeadSpam(intakePayload);
+
+  if (spam.isSpam) {
+    console.info("Blocked Resonate checkout spam", { score: spam.score, reasons: spam.reasons });
+    return redirectTo(request, `/checkout/success?plan=${plan.id}&status=received`);
+  }
+
   const onboarding = buildCustomerOnboardingRecord({
     ...intakePayload,
     source: plan.paymentMode === "none" ? "website_intake" : "website_checkout",

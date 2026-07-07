@@ -42,6 +42,10 @@ export default async function CheckoutPage({
         {statusMessage ? <p className="mt-5 rounded-2xl bg-[#fff0e9] px-4 py-3 text-sm font-bold text-coral">{statusMessage}</p> : null}
         <form action="/api/checkout" method="POST" className="mt-8 grid gap-4">
           <input type="hidden" name="plan" value={plan?.id || "setup"} />
+          <input type="hidden" name="startedAt" value={Date.now().toString()} />
+          <input tabIndex={-1} autoComplete="off" name="website" className="hidden" aria-hidden="true" />
+          <input tabIndex={-1} autoComplete="off" name="companyWebsite" className="hidden" aria-hidden="true" />
+          <input tabIndex={-1} autoComplete="off" name="confirmEmail" className="hidden" aria-hidden="true" />
           <div className="grid gap-4 md:grid-cols-2">
             <label className="grid gap-2 text-sm font-bold text-ink">
               Business name

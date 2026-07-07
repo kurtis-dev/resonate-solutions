@@ -7,22 +7,27 @@ type FormState = {
   message: string;
 };
 
-const initialForm = {
-  businessName: "",
-  contactName: "",
-  email: "",
-  phone: "",
-  businessType: "",
-  city: "",
-  currentMenuLink: "",
-  mainNeed: "We need a food menu",
-  packageInterest: "Free Page Plan",
-  notes: "",
-  website: ""
-};
+function createInitialForm() {
+  return {
+    businessName: "",
+    contactName: "",
+    email: "",
+    phone: "",
+    businessType: "",
+    city: "",
+    currentMenuLink: "",
+    mainNeed: "We need a food menu",
+    packageInterest: "Free Page Plan",
+    notes: "",
+    website: "",
+    companyWebsite: "",
+    confirmEmail: "",
+    startedAt: Date.now().toString()
+  };
+}
 
 export function IntakeForm() {
-  const [form, setForm] = useState(initialForm);
+  const [form, setForm] = useState(createInitialForm);
   const [state, setState] = useState<FormState>({ status: "idle", message: "" });
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
@@ -42,7 +47,7 @@ export function IntakeForm() {
       return;
     }
 
-    setForm(initialForm);
+    setForm(createInitialForm());
     setState({ status: "success", message: result.message || "Thanks. Your request was received." });
   }
 
@@ -121,6 +126,8 @@ export function IntakeForm() {
       </label>
 
       <input tabIndex={-1} autoComplete="off" value={form.website} onChange={(event) => updateField("website", event.target.value)} className="hidden" aria-hidden="true" />
+      <input tabIndex={-1} autoComplete="off" value={form.companyWebsite} onChange={(event) => updateField("companyWebsite", event.target.value)} className="hidden" aria-hidden="true" />
+      <input tabIndex={-1} autoComplete="off" value={form.confirmEmail} onChange={(event) => updateField("confirmEmail", event.target.value)} className="hidden" aria-hidden="true" />
 
       <button disabled={state.status === "submitting"} type="submit" className="rounded-full bg-coral px-6 py-3 font-black text-white shadow-soft hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70">
         {state.status === "submitting" ? "Sending..." : "Request Free Page Plan"}

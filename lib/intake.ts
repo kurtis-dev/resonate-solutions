@@ -11,6 +11,9 @@ export type IntakePayload = {
   notes?: string;
   source?: string;
   website?: string;
+  companyWebsite?: string;
+  confirmEmail?: string;
+  startedAt?: string;
 };
 
 export type IntakeRecord = IntakePayload & {
@@ -54,12 +57,11 @@ export function parseIntakePayload(input: unknown): { payload?: IntakePayload; e
     packageInterest: clean(data.packageInterest),
     notes: clean(data.notes),
     source: clean(data.source) || "website",
-    website: clean(data.website)
+    website: clean(data.website),
+    companyWebsite: clean(data.companyWebsite),
+    confirmEmail: clean(data.confirmEmail),
+    startedAt: clean(data.startedAt)
   };
-
-  if (payload.website) {
-    return { error: "Spam check failed." };
-  }
 
   const missing = requiredFields.find((field) => !payload[field]);
   if (missing) {
