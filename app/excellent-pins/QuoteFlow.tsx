@@ -129,7 +129,7 @@ function ChoiceGroup({
             className={`rounded-[18px] border px-4 py-3 text-left text-sm font-black transition ${
               selected
                 ? "border-[#c92f2f] bg-[#fff0e4] text-[#17120f] shadow-[0_10px_24px_rgba(201,47,47,0.14)]"
-                : "border-[#e1cfb7] bg-[#fff8ec] text-[#5f5448] hover:border-[#d8a642]"
+                : "border-[#c8d4e3] bg-[#fffaf3] text-[#173866] hover:border-[#c92f2f]"
             }`}
           >
             {option}
@@ -167,7 +167,7 @@ function Field({
         required={required}
         placeholder={placeholder}
         onChange={(event) => onChange(name, event.target.value)}
-        className="rounded-[14px] border border-[#e1cfb7] bg-[#fffaf4] px-4 py-3 font-medium outline-none focus:border-[#c92f2f]"
+        className="rounded-[14px] border border-[#c8d4e3] bg-[#fffaf4] px-4 py-3 font-medium outline-none focus:border-[#c92f2f]"
       />
     </label>
   );
@@ -230,10 +230,10 @@ export function ExcellentPinsQuoteFlow() {
 
   if (status === "sent") {
     return (
-      <div className="rounded-[28px] border border-[#e1cfb7] bg-[#fffaf4] p-8 shadow-[0_18px_55px_rgba(23,18,15,0.08)]">
+      <div className="rounded-[28px] border border-[#c8d4e3] bg-[#fffaf4] p-8 shadow-[0_18px_55px_rgba(23,56,102,0.08)]">
         <p className="text-[12px] font-black uppercase tracking-[0.3em] text-[#173866]">Request sent</p>
         <h3 className="excellent-pins-display mt-4 text-4xl font-black leading-tight text-[#17120f]">Excellent Pins received your quote request.</h3>
-        <p className="mt-4 text-base leading-7 text-[#5f5448]">
+        <p className="mt-4 text-base leading-7 text-[#4b5e73]">
           The details were sent to Excellent Pins and a confirmation was sent to your email.
         </p>
         <button
@@ -243,7 +243,7 @@ export function ExcellentPinsQuoteFlow() {
             setStep(0);
             setStatus("idle");
           }}
-          className="mt-6 rounded-full bg-[#17120f] px-7 py-4 text-sm font-black text-white"
+          className="mt-6 rounded-full bg-[#173866] px-7 py-4 text-sm font-black text-white"
         >
           Start another quote
         </button>
@@ -252,7 +252,7 @@ export function ExcellentPinsQuoteFlow() {
   }
 
   return (
-    <form onSubmit={submit} className="rounded-[28px] border border-[#e1cfb7] bg-[#fffaf4] p-5 shadow-[0_18px_55px_rgba(23,18,15,0.08)] sm:p-8">
+    <form onSubmit={submit} className="rounded-[28px] border border-[#c8d4e3] bg-[#fffaf4] p-5 shadow-[0_18px_55px_rgba(23,56,102,0.08)] sm:p-8">
       <div className="mb-6 grid gap-2 sm:grid-cols-4">
         {steps.map((item, index) => (
           <button
@@ -260,7 +260,7 @@ export function ExcellentPinsQuoteFlow() {
             type="button"
             onClick={() => setStep(index)}
             className={`rounded-full px-3 py-2 text-xs font-black uppercase tracking-[0.18em] ${
-              index === step ? "bg-[#17120f] text-white" : "bg-[#f4ead8] text-[#5f5448]"
+              index === step ? "bg-[#173866] text-white" : "bg-[#eef5fb] text-[#173866]"
             }`}
           >
             {item.label}
@@ -281,7 +281,7 @@ export function ExcellentPinsQuoteFlow() {
                 required
                 onChange={(event) => update("emblemType", event.target.value)}
                 onInput={(event) => update("emblemType", event.currentTarget.value)}
-                className="rounded-[14px] border border-[#e1cfb7] bg-[#fffaf4] px-4 py-3 font-bold text-[#17120f] outline-none focus:border-[#c92f2f]"
+                className="rounded-[14px] border border-[#c8d4e3] bg-[#fffaf4] px-4 py-3 font-bold text-[#17120f] outline-none focus:border-[#c92f2f]"
               >
                 <option value="">Choose a product type</option>
                 {emblemTypes.map((type) => (
@@ -292,8 +292,8 @@ export function ExcellentPinsQuoteFlow() {
               </select>
             </label>
 
-            <div className="grid gap-4 rounded-[22px] border border-[#e1cfb7] bg-[#fff8ec] p-4 sm:grid-cols-[180px_1fr] sm:items-center">
-              <div className="overflow-hidden rounded-[18px] border border-[#eadbc6] bg-[#fffaf4] shadow-[0_10px_26px_rgba(23,18,15,0.06)]">
+            <div className="grid gap-4 rounded-[22px] border border-[#c8d4e3] bg-[#eef5fb] p-4 sm:grid-cols-[180px_1fr] sm:items-center">
+              <div className="overflow-hidden rounded-[18px] border border-[#dbe7f4] bg-[#fffaf4] shadow-[0_10px_26px_rgba(23,56,102,0.08)]">
                 <img
                   src={(selectedStyle || productStyles[0]).image}
                   alt={`${(selectedStyle || productStyles[0]).name} visual preview`}
@@ -313,7 +313,7 @@ export function ExcellentPinsQuoteFlow() {
                     ? selectedStyle.quoteNote
                     : "Choose the closest product type. Not sure is okay."}
                 </p>
-                <p className="mt-2 text-sm font-bold leading-6 text-[#6b5c4a]">
+                <p className="mt-2 text-sm font-bold leading-6 text-[#4b5e73]">
                   Tell us what you want made and Excellent Pins can recommend what works.
                 </p>
               </div>
@@ -376,7 +376,7 @@ export function ExcellentPinsQuoteFlow() {
                 onChange={(event) => update("notes", event.target.value)}
                 rows={6}
                 placeholder="Tell us what you want and any details you already know."
-                className="rounded-[14px] border border-[#e1cfb7] bg-[#fffaf4] px-4 py-3 font-medium outline-none focus:border-[#c92f2f]"
+                className="rounded-[14px] border border-[#c8d4e3] bg-[#fffaf4] px-4 py-3 font-medium outline-none focus:border-[#c92f2f]"
               />
             </label>
           </div>
@@ -394,7 +394,7 @@ export function ExcellentPinsQuoteFlow() {
           <button
             type="button"
             onClick={() => setStep((current) => Math.max(0, current - 1))}
-            className="rounded-full border border-[#e1cfb7] bg-[#fffaf4] px-7 py-4 text-sm font-black text-[#17120f]"
+            className="rounded-full border border-[#c8d4e3] bg-[#fffaf4] px-7 py-4 text-sm font-black text-[#173866]"
           >
             Back
           </button>
