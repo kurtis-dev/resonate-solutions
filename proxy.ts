@@ -1,6 +1,10 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { hasConfiguredAdminAuth } from "./lib/admin-auth";
 
+const excellentPinsHosts = new Set([
+  "excellentpins.resonate.solutions",
+]);
+
 function unauthorized() {
   return new NextResponse("Authentication required.", {
     status: 401,
@@ -10,7 +14,27 @@ function unauthorized() {
   });
 }
 
+function getHostname(request: NextRequest) {
+  return request.headers.get("host")?.split(":")[0]?.toLowerCase() ?? "";
+}
+
+function isExcellentPinsHost(request: NextRequest) {
+  return excellentPinsHosts.has(getHostname(request));
+}
+
 export function proxy(request: NextRequest) {
+  const { pathname } = request.nextUrl;
+
+  if (isExcellentPinsHost(request) && pathname === "/") {
+    const url = request.nextUrl.clone();
+    url.pathname = "/excellent-pins";
+    return NextResponse.rewrite(url);
+  }
+
+  if (!pathname.startsWith("/admin") && !pathname.startsWith("/dashboard")) {
+    return NextResponse.next();
+  }
+
   const username = process.env.ADMIN_USERNAME;
   const password = process.env.ADMIN_PASSWORD;
 
@@ -38,5 +62,5 @@ export function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/admin/:path*", "/dashboard/:path*"]
+  matcher: ["/((?!_next/static|_next/image|favicon.ico|assets).*)"]
 };
