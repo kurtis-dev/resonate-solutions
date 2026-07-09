@@ -129,8 +129,8 @@ export default function ExcellentPinsPage() {
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-[#4b5e73]">
               Tell Excellent Pins what you want made. Upload artwork if you have
-              it, choose the closest product type, and get a quote based on the
-              details that actually affect production.
+              it, choose the closest product type, and get a quote based on
+              your personalized request.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <a
