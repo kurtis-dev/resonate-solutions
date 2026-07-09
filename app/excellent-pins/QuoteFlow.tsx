@@ -22,11 +22,9 @@ const useCases = [
 ];
 
 const packagingOptions = [
-  "No preference",
-  "Individual bags",
-  "Backing cards",
-  "Gift boxes",
-  "Retail packaging",
+  "Individual polybags",
+  "Backer card",
+  "Boxes",
   "Other / not sure"
 ];
 
@@ -37,16 +35,6 @@ const finishOptions = [
   "Black nickel",
   "Antique finish",
   "Full-color print",
-  "Not sure"
-];
-
-const backingOptions = [
-  "Recommend the best backing",
-  "Rubber clutch",
-  "Deluxe clutch",
-  "Magnet",
-  "Safety pin",
-  "Keychain / attachment",
   "Not sure"
 ];
 
@@ -64,15 +52,16 @@ type QuoteState = {
   customerPhone: string;
   emblemType: string;
   quantity: string;
-  designCount: string;
   approximateSize: string;
+  preferredShape: string;
   deadline: string;
+  shippingDestination: string;
   artworkStatus: string;
   artworkLink: string;
   useCase: string;
   finishPreference: string;
-  backingPreference: string;
   packaging: string;
+  packagingRequests: string;
   budgetGuidance: string;
   notes: string;
   website: string;
@@ -88,15 +77,16 @@ function createInitialState(): QuoteState {
     customerPhone: "",
     emblemType: "",
     quantity: "",
-    designCount: "",
     approximateSize: "",
+    preferredShape: "",
     deadline: "",
+    shippingDestination: "",
     artworkStatus: "",
     artworkLink: "",
     useCase: "",
     finishPreference: "Recommend the best finish",
-    backingPreference: "Recommend the best backing",
-    packaging: "No preference",
+    packaging: "Individual polybags",
+    packagingRequests: "",
     budgetGuidance: "Recommend the best production option",
     notes: "",
     website: "",
@@ -197,8 +187,8 @@ export function ExcellentPinsQuoteFlow() {
 
   function canContinue() {
     if (step === 0) return Boolean(form.emblemType);
-    if (step === 1) return Boolean(form.quantity && form.artworkStatus);
-    if (step === 2) return Boolean(form.useCase && form.finishPreference && form.backingPreference && form.packaging && form.budgetGuidance);
+    if (step === 1) return Boolean(form.quantity && form.artworkStatus && form.shippingDestination);
+    if (step === 2) return Boolean(form.useCase && form.finishPreference && form.packaging && form.budgetGuidance);
     return Boolean(form.customerName && form.customerEmail);
   }
 
@@ -325,9 +315,10 @@ export function ExcellentPinsQuoteFlow() {
           <div className="grid gap-5">
             <div className="grid gap-4 sm:grid-cols-2">
               <Field label="Approx quantity" name="quantity" value={form.quantity} placeholder="Example: 250, 1,000, 20,000" required onChange={update} />
-              <Field label="How many designs?" name="designCount" value={form.designCount} placeholder="Example: 1 design, 3 versions" onChange={update} />
-              <Field label="Approx size or shape" name="approximateSize" value={form.approximateSize} placeholder="Example: 1.25 inch round, custom shape" onChange={update} />
+              <Field label="Approx size" name="approximateSize" value={form.approximateSize} placeholder="Example: 1.25 inch, 2 inch" onChange={update} />
+              <Field label="Preferred shape" name="preferredShape" value={form.preferredShape} placeholder="Example: round, rectangle, custom shape" onChange={update} />
               <Field label="Deadline" name="deadline" value={form.deadline} placeholder="Event date or target date" onChange={update} />
+              <Field label="Shipping destination" name="shippingDestination" value={form.shippingDestination} placeholder="City/state or ZIP" required onChange={update} />
             </div>
             <div>
               <p className="mb-3 text-sm font-black">Artwork status</p>
@@ -348,13 +339,10 @@ export function ExcellentPinsQuoteFlow() {
               <ChoiceGroup name="finishPreference" value={form.finishPreference} options={finishOptions} onChange={update} />
             </div>
             <div>
-              <p className="mb-3 text-sm font-black">Backing or attachment</p>
-              <ChoiceGroup name="backingPreference" value={form.backingPreference} options={backingOptions} onChange={update} />
-            </div>
-            <div>
               <p className="mb-3 text-sm font-black">Any special packaging preferred?</p>
               <ChoiceGroup name="packaging" value={form.packaging} options={packagingOptions} onChange={update} />
             </div>
+            <Field label="Packaging notes" name="packagingRequests" value={form.packagingRequests} placeholder="Example: simple polybag is fine, backer card preferred, boxes needed" onChange={update} />
             <div>
               <p className="mb-3 text-sm font-black">Budget guidance</p>
               <ChoiceGroup name="budgetGuidance" value={form.budgetGuidance} options={budgetOptions} onChange={update} />

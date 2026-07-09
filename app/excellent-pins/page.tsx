@@ -216,22 +216,6 @@ export default function ExcellentPinsPage() {
                   <p className="mt-3 text-base leading-6 text-[#4b5e73]">
                     {style.summary}
                   </p>
-
-                  <div className="mt-6 border-t border-[#c8d4e3] pt-5">
-                    <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#173866]">
-                      Good for
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[#15110d]">
-                      {style.goodFor}
-                    </p>
-
-                    <p className="mt-4 text-[11px] font-black uppercase tracking-[0.22em] text-[#173866]">
-                      Affects the quote
-                    </p>
-                    <p className="mt-2 text-sm leading-6 text-[#4b5e73]">
-                      {style.affects}
-                    </p>
-                  </div>
                 </div>
               </article>
             ))}
@@ -301,21 +285,7 @@ export default function ExcellentPinsPage() {
       </section>
 
       <section id="quote" className="bg-[linear-gradient(135deg,#f8f2e9_0%,#eef5fb_100%)] px-5 py-14 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.78fr_1.22fr]">
-          <div className="rounded-[10px] bg-[#173866] p-8 text-white shadow-[0_22px_70px_rgba(23,56,102,0.18)]">
-            <p className="mb-4 text-[12px] font-black uppercase tracking-[0.3em] text-[#d7a83d]">
-              Guided quote request
-            </p>
-            <h2 className="excellent-pins-display text-4xl font-black leading-tight">
-              Tell us what you want. We will tell you what can be made.
-            </h2>
-            <p className="mt-5 text-base leading-7 text-[#e7eef8]">
-              The form gathers the practical details: type, quantity, artwork,
-              finish, backing, packaging, timing, and any notes that help
-              Excellent Pins quote the job cleanly.
-            </p>
-          </div>
-
+        <div className="mx-auto max-w-5xl">
           <ExcellentPinsQuoteFlow />
         </div>
       </section>

@@ -60,7 +60,22 @@ export async function POST(request: Request) {
     eventType: "customer_question",
     priority: "high",
     title: "New Excellent Pins quote request",
-    message: `${record.customerName} requested a quote for ${record.emblemType}.`,
+    message: [
+      `${record.customerName} requested a quote for ${record.emblemType}.`,
+      `Quantity: ${record.quantity}`,
+      record.approximateSize ? `Approx size: ${record.approximateSize}` : "",
+      record.preferredShape ? `Preferred shape: ${record.preferredShape}` : "",
+      `Shipping destination: ${record.shippingDestination}`,
+      `Artwork: ${record.artworkStatus}`,
+      record.useCase ? `Use: ${record.useCase}` : "",
+      record.finishPreference ? `Finish: ${record.finishPreference}` : "",
+      record.packaging ? `Packaging: ${record.packaging}` : "",
+      record.packagingRequests ? `Packaging notes: ${record.packagingRequests}` : "",
+      record.budgetGuidance ? `Budget: ${record.budgetGuidance}` : "",
+      record.notes ? `Notes: ${record.notes}` : ""
+    ]
+      .filter(Boolean)
+      .join("\n"),
     businessName: "Excellent Pins & Badges Factory Inc.",
     contactName: record.customerName,
     email: record.customerEmail,
@@ -72,11 +87,15 @@ export async function POST(request: Request) {
       quoteId: record.id,
       emblemType: record.emblemType,
       quantity: record.quantity,
-      designCount: record.designCount,
       approximateSize: record.approximateSize,
+      preferredShape: record.preferredShape,
+      shippingDestination: record.shippingDestination,
+      artworkStatus: record.artworkStatus,
       useCase: record.useCase,
       finishPreference: record.finishPreference,
-      backingPreference: record.backingPreference,
+      packaging: record.packaging,
+      packagingRequests: record.packagingRequests,
+      budgetGuidance: record.budgetGuidance,
       complianceReview: record.complianceReview
     }
   });

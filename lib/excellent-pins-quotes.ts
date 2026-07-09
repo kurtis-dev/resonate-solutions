@@ -7,15 +7,16 @@ export type ExcellentPinsQuotePayload = {
   customerPhone?: string;
   emblemType: string;
   quantity: string;
-  designCount?: string;
   approximateSize?: string;
+  preferredShape?: string;
   deadline: string;
+  shippingDestination: string;
   artworkStatus: string;
   artworkLink?: string;
   useCase: string;
   finishPreference: string;
-  backingPreference: string;
   packaging: string;
+  packagingRequests?: string;
   budgetGuidance: string;
   notes?: string;
   website?: string;
@@ -54,15 +55,16 @@ export function parseExcellentPinsQuotePayload(body: unknown): ParseResult {
     customerPhone: clean(input.customerPhone, 80),
     emblemType: clean(input.emblemType, 140),
     quantity: clean(input.quantity, 140),
-    designCount: clean(input.designCount, 140),
     approximateSize: clean(input.approximateSize, 180),
+    preferredShape: clean(input.preferredShape, 180),
     deadline: clean(input.deadline, 140),
+    shippingDestination: clean(input.shippingDestination, 180),
     artworkStatus: clean(input.artworkStatus, 180),
     artworkLink: clean(input.artworkLink, 600),
     useCase: clean(input.useCase, 180),
     finishPreference: clean(input.finishPreference, 180) || "Recommend the best finish",
-    backingPreference: clean(input.backingPreference, 180) || "Recommend the best backing",
     packaging: clean(input.packaging, 180),
+    packagingRequests: clean(input.packagingRequests, 500),
     budgetGuidance: clean(input.budgetGuidance, 180),
     notes: clean(input.notes, 1600),
     website: clean(input.website, 240),
@@ -75,6 +77,7 @@ export function parseExcellentPinsQuotePayload(body: unknown): ParseResult {
   if (!payload.customerEmail || !payload.customerEmail.includes("@")) return { error: "A valid email is required." };
   if (!payload.emblemType) return { error: "Metal emblem type is required." };
   if (!payload.quantity) return { error: "Quantity is required." };
+  if (!payload.shippingDestination) return { error: "Shipping destination is required." };
   if (!payload.artworkStatus) return { error: "Artwork status is required." };
 
   return { payload };
@@ -84,8 +87,8 @@ export function createExcellentPinsQuoteRecord(payload: ExcellentPinsQuotePayloa
   const combined = [
     payload.useCase,
     payload.finishPreference,
-    payload.backingPreference,
     payload.packaging,
+    payload.packagingRequests,
     payload.budgetGuidance,
     payload.notes
   ].join(" ").toLowerCase();
@@ -119,13 +122,16 @@ export async function ensureExcellentPinsQuoteRequestsTable() {
       quantity text not null,
       design_count text,
       approximate_size text,
+      preferred_shape text,
       deadline text,
+      shipping_destination text,
       artwork_status text,
       artwork_link text,
       use_case text,
       finish_preference text,
       backing_preference text,
       packaging text,
+      packaging_requests text,
       budget_guidance text,
       notes text,
       compliance_review boolean not null default false,
@@ -135,8 +141,11 @@ export async function ensureExcellentPinsQuoteRequestsTable() {
 
   await sql`alter table excellent_pins_quote_requests add column if not exists design_count text`;
   await sql`alter table excellent_pins_quote_requests add column if not exists approximate_size text`;
+  await sql`alter table excellent_pins_quote_requests add column if not exists preferred_shape text`;
+  await sql`alter table excellent_pins_quote_requests add column if not exists shipping_destination text`;
   await sql`alter table excellent_pins_quote_requests add column if not exists finish_preference text`;
   await sql`alter table excellent_pins_quote_requests add column if not exists backing_preference text`;
+  await sql`alter table excellent_pins_quote_requests add column if not exists packaging_requests text`;
 
   await sql`
     create index if not exists excellent_pins_quote_requests_created_idx
@@ -174,13 +183,16 @@ export async function saveExcellentPinsQuoteRequest(record: ExcellentPinsQuoteRe
         quantity,
         design_count,
         approximate_size,
+        preferred_shape,
         deadline,
+        shipping_destination,
         artwork_status,
         artwork_link,
         use_case,
         finish_preference,
         backing_preference,
         packaging,
+        packaging_requests,
         budget_guidance,
         notes,
         compliance_review,
@@ -195,15 +207,18 @@ export async function saveExcellentPinsQuoteRequest(record: ExcellentPinsQuoteRe
         ${record.customerPhone || null},
         ${record.emblemType},
         ${record.quantity},
-        ${record.designCount || null},
+        ${null},
         ${record.approximateSize || null},
+        ${record.preferredShape || null},
         ${record.deadline || null},
+        ${record.shippingDestination || null},
         ${record.artworkStatus || null},
         ${record.artworkLink || null},
         ${record.useCase || null},
         ${record.finishPreference || null},
-        ${record.backingPreference || null},
+        ${null},
         ${record.packaging || null},
+        ${record.packagingRequests || null},
         ${record.budgetGuidance || null},
         ${record.notes || null},
         ${record.complianceReview},
@@ -236,15 +251,16 @@ export function buildJackQuoteEmail(record: ExcellentPinsQuoteRecord) {
     "Project",
     line("Metal emblem type", record.emblemType),
     line("Quantity", record.quantity),
-    line("Number of designs", record.designCount),
-    line("Approx size / shape", record.approximateSize),
+    line("Approx size", record.approximateSize),
+    line("Preferred shape", record.preferredShape),
     line("Deadline", record.deadline),
+    line("Shipping destination", record.shippingDestination),
     line("Artwork", record.artworkStatus),
     line("Artwork link", record.artworkLink),
     line("Use case", record.useCase),
     line("Finish preference", record.finishPreference),
-    line("Backing / attachment", record.backingPreference),
     line("Packaging", record.packaging),
+    line("Packaging notes", record.packagingRequests),
     line("Budget guidance", record.budgetGuidance),
     "",
     "Notes",
@@ -273,9 +289,10 @@ export function buildCustomerQuoteReceipt(record: ExcellentPinsQuoteRecord) {
     "We received:",
     line("Metal emblem type", record.emblemType),
     line("Quantity", record.quantity),
-    line("Number of designs", record.designCount),
-    line("Approx size / shape", record.approximateSize),
+    line("Approx size", record.approximateSize),
+    line("Preferred shape", record.preferredShape),
     line("Deadline", record.deadline),
+    line("Shipping destination", record.shippingDestination),
     line("Artwork", record.artworkStatus),
     "",
     "Excellent Pins will review the details and follow up with the next step.",
