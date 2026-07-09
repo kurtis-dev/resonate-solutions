@@ -391,11 +391,11 @@ export function ExcellentPinsQuoteFlow() {
 
       <div className="mt-7 flex flex-col gap-4 rounded-[18px] border border-[#c8d4e3] bg-[#eef5fb] p-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-4">
-          <span className="flex h-14 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[12px] border border-[#d7a83d] bg-[#15110d]">
+          <span className="flex h-14 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[14px] border border-[#c8d4e3] bg-[#fffaf3] shadow-[0_10px_24px_rgba(23,56,102,0.12)]">
             <img
               src="/assets/excellent-pins/excellent-pins-logo-mark.png"
               alt="Excellent Pins & Badges"
-              className="h-full w-full object-contain p-1"
+              className="h-full w-full object-contain p-1.5 drop-shadow-[0_5px_8px_rgba(21,17,13,0.18)]"
             />
           </span>
           <div>

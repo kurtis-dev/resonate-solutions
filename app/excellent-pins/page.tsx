@@ -83,11 +83,11 @@ export default function ExcellentPinsPage() {
       <header className="sticky top-0 z-30 border-b border-[#c8d4e3] bg-[#f8f2e9]/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <a href="#top" className="flex items-center gap-3">
-            <span className="flex h-14 w-28 items-center justify-center overflow-hidden rounded-[12px] border border-[#d7a83d] bg-[#15110d] shadow-[0_10px_28px_rgba(23,18,15,0.16)]">
+            <span className="flex h-14 w-28 items-center justify-center overflow-hidden rounded-[14px] border border-[#c8d4e3] bg-[#fffaf3] shadow-[0_12px_30px_rgba(23,56,102,0.12)]">
               <img
                 src="/assets/excellent-pins/excellent-pins-logo-mark.png"
                 alt="Excellent Pins & Badges"
-                className="h-full w-full object-contain p-1"
+                className="h-full w-full object-contain p-1.5 drop-shadow-[0_5px_8px_rgba(21,17,13,0.18)]"
               />
             </span>
             <span>
