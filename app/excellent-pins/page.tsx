@@ -32,7 +32,7 @@ const processSteps = [
   },
   {
     title: "You get a practical quote",
-    text: "Jack replies with pricing, production options, and the next details needed before an order moves forward.",
+    text: "We reply with pricing, production options, and the next details needed before an order moves forward.",
   },
 ];
 
@@ -66,8 +66,8 @@ const customizationChoices = [
     text: "Line weight and color count affect what is producible.",
   },
   {
-    title: "Documentation",
-    text: "Compliance paperwork flagged where required for your use.",
+    title: "Timeline",
+    text: "Event dates, rush needs, and approval timing help shape the quote.",
   },
 ];
 
@@ -184,11 +184,11 @@ export default function ExcellentPinsPage() {
               Product starting points
             </p>
             <h2 className="excellent-pins-display text-4xl font-black leading-tight sm:text-5xl">
-              Choose the closest format. Jack can guide the exact build.
+              Choose the closest format. We will help shape the exact build.
             </h2>
             <p className="mt-5 text-base leading-7 text-[#5f5143]">
               These are not fixed-price menu items. They are the main quote
-              paths buyers can recognize before Excellent Pins reviews the
+              paths customers can recognize before Excellent Pins reviews the
               artwork, quantity, finish, and production details.
             </p>
           </div>
@@ -286,7 +286,7 @@ export default function ExcellentPinsPage() {
               How it works
             </p>
             <h2 className="excellent-pins-display text-4xl font-black leading-tight sm:text-5xl">
-              Simple for the buyer. Specific enough for a real quote.
+              Send the right details without needing to know every production term.
             </h2>
           </div>
           <div className="grid gap-4 md:grid-cols-3">
@@ -303,26 +303,6 @@ export default function ExcellentPinsPage() {
         </div>
       </section>
 
-      <section id="compliance" className="px-5 py-14 lg:px-8">
-        <div className="mx-auto grid max-w-7xl gap-6 rounded-[10px] border border-[#dac9b7] bg-[#fffaf3] p-7 shadow-[0_18px_50px_rgba(23,18,15,0.07)] lg:grid-cols-[0.62fr_1fr] lg:p-9">
-          <div>
-            <p className="mb-4 text-[12px] font-black uppercase tracking-[0.3em] text-[#173866]">
-              Documentation awareness
-            </p>
-            <h2 className="excellent-pins-display text-3xl font-black leading-tight text-[#15110d]">
-              Compliance questions are handled when they matter.
-            </h2>
-          </div>
-          <p className="text-base leading-8 text-[#5f5143]">
-            Most buyers should not have to start with technical paperwork
-            language. If a project involves resale requirements, children or
-            school/youth use, buyer-required documentation, special materials,
-            or certification questions, Excellent Pins can flag that during
-            quoting before production decisions are made.
-          </p>
-        </div>
-      </section>
-
       <section id="quote" className="bg-[#eee3d5] px-5 py-14 lg:px-8">
         <div className="mx-auto grid max-w-7xl gap-8 lg:grid-cols-[0.78fr_1.22fr]">
           <div className="rounded-[10px] bg-[#17120f] p-8 text-white shadow-[0_22px_70px_rgba(23,18,15,0.16)]">
@@ -330,7 +310,7 @@ export default function ExcellentPinsPage() {
               Guided quote request
             </p>
             <h2 className="excellent-pins-display text-4xl font-black leading-tight">
-              Tell Jack what you want. He will tell you what can be made.
+              Tell us what you want. We will tell you what can be made.
             </h2>
             <p className="mt-5 text-base leading-7 text-[#f4efe7]">
               The form gathers the practical details: type, quantity, artwork,
