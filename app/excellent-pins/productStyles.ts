@@ -99,12 +99,12 @@ export const productStyles = [
     name: "Other / not sure",
     cardTitle: "Not sure yet",
     shortName: "Not sure",
-    image: "/assets/excellent-pins/lovable-page/not-sure-finishes.png",
+    image: "/assets/excellent-pins/lovable/finishes.jpg",
     imageFit: "cover",
     accent: "#c92f2f",
-    summary: "Compare plating options - gold, nickel silver, black nickel, antique brass.",
-    goodFor: "Undecided on style - we'll recommend based on your artwork.",
-    affects: "We'll walk through finish, fill and format with you.",
+    summary: "Not sure which format fits? Send the result you want.",
+    goodFor: "Early ideas, mixed needs, or artwork that could work several ways.",
+    affects: "Excellent Pins will recommend the product type, finish, backing, and quote path.",
     quoteNote: "Send what you know. Excellent Pins can recommend the practical product type, finish, backing, and quote path."
   }
 ];

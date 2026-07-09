@@ -389,6 +389,26 @@ export function ExcellentPinsQuoteFlow() {
 
       {error && <p className="mt-5 rounded-[14px] bg-[#fff0e4] px-4 py-3 text-sm font-black text-[#9d2429]">{error}</p>}
 
+      <div className="mt-7 flex flex-col gap-4 rounded-[18px] border border-[#c8d4e3] bg-[#eef5fb] p-4 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex items-center gap-4">
+          <span className="flex h-14 w-28 shrink-0 items-center justify-center overflow-hidden rounded-[12px] border border-[#d7a83d] bg-[#15110d]">
+            <img
+              src="/assets/excellent-pins/excellent-pins-logo-mark.png"
+              alt="Excellent Pins & Badges"
+              className="h-full w-full object-contain p-1"
+            />
+          </span>
+          <div>
+            <p className="text-[11px] font-black uppercase tracking-[0.22em] text-[#173866]">
+              Sent to Excellent Pins
+            </p>
+            <p className="mt-1 text-sm font-bold leading-6 text-[#4b5e73]">
+              Your quote details go directly to Excellent Pins & Badges for review.
+            </p>
+          </div>
+        </div>
+      </div>
+
       <div className="mt-7 flex flex-col gap-3 sm:flex-row">
         {step > 0 && (
           <button

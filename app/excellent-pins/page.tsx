@@ -10,14 +10,14 @@ export const metadata: Metadata = {
     title: "Excellent Pins & Badges Custom Quotes",
     description:
       "Custom pins, badges, medals, coins, and metal emblems quoted from your artwork and project details.",
-    images: ["/assets/excellent-pins/excellent-pins-logo.png"],
+    images: ["/assets/excellent-pins/excellent-pins-logo-mark.png"],
   },
   twitter: {
     card: "summary_large_image",
     title: "Excellent Pins & Badges Custom Quotes",
     description:
       "Custom pins, badges, medals, coins, and metal emblems quoted from your artwork and project details.",
-    images: ["/assets/excellent-pins/excellent-pins-logo.png"],
+    images: ["/assets/excellent-pins/excellent-pins-logo-mark.png"],
   },
 };
 
@@ -83,11 +83,11 @@ export default function ExcellentPinsPage() {
       <header className="sticky top-0 z-30 border-b border-[#c8d4e3] bg-[#f8f2e9]/95 backdrop-blur">
         <div className="mx-auto flex max-w-7xl flex-col gap-4 px-5 py-4 sm:flex-row sm:items-center sm:justify-between lg:px-8">
           <a href="#top" className="flex items-center gap-3">
-            <span className="flex h-14 w-28 items-center justify-center overflow-hidden rounded-[12px] border border-[#d7a83d] bg-[#17120f] shadow-[0_10px_28px_rgba(23,18,15,0.16)]">
+            <span className="flex h-14 w-28 items-center justify-center overflow-hidden rounded-[12px] border border-[#d7a83d] bg-[#15110d] shadow-[0_10px_28px_rgba(23,18,15,0.16)]">
               <img
-                src="/assets/excellent-pins/excellent-pins-logo.png"
+                src="/assets/excellent-pins/excellent-pins-logo-mark.png"
                 alt="Excellent Pins & Badges"
-                className="h-full w-full object-cover"
+                className="h-full w-full object-contain p-1"
               />
             </span>
             <span>
@@ -207,9 +207,6 @@ export default function ExcellentPinsPage() {
                       style.imageFit === "contain" ? "object-contain p-7" : "object-cover"
                     }`}
                   />
-                  <span className="absolute left-4 top-4 rounded-full bg-[#fffaf3]/92 px-3 py-1 text-[10px] font-black uppercase tracking-[0.22em] text-[#7c6b5b]">
-                    Sample
-                  </span>
                 </div>
 
                 <div className="flex flex-1 flex-col p-6">
