@@ -152,9 +152,9 @@ export default function ExcellentPinsPage() {
             <div className="absolute -inset-5 rounded-[34px] bg-[#d7a83d]/20 blur-3xl" aria-hidden="true" />
             <div className="relative overflow-hidden rounded-[30px] border border-[#c8d4e3] bg-[#fffaf3] p-3 shadow-[0_32px_85px_rgba(23,56,102,0.14)]">
               <img
-                src="/assets/excellent-pins/lovable/hero-pin.jpg"
-                alt="Premium custom pin example"
-                className="min-h-[360px] w-full rounded-[22px] object-cover"
+                src="/assets/excellent-pins/excellent-pins-logo-mark.png"
+                alt="Excellent Pins & Badges custom metal emblem example"
+                className="min-h-[360px] w-full rounded-[22px] bg-[#fffaf3] object-contain p-8 drop-shadow-[0_18px_28px_rgba(21,17,13,0.22)] sm:p-10"
               />
               <div className="grid gap-3 p-4 sm:grid-cols-3">
                 {["Artwork", "Options", "Quote"].map((item, index) => (
