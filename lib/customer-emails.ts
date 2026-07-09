@@ -10,6 +10,7 @@ type CustomerEmailInput = {
   to: string;
   subject: string;
   text: string;
+  replyTo?: string;
 };
 
 function clean(value: unknown, max = 1200) {
@@ -23,7 +24,7 @@ export function customerEmailConfigured() {
 export async function sendCustomerEmail(input: CustomerEmailInput): Promise<EmailResult> {
   const apiKey = process.env.RESEND_API_KEY || "";
   const from = process.env.CUSTOMER_EMAIL_FROM || process.env.OPS_ALERT_EMAIL_FROM || "";
-  const replyTo = process.env.CUSTOMER_EMAIL_REPLY_TO || process.env.NEXT_PUBLIC_QUESTIONS_EMAIL || "";
+  const replyTo = clean(input.replyTo, 320) || process.env.CUSTOMER_EMAIL_REPLY_TO || process.env.NEXT_PUBLIC_QUESTIONS_EMAIL || "";
   const to = clean(input.to, 320).toLowerCase();
 
   if (!apiKey || !from || !to) {
@@ -53,4 +54,3 @@ export async function sendCustomerEmail(input: CustomerEmailInput): Promise<Emai
     return { sent: false, provider: "email", reason: "request_failed" };
   }
 }
-

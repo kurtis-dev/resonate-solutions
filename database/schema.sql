@@ -254,3 +254,30 @@ create table if not exists ops_alerts (
 create index if not exists ops_alerts_created_idx on ops_alerts (created_at desc);
 create index if not exists ops_alerts_event_idx on ops_alerts (event_type, created_at desc);
 create index if not exists ops_alerts_priority_idx on ops_alerts (priority, created_at desc);
+
+create table if not exists excellent_pins_quote_requests (
+  id text primary key,
+  created_at timestamptz not null,
+  source text not null,
+  customer_name text not null,
+  customer_email text not null,
+  customer_phone text,
+  emblem_type text not null,
+  quantity text not null,
+  design_count text,
+  approximate_size text,
+  deadline text,
+  artwork_status text,
+  artwork_link text,
+  use_case text,
+  finish_preference text,
+  backing_preference text,
+  packaging text,
+  budget_guidance text,
+  notes text,
+  compliance_review boolean not null default false,
+  compliance_reason text
+);
+
+create index if not exists excellent_pins_quote_requests_created_idx on excellent_pins_quote_requests (created_at desc);
+create index if not exists excellent_pins_quote_requests_email_idx on excellent_pins_quote_requests (customer_email);
