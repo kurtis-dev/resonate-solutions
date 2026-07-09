@@ -7,7 +7,7 @@ import { questionsEmail } from "@/lib/contact";
 export function Footer() {
   const pathname = usePathname();
 
-  if (pathname.startsWith("/m/")) {
+  if (pathname.startsWith("/m/") || pathname.startsWith("/excellent-pins")) {
     return null;
   }
 
