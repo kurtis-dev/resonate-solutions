@@ -39,7 +39,7 @@ const processSteps = [
 const customizationChoices = [
   {
     title: "Metal finish",
-    text: "Gold, silver, black nickel, antique gold, antique silver, copper.",
+    text: "Common directions include gold-tone, nickel/silver-tone, black nickel, antique brass, antique silver, and copper-tone finishes. Exact finish names are confirmed during quoting.",
   },
   {
     title: "Color & enamel",
@@ -254,8 +254,8 @@ export default function ExcellentPinsPage() {
             </p>
             <div className="mt-8 overflow-hidden rounded-[10px] bg-[#eef5fb] shadow-[0_14px_40px_rgba(23,56,102,0.12)]">
               <img
-                src="/assets/excellent-pins/lovable-page/finish-options-large.png"
-                alt="Metal finish comparison sample"
+                src="/assets/excellent-pins/lovable/finishes.jpg"
+                alt="Metal finish sample discs"
                 className="w-full object-cover"
               />
             </div>
