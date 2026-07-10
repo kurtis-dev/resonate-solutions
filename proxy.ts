@@ -2,6 +2,7 @@ import { NextResponse, type NextRequest } from "next/server";
 import { hasConfiguredAdminAuth } from "./lib/admin-auth";
 
 const excellentPinsHosts = new Set([
+  "excellent-pins.resonate.solutions",
   "excellentpins.resonate.solutions",
 ]);
 
