@@ -27,12 +27,12 @@ const processSteps = [
     text: "Choose the closest product type, upload artwork if you have it, and describe the result you want.",
   },
   {
-    title: "We review the details",
-    text: "Excellent Pins checks the artwork, quantity, size, finish, backing, packaging, and timeline.",
+    title: "We look it over",
+    text: "Excellent Pins reviews what you sent and follows up if anything important is missing.",
   },
   {
-    title: "You get a practical quote",
-    text: "We reply with pricing, production options, and the next details needed before an order moves forward.",
+    title: "You get a quote",
+    text: "We reply with pricing and the next step to start the order.",
   },
 ];
 
@@ -43,19 +43,19 @@ const customizationChoices = [
   },
   {
     title: "Color & enamel",
-    text: "Soft enamel fills, hard enamel polish, screen-print color matching.",
+    text: "Choose a colored enamel look, a smooth polished finish, or printed artwork for detailed designs.",
   },
   {
     title: "Size & shape",
-    text: "Round, oval, rectangle, or cut to your custom silhouette.",
+    text: "Pick a general size and shape. Custom outlines are welcome.",
   },
   {
     title: "Backing",
-    text: "Butterfly clutch, rubber, deluxe locking, magnet, safety pin.",
+    text: "Pin backs, magnets, clips, key rings, and other attachments can be matched to the item.",
   },
   {
     title: "Packaging",
-    text: "Poly bag, header card, velvet pouch, custom branded card.",
+    text: "Most orders can be individually polybagged. Ask about backer cards, boxes, or other packaging if needed.",
   },
   {
     title: "Quantity",
@@ -63,11 +63,11 @@ const customizationChoices = [
   },
   {
     title: "Artwork detail",
-    text: "Line weight and color count affect what is producible.",
+    text: "Simple designs, detailed logos, and full-color artwork can each be quoted in the right style.",
   },
   {
     title: "Timeline",
-    text: "Event dates, rush needs, and approval timing help shape the quote.",
+    text: "Tell us when you need it, especially for events or deadlines.",
   },
 ];
 
@@ -150,12 +150,14 @@ export default function ExcellentPinsPage() {
 
           <div className="relative">
             <div className="absolute -inset-5 rounded-[34px] bg-[#d7a83d]/20 blur-3xl" aria-hidden="true" />
-            <div className="relative overflow-hidden rounded-[30px] border border-[#c8d4e3] bg-[#fffaf3] p-3 shadow-[0_32px_85px_rgba(23,56,102,0.14)]">
-              <img
-                src="/assets/excellent-pins/excellent-pins-logo-mark.png"
-                alt="Excellent Pins & Badges custom metal emblem example"
-                className="min-h-[360px] w-full rounded-[22px] bg-[#fffaf3] object-contain p-8 drop-shadow-[0_18px_28px_rgba(21,17,13,0.22)] sm:p-10"
-              />
+            <div className="relative rounded-[30px] border border-[#c8d4e3] bg-[#fffaf3] p-3 shadow-[0_32px_85px_rgba(23,56,102,0.14)]">
+              <div className="flex min-h-[360px] items-center justify-center overflow-visible rounded-[22px] bg-[#fffaf3] p-8 sm:p-10">
+                <img
+                  src="/assets/excellent-pins/excellent-pins-logo-mark.png"
+                  alt="Excellent Pins & Badges custom metal emblem example"
+                  className="max-h-[330px] w-full object-contain drop-shadow-[0_18px_28px_rgba(21,17,13,0.22)]"
+                />
+              </div>
               <div className="grid gap-3 p-4 sm:grid-cols-3">
                 {["Artwork", "Options", "Quote"].map((item, index) => (
                   <div
@@ -181,15 +183,15 @@ export default function ExcellentPinsPage() {
         <div className="mx-auto max-w-7xl">
           <div className="mb-8 max-w-3xl">
             <p className="mb-4 text-[12px] font-black uppercase tracking-[0.34em] text-[#173866]">
-              Product starting points
+              What would you like made?
             </p>
             <h2 className="excellent-pins-display text-4xl font-black leading-tight sm:text-5xl">
-              Choose the closest format. We will help shape the exact build.
+              Start with the option that feels closest.
             </h2>
             <p className="mt-5 text-base leading-7 text-[#4b5e73]">
-              These are not fixed-price menu items. They are the main quote
-              paths customers can recognize before Excellent Pins reviews the
-              artwork, quantity, finish, and production details.
+              If you are not sure what to call it, that is okay. Pick the
+              closest match or choose "Not sure yet" and describe what you want
+              made.
             </p>
           </div>
 
