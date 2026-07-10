@@ -232,7 +232,7 @@ export default function ExcellentPinsPage() {
               Customization choices
             </p>
             <h2 className="excellent-pins-display text-5xl font-black leading-[0.96] text-[#15110d] sm:text-6xl">
-              Built to your spec, one decision at a time.
+              Choose the details that make it yours.
             </h2>
             <p className="mt-7 max-w-md text-lg leading-8 text-[#4b5e73]">
               Excellent Pins will guide you through the options that matter for
