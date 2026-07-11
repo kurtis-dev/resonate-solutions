@@ -241,7 +241,7 @@ function line(label: string, value?: string | boolean) {
 export function buildJackQuoteEmail(record: ExcellentPinsQuoteRecord) {
   const subject = `New quote request - ${record.customerName} - ${record.emblemType}`;
   const text = [
-    "New quote request from the Excellent Pins & Badges page",
+    "New quote request from Excellent Pins & Badges",
     "",
     "Customer",
     line("Name", record.customerName),
@@ -266,12 +266,12 @@ export function buildJackQuoteEmail(record: ExcellentPinsQuoteRecord) {
     "Notes",
     record.notes || "No extra notes provided.",
     "",
-    "Internal flags",
-    line("Compliance review", record.complianceReview ? "Review recommended" : "No obvious flag"),
+    "Review notes",
+    line("Extra review", record.complianceReview ? "Recommended before promising production details" : "No obvious review flag"),
     line("Reason", record.complianceReason),
     "",
     "Suggested next step",
-    "Reply to the customer, confirm artwork/quantity/deadline, and ask for any missing production details."
+    "Reply to the customer, confirm the artwork, quantity, deadline, and shipping destination, then ask for any missing details needed to quote the order."
   ]
     .filter((item) => item !== "")
     .join("\n");
@@ -280,13 +280,13 @@ export function buildJackQuoteEmail(record: ExcellentPinsQuoteRecord) {
 }
 
 export function buildCustomerQuoteReceipt(record: ExcellentPinsQuoteRecord) {
-  const subject = "We received your Excellent Pins quote request";
+  const subject = "Excellent Pins received your quote request";
   const text = [
     `Hi ${record.customerName},`,
     "",
-    "Thanks for sending your custom quote request to Excellent Pins & Badges.",
+    "Thanks for reaching out to Excellent Pins & Badges. Your quote request was received.",
     "",
-    "We received:",
+    "Here is the request we received:",
     line("Metal emblem type", record.emblemType),
     line("Quantity", record.quantity),
     line("Approx size", record.approximateSize),
@@ -295,7 +295,9 @@ export function buildCustomerQuoteReceipt(record: ExcellentPinsQuoteRecord) {
     line("Shipping destination", record.shippingDestination),
     line("Artwork", record.artworkStatus),
     "",
-    "Excellent Pins will review the details and follow up with the next step.",
+    "Excellent Pins will review your details and follow up with pricing, questions, or the next step for your order.",
+    "",
+    "If you forgot something important, you can reply to this email with the extra details.",
     "",
     "Thanks,",
     "Excellent Pins & Badges"
