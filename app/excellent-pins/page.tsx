@@ -71,6 +71,27 @@ const customizationChoices = [
   },
 ];
 
+const heroActionLinks = [
+  {
+    label: "Artwork",
+    href: "#quote",
+    ariaLabel: "Jump to the quote form artwork questions",
+    className: "bg-[#173866] text-white",
+  },
+  {
+    label: "Options",
+    href: "#options",
+    ariaLabel: "Jump to product options",
+    className: "bg-[#d7a83d] text-[#15110d]",
+  },
+  {
+    label: "Quote",
+    href: "#quote",
+    ariaLabel: "Jump to the quote form",
+    className: "bg-[#c92f2f] text-white",
+  },
+];
+
 export default function ExcellentPinsPage() {
   return (
     <main className="excellent-pins-page min-h-screen bg-[#f4efe7] text-[#15110d]">
@@ -153,25 +174,21 @@ export default function ExcellentPinsPage() {
             <div className="relative rounded-[30px] border border-[#c8d4e3] bg-[#fffaf3] p-3 shadow-[0_32px_85px_rgba(23,56,102,0.14)]">
               <div className="flex min-h-[360px] items-center justify-center overflow-visible rounded-[22px] bg-[#fffaf3] p-8 sm:p-10">
                 <img
-                  src="/assets/excellent-pins/excellent-pins-logo-mark.png"
+                  src="/assets/excellent-pins/excellent-pins-logo.png"
                   alt="Excellent Pins & Badges custom metal emblem example"
-                  className="max-h-[330px] w-full object-contain drop-shadow-[0_18px_28px_rgba(21,17,13,0.22)]"
+                  className="max-h-[330px] w-full rounded-[18px] object-contain shadow-[0_18px_34px_rgba(21,17,13,0.14)]"
                 />
               </div>
               <div className="grid gap-3 p-4 sm:grid-cols-3">
-                {["Artwork", "Options", "Quote"].map((item, index) => (
-                  <div
-                    key={item}
-                    className={`rounded-[16px] px-4 py-3 text-xs font-black uppercase tracking-[0.16em] ${
-                      index === 0
-                        ? "bg-[#173866] text-white"
-                        : index === 1
-                          ? "bg-[#d7a83d] text-[#15110d]"
-                          : "bg-[#c92f2f] text-white"
-                    }`}
+                {heroActionLinks.map((item) => (
+                  <a
+                    key={item.label}
+                    href={item.href}
+                    aria-label={item.ariaLabel}
+                    className={`flex h-10 items-center justify-center rounded-[16px] px-4 text-center text-xs font-black uppercase leading-none tracking-[0.16em] transition hover:-translate-y-0.5 focus:outline-none focus-visible:ring-2 focus-visible:ring-[#173866] focus-visible:ring-offset-2 ${item.className}`}
                   >
-                    {item}
-                  </div>
+                    <span className="translate-y-px">{item.label}</span>
+                  </a>
                 ))}
               </div>
             </div>
