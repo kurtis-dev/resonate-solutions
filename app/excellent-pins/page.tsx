@@ -74,8 +74,8 @@ const customizationChoices = [
 const heroActionLinks = [
   {
     label: "Artwork",
-    href: "#quote",
-    ariaLabel: "Jump to the quote form artwork questions",
+    href: "#customization",
+    ariaLabel: "Jump to artwork and customization choices",
     className: "bg-[#173866] text-white",
   },
   {
@@ -128,6 +128,9 @@ export default function ExcellentPinsPage() {
             <a className="rounded-full px-3 py-2 hover:bg-[#eef5fb]" href="#customization">
               Details
             </a>
+            <a className="rounded-full px-3 py-2 hover:bg-[#eef5fb]" href="/excellent-pins/library">
+              Library
+            </a>
             <a className="rounded-full px-3 py-2 hover:bg-[#eef5fb]" href="#process">
               How it works
             </a>
@@ -161,10 +164,10 @@ export default function ExcellentPinsPage() {
                 Start a custom quote
               </a>
               <a
-                href="#options"
+                href="/excellent-pins/library"
                 className="inline-flex items-center justify-center rounded-full border border-[#c8d4e3] bg-[#fffaf3] px-7 py-4 text-sm font-black text-[#173866] shadow-[0_14px_36px_rgba(23,56,102,0.08)]"
               >
-                See product options
+                See example library
               </a>
             </div>
           </div>
