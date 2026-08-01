@@ -16,7 +16,7 @@ export default function BillingPage() {
               Billing for your Resonate page.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
-              Pay the one-time Launch setup, start monthly care, or manage an existing subscription through Stripe secure checkout.
+              Pay the one-time Launch setup, start Webpage Hosting, choose monthly care, or manage an existing subscription through Stripe secure checkout.
             </p>
           </div>
           <div className="rounded-[1.5rem] border border-coral/25 bg-white p-6 shadow-sm">
@@ -29,7 +29,7 @@ export default function BillingPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-14">
-        <div className="grid gap-6 lg:grid-cols-3">
+        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
           {paidPlans.map((plan) => (
             <article key={plan.id} className={`flex min-h-full flex-col rounded-[1.75rem] border-2 bg-white p-6 shadow-sm ${plan.highlighted ? "border-coral" : "border-line"}`}>
               <div className="flex items-start justify-between gap-4">
@@ -50,6 +50,17 @@ export default function BillingPage() {
             </article>
           ))}
         </div>
+
+        <section className="mt-8 rounded-[1.75rem] border border-coral/25 bg-white p-7 shadow-sm">
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Launch with hosting</p>
+          <h2 className="mt-3 text-2xl font-extrabold text-ink">Pay $416.99 today, then $17.99 per month.</h2>
+          <p className="mt-3 max-w-3xl leading-7 text-muted">
+            One Stripe checkout includes the $399 one-time Launch payment and the first $17.99 Webpage Hosting charge. Only hosting renews after the first payment.
+          </p>
+          <Link href="/checkout?plan=launch-hosting" className="mt-6 inline-flex rounded-full bg-coral px-5 py-3 font-black text-white transition hover:bg-ink">
+            Pay Launch + Hosting together
+          </Link>
+        </section>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[0.8fr_1fr]">
           <section className="rounded-[1.75rem] border border-line bg-white p-7 shadow-sm">
@@ -73,21 +84,9 @@ export default function BillingPage() {
             <p className="mt-3 leading-7 text-muted">
               Your MenuPilot customer portal lives at app.resonate.solutions. Portal access is opened after Resonate reviews the business record and connects it to the right account.
             </p>
-            <a href={customerPortalUrl} className="mt-6 inline-flex rounded-full border border-line px-5 py-3 font-black text-ink transition hover:border-coral">
-              Open customer portal
-            </a>
-          </section>
-        </div>
-
-        <section className="mt-6 rounded-[1.75rem] border border-line bg-white p-7 shadow-sm">
-          <h2 className="text-2xl font-extrabold text-ink">Before work starts</h2>
-            <div className="mt-5 grid gap-4 text-sm leading-6 text-muted sm:grid-cols-3">
-              <p><strong className="block text-ink">Free Page Plan</strong>Resonate reviews the business and recommends the right setup.</p>
-              <p><strong className="block text-ink">Launch payment</strong>The one-time setup payment starts the custom build.</p>
-              <p><strong className="block text-ink">Monthly care</strong>Maintain or Managed keeps the page current after launch.</p>
-            </div>
-        </section>
-      </section>
-    </main>
-  );
-}
+            <a href={customerPortalUrl} className="mt-6 inline-flex rounded-full border border-lm¹×kh‘éì¶»§q«^w[›Ü›X[ˆÏ‚ˆÛX™[‚ˆ]Ûˆ\OHœÝX›Z]ˆÛ\ÜÓ˜[YOHœ›Ý[™YY[™ËXÛÜ˜[MHKLÈ^XÙ[\ˆ›ÛX›XÚÈ^]Ú]HÚYÝË\ÛÙÝ™\Ž˜™ËZ[šÈ‚ˆØ]Û•^BˆØ]Û‚ˆÙ›Ü›O‚ˆ]ˆÛ\ÜÓ˜[YOH›]MˆÜšYØ\LÈ›Ý[™YLž›Ü™\ˆ›Ü™\‹[[™H™ËXÜ™X[HM^\ÛHXY[™ËMˆ^[]]Y‚ˆÚ\Ñœ™YHÈ
+ˆÝ›Û™ÈÛ\ÜÓ˜[YOH^Z[šÈ“›È^[Y[\È™\]Z\™Y›ÜˆHœ™YHYÙH[‹ÜÝ›Û™ÏˆZYZ[ÛÜšÈ™YÚ[œÈÛ›HY\ˆ[ÝHÚÛÜÙH][˜ÚÜ‚ˆ
+Hˆ
+ˆ‚ˆÝ›Û™ÈÛ\ÜÓ˜[YOH^Z[šÈ‘Xš][™Ü™Y]Ø\™È\™HXØÙ\Y›ÝYÚÝš\KÜÝ›Û™Ïˆ™\ÛÛ˜]HÙ\È›ÝÛÛXÝÜˆÝÜ™HØ\™[X™\œÈÛˆ\ÈÙXœÚ]KÜ‚ˆÚ\Ó][˜ÚÜÝ[™ÈÈÝ›Û™ÈÛ\ÜÓ˜[YOH^Z[šÈ•Ù^Nˆ	M‹ŽNKÜÝ›Û™ÏˆÜÝ[™È[ˆ™[™]ÜÈ]	MËŽNH\ˆ[ÛÈH	ÎNH][˜ÚÚ\™ÙHÙ\È›Ý™\X]Üˆˆ[BˆÏ‚ˆ
+_BˆY\ˆ™]šY]ËÝ\ÝÛY\ˆÜ[XØÙ\ÜÈ\È[™Y]\œ™\ÛÛ˜]KœÛÛ][ÛœËˆ[ÛHš[[™È\ÈX[˜YÙYÙXÝ\™[H›ÝYÚÝš\KÜ‚ˆÙ]‚ˆ]ˆÛ\ÜÓ˜[YOH›]N›^›^XÛÛØ\LÈÛN™›^\›ÝÈ‚ˆ[šÈ™YH‹ÜšXÚ[™ÈˆÛ\ÜÓ˜[YOHœ›Ý[™YY[›Ü™\ˆ›Ü™\‹[[™HMHKLÈ^XÙ[\ˆ›ÛX›XÚÈ^Z[šÈ˜XÚÈÈšXÚ[™ÏÓ[šÏ‚ˆÈZ\Ñœ™YHÈ[šÈ™YH‹ØÚXÚÛÝ]Ü[\™]šY]ÈˆÛ\ÜÓ˜[YOHœ›Ý[™YY[›Ü™\ˆ›Ü™\‹[[™HMHKLÈ^XÙ[\ˆ›ÛX›XÚÈ^Z[šÈ”™\]Y\Ýœ™YHYÙH[Ó[šÏˆˆ[BˆÙ]‚ˆÜÙXÝ[Û‚ˆÛXZ[‚ˆ
+NÂŸB

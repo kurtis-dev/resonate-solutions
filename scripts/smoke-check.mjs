@@ -5,6 +5,8 @@ const checks = [
   { path: "/menupilot", expect: "text/html" },
   { path: "/menupilot/examples", expect: "text/html" },
   { path: "/pricing", expect: "text/html" },
+  { path: "/checkout?plan=hosting", expect: "text/html" },
+  { path: "/checkout?plan=launch-hosting", expect: "text/html" },
   { path: "/privacy", expect: "text/html" },
   { path: "/terms", expect: "text/html" },
   { path: "/disclaimer", expect: "text/html" },

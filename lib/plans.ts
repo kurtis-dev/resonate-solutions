@@ -12,7 +12,10 @@ export type Plan = {
   cta: string;
   highlighted?: boolean;
   checkoutUrl: string;
-  stripePriceEnvKey?: string;
+  stripePrices?: Array<{
+    envKey: string;
+    fallbackPriceId?: string;
+  }>;
   stripePaymentLinkEnvKey?: string;
   paymentMode: "none" | "payment" | "subscription";
 };
@@ -53,9 +56,31 @@ export const plans: Plan[] = [
     cta: "Start Launch",
     highlighted: true,
     checkoutUrl: "/checkout?plan=setup",
-    stripePriceEnvKey: "STRIPE_PRICE_SETUP",
+    stripePrices: [{ envKey: "STRIPE_PRICE_SETUP" }],
     stripePaymentLinkEnvKey: "STRIPE_PAYMENT_LINK_SETUP",
     paymentMode: "payment"
+  },
+  {
+    id: "hosting",
+    name: "Webpage Hosting",
+    price: "$17.99",
+    description: "Simple monthly hosting for a live customer webpage managed by Resonate Solutions.",
+    limit: "Monthly hosting",
+    billingPeriod: "mo",
+    features: [
+      { label: "Live webpage hosting", detail: "Keeps one approved customer webpage available at its public Resonate link." },
+      { label: "Secure managed delivery", detail: "Resonate manages the hosting connection and production delivery for the live page." },
+      { label: "Monthly billing", detail: "Hosting renews at $17.99 each month until the subscription is cancelled." }
+    ],
+    cta: "Choose Webpage Hosting",
+    checkoutUrl: "/checkout?plan=hosting",
+    stripePrices: [
+      {
+        envKey: "STRIPE_PRICE_HOSTING",
+        fallbackPriceId: "price_1Tz7OmCXtuHVAwMwLgZcnUdy"
+      }
+    ],
+    paymentMode: "subscription"
   },
   {
     id: "care",
@@ -72,7 +97,7 @@ export const plans: Plan[] = [
     ],
     cta: "Choose Maintain",
     checkoutUrl: "/checkout?plan=care",
-    stripePriceEnvKey: "STRIPE_PRICE_CORE",
+    stripePrices: [{ envKey: "STRIPE_PRICE_CORE" }],
     stripePaymentLinkEnvKey: "STRIPE_PAYMENT_LINK_CORE",
     paymentMode: "subscription"
   },
@@ -92,14 +117,41 @@ export const plans: Plan[] = [
     ],
     cta: "Choose Managed",
     checkoutUrl: "/checkout?plan=care-plus",
-    stripePriceEnvKey: "STRIPE_PRICE_PLUS",
+    stripePrices: [{ envKey: "STRIPE_PRICE_PLUS" }],
     stripePaymentLinkEnvKey: "STRIPE_PAYMENT_LINK_PLUS",
     paymentMode: "subscription"
   }
 ];
 
+const launchHostingPlan: Plan = {
+  id: "launch-hosting",
+  name: "Launch + Webpage Hosting",
+  price: "$416.99",
+  description: "Launch your customer page and keep it hosted through one secure Stripe checkout.",
+  limit: "$399 once + $17.99 monthly",
+  billingPeriod: "first payment",
+  features: [
+    { label: "Launch", detail: "A one-time $399 custom page build included on the first Stripe invoice." },
+    { label: "Webpage Hosting", detail: "$17.99 is charged today and renews monthly after launch." }
+  ],
+  cta: "Pay Launch + Hosting",
+  checkoutUrl: "/checkout?plan=launch-hosting",
+  stripePrices: [
+    { envKey: "STRIPE_PRICE_SETUP" },
+    {
+      envKey: "STRIPE_PRICE_HOSTING",
+      fallbackPriceId: "price_1Tz7OmCXtuHVAwMwLgZcnUdy"
+    }
+  ],
+  paymentMode: "subscription"
+};
+
 export function getPlanById(id: string) {
-  return plans.find((plan) => plan.id === id);
+  return id === launchHostingPlan.id ? launchHostingPlan : plans.find((plan) => plan.id === id);
+}
+
+export function getConfiguredStripePriceIds(plan: Plan) {
+  return (plan.stripePrices || []).map(({ envKey, fallbackPriceId }) => process.env[envKey] || fallbackPriceId || "");
 }
 
 export function getConfiguredPaymentLink(plan: Plan) {

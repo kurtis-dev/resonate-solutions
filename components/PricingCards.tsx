@@ -2,7 +2,7 @@ import { plans } from "@/lib/plans";
 
 export function PricingCards() {
   return (
-    <div className="grid auto-rows-fr gap-6 md:grid-cols-2 xl:grid-cols-4">
+    <div className="grid auto-rows-fr gap-6 md:grid-cols-2 xl:grid-cols-3">
       {plans.map((plan) => {
         const isFree = plan.paymentMode === "none";
         const isManaged = plan.id === "care-plus";
@@ -65,6 +65,14 @@ export function PricingCards() {
               {plan.cta}
               <span aria-hidden="true">{"\u2192"}</span>
             </a>
+            {plan.id === "setup" || plan.id === "hosting" ? (
+              <a
+                href="/checkout?plan=launch-hosting"
+                className="mt-3 inline-flex w-full items-center justify-center rounded-full border border-line px-4 py-3 text-center text-sm font-black text-ink transition hover:border-[#ff5a1f] hover:text-[#ff5a1f]"
+              >
+                Pay Launch + Hosting together
+              </a>
+            ) : null}
           </article>
         );
       })}

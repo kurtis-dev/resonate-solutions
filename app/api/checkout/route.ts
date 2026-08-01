@@ -4,7 +4,7 @@ import { sendCustomerEmail } from "@/lib/customer-emails";
 import { saveIntakeRecord, upsertCustomerOnboarding, upsertLeadTask } from "@/lib/customer-store";
 import { createIntakeRecord, type IntakePayload } from "@/lib/intake";
 import { buildFreePlanReceiptEmail, createFreePlanLeadTask } from "@/lib/lead-tasks";
-import { getConfiguredPaymentLink, getPlanById } from "@/lib/plans";
+import { getConfiguredPaymentLink, getConfiguredStripePriceIds, getPlanById } from "@/lib/plans";
 import { notifyOpsAlert } from "@/lib/ops-alerts";
 import { assessLeadSpam } from "@/lib/spam-guard";
 import { getStripe } from "@/lib/stripe";
@@ -122,9 +122,9 @@ export async function POST(request: Request) {
   });
 
   const stripe = getStripe();
-  const priceId = plan.stripePriceEnvKey ? process.env[plan.stripePriceEnvKey] : "";
+  const priceIds = getConfiguredStripePriceIds(plan);
 
-  if (!stripe || !priceId) {
+  if (!stripe || priceIds.length === 0 || priceIds.some((priceId) => !priceId)) {
     const paymentLink = getConfiguredPaymentLink(plan);
 
     if (paymentLink) {
@@ -136,7 +136,7 @@ export async function POST(request: Request) {
 
   const session = await stripe.checkout.sessions.create({
     mode: plan.paymentMode,
-    line_items: [{ price: priceId, quantity: 1 }],
+    line_items: priceIds.map((price) => ({ price, quantity: 1 })),
     customer_email: email || undefined,
     customer_creation: plan.paymentMode === "payment" ? "always" : undefined,
     allow_promotion_codes: true,

@@ -1,8 +1,11 @@
 import { NextResponse } from "next/server";
 import { adminCredentialStatus, hasConfiguredAdminAuth } from "@/lib/admin-auth";
 import { customerPortalUrl } from "@/lib/portal";
+import { getConfiguredStripePriceIds, getPlanById } from "@/lib/plans";
 
 export async function GET() {
+  const hostingPlan = getPlanById("hosting");
+
   return NextResponse.json({
     ok: true,
     checks: {
@@ -12,6 +15,7 @@ export async function GET() {
       setupPriceConfigured: Boolean(process.env.STRIPE_PRICE_SETUP),
       corePriceConfigured: Boolean(process.env.STRIPE_PRICE_CORE),
       plusPriceConfigured: Boolean(process.env.STRIPE_PRICE_PLUS),
+      hostingPriceConfigured: Boolean(hostingPlan && getConfiguredStripePriceIds(hostingPlan).every(Boolean)),
       adminProtected: hasConfiguredAdminAuth(),
       adminCredentialStatus: adminCredentialStatus(),
       siteUrlConfigured: Boolean(process.env.NEXT_PUBLIC_SITE_URL),
