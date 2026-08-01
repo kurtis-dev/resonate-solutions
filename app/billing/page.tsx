@@ -7,29 +7,29 @@ const portalUrl = process.env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL || "";
 const checkoutChoices = [
   {
     name: "Launch only",
-    price: "$399",
-    billing: "one-time",
-    description: "The custom page build with no Resonate monthly plan added at checkout.",
+    price: "No monthly bill",
+    billing: "$399 Launch payment only",
+    description: "Start with the one-time Launch build and continue without a Resonate monthly plan.",
     href: "/checkout?plan=setup",
     cta: "Choose Launch only",
     highlighted: false
   },
   {
-    name: "Launch + Webpage Hosting",
-    price: "$416.99",
-    billing: "today, then $17.99/month",
-    description: "Launch plus hosting, SSL, routine platform maintenance, and basic uptime monitoring. Content updates are not included.",
+    name: "Webpage Hosting",
+    price: "$17.99",
+    billing: "per month with Launch",
+    description: "Hosting, SSL, routine platform maintenance, and basic uptime monitoring. Content updates are not included.",
     href: "/checkout?plan=launch-hosting",
-    cta: "Choose Launch + Hosting",
+    cta: "Choose Hosting after Launch",
     highlighted: false
   },
   {
-    name: "Launch + Managed Page",
-    price: "$478.99",
-    billing: "today, then $79.99/month",
-    description: "Launch plus Managed Page. Hosting is included, so there is no separate $17.99 monthly charge.",
+    name: "Managed Page",
+    price: "$79.99",
+    billing: "per month with Launch",
+    description: "Ongoing page updates and priority care. Webpage Hosting is included, so there is no separate hosting charge.",
     href: "/checkout?plan=launch-managed-page",
-    cta: "Choose Launch + Managed Page",
+    cta: "Choose Managed Page after Launch",
     highlighted: true
   }
 ];
@@ -44,7 +44,7 @@ export default function BillingPage() {
               Billing for your Resonate page.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
-              Choose Launch only, Launch with Webpage Hosting, or Launch with Managed Page through secure Stripe checkout.
+              Every Resonate page starts with Launch at $399 one-time. Then choose whether you need no monthly plan, Webpage Hosting, or Managed Page.
             </p>
           </div>
           <div className="rounded-[1.5rem] border border-coral/25 bg-white p-6 shadow-sm">
@@ -57,7 +57,23 @@ export default function BillingPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-14">
-        <div className="grid gap-6 lg:grid-cols-3">
+        <section className="rounded-[1.75rem] border-2 border-coral bg-white p-7 shadow-sm">
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Step 1 — Every page starts here</p>
+          <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <h2 className="text-3xl font-extrabold text-ink">Launch</h2>
+              <p className="mt-2 max-w-3xl leading-7 text-muted">The one-time custom page build, private preview, and launch check.</p>
+            </div>
+            <p className="text-3xl font-black text-ink">$399 <span className="text-sm font-bold text-muted">one-time</span></p>
+          </div>
+        </section>
+
+        <div className="mt-8">
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Step 2 — Choose what follows Launch</p>
+          <h2 className="mt-2 text-3xl font-extrabold text-ink">Pick your monthly support.</h2>
+        </div>
+
+        <div className="mt-6 grid gap-6 lg:grid-cols-3">
           {checkoutChoices.map((choice) => (
             <article
               key={choice.name}
@@ -81,6 +97,10 @@ export default function BillingPage() {
             </article>
           ))}
         </div>
+
+        <p className="mt-5 text-center text-sm font-semibold leading-6 text-muted">
+          Monthly plans are selected with Launch. Stripe charges the first month at checkout; after that, only the monthly plan renews.
+        </p>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-2">
           <section className="rounded-[1.75rem] border border-line bg-white p-7 shadow-sm">
