@@ -64,16 +64,18 @@ export const plans: Plan[] = [
     id: "hosting",
     name: "Webpage Hosting",
     price: "$17.99",
-    description: "Simple monthly hosting for a live customer webpage managed by Resonate Solutions.",
+    description: "Reliable hosting and routine platform care for a live customer webpage, without content updates.",
     limit: "Monthly hosting",
     billingPeriod: "mo",
     features: [
-      { label: "Live webpage hosting", detail: "Keeps one approved customer webpage available at its public Resonate link." },
-      { label: "Secure managed delivery", detail: "Resonate manages the hosting connection and production delivery for the live page." },
-      { label: "Monthly billing", detail: "Hosting renews at $17.99 each month until the subscription is cancelled." }
+      { label: "Webpage hosting", detail: "Keeps one approved customer webpage available at its public Resonate link." },
+      { label: "SSL", detail: "Keeps the hosted page served over a secure HTTPS connection." },
+      { label: "Routine platform maintenance", detail: "Covers routine upkeep of the hosting platform and production delivery." },
+      { label: "Basic uptime monitoring", detail: "Includes basic checks that the hosted page remains available." },
+      { label: "No content updates", detail: "Text, photo, hours, menu, and service changes are not included in this plan." }
     ],
-    cta: "Choose Webpage Hosting",
-    checkoutUrl: "/checkout?plan=hosting",
+    cta: "Choose Launch + Hosting",
+    checkoutUrl: "/checkout?plan=launch-hosting",
     stripePrices: [
       {
         envKey: "STRIPE_PRICE_HOSTING",
@@ -83,42 +85,28 @@ export const plans: Plan[] = [
     paymentMode: "subscription"
   },
   {
-    id: "care",
-    name: "Maintain",
-    price: "$79",
-    description: "For businesses that want the page kept current after launch without paying for a rebuild every time small details change.",
-    limit: "Monthly care",
+    id: "managed-page",
+    name: "Managed Page",
+    price: "$79.99",
+    description: "Hosting plus a clear monthly update allowance for businesses that want Resonate to keep their page current.",
+    limit: "Hosting + monthly updates",
     billingPeriod: "mo",
     features: [
-      { label: "Hosting and page care", detail: "The page stays available and Resonate remains the place to request changes." },
-      { label: "Two update requests per month", detail: "Good for hours, links, small menu/service edits, price note changes, and photo swaps." },
-      { label: "Monthly link check", detail: "We check the main call, map, booking, order, quote, and social/profile links." },
-      { label: "Email support", detail: "Simple support for page questions and update requests." }
+      { label: "Everything in Webpage Hosting", detail: "Includes hosting, SSL, routine platform maintenance, and basic uptime monitoring." },
+      { label: "Up to 4 standard update requests", detail: "Four standard page-update requests are included each month." },
+      { label: "Monthly page review", detail: "Resonate reviews the page each month for obvious content and presentation issues." },
+      { label: "Common content updates", detail: "Includes supplied text, photo, hours, menu, and service updates." },
+      { label: "Priority turnaround", detail: "Standard update requests are handled ahead of hosting-only requests." },
+      { label: "Basic link and page-health checks", detail: "Includes basic checks of important links and the customer-facing page." }
     ],
-    cta: "Choose Maintain",
-    checkoutUrl: "/checkout?plan=care",
-    stripePrices: [{ envKey: "STRIPE_PRICE_CORE" }],
-    stripePaymentLinkEnvKey: "STRIPE_PAYMENT_LINK_CORE",
-    paymentMode: "subscription"
-  },
-  {
-    id: "care-plus",
-    name: "Managed",
-    price: "$149",
-    description: "For restaurants, food trucks, and service businesses that change often and want Resonate to keep the page useful without counting every small edit.",
-    limit: "Priority monthly care",
-    billingPeriod: "mo",
-    features: [
-      { label: "Everything in Maintain", detail: "Includes hosting, link checks, update handling, and page support." },
-      { label: "Unlimited standard updates", detail: "Useful for specials, seasonal menus, service changes, sold-out items, availability, featured offers, hours, links, and small copy/photo swaps. Larger rebuilds are quoted separately." },
-      { label: "Monthly page polish", detail: "A recurring pass to improve labels, ordering, photos, and the customer path." },
-      { label: "Priority turnaround", detail: "Update requests are treated ahead of standard care requests when the page needs to stay current." },
-      { label: "Menu/service refresh help", detail: "We help reorganize supplied menu or service updates so customers can understand them quickly." }
+    cta: "Choose Launch + Managed Page",
+    checkoutUrl: "/checkout?plan=launch-managed-page",
+    stripePrices: [
+      {
+        envKey: "STRIPE_PRICE_MANAGED_PAGE",
+        fallbackPriceId: "price_1TzSrPCXtuHVAwMwdtSFQBZe"
+      }
     ],
-    cta: "Choose Managed",
-    checkoutUrl: "/checkout?plan=care-plus",
-    stripePrices: [{ envKey: "STRIPE_PRICE_PLUS" }],
-    stripePaymentLinkEnvKey: "STRIPE_PAYMENT_LINK_PLUS",
     paymentMode: "subscription"
   }
 ];
@@ -146,8 +134,33 @@ const launchHostingPlan: Plan = {
   paymentMode: "subscription"
 };
 
+const launchManagedPagePlan: Plan = {
+  id: "launch-managed-page",
+  name: "Launch + Managed Page",
+  price: "$478.99",
+  description: "Launch your customer page with hosting and ongoing monthly updates through one secure Stripe checkout.",
+  limit: "$399 once + $79.99 monthly",
+  billingPeriod: "first payment",
+  features: [
+    { label: "Launch", detail: "A one-time $399 custom page build included on the first Stripe invoice." },
+    { label: "Managed Page", detail: "$79.99 is charged today and renews monthly after launch. Hosting is included." }
+  ],
+  cta: "Pay Launch + Managed Page",
+  checkoutUrl: "/checkout?plan=launch-managed-page",
+  stripePrices: [
+    { envKey: "STRIPE_PRICE_SETUP" },
+    {
+      envKey: "STRIPE_PRICE_MANAGED_PAGE",
+      fallbackPriceId: "price_1TzSrPCXtuHVAwMwdtSFQBZe"
+    }
+  ],
+  paymentMode: "subscription"
+};
+
 export function getPlanById(id: string) {
-  return id === launchHostingPlan.id ? launchHostingPlan : plans.find((plan) => plan.id === id);
+  if (id === launchHostingPlan.id) return launchHostingPlan;
+  if (id === launchManagedPagePlan.id) return launchManagedPagePlan;
+  return plans.find((plan) => plan.id === id);
 }
 
 export function getConfiguredStripePriceIds(plan: Plan) {

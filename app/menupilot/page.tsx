@@ -581,7 +581,7 @@ export default function MenuPilotPage() {
               Build once. Choose how much help you want after launch.
             </h2>
             <p className="mt-4 leading-7 text-muted">
-              Start with a free page plan so everyone agrees on the work. The one-time Launch payment starts the custom build. After launch, Maintain covers occasional edits, while Managed gives active businesses unlimited standard updates with priority help.
+              Start with a free page plan so everyone agrees on the work. The one-time Launch payment starts the custom build. Add Webpage Hosting for reliable delivery, or choose Managed Page for hosting plus up to four standard update requests each month.
             </p>
           </div>
           <div className="mt-10">
@@ -631,7 +631,7 @@ export default function MenuPilotPage() {
                       ["01", "Free Page Plan", "We review the business details and recommend the right MenuPilot page, menu, or services setup."],
                       ["02", "Launch Payment", "$399 starts the custom build. This is when production work begins."],
                       ["03", "Private Preview", "The customer reviews the page before the public link is shared."],
-                      ["04", "Go Live + Care", "Choose Launch only, Maintain, or Managed before the page becomes the customer-facing link."]
+                      ["04", "Go Live + Care", "Choose Launch only, Launch + Webpage Hosting, or Launch + Managed Page before the page becomes the customer-facing link."]
                     ].map(([number, title, text]) => (
                       <li key={number} className="grid grid-cols-[auto_1fr] gap-4 rounded-2xl border border-line bg-white p-4">
                         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff0e9] text-xs font-black text-coral">{number}</span>

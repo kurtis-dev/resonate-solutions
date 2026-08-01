@@ -5,6 +5,7 @@ import { getConfiguredStripePriceIds, getPlanById } from "@/lib/plans";
 
 export async function GET() {
   const hostingPlan = getPlanById("hosting");
+  const managedPagePlan = getPlanById("managed-page");
 
   return NextResponse.json({
     ok: true,
@@ -13,9 +14,8 @@ export async function GET() {
       stripeConfigured: Boolean(process.env.STRIPE_SECRET_KEY),
       stripeWebhookConfigured: Boolean(process.env.STRIPE_WEBHOOK_SECRET),
       setupPriceConfigured: Boolean(process.env.STRIPE_PRICE_SETUP),
-      corePriceConfigured: Boolean(process.env.STRIPE_PRICE_CORE),
-      plusPriceConfigured: Boolean(process.env.STRIPE_PRICE_PLUS),
       hostingPriceConfigured: Boolean(hostingPlan && getConfiguredStripePriceIds(hostingPlan).every(Boolean)),
+      managedPagePriceConfigured: Boolean(managedPagePlan && getConfiguredStripePriceIds(managedPagePlan).every(Boolean)),
       adminProtected: hasConfiguredAdminAuth(),
       adminCredentialStatus: adminCredentialStatus(),
       siteUrlConfigured: Boolean(process.env.NEXT_PUBLIC_SITE_URL),

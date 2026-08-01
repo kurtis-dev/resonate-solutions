@@ -13,25 +13,35 @@ export default async function CheckoutPage({
   const isOneTime = plan?.paymentMode === "payment";
   const isHosting = plan?.id === "hosting";
   const isLaunchHosting = plan?.id === "launch-hosting";
+  const isManagedPage = plan?.id === "managed-page";
+  const isLaunchManagedPage = plan?.id === "launch-managed-page";
   const heading = isFree
     ? "Request your free page plan."
-    : isLaunchHosting
-      ? "Launch your page with hosting."
-      : isHosting
-        ? "Start Webpage Hosting."
-    : isOneTime
-      ? "Start your page/menu setup."
-      : "Start monthly page care.";
+    : isLaunchManagedPage
+      ? "Launch with a fully managed page."
+      : isLaunchHosting
+        ? "Launch your page with hosting."
+        : isManagedPage
+          ? "Start Managed Page."
+          : isHosting
+            ? "Start Webpage Hosting."
+            : isOneTime
+              ? "Start your page/menu setup."
+              : "Start monthly page care.";
   const intro = isFree
     ? "Add the business details once. Resonate will review the business, recommend the right MenuPilot setup, and tell you what is needed before any paid build starts."
-    : isLaunchHosting
-      ? "Your first Stripe invoice includes the $399 Launch payment and the first $17.99 hosting charge. Future invoices include only $17.99 per month for Webpage Hosting."
-    : "Add the business details once, then continue to secure payment. Resonate uses this to match your order to the right page, menu, or services setup.";
+    : isLaunchManagedPage
+      ? "Your first Stripe invoice includes the $399 Launch payment and the first $79.99 Managed Page charge. Future invoices include only $79.99 per month; hosting is already included."
+      : isLaunchHosting
+        ? "Your first Stripe invoice includes the $399 Launch payment and the first $17.99 hosting charge. Future invoices include only $17.99 per month for Webpage Hosting."
+        : "Add the business details once, then continue to secure payment. Resonate uses this to match your order to the right page, menu, or services setup.";
   const buttonText = isFree
     ? "Send free page plan request"
-    : isLaunchHosting
-      ? "Pay $416.99 today, then $17.99/month"
-      : "Continue to secure Stripe checkout";
+    : isLaunchManagedPage
+      ? "Pay $478.99 today, then $79.99/month"
+      : isLaunchHosting
+        ? "Pay $416.99 today, then $17.99/month"
+        : "Continue to secure Stripe checkout";
   const statusMessage =
     params.status === "missing-stripe"
       ? "Secure checkout is not connected yet. Resonate can still send a Stripe payment link or invoice when your plan is ready."
@@ -55,9 +65,11 @@ export default async function CheckoutPage({
         {!isFree ? (
           <div className="mt-5 rounded-2xl border border-line bg-cream px-4 py-3 text-sm leading-6 text-muted" aria-label="Order summary">
             <strong className="text-ink">Order summary: </strong>
-            {isLaunchHosting
-              ? "$416.99 today, then $17.99 per month for Webpage Hosting."
-              : `${plan?.price}${plan?.billingPeriod ? " per month" : " one-time"}.`}
+            {isLaunchManagedPage
+              ? "$478.99 today, then $79.99 per month for Managed Page. Hosting is included."
+              : isLaunchHosting
+                ? "$416.99 today, then $17.99 per month for Webpage Hosting."
+                : `${plan?.price}${plan?.billingPeriod ? " per month" : " one-time"}.`}
           </div>
         ) : null}
         <form action="/api/checkout" method="POST" className="mt-8 grid gap-4">
@@ -122,6 +134,7 @@ export default async function CheckoutPage({
             <>
               <p><strong className="text-ink">Debit and credit cards are accepted through Stripe.</strong> Resonate does not collect or store card numbers on this website.</p>
               {isLaunchHosting ? <p><strong className="text-ink">Today: $416.99.</strong> Hosting then renews at $17.99 per month; the $399 Launch charge does not repeat.</p> : null}
+              {isLaunchManagedPage ? <p><strong className="text-ink">Today: $478.99.</strong> Managed Page then renews at $79.99 per month, with hosting included; the $399 Launch charge does not repeat.</p> : null}
             </>
           )}
           <p>After review, customer portal access is handled at app.resonate.solutions. Monthly billing is managed securely through Stripe.</p>
