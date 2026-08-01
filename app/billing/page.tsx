@@ -84,9 +84,21 @@ export default function BillingPage() {
             <p className="mt-3 leading-7 text-muted">
               Your MenuPilot customer portal lives at app.resonate.solutions. Portal access is opened after Resonate reviews the business record and connects it to the right account.
             </p>
-            <a href={customerPortalUrl} className="mt-6 inline-flex rounded-full border border-lm¹×kh‘éì¶»§q«^w[›Ü›X[ˆÏ‚ˆÛX™[‚ˆ]Ûˆ\OHœÝX›Z]ˆÛ\ÜÓ˜[YOHœ›Ý[™YY[™ËXÛÜ˜[MHKLÈ^XÙ[\ˆ›ÛX›XÚÈ^]Ú]HÚYÝË\ÛÙÝ™\Ž˜™ËZ[šÈ‚ˆØ]Û•^BˆØ]Û‚ˆÙ›Ü›O‚ˆ]ˆÛ\ÜÓ˜[YOH›]MˆÜšYØ\LÈ›Ý[™YLž›Ü™\ˆ›Ü™\‹[[™H™ËXÜ™X[HM^\ÛHXY[™ËMˆ^[]]Y‚ˆÚ\Ñœ™YHÈ
-ˆÝ›Û™ÈÛ\ÜÓ˜[YOH^Z[šÈ“›È^[Y[\È™\]Z\™Y›ÜˆHœ™YHYÙH[‹ÜÝ›Û™ÏˆZYZ[ÛÜšÈ™YÚ[œÈÛ›HY\ˆ[ÝHÚÛÜÙH][˜ÚÜ‚ˆ
-Hˆ
-ˆ‚ˆÝ›Û™ÈÛ\ÜÓ˜[YOH^Z[šÈ‘Xš][™Ü™Y]Ø\™È\™HXØÙ\Y›ÝYÚÝš\KÜÝ›Û™Ïˆ™\ÛÛ˜]HÙ\È›ÝÛÛXÝÜˆÝÜ™HØ\™[X™\œÈÛˆ\ÈÙXœÚ]KÜ‚ˆÚ\Ó][˜ÚÜÝ[™ÈÈÝ›Û™ÈÛ\ÜÓ˜[YOH^Z[šÈ•Ù^Nˆ	M‹ŽNKÜÝ›Û™ÏˆÜÝ[™È[ˆ™[™]ÜÈ]	MËŽNH\ˆ[ÛÈH	ÎNH][˜ÚÚ\™ÙHÙ\È›Ý™\X]Üˆˆ[BˆÏ‚ˆ
-_BˆY\ˆ™]šY]ËÝ\ÝÛY\ˆÜ[XØÙ\ÜÈ\È[™Y]\œ™\ÛÛ˜]KœÛÛ][ÛœËˆ[ÛHš[[™È\ÈX[˜YÙYÙXÝ\™[H›ÝYÚÝš\KÜ‚ˆÙ]‚ˆ]ˆÛ\ÜÓ˜[YOH›]N›^›^XÛÛØ\LÈÛN™›^\›ÝÈ‚ˆ[šÈ™YH‹ÜšXÚ[™ÈˆÛ\ÜÓ˜[YOHœ›Ý[™YY[›Ü™\ˆ›Ü™\‹[[™HMHKLÈ^XÙ[\ˆ›ÛX›XÚÈ^Z[šÈ˜XÚÈÈšXÚ[™ÏÓ[šÏ‚ˆÈZ\Ñœ™YHÈ[šÈ™YH‹ØÚXÚÛÝ]Ü[\™]šY]ÈˆÛ\ÜÓ˜[YOHœ›Ý[™YY[›Ü™\ˆ›Ü™\‹[[™HMHKLÈ^XÙ[\ˆ›ÛX›XÚÈ^Z[šÈ”™\]Y\Ýœ™YHYÙH[Ó[šÏˆˆ[BˆÙ]‚ˆÜÙXÝ[Û‚ˆÛXZ[‚ˆ
-NÂŸB
+            <a href={customerPortalUrl} className="mt-6 inline-flex rounded-full border border-line px-5 py-3 font-black text-ink transition hover:border-coral">
+              Open customer portal
+            </a>
+          </section>
+        </div>
+
+        <section className="mt-6 rounded-[1.75rem] border border-line bg-white p-7 shadow-sm">
+          <h2 className="text-2xl font-extrabold text-ink">Before work starts</h2>
+            <div className="mt-5 grid gap-4 text-sm leading-6 text-muted sm:grid-cols-3">
+              <p><strong className="block text-ink">Free Page Plan</strong>Resonate reviews the business and recommends the right setup.</p>
+              <p><strong className="block text-ink">Launch payment</strong>The one-time setup payment starts the custom build.</p>
+              <p><strong className="block text-ink">Hosting and monthly care</strong>Webpage Hosting keeps the page live; Maintain or Managed adds ongoing update support.</p>
+            </div>
+        </section>
+      </section>
+    </main>
+  );
+}
