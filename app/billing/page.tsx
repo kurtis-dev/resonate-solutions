@@ -1,10 +1,38 @@
 import Link from "next/link";
-import { plans } from "@/lib/plans";
 import { questionsEmail } from "@/lib/contact";
 import { customerPortalUrl } from "@/lib/portal";
 
-const paidPlans = plans.filter((plan) => plan.paymentMode !== "none");
 const portalUrl = process.env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL || "";
+
+const checkoutChoices = [
+  {
+    name: "Launch only",
+    price: "$399",
+    billing: "one-time",
+    description: "The custom page build with no Resonate monthly plan added at checkout.",
+    href: "/checkout?plan=setup",
+    cta: "Choose Launch only",
+    highlighted: false
+  },
+  {
+    name: "Launch + Webpage Hosting",
+    price: "$416.99",
+    billing: "today, then $17.99/month",
+    description: "Launch plus hosting, SSL, routine platform maintenance, and basic uptime monitoring. Content updates are not included.",
+    href: "/checkout?plan=launch-hosting",
+    cta: "Choose Launch + Hosting",
+    highlighted: false
+  },
+  {
+    name: "Launch + Managed Page",
+    price: "$478.99",
+    billing: "today, then $79.99/month",
+    description: "Launch plus Managed Page. Hosting is included, so there is no separate $17.99 monthly charge.",
+    href: "/checkout?plan=launch-managed-page",
+    cta: "Choose Launch + Managed Page",
+    highlighted: true
+  }
+];
 
 export default function BillingPage() {
   return (
@@ -16,7 +44,7 @@ export default function BillingPage() {
               Billing for your Resonate page.
             </h1>
             <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
-              Pay the one-time Launch setup, start Webpage Hosting, choose monthly care, or manage an existing subscription through Stripe secure checkout.
+              Choose Launch only, Launch with Webpage Hosting, or Launch with Managed Page through secure Stripe checkout.
             </p>
           </div>
           <div className="rounded-[1.5rem] border border-coral/25 bg-white p-6 shadow-sm">
@@ -29,38 +57,59 @@ export default function BillingPage() {
       </section>
 
       <section className="mx-auto max-w-7xl px-5 py-14">
-        <div className="grid gap-6 md:grid-cols-2 xl:grid-cols-4">
-          {paidPlans.map((plan) => (
-            <article key={plan.id} className={`flex min-h-full flex-col rounded-[1.75rem] border-2 bg-white p-6 shadow-sm ${plan.highlighted ? "border-coral" : "border-line"}`}>
-              <div className="flex items-start justify-between gap-4">
-                <div>
-                  <h2 className="text-2xl font-extrabold text-ink">{plan.name}</h2>
-                  <p className="mt-2 text-sm font-bold uppercase tracking-[0.12em] text-coral">{plan.limit}</p>
-                </div>
-                <p className="text-right text-3xl font-black text-ink">
-                  {plan.price}
-                  {plan.billingPeriod ? <span className="block text-sm font-bold text-muted">/{plan.billingPeriod}</span> : null}
-                </p>
-              </div>
-              <p className="mt-5 leading-7 text-muted">{plan.description}</p>
+        <div className="grid gap-6 lg:grid-cols-3">
+          {checkoutChoices.map((choice) => (
+            <article
+              key={choice.name}
+              className={`flex min-h-full flex-col rounded-[1.75rem] border-2 bg-white p-6 shadow-sm ${
+                choice.highlighted ? "border-coral" : "border-line"
+              }`}
+            >
+              <h2 className="text-2xl font-extrabold text-ink">{choice.name}</h2>
+              <p className="mt-5 text-3xl font-black text-ink">{choice.price}</p>
+              <p className="mt-1 text-sm font-bold text-coral">{choice.billing}</p>
+              <p className="mt-5 leading-7 text-muted">{choice.description}</p>
               <div className="flex-1" />
-              <Link href={plan.checkoutUrl} className={`mt-7 rounded-full px-5 py-3 text-center font-black shadow-sm transition ${plan.highlighted ? "bg-coral text-white hover:bg-ink" : "bg-ink text-white hover:bg-coral"}`}>
-                {plan.paymentMode === "payment" ? "Pay Launch setup" : `Start ${plan.name}`}
+              <Link
+                href={choice.href}
+                className={`mt-7 rounded-full px-5 py-3 text-center font-black shadow-sm transition ${
+                  choice.highlighted ? "bg-coral text-white hover:bg-ink" : "bg-ink text-white hover:bg-coral"
+                }`}
+              >
+                {choice.cta}
               </Link>
             </article>
           ))}
         </div>
 
-        <section className="mt-8 rounded-[1.75rem] border border-coral/25 bg-white p-7 shadow-sm">
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Launch with hosting</p>
-          <h2 className="mt-3 text-2xl font-extrabold text-ink">Pay $416.99 today, then $17.99 per month.</h2>
-          <p className="mt-3 max-w-3xl leading-7 text-muted">
-            One Stripe checkout includes the $399 one-time Launch payment and the first $17.99 Webpage Hosting charge. Only hosting renews after the first payment.
-          </p>
-          <Link href="/checkout?plan=launch-hosting" className="mt-6 inline-flex rounded-full bg-coral px-5 py-3 font-black text-white transition hover:bg-ink">
-            Pay Launch + Hosting together
-          </Link>
-        </section>
+        <div className="mt-8 grid gap-6 lg:grid-cols-2">
+          <section className="rounded-[1.75rem] border border-line bg-white p-7 shadow-sm">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Webpage Hosting</p>
+            <h2 className="mt-3 text-2xl font-extrabold text-ink">$17.99/month</h2>
+            <ul className="mt-5 grid gap-3 text-sm leading-6 text-muted">
+              <li>Hosting and SSL</li>
+              <li>Routine platform maintenance</li>
+              <li>Basic uptime monitoring</li>
+              <li>No content updates</li>
+            </ul>
+          </section>
+
+          <section className="rounded-[1.75rem] border-2 border-coral bg-white p-7 shadow-sm">
+            <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Managed Page</p>
+            <h2 className="mt-3 text-2xl font-extrabold text-ink">$79.99/month, hosting included</h2>
+            <ul className="mt-5 grid gap-3 text-sm leading-6 text-muted">
+              <li>Up to 4 standard update requests per month</li>
+              <li>Monthly page review</li>
+              <li>Text, photo, hours, menu, and service updates</li>
+              <li>Priority turnaround</li>
+              <li>Basic link and page-health checks</li>
+            </ul>
+          </section>
+        </div>
+
+        <p className="mt-6 text-center text-sm font-semibold leading-6 text-muted">
+          Need frequent or complex updates? Custom management is available by quote.
+        </p>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[0.8fr_1fr]">
           <section className="rounded-[1.75rem] border border-line bg-white p-7 shadow-sm">
@@ -92,11 +141,11 @@ export default function BillingPage() {
 
         <section className="mt-6 rounded-[1.75rem] border border-line bg-white p-7 shadow-sm">
           <h2 className="text-2xl font-extrabold text-ink">Before work starts</h2>
-            <div className="mt-5 grid gap-4 text-sm leading-6 text-muted sm:grid-cols-3">
-              <p><strong className="block text-ink">Free Page Plan</strong>Resonate reviews the business and recommends the right setup.</p>
-              <p><strong className="block text-ink">Launch payment</strong>The one-time setup payment starts the custom build.</p>
-              <p><strong className="block text-ink">Hosting and monthly care</strong>Webpage Hosting keeps the page live; Maintain or Managed adds ongoing update support.</p>
-            </div>
+          <div className="mt-5 grid gap-4 text-sm leading-6 text-muted sm:grid-cols-3">
+            <p><strong className="block text-ink">Free Page Plan</strong>Resonate reviews the business and recommends the right setup.</p>
+            <p><strong className="block text-ink">Launch payment</strong>The one-time setup payment starts the custom build.</p>
+            <p><strong className="block text-ink">Choose monthly support</strong>Webpage Hosting keeps the page live; Managed Page adds updates and includes hosting.</p>
+          </div>
         </section>
       </section>
     </main>
