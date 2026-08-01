@@ -21,13 +21,17 @@ export function Footer() {
             className="h-12 w-auto max-w-[230px] object-contain"
           />
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
-            Customer-ready pages for service businesses: branded mobile pages, QR links, photos, hours, service details, and clear next steps.
+            Practical digital systems for small businesses: customer-ready pages, guided intake, business information tools, hosting, and managed support.
           </p>
+          <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-muted">Built in Northwest Arkansas</p>
           <a className="mt-3 inline-flex text-sm font-black text-coral hover:text-ink" href={`mailto:${questionsEmail}`}>
             {questionsEmail}
           </a>
         </div>
-        <nav className="flex flex-wrap gap-5 text-sm font-medium text-muted">
+        <nav className="flex flex-wrap gap-5 text-sm font-medium text-muted" aria-label="Footer navigation">
+          <Link className="hover:text-ink" href="/#solutions">Solutions</Link>
+          <Link className="hover:text-ink" href="/#work">Our Work</Link>
+          <Link className="hover:text-ink" href="/menupilot">MenuPilot</Link>
           <Link className="hover:text-ink" href="/privacy">Privacy</Link>
           <Link className="hover:text-ink" href="/terms">Terms</Link>
           <Link className="hover:text-ink" href="/disclaimer">Disclaimer</Link>
