@@ -192,7 +192,7 @@ export default function ResonateHome() {
             </article>
             <article className="overflow-hidden rounded-[1.75rem] bg-[#2d1b12] text-white shadow-sm">
               <div className="grid h-64 grid-cols-[1.15fr_0.85fr] overflow-hidden bg-[#f2e6d5]">
-                <img src="/assets/excellent-pins/lovable/hero-pin.jpg" alt="Custom pin example" className="h-full w-full object-cover" />
+                <img src="/assets/excellent-pins/lovable/pin-hard-enamel.jpg" alt="Red and navy hard-enamel pin example" className="h-full w-full object-cover" />
                 <div className="grid grid-rows-2 gap-px bg-[#2d1b12]/15">
                   <img src="/assets/excellent-pins/lovable/finishes.jpg" alt="Custom pin finish options" className="h-full w-full object-cover" />
                   <img src="/assets/excellent-pins/lovable/pin-badge.jpg" alt="Custom badge example" className="h-full w-full object-cover" />
