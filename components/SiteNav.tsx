@@ -49,7 +49,7 @@ export function SiteNav() {
           ))}
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/checkout?plan=review" className="hidden rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-coral sm:inline-flex">Free Page Plan</Link>
+          <Link href="/checkout?plan=review" className="hidden rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-coral sm:inline-flex">Start a Project</Link>
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
@@ -73,7 +73,7 @@ export function SiteNav() {
             {links.map((item) => (
               <Link key={item.href} onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-semibold text-ink hover:bg-white" href={item.href}>{item.label}</Link>
             ))}
-            <Link onClick={() => setOpen(false)} href="/checkout?plan=review" className="mt-2 rounded-full bg-coral px-5 py-3 text-center font-black text-white sm:hidden">Free Page Plan</Link>
+            <Link onClick={() => setOpen(false)} href="/checkout?plan=review" className="mt-2 rounded-full bg-coral px-5 py-3 text-center font-black text-white sm:hidden">Start a Project</Link>
           </div>
         </nav>
       ) : null}
