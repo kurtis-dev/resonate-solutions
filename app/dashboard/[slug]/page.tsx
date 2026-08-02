@@ -93,18 +93,8 @@ type DayHours = {
   close2: string;
 };
 
-function defaultHoursForDay(slug: string, dayKey: string): DayHours {
-  const closed = { closed: true, open1: "", close1: "", open2: "", close2: "" };
-
-  if (slug === "mellow-moose-burgers" && ["tue", "wed", "thu", "fri"].includes(dayKey)) {
-    return { closed: false, open1: "11:00 AM", close1: "2:00 PM", open2: "4:00 PM", close2: "8:00 PM" };
-  }
-
-  if (slug === "mellow-moose-burgers" && dayKey === "sat") {
-    return { closed: false, open1: "11:00 AM", close1: "5:00 PM", open2: "", close2: "" };
-  }
-
-  return closed;
+function defaultHoursForDay(): DayHours {
+  return { closed: true, open1: "", close1: "", open2: "", close2: "" };
 }
 
 function TimeSelect({ name, defaultValue, label }: { name: string; defaultValue: string; label: string }) {
@@ -120,7 +110,7 @@ function TimeSelect({ name, defaultValue, label }: { name: string; defaultValue:
   );
 }
 
-function WeeklyHoursEditor({ slug }: { slug: string }) {
+function WeeklyHoursEditor() {
   return (
     <div className="rounded-2xl border border-[#d8cec0] bg-white p-4">
       <input type="hidden" name="hoursInputMode" value="weekly" />
@@ -130,7 +120,7 @@ function WeeklyHoursEditor({ slug }: { slug: string }) {
       </div>
       <div className="mt-4 grid gap-4">
         {weekdays.map((day) => {
-          const defaults = defaultHoursForDay(slug, day.key);
+          const defaults = defaultHoursForDay();
 
           return (
             <div key={day.key} className="rounded-2xl border border-[#eadfce] bg-[#f9f5ef] p-4">
@@ -237,7 +227,7 @@ export default async function BusinessDashboardPage({ params, searchParams }: Pa
               <input name="statusNote" defaultValue={business.statusNote || ""} className={inputClass} placeholder="Closing at 7 PM tonight because of weather." />
             </FieldShell>
 
-            <WeeklyHoursEditor slug={business.slug} />
+            <WeeklyHoursEditor />
 
             <FieldShell label="Which menu or service list should show?">
               <select name="activeMenuKey" defaultValue={business.activeMenuKey || variants[0]?.key || "main"} className={inputClass}>

@@ -8,7 +8,7 @@ export async function updateBusinessDashboardAction(formData: FormData) {
   const result = await updateMenuMode(formData);
 
   if (!result.ok) {
-    redirect(`/dashboard/${fallbackSlug || "mellow-moose-burgers"}?status=${result.reason}`);
+    redirect(fallbackSlug ? `/dashboard/${fallbackSlug}?status=${result.reason}` : `/portal?status=${result.reason}`);
   }
 
   redirect(`/dashboard/${result.slug}?status=saved`);

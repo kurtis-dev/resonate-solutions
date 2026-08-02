@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
+import { OwnerPortalPreview } from "@/components/OwnerPortalPreview";
 import { PricingCards } from "@/components/PricingCards";
-import { customerPortalUrl } from "@/lib/portal";
 
 type BusinessTheme = {
   label: string;
@@ -100,45 +100,6 @@ const managedChannels = [
   }
 ];
 
-const ownerPortalActions = [
-  {
-    title: "Change hours",
-    text: "Early close, holiday hours, weather delay",
-    icon: "clock"
-  },
-  {
-    title: "Spotlight item",
-    text: "Feature a special, popup item, or seasonal offer",
-    icon: "flame"
-  },
-  {
-    title: "Menu or price edit",
-    text: "Send the exact item and price to review",
-    icon: "menu"
-  },
-  {
-    title: "Photo update",
-    text: "Add or swap the images customers see first",
-    icon: "camera"
-  },
-  {
-    title: "Google post",
-    text: "Queue a reviewed update for connected profiles",
-    icon: "pin"
-  },
-  {
-    title: "Ask for reviews",
-    text: "Get the right review link or request copy",
-    icon: "star"
-  }
-];
-
-const reviewQueue = [
-  ["Needs review", "Saturday hours change", "Google + MenuPilot"],
-  ["Ready to send", "Brisket burger spotlight", "MenuPilot + Facebook"],
-  ["Done", "New loaded fries photo", "Customer page"]
-];
-
 const brandItems = [
   { label: "Your colors", icon: "palette" },
   { label: "Your photos", icon: "camera" },
@@ -146,22 +107,10 @@ const brandItems = [
   { label: "Your buttons", icon: "external" }
 ];
 
-const brandKitImages = [
-  {
-    src: "/assets/mellow-moose-og-smashburger.jpg",
-    alt: "Mellow Moose cheeseburger brand photo",
-    label: "Hero item"
-  },
-  {
-    src: "/assets/mellow-moose-blazing-fries.jpg",
-    alt: "Loaded fries brand photo",
-    label: "Menu photo"
-  },
-  {
-    src: "/assets/mellow-moose-jalapeno-ranch-bacon.jpg",
-    alt: "Mellow Moose burger with jalapeno and bacon",
-    label: "Spotlight"
-  }
+const brandAssets = [
+  { label: "Logo", icon: "palette" },
+  { label: "Cover image", icon: "camera" },
+  { label: "Service or menu photo", icon: "external" }
 ];
 
 function MiniIcon({ name }: { name: string }) {
@@ -360,62 +309,13 @@ export default function MenuPilotPage() {
       </section>
 
       <section id="owner-portal" className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-16">
-          <div className="grid gap-8 lg:grid-cols-[0.72fr_1.28fr] lg:items-center">
-            <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-coral">Owner portal</p>
-              <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-                A simple review dashboard before anything goes live.
-              </h2>
-              <p className="mt-5 leading-7 text-muted">
-                Customers sign in to the MenuPilot portal, choose the kind of change they need, and send the details once. Resonate reviews the request before it reaches the public page or connected channels.
-              </p>
-              <a href={customerPortalUrl} className="mt-7 inline-flex rounded-full border border-line px-5 py-3 font-black text-ink shadow-sm transition hover:border-coral hover:text-coral">
-                Open app.resonate.solutions
-              </a>
-            </div>
-
-            <div className="overflow-hidden rounded-[1.75rem] border border-line bg-[#fffaf4] shadow-soft">
-              <div className="flex flex-wrap items-center justify-between gap-4 border-b border-line bg-white px-5 py-4">
-                <div>
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-muted">Signed in</p>
-                  <h3 className="mt-1 text-xl font-black text-ink">Mellow Moose dashboard</h3>
-                </div>
-                <span className="rounded-full bg-[#e7f4f1] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#2f7d72]">
-                  Review first
-                </span>
-              </div>
-
-              <div className="grid gap-0 lg:grid-cols-[1fr_0.72fr]">
-                <div className="grid gap-3 p-5 sm:grid-cols-2">
-                  {ownerPortalActions.map((action) => (
-                    <button key={action.title} type="button" className="group rounded-[1.15rem] border border-line bg-white p-4 text-left shadow-sm transition hover:border-coral hover:bg-[#fff7f2]">
-                      <span className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[#fff0e9] text-coral transition group-hover:bg-coral group-hover:text-white">
-                        <MiniIcon name={action.icon} />
-                      </span>
-                      <span className="mt-4 block font-black text-ink">{action.title}</span>
-                      <span className="mt-1 block text-sm leading-5 text-muted">{action.text}</span>
-                    </button>
-                  ))}
-                </div>
-
-                <aside className="border-t border-line bg-[#2d1b12] p-5 text-white lg:border-l lg:border-t-0">
-                  <p className="text-xs font-black uppercase tracking-[0.16em] text-gold">Review queue</p>
-                  <div className="mt-4 grid gap-3">
-                    {reviewQueue.map(([status, title, channel]) => (
-                      <div key={title} className="rounded-2xl border border-white/10 bg-white/[0.07] p-4">
-                        <span className="rounded-full bg-white/10 px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] text-gold">
-                          {status}
-                        </span>
-                        <p className="mt-3 font-black leading-5">{title}</p>
-                        <p className="mt-1 text-sm text-white/62">{channel}</p>
-                      </div>
-                    ))}
-                  </div>
-                </aside>
-              </div>
-            </div>
+        <div className="mx-auto max-w-7xl px-5 py-16"×¾­¢G§²ÚîÆ­yÐen requests, and the next details Resonate needs before publishing.
+            </p>
+            <Link href="/portal" className="mt-7 inline-flex rounded-full border border-line px-5 py-3 font-black text-ink shadow-sm transition hover:border-coral hover:text-coral">
+              Explore the Owner Portal
+            </Link>
           </div>
+          <div className="mt-10"><OwnerPortalPreview showPortalLink /></div>
         </div>
       </section>
 
@@ -528,18 +428,18 @@ export default function MenuPilotPage() {
             <div className="rounded-[1.75rem] border border-line bg-white p-5 text-ink shadow-soft">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
-                  <p className="text-xs font-black uppercase tracking-[0.18em] text-[#3a2418]/70">Brand kit sample</p>
-                  <h3 className="mt-3 text-2xl font-black">Mellow Moose Burgers</h3>
+                  <p className="text-xs font-black uppercase tracking-[0.18em] text-[#3a2418]/70">Your brand kit</p>
+                  <h3 className="mt-3 text-2xl font-black">Built around your business</h3>
                 </div>
-                <span className="rounded-full bg-[#ffe5d8] px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-[#ff5a1f]">Live customer</span>
+                <span className="rounded-full bg-[#ffe5d8] px-4 py-2 text-[10px] font-black uppercase tracking-[0.14em] text-[#ff5a1f]">Ready to customize</span>
               </div>
 
               <div className="mt-5 grid grid-cols-4 gap-2 sm:gap-3">
                 {[
-                  ["Orange", "bg-[#ff5a1f]"],
-                  ["Cocoa", "bg-[#3a2418]"],
-                  ["Gold", "bg-[#f8b737]"],
-                  ["Teal", "bg-[#319a94]"]
+                  ["Primary", "bg-[#d97856]"],
+                  ["Text", "bg-[#202320]"],
+                  ["Accent", "bg-[#e8a93a]"],
+                  ["Background", "bg-[#dce9df]"]
                 ].map(([label, color]) => (
                   <div key={label}>
                     <span className={`block aspect-square rounded-2xl ${color} shadow-[0_14px_35px_rgba(58,36,24,0.12)]`} />
@@ -549,24 +449,16 @@ export default function MenuPilotPage() {
               </div>
 
               <div className="mt-5 grid grid-cols-3 gap-3">
-                {brandKitImages.map((image) => (
-                  <figure key={image.src} className="group relative aspect-square overflow-hidden rounded-2xl bg-[#3a2418]/10 shadow-[0_12px_35px_rgba(58,36,24,0.16)]">
-                    <img
-                      src={image.src}
-                      alt={image.alt}
-                      className="absolute inset-0 h-full w-full object-cover transition duration-500 group-hover:scale-105"
-                      loading="eager"
-                      decoding="async"
-                    />
-                    <figcaption className="absolute inset-x-2 bottom-2 rounded-full bg-[#3a2418]/82 px-3 py-1.5 text-center text-[10px] font-black uppercase tracking-[0.12em] text-white shadow-sm">
-                      {image.label}
-                    </figcaption>
-                  </figure>
+                {brandAssets.map((asset) => (
+                  <div key={asset.label} className="flex aspect-square flex-col items-center justify-center rounded-2xl border border-line bg-[#f8f3eb] p-3 text-center shadow-[0_12px_35px_rgba(58,36,24,0.08)]">
+                    <span className="flex h-11 w-11 items-center justify-center rounded-2xl bg-white text-coral shadow-sm"><MiniIcon name={asset.icon} /></span>
+                    <span className="mt-3 text-[10px] font-black uppercase tracking-[0.12em] text-[#3a2418]/75">{asset.label}</span>
+                  </div>
                 ))}
               </div>
 
               <div className="mt-5 rounded-2xl bg-[#f1eadf] px-5 py-4 text-sm text-[#3a2418]">
-                <span className="text-[#8b7463]">Headline:</span> <span className="font-black">Smashed fresh. Mellow vibes.</span>
+                <span className="text-[#8b7463]">Customer promise:</span> <span className="font-black">Say clearly why people should choose your business.</span>
               </div>
             </div>
           </div>
@@ -581,7 +473,7 @@ export default function MenuPilotPage() {
               Build once. Choose how much help you want after launch.
             </h2>
             <p className="mt-4 leading-7 text-muted">
-              Start with a free page plan so everyone agrees on the work. The one-time Launch payment starts the custom build. Add Webpage Hosting for reliable delivery, or choose Managed Page for hosting plus up to four standard update requests each month.
+              Start with a free page plan so everyone agrees on the work. The one-time Launch payment starts the custom build. After launch, Maintain covers occasional edits, while Managed gives active businesses unlimited standard updates with priority help.
             </p>
           </div>
           <div className="mt-10">
@@ -631,7 +523,7 @@ export default function MenuPilotPage() {
                       ["01", "Free Page Plan", "We review the business details and recommend the right MenuPilot page, menu, or services setup."],
                       ["02", "Launch Payment", "$399 starts the custom build. This is when production work begins."],
                       ["03", "Private Preview", "The customer reviews the page before the public link is shared."],
-                      ["04", "Go Live + Care", "Choose Launch only, Launch + Webpage Hosting, or Launch + Managed Page before the page becomes the customer-facing link."]
+                      ["04", "Go Live + Care", "Choose Launch only, Maintain, or Managed before the page becomes the customer-facing link."]
                     ].map(([number, title, text]) => (
                       <li key={number} className="grid grid-cols-[auto_1fr] gap-4 rounded-2xl border border-line bg-white p-4">
                         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff0e9] text-xs font-black text-coral">{number}</span>
