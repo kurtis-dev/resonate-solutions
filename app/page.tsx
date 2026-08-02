@@ -83,7 +83,7 @@ export default function ResonateHome() {
           <div>
             <SectionLabel>Resonate Solutions</SectionLabel>
             <h1 className="mt-5 max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.025em] text-ink md:text-7xl">
-              Give customers the answers they need<span className="text-coral">—and a clear reason to choose you.</span>
+              Give customers the answers they need.<span className="text-coral"> Give them a clear reason to choose you.</span>
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
               We build focused webpages and simple business tools that help people understand what you offer,

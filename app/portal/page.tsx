@@ -51,7 +51,7 @@ export default function PortalPage() {
         <div className="mb-8 max-w-3xl">
           <p className="text-xs font-black uppercase tracking-[0.18em] text-coral">Dashboard preview</p>
           <h2 className="mt-4 text-3xl font-black leading-tight md:text-5xl">One place to see what is live and what needs attention.</h2>
-          <p className="mt-4 text-lg leading-8 text-muted">The dashboard is organized around owner tasks—not internal Resonate setup, billing notes, or technical controls.</p>
+          <p className="mt-4 text-lg leading-8 text-muted">The dashboard is organized around owner tasks, not internal Resonate setup, billing notes, or technical controls.</p>
         </div>
         <OwnerPortalPreview />
       </section>
