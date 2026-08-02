@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { OwnerPortalPreview } from "@/components/OwnerPortalPreview";
-import { PricingCards } from "@/components/PricingCards";
+import { MenuPilotSubnav } from "@/components/MenuPilotSubnav";
 
 type BusinessTheme = {
   label: string;
@@ -175,22 +175,6 @@ function MiniIcon({ name }: { name: string }) {
   }
 }
 
-function MenuPilotMark({ compact = false }: { compact?: boolean }) {
-  return (
-    <span className="inline-flex items-center gap-3">
-      <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[#3a2418] text-lg font-black text-white shadow-[0_12px_30px_rgba(58,36,24,0.22)] ring-4 ring-[#ff5a1f]/10">
-        M
-      </span>
-      {compact ? null : (
-        <span className="leading-none">
-          <span className="block text-base font-black text-ink">MenuPilot</span>
-          <span className="mt-1 block text-[10px] font-black uppercase tracking-[0.18em] text-muted">By Resonate Solutions</span>
-        </span>
-      )}
-    </span>
-  );
-}
-
 function PhonePreview({ theme }: { theme: BusinessTheme }) {
   return (
     <div className="relative mx-auto max-w-[360px] rounded-[2.35rem] border-[7px] border-[#3a2418] bg-white shadow-soft">
@@ -256,22 +240,7 @@ function PhonePreview({ theme }: { theme: BusinessTheme }) {
 export default function MenuPilotPage() {
   return (
     <main className="bg-cream">
-      <section className="sticky top-0 z-30 border-b border-line bg-[#f7f0e8]/92 backdrop-blur-xl">
-        <div className="mx-auto flex max-w-7xl items-center gap-5 px-5 py-3">
-          <Link href="/menupilot" className="shrink-0">
-            <MenuPilotMark />
-          </Link>
-          <div className="ml-auto flex min-w-0 items-center gap-5 overflow-x-auto text-sm font-bold text-muted">
-            <a href="#owner-portal" className="shrink-0 hover:text-ink">Owner portal</a>
-            <a href="#managed-channels" className="shrink-0 hover:text-ink">Where updates go</a>
-            <a href="#custom-branding" className="shrink-0 hover:text-ink">Branding</a>
-            <a href="#plans" className="shrink-0 hover:text-ink">Plans</a>
-          </div>
-          <Link href="/checkout?plan=review" className="hidden shrink-0 rounded-full bg-[#ff5a1f] px-5 py-3 text-sm font-black text-white shadow-[0_14px_35px_rgba(255,90,31,0.28)] transition hover:-translate-y-0.5 hover:bg-[#3a2418] sm:inline-flex">
-            Free Page Plan
-          </Link>
-        </div>
-      </section>
+      <MenuPilotSubnav />
 
       <section className="relative overflow-hidden">
         <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#202320,#ff5a1f,#f8b737,#202320)]" />
@@ -291,7 +260,7 @@ export default function MenuPilotPage() {
                 <span className="relative">See a live example page</span>
               </Link>
               <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">
-                View Plans
+                View Pricing
               </Link>
             </div>
             <p className="mt-3 text-sm font-bold text-coral">See the kind of simple, polished page your customers can open from a QR code, text, or link.</p>
@@ -474,17 +443,22 @@ export default function MenuPilotPage() {
 
       <section id="plans" className="bg-[#fffaf4]">
         <div className="mx-auto max-w-7xl px-5 py-20">
-          <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#ff5a1f]">Plans</p>
-            <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-              Build once. Choose how much help you want after launch.
+          <div className="overflow-hidden rounded-[1.75rem] bg-[#202320] p-8 text-white shadow-soft md:p-12">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6a15e]">Plan the next step</p>
+            <h2 className="mt-3 max-w-4xl text-4xl font-extrabold leading-tight tracking-[-0.01em] md:text-5xl">
+              Choose the right level of support for your page.
             </h2>
-            <p className="mt-4 leading-7 text-muted">
-              Start with a free page plan so everyone agrees on the work. The one-time Launch payment starts the custom build. After launch, Maintain covers occasional edits, while Managed gives active businesses unlimited standard updates with priority help.
+            <p className="mt-5 max-w-3xl text-lg leading-8 text-white/78">
+              MenuPilot pages begin with a custom Launch. Hosting and managed update options are available based on how much ongoing help your business needs.
             </p>
-          </div>
-          <div className="mt-10">
-            <PricingCards />
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+              <Link href="/pricing" className="rounded-full bg-[#ff5a1f] px-7 py-4 text-center font-black text-white transition hover:bg-white hover:text-[#202320]">
+                View Pricing
+              </Link>
+              <Link href="/checkout?plan=review" className="rounded-full border border-white/30 px-7 py-4 text-center font-black text-white transition hover:border-white hover:bg-white hover:text-[#202320]">
+                Start a Project
+              </Link>
+            </div>
           </div>
         </div>
       </section>
@@ -495,10 +469,10 @@ export default function MenuPilotPage() {
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6a15e]">Free Page Plan</p>
             <h2 className="mt-3 max-w-3xl text-3xl font-black leading-tight md:text-5xl">Send the business details once. We recommend the right build before you pay.</h2>
             <p className="mt-5 max-w-3xl leading-7 text-white/78">
-              Use the same short business-details form whether you start free, pay for Launch, or choose monthly care. Free Page Plan requests do not ask for payment.
+              Share your business name, services or menu, photos, hours, and links. Resonate reviews the details and recommends the most useful MenuPilot setup before custom work begins.
             </p>
             <Link href="/checkout?plan=review" className="mt-8 inline-flex rounded-full bg-[#ff5a1f] px-7 py-4 text-center font-black text-white shadow-[0_16px_40px_rgba(255,90,31,0.28)] transition hover:bg-white hover:text-[#202320]">
-              Request Free Page Plan
+              Start a Project
             </Link>
           </div>
           <div className="overflow-hidden rounded-[1.75rem] border border-line bg-[#fffaf4] shadow-soft">
@@ -507,17 +481,17 @@ export default function MenuPilotPage() {
                 <div className="p-8 md:p-12">
                   <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Clear next step</p>
                   <h2 className="mt-3 max-w-2xl text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-                    Start with a MenuPilot plan. Build after payment.
+                    Start with the business details. Build the right page.
                   </h2>
                   <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
-                    Send your business name, menu or services, photos, hours, and links. Resonate will recommend the right MenuPilot setup first. Custom design, preview, and hosting begin after the Launch payment.
+                    Resonate reviews what customers need to find, what actions they should take, and what information your business needs to keep current.
                   </p>
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
                     <Link href="/checkout?plan=review" className="rounded-full bg-coral px-7 py-4 text-center font-bold text-white shadow-sm transition hover:bg-ink">
-                      Request Free Page Plan
+                      Start a Project
                     </Link>
                     <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">
-                      View Plans
+                      View Pricing
                     </Link>
                   </div>
                 </div>
@@ -527,10 +501,10 @@ export default function MenuPilotPage() {
                   <p className="text-xs font-bold uppercase tracking-[0.16em] text-coral">How it moves forward</p>
                   <ol className="mt-5 grid gap-4">
                     {[
-                      ["01", "Free Page Plan", "We review the business details and recommend the right MenuPilot page, menu, or services setup."],
-                      ["02", "Launch Payment", "$399 starts the custom build. This is when production work begins."],
+                      ["01", "Share the basics", "Send the business details, photos, links, and customer actions that matter most."],
+                      ["02", "Resonate reviews", "We organize what you provide and recommend the clearest MenuPilot setup."],
                       ["03", "Private Preview", "The customer reviews the page before the public link is shared."],
-                      ["04", "Go Live + Care", "Choose Launch only, Maintain, or Managed before the page becomes the customer-facing link."]
+                      ["04", "Go Live", "The approved page becomes the customer-facing link you can share anywhere."]
                     ].map(([number, title, text]) => (
                       <li key={number} className="grid grid-cols-[auto_1fr] gap-4 rounded-2xl border border-line bg-white p-4">
                         <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff0e9] text-xs font-black text-coral">{number}</span>
@@ -545,10 +519,6 @@ export default function MenuPilotPage() {
               </div>
             </div>
           </div>
-          <footer className="mt-12 flex flex-col gap-4 border-t border-line pt-8 text-sm text-muted md:flex-row md:items-center md:justify-between">
-            <p className="font-bold text-ink">MenuPilot by Resonate Solutions</p>
-            <p>Customer-ready pages for service businesses. Built in Northwest Arkansas.</p>
-          </footer>
         </div>
       </section>
     </main>

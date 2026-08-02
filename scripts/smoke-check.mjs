@@ -11,8 +11,18 @@ const checks = [
   { path: "/privacy", expect: "text/html" },
   { path: "/terms", expect: "text/html" },
   { path: "/disclaimer", expect: "text/html" },
-  { path: "/m/mellow-moose-burgers", expect: "text/html" },
-  { path: "/m/mellow-moose-burgers?menu=dos-gordos", expect: "text/html" },
+  {
+    path: "/m/mellow-moose-burgers",
+    expect: "text/html",
+    expectText: ["Mellow", "Moose", "Burgers."],
+    rejectText: ["Dos Gordos", "Takeover"]
+  },
+  {
+    path: "/m/mellow-moose-burgers?menu=dos-gordos",
+    expect: "text/html",
+    expectText: ["Mellow", "Moose", "Burgers."],
+    rejectText: ["Dos Gordos", "Takeover"]
+  },
   { path: "/api/qr/mellow-moose-burgers", expect: "image/svg+xml" },
   { path: "/api/health", expect: "application/json" }
 ];
@@ -34,6 +44,22 @@ for (const check of checks) {
     if (!contentType.includes(check.expect)) {
       failures.push(`${check.path} expected ${check.expect}, got ${contentType || "no content-type"}`);
       continue;
+    }
+
+    if (check.expectText || check.rejectText) {
+      const body = await response.text();
+      const missingText = (check.expectText || []).filter((text) => !body.includes(text));
+      const rejectedText = (check.rejectText || []).filter((text) => body.includes(text));
+
+      if (missingText.length) {
+        failures.push(`${check.path} did not include expected text: ${missingText.join(", ")}`);
+        continue;
+      }
+
+      if (rejectedText.length) {
+        failures.push(`${check.path} included retired public text: ${rejectedText.join(", ")}`);
+        continue;
+      }
     }
 
     if (check.expect === "image/svg+xml") {

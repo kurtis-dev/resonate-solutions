@@ -58,7 +58,7 @@ export default function BillingPage() {
 
       <section className="mx-auto max-w-7xl px-5 py-14">
         <section className="rounded-[1.75rem] border-2 border-coral bg-white p-7 shadow-sm">
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Step 1 — Every page starts here</p>
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Step 1: Every page starts here</p>
           <div className="mt-3 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <h2 className="text-3xl font-extrabold text-ink">Launch</h2>
@@ -69,7 +69,7 @@ export default function BillingPage() {
         </section>
 
         <div className="mt-8">
-          <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Step 2 — Choose what follows Launch</p>
+          <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Step 2: Choose what follows Launch</p>
           <h2 className="mt-2 text-3xl font-extrabold text-ink">Pick your monthly support.</h2>
         </div>
 

@@ -1,29 +1,30 @@
 import Link from "next/link";
+import { MenuPilotSubnav } from "@/components/MenuPilotSubnav";
 
 const exampleFeatures = [
   {
-    label: "Customer-facing menu",
-    title: "The restaurant page stays clean",
-    text: "Mellow Moose customers see food, hours, location, ordering, QR sharing, and current specials without extra sales copy getting in the way."
+    label: "Clear information",
+    title: "Customers find the details they came for",
+    text: "Put the menu, current hours, location, photos, and important updates together on one page that is easy to scan from a phone."
   },
   {
-    label: "Event mode",
-    title: "One page can shift for a popup",
-    text: "Dos Gordos takeover mode changes the hero, featured items, menu sections, and event messaging without creating a confusing second website."
+    label: "Clear next step",
+    title: "Ordering and directions stay easy to reach",
+    text: "Customers can move from browsing to ordering, calling, or getting directions without hunting through profiles and old links."
   },
   {
-    label: "Owner controls",
-    title: "The business can change the day",
-    text: "Hours, closed notes, sold-out alerts, Happy Hour, Fry Day, combos, and popup mode are the kinds of controls that make the page useful after launch."
+    label: "Useful after launch",
+    title: "The page can keep up with the business",
+    text: "Hours, closing notes, sold-out alerts, specials, menu details, and new photos can be updated as the business changes."
   }
 ];
 
 const ownerControls = [
-  "Turn popup mode on or off",
   "Update hours for the week",
   "Post closing early or sold-out notes",
   "Feature daily specials",
-  "Flag changed location",
+  "Update menu items and prices",
+  "Keep ordering and location links current",
   "Swap food photos",
   "Keep the same QR code"
 ];
@@ -31,48 +32,41 @@ const ownerControls = [
 export default function MenuPilotExamplesPage() {
   return (
     <main className="bg-cream">
+      <MenuPilotSubnav />
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div>
           <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand">Business page examples</p>
           <h1 className="mt-3 max-w-3xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
-            Show what changes without cluttering the customer menu.
+            Give customers one clear place to get what they need.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
-            See how one customer page can handle a regular menu, a special event, owner updates, and daily changes without confusing customers.
+            This live example brings the menu, current hours, location, ordering, photos, and business updates together in one mobile-friendly page.
           </p>
-          <div className="mt-8 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-8">
             <Link href="/m/mellow-moose-burgers" className="rounded-full bg-brand px-6 py-3 text-center font-black text-white shadow-soft hover:bg-brandDark">
-              View customer menu
-            </Link>
-            <Link href="/m/mellow-moose-burgers?menu=dos-gordos" className="rounded-full border border-line bg-white px-6 py-3 text-center font-black text-ink hover:border-brand">
-              View takeover mode
+              Open the live menu example
             </Link>
           </div>
         </div>
 
         <div className="rounded-[1.75rem] border border-line bg-white p-4 shadow-soft">
           <div className="rounded-[1.25rem] bg-[#f8f0e5] p-5">
-            <div className="grid gap-4 sm:grid-cols-2">
-              <div className="overflow-hidden rounded-2xl border border-[#dfd2c3] bg-white">
-                <img src="/assets/mellow-moose-og-smashburger.jpg" alt="Mellow Moose burger menu example" className="h-56 w-full object-cover" />
-                <div className="p-4">
-                  <p className="text-xs font-black uppercase tracking-[0.14em] text-[#ff6422]">Normal mode</p>
-                  <h2 className="mt-2 text-2xl font-black text-[#21140d]">Mellow Moose Burgers</h2>
-                  <p className="mt-2 text-sm leading-6 text-[#68513f]">The public page feels like the business, not like a generic hosted menu.</p>
-                </div>
-              </div>
-              <div className="overflow-hidden rounded-2xl border border-[#dfd2c3] bg-white">
-                <img src="/assets/dos-gordos-birria-tacos.jpg" alt="Dos Gordos takeover example" className="h-56 w-full object-cover" />
-                <div className="p-4">
-                  <p className="text-xs font-black uppercase tracking-[0.14em] text-[#2f9c96]">Popup mode</p>
-                  <h2 className="mt-2 text-2xl font-black text-[#21140d]">Dos Gordos Takeover</h2>
-                  <p className="mt-2 text-sm leading-6 text-[#68513f]">The same customer path can shift for a special menu without losing clarity.</p>
+            <div className="overflow-hidden rounded-2xl border border-[#dfd2c3] bg-white">
+              <img src="/assets/mellow-moose-og-smashburger.jpg" alt="Burger featured on a MenuPilot customer page" className="h-72 w-full object-cover sm:h-80" />
+              <div className="p-5">
+                <p className="text-xs font-black uppercase tracking-[0.14em] text-[#ff6422]">Live MenuPilot example</p>
+                <h2 className="mt-2 text-3xl font-black text-[#21140d]">Mellow Moose Burgers</h2>
+                <p className="mt-2 leading-7 text-[#68513f]">Customers can see the food, check current hours, order, call, or get directions from one page.</p>
+                <div className="mt-5 flex flex-wrap gap-2" aria-label="Customer actions shown in the example">
+                  {['Menu', 'Hours', 'Order', 'Directions'].map((action) => (
+                    <span key={action} className="rounded-full bg-[#fff4df] px-3 py-2 text-xs font-black text-[#3a2418]">{action}</span>
+                  ))}
                 </div>
               </div>
             </div>
             <div className="mt-4 rounded-2xl bg-[#3a2418] p-5 text-white">
               <p className="text-xs font-black uppercase tracking-[0.14em] text-[#ffc22e]">Why this matters</p>
-              <p className="mt-2 text-lg font-black">The page can match the day, the menu, and the business without reprinting QR codes.</p>
+              <p className="mt-2 text-lg font-black">One dependable link is easier to share and easier for customers to use.</p>
             </div>
           </div>
         </div>
@@ -99,7 +93,7 @@ export default function MenuPilotExamplesPage() {
             Monthly care keeps the page useful after launch.
           </h2>
           <p className="mt-5 leading-7 text-muted">
-            A static menu is easy to forget. A business page is useful because the public page can respond to real operations: weather, sellouts, hours, popups, specials, and new photos.
+            A static menu is easy to forget. A managed business page stays useful because hours, sellouts, specials, menu details, links, and photos can be kept current.
           </p>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">

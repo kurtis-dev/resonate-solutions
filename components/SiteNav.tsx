@@ -3,35 +3,56 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useState } from "react";
+import {
+  isGlobalNavigationExcluded,
+  isNavigationLinkActive,
+  isNavigationLinkCurrent,
+  primaryNavigationLinks,
+  productNavigationLinks,
+  secondaryNavigationLinks,
+  startProjectLink
+} from "@/lib/site-navigation";
 
 export function SiteNav() {
   const pathname = usePathname();
   const [open, setOpen] = useState(false);
 
-  if (
-    pathname.startsWith("/m/") ||
-    pathname.startsWith("/admin") ||
-    pathname.startsWith("/dashboard") ||
-    pathname.startsWith("/excellent-pins")
-  ) {
+  if (isGlobalNavigationExcluded(pathname)) {
     return null;
   }
 
-  const homeLinks = [
-    { label: "Solutions", href: "/#solutions" },
-    { label: "Our Work", href: "/#work" },
-    { label: "MenuPilot", href: "/menupilot" },
-    { label: "Pricing", href: "/pricing" },
-    { label: "About", href: "/#about" }
-  ];
+  const productsActive = productNavigationLinks.some((item) => isNavigationLinkActive(pathname, item.href));
 
-  const standardLinks = [
-    { label: "Services", href: "/menupilot" },
-    { label: "Examples", href: "/menupilot/examples" },
-    { label: "Pricing", href: "/pricing" }
-  ];
+  const renderDesktopLink = (item: { label: string; href: string }) => {
+    const active = isNavigationLinkCurrent(pathname, item.href);
 
-  const links = pathname === "/" ? homeLinks : standardLinks;
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        aria-current={active ? "page" : undefined}
+        className={`rounded-full px-3 py-2 transition hover:bg-white hover:text-ink ${active ? "bg-white text-ink shadow-sm" : ""}`}
+      >
+        {item.label}
+      </Link>
+    );
+  };
+
+  const renderMobileLink = (item: { label: string; href: string }, nested = false) => {
+    const active = isNavigationLinkCurrent(pathname, item.href);
+
+    return (
+      <Link
+        key={item.href}
+        href={item.href}
+        onClick={() => setOpen(false)}
+        aria-current={active ? "page" : undefined}
+        className={`rounded-xl px-4 py-3 font-semibold text-ink hover:bg-white ${nested ? "pl-7" : ""} ${active ? "bg-white shadow-sm" : ""}`}
+      >
+        {item.label}
+      </Link>
+    );
+  };
 
   return (
     <header className="sticky top-0 z-30 border-b border-line bg-cream/90 backdrop-blur">
@@ -43,13 +64,25 @@ export function SiteNav() {
             className="h-10 w-auto max-w-[150px] object-contain sm:max-w-[190px]"
           />
         </Link>
-        <nav className="hidden items-center gap-6 text-sm font-medium text-muted lg:flex" aria-label="Primary navigation">
-          {links.map((item) => (
-            <Link key={item.href} className="transition hover:text-ink" href={item.href}>{item.label}</Link>
-          ))}
+        <nav className="hidden items-center gap-1 text-sm font-medium text-muted lg:flex" aria-label="Primary navigation">
+          {primaryNavigationLinks.map(renderDesktopLink)}
+          <details className="group relative">
+            <summary
+              className={`flex cursor-pointer list-none items-center gap-1 rounded-full px-3 py-2 transition hover:bg-white hover:text-ink [&::-webkit-details-marker]:hidden ${productsActive ? "bg-white text-ink shadow-sm" : ""}`}
+            >
+              Products
+              <svg aria-hidden="true" viewBox="0 0 16 16" className="h-3.5 w-3.5 fill-none stroke-current transition group-open:rotate-180">
+                <path d="m4 6 4 4 4-4" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
+              </svg>
+            </summary>
+            <div className="absolute left-0 top-full z-40 mt-2 grid min-w-52 gap-1 rounded-2xl border border-line bg-white p-2 shadow-soft">
+              {productNavigationLinks.map(renderDesktopLink)}
+            </div>
+          </details>
+          {secondaryNavigationLinks.map(renderDesktopLink)}
         </nav>
         <div className="flex items-center gap-2">
-          <Link href="/checkout?plan=review" className="hidden rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-coral sm:inline-flex">Start a Project</Link>
+          <Link href={startProjectLink.href} className="hidden rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-coral sm:inline-flex">{startProjectLink.label}</Link>
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
@@ -67,16 +100,20 @@ export function SiteNav() {
           </button>
         </div>
       </div>
-      {open ? (
-        <nav id="mobile-site-nav" className="border-t border-line bg-cream px-5 py-4 lg:hidden" aria-label="Mobile navigation">
+      <nav
+        id="mobile-site-nav"
+        hidden={!open}
+        className="border-t border-line bg-cream px-5 py-4 lg:hidden"
+        aria-label="Mobile navigation"
+      >
           <div className="mx-auto grid max-w-7xl gap-1">
-            {links.map((item) => (
-              <Link key={item.href} onClick={() => setOpen(false)} className="rounded-xl px-4 py-3 font-semibold text-ink hover:bg-white" href={item.href}>{item.label}</Link>
-            ))}
-            <Link onClick={() => setOpen(false)} href="/checkout?plan=review" className="mt-2 rounded-full bg-coral px-5 py-3 text-center font-black text-white sm:hidden">Start a Project</Link>
+            {primaryNavigationLinks.map((item) => renderMobileLink(item))}
+            <p className="px-4 pb-1 pt-3 text-xs font-black uppercase tracking-[0.16em] text-muted">Products</p>
+            {productNavigationLinks.map((item) => renderMobileLink(item, true))}
+            {secondaryNavigationLinks.map((item) => renderMobileLink(item))}
+            <Link onClick={() => setOpen(false)} href={startProjectLink.href} className="mt-2 rounded-full bg-coral px-5 py-3 text-center font-black text-white sm:hidden">{startProjectLink.label}</Link>
           </div>
-        </nav>
-      ) : null}
+      </nav>
     </header>
   );
 }

@@ -362,90 +362,12 @@ const mellowMooseBurgers: MenuBusiness = {
       id: "moose-24",
       sectionId: "moose-specials",
       name: "Torta Burger",
-      description: "A photographed throwback-style burger with Dos Gordos energy and Mellow Moose smash burger attitude.",
+      description: "A photographed Mellow Moose special served torta-style with bold, savory flavor.",
       price: null,
       imageUrl: "/assets/mellow-moose-torta-burger.jpg",
       badge: "Rotating special",
       isSoldOut: false,
       sortOrder: 23
-    }
-  ],
-  menuVariants: [
-    {
-      key: "mellow-moose",
-      label: "Mellow Moose Burgers",
-      banner: null,
-      orderUrl: "https://www.clover.com/online-ordering/dos-gordos-tacos-siloam-springs",
-      sections: [],
-      items: []
-    },
-    {
-      key: "dos-gordos",
-      label: "Dos Gordos popup",
-      banner: "Dos Gordos Takeover at Mellow Moose is active today.",
-      orderUrl: "https://www.clover.com/online-ordering/dos-gordos-tacos-siloam-springs",
-      sections: [
-        { id: "dos-gordos-tacos", name: "Tacos & Quesabirria", sortOrder: 0 },
-        { id: "dos-gordos-loaded", name: "Loaded Fries & Burger", sortOrder: 1 },
-        { id: "dos-gordos-extras", name: "Extras", sortOrder: 2 }
-      ],
-      items: [
-        {
-          id: "dos-gordos-quesabirria",
-          sectionId: "dos-gordos-tacos",
-          name: "#1 Quesabirria Tacos",
-          description: "Three corn tortillas grilled with cheese and birria, served with grilled onions, cilantro, and consome on the side. Choice of two salsas.",
-          price: "$13",
-          imageUrl: "/assets/dos-gordos-birria-tacos.jpg",
-          badge: "Takeover favorite",
-          isSoldOut: false,
-          sortOrder: 0
-        },
-        {
-          id: "dos-gordos-street-tacos",
-          sectionId: "dos-gordos-tacos",
-          name: "#2 Street Tacos",
-          description: "Four corn tortillas with choice of Al Pastor or Birria, cilantro, and onion, served with limes, grilled onions, and two salsas.",
-          price: "$13",
-          imageUrl: "/assets/dos-gordos-street-tacos.jpg",
-          badge: null,
-          isSoldOut: false,
-          sortOrder: 1
-        },
-        {
-          id: "dos-gordos-cali-fries",
-          sectionId: "dos-gordos-loaded",
-          name: "#3 Cali Fries",
-          description: "Fries, nacho cheese, choice of Al Pastor or Birria, pico, sour cream, and mild salsa.",
-          price: "$17",
-          imageUrl: "/assets/dos-gordos-cali-fries.jpg",
-          badge: "Loaded",
-          isSoldOut: false,
-          sortOrder: 2
-        },
-        {
-          id: "dos-gordos-birria-moose-burger",
-          sectionId: "dos-gordos-loaded",
-          name: "#4 Birria Moose Burger",
-          description: "Toasted bun, mayo, fresh smashed patty, cheese, birria, pico, and mild salsa.",
-          price: "$15 / $18 with fries",
-          imageUrl: null,
-          badge: "Mellow x Dos Gordos",
-          isSoldOut: false,
-          sortOrder: 3
-        },
-        {
-          id: "dos-gordos-extras",
-          sectionId: "dos-gordos-extras",
-          name: "Extras",
-          description: "Ask at the truck for salsa, consome, and daily add-ons while supplies last.",
-          price: null,
-          imageUrl: null,
-          badge: null,
-          isSoldOut: false,
-          sortOrder: 4
-        }
-      ]
     }
   ]
 };

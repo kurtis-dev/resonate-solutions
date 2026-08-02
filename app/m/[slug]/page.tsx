@@ -274,15 +274,7 @@ function MellowMooseShell({
   const featuredItems = activeMenu.items.filter((item) => !item.isSoldOut && item.imageUrl).slice(0, 4);
   const mappedAddress = business.address || business.locationSummary || business.city || business.businessName;
   const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(mappedAddress)}&output=embed`;
-  const isDosGordos = activeMenu.key === "dos-gordos";
   const liveStatus = businessStatusLabel(business);
-  const todaySpecials = isDosGordos
-    ? [
-        { label: "Special event", title: "Dos Gordos Takeover", body: "Birria tacos, Cali fries, and the Birria Moose Burger are running today." },
-        { label: "Order here", title: "Use the Clover button", body: "Tap Order on Clover to start an order from the current menu." },
-        { label: "Regular menu", title: "Mellow Moose Burgers", body: "Looking for burgers instead? Jump back to the regular Mellow Moose menu below." }
-      ]
-    : [];
 
   return (
     <main className="min-h-screen bg-[#f8f0e5] text-[#2f1c12]">
@@ -303,29 +295,17 @@ function MellowMooseShell({
       <section id="top" className="mx-auto grid max-w-5xl gap-10 px-5 py-14 md:grid-cols-[1.05fr_0.95fr] md:items-center md:py-20">
         <div>
           <span className="inline-flex rounded-full bg-[#4a3324] px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-white">
-            {liveStatus || (isDosGordos ? "Special event - Siloam Springs" : "Now serving - Siloam Springs")}
+            {liveStatus || "Now serving - Siloam Springs"}
           </span>
           <h1 className="mt-5 text-6xl font-black leading-[0.9] tracking-tight [text-wrap:balance] md:text-7xl">
-            {isDosGordos ? (
-              <>
-                <span className="text-[#3a2418]">Dos Gordos</span>
-                <br />
-                <span className="text-[#ff6422] drop-shadow-[0_2px_0_rgba(58,36,24,.10)]">Takeover.</span>
-              </>
-            ) : (
-              <>
-                <span className="text-[#3a2418]">Mellow</span>
-                <br />
-                <span className="text-[#ff6422] drop-shadow-[0_2px_0_rgba(58,36,24,.10)]">Moose</span>
-                <br />
-                <span className="text-[#3a2418]">Burgers.</span>
-              </>
-            )}
+            <span className="text-[#3a2418]">Mellow</span>
+            <br />
+            <span className="text-[#ff6422] drop-shadow-[0_2px_0_rgba(58,36,24,.10)]">Moose</span>
+            <br />
+            <span className="text-[#3a2418]">Burgers.</span>
           </h1>
           <p className="mt-7 max-w-xl text-lg leading-8 text-[#4d3525]">
-            {isDosGordos
-              ? "Dos Gordos Takeover at Mellow Moose brings back birria tacos, Cali fries, and throwback specials from the little orange truck at Griffin's Food Court."
-              : "Smash burgers, loaded fries, salads, kids meals, and rotating specials from a little orange truck at Griffin's Food Court."}
+            Smash burgers, loaded fries, salads, kids meals, and rotating specials from a little orange truck at Griffin&apos;s Food Court.
           </p>
           <div className="mt-7 flex flex-wrap items-center gap-3">
             {activeMenu.orderUrl ? (
@@ -352,7 +332,7 @@ function MellowMooseShell({
             <img src={business.heroImageUrl || "/assets/mellow-moose-logo.jpg"} alt={`${business.businessName} logo`} className="aspect-square w-full object-contain" />
           </div>
           <span className="absolute -bottom-3 right-3 rotate-6 rounded-full bg-[#ffc22e] px-5 py-2 text-sm font-black text-[#3a2418] shadow-[0_8px_20px_rgba(55,34,22,.15)]">
-            {isDosGordos ? "Takeover" : "Hey there"}
+            Hey there
           </span>
         </div>
       </section>
@@ -365,24 +345,10 @@ function MellowMooseShell({
         </section>
       ) : null}
 
-      {todaySpecials.length ? (
-        <section className="mx-auto max-w-5xl px-5 pb-10">
-          <div className="grid gap-4 md:grid-cols-3">
-            {todaySpecials.map((special) => (
-              <article key={special.title} className="rounded-[1rem] border border-[#dfd2c3] bg-[#fffaf3] p-5 shadow-[0_10px_25px_rgba(55,34,22,.08)]">
-                <p className="text-xs font-black uppercase tracking-[0.14em] text-[#ff6422]">{special.label}</p>
-                <h2 className="mt-2 text-2xl font-black leading-tight text-[#21140d]">{special.title}</h2>
-                <p className="mt-2 text-sm leading-6 text-[#68513f]">{special.body}</p>
-              </article>
-            ))}
-          </div>
-        </section>
-      ) : null}
-
       <section className="mx-auto max-w-5xl px-5 py-10">
-        <p className="text-xs font-black uppercase tracking-[0.16em] text-[#ff6422]">{isDosGordos ? "Takeover menu" : "Start here"}</p>
-        <h2 className="mt-2 text-4xl font-black leading-none text-[#21140d]">{isDosGordos ? "Dos Gordos at Mellow Moose" : "Local Favorites"}</h2>
-        <p className="mt-2 text-sm text-[#5b4331]">{isDosGordos ? "Today's throwback takeover menu." : "What the Burger Fam comes back for."}</p>
+        <p className="text-xs font-black uppercase tracking-[0.16em] text-[#ff6422]">Start here</p>
+        <h2 className="mt-2 text-4xl font-black leading-none text-[#21140d]">Local Favorites</h2>
+        <p className="mt-2 text-sm text-[#5b4331]">What the Burger Fam comes back for.</p>
         <div className="mt-8 grid gap-7 md:grid-cols-2">
           {featuredItems.map((item, index) => (
             <FeaturedFavoriteCard key={item.id} item={item} index={index} />
@@ -394,9 +360,9 @@ function MellowMooseShell({
         <div className="mx-auto max-w-5xl px-5">
           <div className="mb-9 flex flex-col justify-between gap-4 sm:flex-row sm:items-end">
             <div>
-              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#ffc22e]">{isDosGordos ? "Special event" : "The whole menu"}</p>
-              <h2 className="mt-2 text-4xl font-black leading-none">{isDosGordos ? "Takeover Menu" : "Full Menu"}</h2>
-              <p className="mt-2 text-sm text-[#e8d7c8]">{isDosGordos ? "Tap an item to order while the popup is active." : "Tap an item to open Clover."}</p>
+              <p className="text-xs font-black uppercase tracking-[0.16em] text-[#ffc22e]">The whole menu</p>
+              <h2 className="mt-2 text-4xl font-black leading-none">Full Menu</h2>
+              <p className="mt-2 text-sm text-[#e8d7c8]">Tap an item to open Clover.</p>
             </div>
             {activeMenu.orderUrl ? (
               <a href={activeMenu.orderUrl} className="rounded-full bg-[#ff6422] px-6 py-3 text-sm font-black text-white transition hover:-translate-y-0.5">
@@ -472,32 +438,13 @@ function MellowMooseShell({
         </div>
       </section>
 
-      {isDosGordos ? (
-        <section className="mx-auto max-w-4xl px-5 pb-16">
-          <div className="rounded-[1.25rem] border border-dashed border-[#bba995] bg-[#fffaf3] p-6">
-            <div className="flex flex-col justify-between gap-5 sm:flex-row sm:items-center">
-              <div>
-                <p className="inline-flex rounded-full bg-[#d8f0ea] px-4 py-2 text-xs font-black uppercase tracking-[0.12em] text-[#277067]">Regular menu</p>
-                <h2 className="mt-4 text-2xl font-black text-[#21140d]">Looking for Mellow Moose Burgers?</h2>
-                <p className="mt-2 max-w-xl text-sm leading-6 text-[#5b4331]">
-                  The regular burger menu is still available when the Dos Gordos takeover is not running.
-                </p>
-              </div>
-              <a href="/m/mellow-moose-burgers" className="rounded-full bg-[#2f9c96] px-5 py-3 text-sm font-black text-white transition hover:-translate-y-0.5">
-                Back to burger menu
-              </a>
-            </div>
-          </div>
-        </section>
-      ) : null}
-
       <footer className="bg-[#3a2418] px-5 py-8 text-white">
         <div className="mx-auto flex max-w-5xl flex-col justify-between gap-4 sm:flex-row sm:items-center">
           <div className="flex items-center gap-3">
             <img src={business.heroImageUrl || "/assets/mellow-moose-logo.jpg"} alt="" className="h-9 w-9 rounded-full object-cover" />
             <span className="font-black">{business.businessName}</span>
           </div>
-          <p className="text-sm text-[#e8d7c8]">Siloam Springs, AR - Formerly Dos Gordos Tacos</p>
+          <p className="text-sm text-[#e8d7c8]">Siloam Springs, Arkansas</p>
         </div>
       </footer>
     </main>

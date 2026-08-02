@@ -6,6 +6,7 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
+    "audit:links": "next build && node scripts/link-audit.mjs",
     "smoke": "node scripts/smoke-check.mjs",
     "lint": "next lint"
   },
