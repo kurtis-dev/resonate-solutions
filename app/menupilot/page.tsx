@@ -309,7 +309,14 @@ export default function MenuPilotPage() {
       </section>
 
       <section id="owner-portal" className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-16"×¾­¢G§²ÚîÆ­yÐen requests, and the next details Resonate needs before publishing.
+        <div className="mx-auto max-w-7xl px-5 py-16">
+          <div className="mx-auto max-w-4xl text-center">
+            <p className="text-sm font-black uppercase tracking-[0.18em] text-coral">Owner portal</p>
+            <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
+              See what is live. Request what needs to change.
+            </h2>
+            <p className="mx-auto mt-5 max-w-2xl leading-7 text-muted">
+              The dashboard gives every business owner the same clear view of their customer page, open requests, and the next details Resonate needs before publishing.
             </p>
             <Link href="/portal" className="mt-7 inline-flex rounded-full border border-line px-5 py-3 font-black text-ink shadow-sm transition hover:border-coral hover:text-coral">
               Explore the Owner Portal
