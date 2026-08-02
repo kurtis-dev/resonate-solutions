@@ -48,16 +48,16 @@ const solutionAreas = [
     items: ["Services, menus, and key details", "Hours, photos, and directions", "Call, order, book, or request a quote", "One easy link to share anywhere"]
   },
   {
-    number: "For new leads",
-    title: "Turn questions into qualified leads",
-    copy: "Guide customers to the right service and collect the useful details before you call or email them back.",
-    items: ["Guided intake and quote requests", "Questions tailored to your service", "Clearer customer details", "Less back-and-forth before the sale"]
+    number: "For new inquiries",
+    title: "Collect the details you need",
+    copy: "Ask the right questions before you follow up, so you can respond with context instead of starting from scratch.",
+    items: ["Guided intake and quote requests", "Questions matched to your service", "Contact and project details in one submission", "Fewer missing answers before follow-up"]
   },
   {
-    number: "For your team",
-    title: "Keep business information current",
-    copy: "Organize important details and make changes without repeating the same work across scattered places.",
-    items: ["Structured business information", "Managed change requests", "Publishing workflows", "Tools that reduce repeated updates"]
+    number: "For ongoing support",
+    title: "Keep your page useful after launch",
+    copy: "Use managed support for routine changes and basic page checks when your business information changes.",
+    items: ["Text, photo, hours, menu, and service updates", "Monthly page review", "Basic link and page-health checks", "Hosting and routine platform maintenance"]
   }
 ];
 
@@ -132,9 +132,21 @@ export default function ResonateHome() {
           <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">Confused customers call, leave, or choose someone else.</h2>
           <div className="mt-12 grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
-              <p className="font-black text-ink">Your business details end up spread across:</p>
-              <div className="mt-5 flex flex-wrap gap-2.5">
-                {['Google profiles', 'Facebook pages', 'PDFs', 'Printed menus', 'Booking tools', 'Old websites', 'Customer messages', 'Internal notes'].map((item, index) => <span key={item} className={`rounded-full border px-4 py-2 text-sm font-semibold text-ink ${index % 3 === 0 ? "border-[#ffc7b7] bg-[#fff1ec]" : index % 3 === 1 ? "border-[#b9e5da] bg-[#edf9f6]" : "border-[#ddd7ff] bg-[#f4f2ff]"}`}>{item}</span>)}
+              <p className="font-black text-ink">The same business details live in different places.</p>
+              <div className="mt-5 grid gap-3 sm:grid-cols-2">
+                {[
+                  { number: "01", title: "Search and social", detail: "Google Business and Facebook", color: "border-[#ffb8a5] bg-[#fff2ed] text-[#c9482b]" },
+                  { number: "02", title: "Menus and documents", detail: "Printed menus and PDFs", color: "border-[#f0d47d] bg-[#fff9df] text-[#9a6500]" },
+                  { number: "03", title: "Sites and booking tools", detail: "Old pages and scheduling links", color: "border-[#9fdcce] bg-[#ebf8f4] text-[#166f61]" },
+                  { number: "04", title: "Messages and notes", detail: "Customer messages and internal notes", color: "border-[#cfc9ff] bg-[#f2f0ff] text-[#5d55a7]" }
+                ].map((item) => (
+                  <div key={item.number} className={`relative overflow-hidden rounded-2xl border p-5 ${item.color}`}>
+                    <span className="absolute -right-1 -top-5 text-7xl font-black opacity-[0.08]" aria-hidden="true">{item.number}</span>
+                    <p className="text-[11px] font-black uppercase tracking-[0.18em]">Source {item.number}</p>
+                    <p className="mt-3 font-black text-ink">{item.title}</p>
+                    <p className="mt-1 text-sm leading-6 text-muted">{item.detail}</p>
+                  </div>
+                ))}
               </div>
               <p className="mt-6 max-w-xl leading-7 text-muted">Hours change. Prices move. Services get added. Before long, customers find different answers depending on where they look.</p>
             </div>
@@ -159,7 +171,7 @@ export default function ResonateHome() {
         <div className="mx-auto max-w-7xl px-5 py-16 md:py-24">
           <SectionLabel>How we help</SectionLabel>
           <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">What Resonate can do for your business.</h2>
-          <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">You do not need more complicated software. You need the right information, the right next step, and less repetitive work.</p>
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">We turn scattered information and repeated questions into a clearer customer page, a better intake path, and dependable ongoing support.</p>
           <div className="mt-14 grid gap-6 lg:grid-cols-3">
             {solutionAreas.map((area, index) => (
               <article key={area.number} className={`relative overflow-hidden rounded-[1.75rem] border p-8 shadow-[0_20px_55px_rgba(46,52,49,0.08)] ${index === 0 ? "border-[#27243f] bg-[#27243f] text-white" : index === 1 ? "border-[#ffc8b8] bg-[#fff1ec]" : "border-[#a9dfd3] bg-[#eaf8f4]"}`}>
@@ -181,10 +193,10 @@ export default function ResonateHome() {
           <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">Different businesses. Different problems. Practical systems built around each one.</p>
           <div className="mt-14 grid gap-8 lg:grid-cols-2">
             <article className="overflow-hidden rounded-[1.75rem] border border-[#ffc8b8] bg-white shadow-[0_24px_70px_rgba(240,95,59,0.12)]">
-              <div className="relative h-64 overflow-hidden">
-                <img src="/assets/mellow-moose-food-truck.jpg" alt="Mellow Moose food truck" className="h-full w-full object-cover transition duration-500 hover:scale-[1.02]" />
-                <div className="absolute inset-0 bg-gradient-to-t from-ink/70 to-transparent" />
-                <p className="absolute bottom-5 left-6 text-xs font-black uppercase tracking-[0.15em] text-white">MenuPilot · Mellow Moose</p>
+              <div className="relative h-72 overflow-hidden">
+                <img src="/assets/mellow-moose-buffalo-chicken-fries.jpg" alt="Mellow Moose buffalo chicken fries" className="h-full w-full object-cover object-center transition duration-500 hover:scale-[1.02]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent" />
+                <p className="absolute bottom-5 left-6 text-xs font-black uppercase tracking-[0.15em] text-white">MenuPilot | Mellow Moose</p>
               </div>
               <div className="p-8">
                 <h3 className="text-3xl font-black text-ink">One page takes customers from hungry to ordering.</h3>
@@ -196,18 +208,10 @@ export default function ResonateHome() {
               </div>
             </article>
             <article className="overflow-hidden rounded-[1.75rem] border border-[#4b466d] bg-[#27243f] text-white shadow-[0_26px_75px_rgba(39,36,63,0.2)]">
-              <div className="grid h-72 grid-cols-[1.18fr_0.82fr] gap-2 overflow-hidden bg-[linear-gradient(135deg,#ffe7dc,#fff6d9_48%,#e7f8f4)] p-3">
-                <div className="overflow-hidden rounded-2xl bg-white shadow-sm">
-                  <img src="/assets/excellent-pins/lovable/pin-hard-enamel.jpg" alt="Red and navy hard-enamel pin example" className="h-full w-full object-contain object-center" />
-                </div>
-                <div className="grid min-h-0 min-w-0 grid-rows-[minmax(0,1fr)_minmax(0,1fr)] gap-2">
-                  <div className="min-h-0 overflow-hidden rounded-2xl bg-[#fff5e8] shadow-sm">
-                    <img src="/assets/excellent-pins/lovable/finishes.jpg" alt="Custom pin finish options" className="h-full w-full object-contain object-center" />
-                  </div>
-                  <div className="min-h-0 overflow-hidden rounded-2xl bg-white shadow-sm">
-                    <img src="/assets/excellent-pins/lovable/pin-badge.jpg" alt="Custom badge example" className="h-full w-full object-contain object-center" />
-                  </div>
-                </div>
+              <div className="relative h-72 overflow-hidden bg-[#f6eee6]">
+                <img src="/assets/excellent-pins/lovable/pin-event.jpg" alt="Colorful custom enamel event badge" className="h-full w-full object-cover object-[50%_58%] transition duration-500 hover:scale-[1.02]" />
+                <div className="absolute inset-0 bg-gradient-to-t from-[#27243f]/75 via-transparent to-transparent" />
+                <p className="absolute bottom-5 left-6 max-w-md pr-6 text-xs font-black uppercase tracking-[0.15em] text-white">A product buyers can understand before they request a quote</p>
               </div>
               <div className="p-8">
                 <p className="text-xs font-black uppercase tracking-[0.15em] text-[#ffd35e]">Excellent Pins &amp; Badges</p>
@@ -223,13 +227,13 @@ export default function ResonateHome() {
       <section id="about" className="scroll-mt-24 border-b border-[#eee5df] bg-white">
         <div className="mx-auto max-w-7xl px-5 py-16 md:py-24">
           <SectionLabel>A simple process</SectionLabel>
-          <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">Tell us where the business gets stuck. We will build the right system to fix it.</h2>
+          <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">Tell us where the business gets stuck. We will recommend a practical next step.</h2>
           <ol className="mt-12 grid gap-8 md:grid-cols-2 xl:grid-cols-4">
             {["Show us where customers or staff lose time", "We recommend the smallest useful system", "You review everything before it goes live", "We launch it and stay available when you need help"].map((step, index) => (
               <li key={step} className={`rounded-2xl border p-5 ${index === 0 ? "border-[#ffc8b8] bg-[#fff1ec]" : index === 1 ? "border-[#f2dc92] bg-[#fff9df]" : index === 2 ? "border-[#a9dfd3] bg-[#eaf8f4]" : "border-[#d7d2ff] bg-[#f3f1ff]"}`}><span className="text-xs font-black uppercase tracking-[0.16em] text-[#f05f3b]">0{index + 1}</span><p className="mt-3 font-black leading-6 text-ink">{step}</p></li>
             ))}
           </ol>
-          <p className="mt-10 max-w-3xl leading-7 text-muted">No bloated package and no technology for technology's sake. We recommend the smallest useful solution that makes the business easier to understand and run.</p>
+          <p className="mt-10 max-w-3xl leading-7 text-muted">You get a focused recommendation tied to the problem you showed us, with a clear scope before work begins.</p>
         </div>
       </section>
 
