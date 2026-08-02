@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { redirect } from "next/navigation";
 import { getPlanById } from "@/lib/plans";
 
 export default async function CheckoutPage({
@@ -8,7 +9,10 @@ export default async function CheckoutPage({
 }) {
   const params = await searchParams;
   const planId = params.plan || "setup";
-  const plan = getPlanById(planId) || getPlanById("setup");
+  const plan = getPlanById(planId);
+  if (!plan) {
+    redirect("/pricing?checkout=invalid-plan");
+  }
   const isFree = plan?.paymentMode === "none";
   const isOneTime = plan?.paymentMode === "payment";
   const isHosting = plan?.id === "hosting";
