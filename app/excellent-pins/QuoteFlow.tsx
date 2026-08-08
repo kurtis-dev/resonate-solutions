@@ -46,6 +46,8 @@ const budgetOptions = [
   "Not sure"
 ];
 
+const maxArtworkFileSize = 4 * 1024 * 1024;
+
 type QuoteState = {
   customerName: string;
   customerEmail: string;
@@ -168,6 +170,8 @@ export function ExcellentPinsQuoteFlow() {
   const [form, setForm] = useState<QuoteState>(createInitialState);
   const [status, setStatus] = useState<"idle" | "submitting" | "sent" | "error">("idle");
   const [error, setError] = useState("");
+  const [artworkFile, setArtworkFile] = useState<File | null>(null);
+  const [fileInputKey, setFileInputKey] = useState(0);
   const selectedStyle = productStyles.find((style) => style.name === form.emblemType);
 
   const steps = useMemo(
@@ -202,11 +206,21 @@ export function ExcellentPinsQuoteFlow() {
     setStatus("submitting");
     setError("");
 
-    const response = await fetch("/api/excellent-pins/quote", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify(form)
-    });
+    const requestBody = new FormData();
+    Object.entries(form).forEach(([name, value]) => requestBody.append(name, value));
+    if (artworkFile) requestBody.append("artworkFile", artworkFile);
+
+    let response: Response;
+    try {
+      response = await fetch("/api/excellent-pins/quote", {
+        method: "POST",
+        body: requestBody
+      });
+    } catch {
+      setStatus("error");
+      setError("The quote request could not be sent. Check your connection and try again.");
+      return;
+    }
 
     if (!response.ok) {
       const body = (await response.json().catch(() => null)) as { error?: string } | null;
@@ -230,6 +244,8 @@ export function ExcellentPinsQuoteFlow() {
           type="button"
           onClick={() => {
             setForm(createInitialState());
+            setArtworkFile(null);
+            setFileInputKey((current) => current + 1);
             setStep(0);
             setStatus("idle");
           }}
@@ -325,6 +341,71 @@ export function ExcellentPinsQuoteFlow() {
               <ChoiceGroup name="artworkStatus" value={form.artworkStatus} options={artworkStatuses} onChange={update} />
             </div>
             <Field label="Artwork link, if available" name="artworkLink" value={form.artworkLink} placeholder="Google Drive, Dropbox, website, or file link" onChange={update} />
+            <div className="grid gap-3 rounded-[18px] border border-dashed border-[#8da6c4] bg-[#eef5fb] p-4">
+              <div>
+                <p className="text-sm font-black text-[#17120f]">Upload artwork, if available</p>
+                <p className="mt-1 text-sm font-bold leading-6 text-[#4b5e73]">
+                  Add one JPG or PDF up to 4 MB. For a larger file, use the artwork link field above.
+                </p>
+              </div>
+              <input
+                key={fileInputKey}
+                id="excellent-pins-artwork-file"
+                type="file"
+                name="artworkFile"
+                accept=".jpg,.jpeg,.pdf,image/jpeg,application/pdf"
+                onChange={(event) => {
+                  const file = event.currentTarget.files?.[0] || null;
+                  if (!file) {
+                    setArtworkFile(null);
+                    return;
+                  }
+
+                  const validType = file.type === "image/jpeg" || file.type === "application/pdf";
+                  const validExtension = /\.(jpe?g|pdf)$/i.test(file.name);
+                  if (!validType || !validExtension) {
+                    setArtworkFile(null);
+                    event.currentTarget.value = "";
+                    setError("Artwork must be a JPG or PDF file.");
+                    return;
+                  }
+
+                  if (file.size > maxArtworkFileSize) {
+                    setArtworkFile(null);
+                    event.currentTarget.value = "";
+                    setError("Artwork must be 4 MB or smaller. Use the artwork link field for larger files.");
+                    return;
+                  }
+
+                  setArtworkFile(file);
+                  setError("");
+                }}
+                className="sr-only"
+              />
+              <label
+                htmlFor="excellent-pins-artwork-file"
+                className="w-fit cursor-pointer rounded-full bg-[#173866] px-5 py-3 text-sm font-black text-white shadow-[0_12px_28px_rgba(23,56,102,0.2)]"
+              >
+                {artworkFile ? "Choose a different file" : "Choose JPG or PDF"}
+              </label>
+              {artworkFile && (
+                <div className="flex flex-col gap-2 rounded-[14px] bg-white px-4 py-3 sm:flex-row sm:items-center sm:justify-between">
+                  <p className="min-w-0 break-all text-sm font-black text-[#173866]">
+                    {artworkFile.name} ({(artworkFile.size / (1024 * 1024)).toFixed(2)} MB)
+                  </p>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setArtworkFile(null);
+                      setFileInputKey((current) => current + 1);
+                    }}
+                    className="self-start text-sm font-black text-[#9d2429] sm:self-auto"
+                  >
+                    Remove file
+                  </button>
+                </div>
+              )}
+            </div>
           </div>
         )}
 
@@ -427,7 +508,11 @@ export function ExcellentPinsQuoteFlow() {
             disabled={status === "submitting"}
             className="rounded-full bg-[#c92f2f] px-7 py-4 text-sm font-black text-white shadow-[0_18px_45px_rgba(201,47,47,0.24)] disabled:opacity-60"
           >
-            {status === "submitting" ? "Sending..." : "Send quote request"}
+            {status === "submitting"
+              ? artworkFile
+                ? "Uploading artwork and sending..."
+                : "Sending..."
+              : "Send quote request"}
           </button>
         )}
       </div>
