@@ -11,6 +11,11 @@ type CustomerEmailInput = {
   subject: string;
   text: string;
   replyTo?: string;
+  attachments?: Array<{
+    filename: string;
+    content: string;
+    contentType?: string;
+  }>;
 };
 
 function clean(value: unknown, max = 1200) {
@@ -43,7 +48,12 @@ export async function sendCustomerEmail(input: CustomerEmailInput): Promise<Emai
         to,
         reply_to: replyTo || undefined,
         subject: clean(input.subject, 180),
-        text: clean(input.text, 5000)
+        text: clean(input.text, 5000),
+        attachments: input.attachments?.map((attachment) => ({
+          filename: clean(attachment.filename, 180),
+          content: attachment.content,
+          content_type: clean(attachment.contentType, 120) || undefined
+        }))
       })
     });
 

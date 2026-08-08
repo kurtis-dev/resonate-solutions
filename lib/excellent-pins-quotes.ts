@@ -13,6 +13,7 @@ export type ExcellentPinsQuotePayload = {
   shippingDestination: string;
   artworkStatus: string;
   artworkLink?: string;
+  artworkFileName?: string;
   useCase: string;
   finishPreference: string;
   packaging: string;
@@ -127,6 +128,7 @@ export async function ensureExcellentPinsQuoteRequestsTable() {
       shipping_destination text,
       artwork_status text,
       artwork_link text,
+      artwork_file_name text,
       use_case text,
       finish_preference text,
       backing_preference text,
@@ -146,6 +148,7 @@ export async function ensureExcellentPinsQuoteRequestsTable() {
   await sql`alter table excellent_pins_quote_requests add column if not exists finish_preference text`;
   await sql`alter table excellent_pins_quote_requests add column if not exists backing_preference text`;
   await sql`alter table excellent_pins_quote_requests add column if not exists packaging_requests text`;
+  await sql`alter table excellent_pins_quote_requests add column if not exists artwork_file_name text`;
 
   await sql`
     create index if not exists excellent_pins_quote_requests_created_idx
@@ -188,6 +191,7 @@ export async function saveExcellentPinsQuoteRequest(record: ExcellentPinsQuoteRe
         shipping_destination,
         artwork_status,
         artwork_link,
+        artwork_file_name,
         use_case,
         finish_preference,
         backing_preference,
@@ -214,6 +218,7 @@ export async function saveExcellentPinsQuoteRequest(record: ExcellentPinsQuoteRe
         ${record.shippingDestination || null},
         ${record.artworkStatus || null},
         ${record.artworkLink || null},
+        ${record.artworkFileName || null},
         ${record.useCase || null},
         ${record.finishPreference || null},
         ${null},
@@ -257,6 +262,7 @@ export function buildJackQuoteEmail(record: ExcellentPinsQuoteRecord) {
     line("Shipping destination", record.shippingDestination),
     line("Artwork", record.artworkStatus),
     line("Artwork link", record.artworkLink),
+    line("Artwork file", record.artworkFileName),
     line("Use case", record.useCase),
     line("Finish preference", record.finishPreference),
     line("Packaging", record.packaging),
@@ -294,6 +300,7 @@ export function buildCustomerQuoteReceipt(record: ExcellentPinsQuoteRecord) {
     line("Deadline", record.deadline),
     line("Shipping destination", record.shippingDestination),
     line("Artwork", record.artworkStatus),
+    line("Artwork file", record.artworkFileName),
     "",
     "Excellent Pins will review your details and follow up with pricing, questions, or the next step for your order.",
     "",
