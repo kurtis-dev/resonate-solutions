@@ -16,27 +16,27 @@ export default async function CheckoutPage({
   const isManagedPage = plan?.id === "managed-page";
   const isLaunchManagedPage = plan?.id === "launch-managed-page";
   const heading = isFree
-    ? "Request your free page plan."
+    ? "Tell us what customers need to find."
     : isLaunchManagedPage
-      ? "Launch with a fully managed page."
+      ? "Start Launch and let Resonate handle routine updates."
       : isLaunchHosting
-        ? "Launch your page with hosting."
+        ? "Start Launch and keep the approved page live."
         : isManagedPage
-          ? "Start Managed Page."
+          ? "Let Resonate handle routine page updates."
           : isHosting
-            ? "Start Webpage Hosting."
+            ? "Keep the approved page live."
             : isOneTime
-              ? "Start your page/menu setup."
-              : "Start monthly page care.";
+              ? "Start your customer page."
+              : "Choose how your page stays current.";
   const intro = isFree
-    ? "Add the business details once. Resonate will review the business, recommend the right MenuPilot setup, and tell you what is needed before any paid build starts."
+    ? "Show us what you have, what customers keep asking, and what information is missing. We will recommend the most useful next step before you pay for a build."
     : isLaunchManagedPage
       ? "Your first Stripe invoice includes the $399 Launch payment and the first $79.99 Managed Page charge. Future invoices include only $79.99 per month; hosting is already included."
       : isLaunchHosting
         ? "Your first Stripe invoice includes the $399 Launch payment and the first $17.99 hosting charge. Future invoices include only $17.99 per month for Webpage Hosting."
-        : "Add the business details once, then continue to secure payment. Resonate uses this to match your order to the right page, menu, or services setup.";
+        : "Add the business details once, then continue to secure payment. Resonate uses them to match the order to the approved page, menu, or services project.";
   const buttonText = isFree
-    ? "Send free page plan request"
+    ? "Get my Free Page Plan"
     : isLaunchManagedPage
       ? "Pay $478.99 today, then $79.99/month"
       : isLaunchHosting
@@ -137,11 +137,11 @@ export default async function CheckoutPage({
               {isLaunchManagedPage ? <p><strong className="text-ink">Today: $478.99.</strong> Managed Page then renews at $79.99 per month, with hosting included; the $399 Launch charge does not repeat.</p> : null}
             </>
           )}
-          <p>After review, customer portal access is handled at app.resonate.solutions. Monthly billing is managed securely through Stripe.</p>
+          <p>Portal access is provided after Resonate activates the business account. Monthly billing is managed securely through Stripe.</p>
         </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
           <Link href="/pricing" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back to pricing</Link>
-          {!isFree ? <Link href="/checkout?plan=review" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Request Free Page Plan</Link> : null}
+          {!isFree ? <Link href="/checkout?plan=review" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Get a Free Page Plan</Link> : null}
         </div>
       </section>
     </main>

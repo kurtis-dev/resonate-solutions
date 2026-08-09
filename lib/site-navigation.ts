@@ -11,13 +11,13 @@ export type NavigationGroup = {
 };
 
 export const homeLink = { label: "Home", href: "/" } as const;
-export const solutionsLink = { label: "Solutions", href: "/#solutions" } as const;
-export const workLink = { label: "Our Work", href: "/#work" } as const;
+export const solutionsLink = { label: "How We Help", href: "/#solutions" } as const;
+export const workLink = { label: "Examples", href: "/#work" } as const;
 export const pricingLink = { label: "Pricing", href: "/pricing" } as const;
-export const aboutLink = { label: "About", href: "/#about" } as const;
+export const aboutLink = { label: "How It Works", href: "/#about" } as const;
 export const menuPilotLink = { label: "MenuPilot", href: "/menupilot" } as const;
-export const ownerPortalLink = { label: "Owner Portal", href: "/portal" } as const;
-export const startProjectLink = { label: "Start a Project", href: "/checkout?plan=review" } as const;
+export const ownerPortalLink = { label: "Managed Page", href: "/portal" } as const;
+export const startProjectLink = { label: "Get a Free Page Plan", href: "/checkout?plan=review" } as const;
 export const billingLink = { label: "Billing", href: "/billing" } as const;
 export const contactLink = { label: "Contact", href: `mailto:${questionsEmail}` } as const;
 export const privacyLink = { label: "Privacy", href: "/privacy" } as const;
@@ -51,7 +51,6 @@ export const menuPilotNavigationLinks = [
   { label: "Overview", href: "/menupilot" },
   { label: "Examples", href: "/menupilot/examples" },
   ownerPortalLink,
-  { label: "How Updates Work", href: "/menupilot#owner-portal" },
   { label: "Pricing", href: "/pricing" }
 ] as const;
 

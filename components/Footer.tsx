@@ -24,9 +24,9 @@ export function Footer() {
             />
           </Link>
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted">
-            Practical digital systems for small businesses: customer-ready pages, guided intake, business information tools, hosting, and managed support.
+            Give customers one clear place to find the right answer and give yourself an easier way to keep it current.
           </p>
-          <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-muted">Based in Northwest Arkansas. Supporting small businesses anywhere.</p>
+          <p className="mt-2 text-xs font-bold uppercase tracking-[0.12em] text-muted">Clear business information. Less repetitive upkeep.</p>
           <a className="mt-3 inline-flex text-sm font-black text-coral hover:text-ink" href={`mailto:${questionsEmail}`}>
             {questionsEmail}
           </a>

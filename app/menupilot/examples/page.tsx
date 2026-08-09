@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { MenuPilotSubnav } from "@/components/MenuPilotSubnav";
+
+export const metadata: Metadata = {
+  title: "MenuPilot Example | One Clear Place for Customer Information",
+  description: "See how a MenuPilot page brings menus, hours, photos, ordering, calling, and directions together for customers."
+};
 
 const exampleFeatures = [
   {
@@ -35,9 +41,9 @@ export default function MenuPilotExamplesPage() {
       <MenuPilotSubnav />
       <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand">Business page examples</p>
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand">MenuPilot example</p>
           <h1 className="mt-3 max-w-3xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
-            Give customers one clear place to get what they need.
+            One simple place for the information customers actually need.
           </h1>
           <p className="mt-6 max-w-2xl text-lg leading-8 text-muted">
             This live example brings the menu, current hours, location, ordering, photos, and business updates together in one mobile-friendly page.
@@ -65,7 +71,7 @@ export default function MenuPilotExamplesPage() {
               </div>
             </div>
             <div className="mt-4 rounded-2xl bg-[#3a2418] p-5 text-white">
-              <p className="text-xs font-black uppercase tracking-[0.14em] text-[#ffc22e]">Why this matters</p>
+              <p className="text-xs font-black uppercase tracking-[0.14em] text-[#ffc22e]">The owner experience</p>
               <p className="mt-2 text-lg font-black">One dependable link is easier to share and easier for customers to use.</p>
             </div>
           </div>
@@ -88,13 +94,14 @@ export default function MenuPilotExamplesPage() {
 
       <section className="mx-auto grid max-w-7xl gap-8 px-5 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand">Behind the menu</p>
+          <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand">When the business changes</p>
           <h2 className="mt-3 text-4xl font-black leading-tight text-ink md:text-5xl">
-            Monthly care keeps the page useful after launch.
+            You run the business. Managed Page helps keep the page current.
           </h2>
           <p className="mt-5 leading-7 text-muted">
-            A static menu is easy to forget. A managed business page stays useful because hours, sellouts, specials, menu details, links, and photos can be kept current.
+            You decide what changes. Resonate can update supplied hours, sellout notes, specials, menu details, links, and photos within the Managed Page scope.
           </p>
+          <Link href="/portal" className="mt-7 inline-flex rounded-full bg-ink px-6 py-3 font-black text-white hover:bg-brand">See how Managed Page works</Link>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {ownerControls.map((control) => (

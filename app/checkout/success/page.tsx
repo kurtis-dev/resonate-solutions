@@ -12,14 +12,14 @@ export default async function CheckoutSuccessPage({
     <main className="mx-auto flex max-w-2xl px-5 py-16">
       <section className="w-full rounded-[1.75rem] border border-line bg-white p-8 shadow-sm">
         <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">{isFreeRequest ? "Request received" : "Payment received"}</p>
-        <h1 className="mt-3 text-4xl font-black text-ink">{isFreeRequest ? "Your Free Page Plan request is in." : "Your Resonate package is confirmed."}</h1>
+        <h1 className="mt-3 text-4xl font-black text-ink">{isFreeRequest ? "We received your Free Page Plan request." : "Your Resonate order is confirmed."}</h1>
         <p className="mt-4 leading-7 text-muted">
           {isFreeRequest
-            ? "Thank you. Resonate will review the business details, recommend the right MenuPilot setup, and follow up with the next step. Paid build work starts only after you choose Launch."
-            : "Thank you. Resonate will review your order, match it to your business details, and follow up with the next step. When your portal is ready, you will sign in at app.resonate.solutions."}
+            ? "Thank you. Resonate will review what customers need to find and follow up with a clear recommendation. Paid build work starts only after you choose Launch."
+            : "Thank you. Resonate will match the order to your business details, confirm the approved scope, and follow up with the next step. Portal access is provided separately when the business account is ready."}
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          {!isFreeRequest ? <Link href="/portal" className="rounded-full bg-coral px-5 py-3 text-center font-black text-white">Open customer portal</Link> : null}
+          {!isFreeRequest ? <Link href="/portal" className="rounded-full bg-coral px-5 py-3 text-center font-black text-white">See Managed Page support</Link> : null}
           {!isFreeRequest ? <Link href="/billing" className="rounded-full bg-ink px-5 py-3 text-center font-black text-white">Open billing</Link> : null}
           <Link href="/" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back home</Link>
         </div>

@@ -1,9 +1,9 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-const title = "Resonate Solutions | Practical Digital Systems for Small Businesses";
+const title = "Resonate Solutions | One Clear Place for the Right Answer";
 const description =
-  "Resonate Solutions builds practical digital systems that help customers understand what you offer, take the right next step, and reduce repetitive work.";
+  "Resonate helps small businesses give customers clear, accurate information without creating more maintenance for the owner.";
 
 export const metadata: Metadata = {
   title,
@@ -43,20 +43,20 @@ function DotList({ items, light = false }: { items: string[]; light?: boolean })
 const solutionAreas = [
   {
     number: "For customers",
-    title: "Help customers choose you",
-    copy: "Put the information people need in one clear, mobile-friendly place, then make the next step obvious.",
+    title: "Give customers one clear place",
+    copy: "Put the answers people need in one mobile-friendly place and make the next step easy to see.",
     items: ["Services, menus, and key details", "Hours, photos, and directions", "Call, order, book, or request a quote", "One easy link to share anywhere"]
   },
   {
     number: "For new inquiries",
-    title: "Collect the details you need",
-    copy: "Ask the right questions before you follow up, so you can respond with context instead of starting from scratch.",
+    title: "Make the next step easier",
+    copy: "Help people call, order, book, or send the details you need without making them hunt for the right link.",
     items: ["Guided intake and quote requests", "Questions matched to your service", "Contact and project details in one submission", "Fewer missing answers before follow-up"]
   },
   {
-    number: "For ongoing support",
-    title: "Keep your page useful after launch",
-    copy: "Use managed support for routine changes and basic page checks when your business information changes.",
+    number: "For owners",
+    title: "Keep it current without doing it all yourself",
+    copy: "You decide what changes. Resonate can handle routine page updates and basic checks when you want ongoing help.",
     items: ["Text, photo, hours, menu, and service updates", "Monthly page review", "Basic link and page-health checks", "Hosting and routine platform maintenance"]
   }
 ];
@@ -68,8 +68,7 @@ export default function ResonateHome() {
     name: "Resonate Solutions",
     url: "https://resonate.solutions",
     email: "questions@resonate.solutions",
-    description,
-    areaServed: "Northwest Arkansas"
+    description
   };
 
   return (
@@ -82,21 +81,22 @@ export default function ResonateHome() {
         <div className="pointer-events-none absolute -bottom-24 left-[38%] h-56 w-56 rounded-full bg-[#7bd7c4]/15 blur-3xl" aria-hidden="true" />
         <div className="relative mx-auto grid max-w-7xl gap-14 px-5 py-16 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:py-24">
           <div>
-            <SectionLabel>Resonate Solutions</SectionLabel>
+            <SectionLabel>Clear answers for your customers</SectionLabel>
             <h1 className="mt-5 max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.025em] text-ink md:text-7xl">
-              Make your business easier to understand.<span className="text-[#f05f3b]"> Make it easier to run.</span>
+              Your customers should not have to hunt for the right answer.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
-              Resonate Solutions builds practical digital systems that help customers understand what you offer,
-              take the right next step, and reduce the repetitive work that slows your business down.
+              Hours change. Prices change. Services change. Resonate gives your business one clear place for the
+              information customers need and an easier way to keep it current when things change.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
-              <a href="#solutions" className="rounded-full bg-[#f05f3b] px-7 py-4 text-center font-black text-white shadow-[0_18px_42px_rgba(240,95,59,0.28)] transition hover:-translate-y-0.5 hover:bg-ink">See what we can build</a>
-              <a href="#work" className="rounded-full border-2 border-ink bg-white/65 px-7 py-4 text-center font-black text-ink transition hover:bg-ink hover:text-white">View customer examples</a>
+              <a href="#work" className="rounded-full bg-[#f05f3b] px-7 py-4 text-center font-black text-white shadow-[0_18px_42px_rgba(240,95,59,0.28)] transition hover:-translate-y-0.5 hover:bg-ink">See what your page could look like</a>
+              <Link href="/m/mellow-moose-burgers" className="rounded-full border-2 border-ink bg-white/65 px-7 py-4 text-center font-black text-ink transition hover:bg-ink hover:text-white">View a live example</Link>
             </div>
-            <div className="mt-8 max-w-xl border-l-2 border-[#f5bd35] pl-5">
-              <Link className="font-black text-ink underline decoration-[#f05f3b] decoration-2 underline-offset-4" href="/checkout?plan=review">Start a project review</Link>
-              <p className="mt-2 text-sm leading-6 text-muted">Tell us where the business gets stuck. We will recommend the most useful next step.</p>
+            <div className="mt-8 grid max-w-2xl gap-2 border-l-2 border-[#f5bd35] pl-5 text-sm font-black text-ink sm:grid-cols-3">
+              <span>Fewer repeated questions.</span>
+              <span>Fewer outdated details.</span>
+              <span>A clearer next step.</span>
             </div>
           </div>
 
@@ -130,6 +130,7 @@ export default function ResonateHome() {
         <div className="relative mx-auto max-w-7xl px-5 py-16 md:py-24">
           <SectionLabel>Where business gets harder</SectionLabel>
           <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">Confused customers call, leave, or choose someone else.</h2>
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">Your business changes faster than your online information does. The correct answer may be clear to you and still be hard for a customer to find.</p>
           <div className="mt-12 grid gap-10 lg:grid-cols-[1.05fr_0.95fr]">
             <div>
               <p className="font-black text-ink">The same business details live in different places.</p>
@@ -159,7 +160,7 @@ export default function ResonateHome() {
               <article className="relative overflow-hidden rounded-3xl bg-[#27243f] p-7 text-white shadow-[0_22px_60px_rgba(39,36,63,0.2)]">
                 <span className="absolute inset-x-0 top-0 h-1 bg-[linear-gradient(90deg,#ff6c4c,#ffd35e,#7bd7c4)]" aria-hidden="true" />
                 <p className="text-xs font-black uppercase tracking-[0.15em] text-[#ffd35e]">For owners</p>
-                <h3 className="mt-3 text-xl font-black">You answer questions your page should handle.</h3>
+                <h3 className="mt-3 text-xl font-black">You keep answering questions your business information should already answer.</h3>
                 <p className="mt-3 text-sm leading-6 text-white/70">Hours, prices, directions, services, and availability keep taking time away from the work that pays.</p>
               </article>
             </div>
@@ -170,8 +171,8 @@ export default function ResonateHome() {
       <section id="solutions" className="scroll-mt-24 border-b border-[#d9eee7] bg-[linear-gradient(180deg,#f3fbf8_0%,#fffdf9_100%)]">
         <div className="mx-auto max-w-7xl px-5 py-16 md:py-24">
           <SectionLabel>How we help</SectionLabel>
-          <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">What Resonate can do for your business.</h2>
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">We turn scattered information and repeated questions into a clearer customer page, a better intake path, and dependable ongoing support.</p>
+          <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">One clear place for customers. One easier way to keep it current.</h2>
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">Start with a customer page that makes the important answers easy to find. Then decide how much help you want when the business changes.</p>
           <div className="mt-14 grid gap-6 lg:grid-cols-3">
             {solutionAreas.map((area, index) => (
               <article key={area.number} className={`relative overflow-hidden rounded-[1.75rem] border p-8 shadow-[0_20px_55px_rgba(46,52,49,0.08)] ${index === 0 ? "border-[#27243f] bg-[#27243f] text-white" : index === 1 ? "border-[#ffc8b8] bg-[#fff1ec]" : "border-[#a9dfd3] bg-[#eaf8f4]"}`}>
@@ -189,8 +190,8 @@ export default function ResonateHome() {
       <section id="work" className="scroll-mt-24 border-b border-[#f1d8cc] bg-[radial-gradient(circle_at_92%_8%,rgba(185,181,255,0.23),transparent_25%),radial-gradient(circle_at_8%_90%,rgba(255,211,94,0.18),transparent_27%),#fff8f3]">
         <div className="mx-auto max-w-7xl px-5 py-16 md:py-24">
           <SectionLabel>See it in action</SectionLabel>
-          <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">Built around the way each business actually sells.</h2>
-          <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">Different businesses. Different problems. Practical systems built around each one.</p>
+          <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">Different businesses need different answers.</h2>
+          <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">The page should match what customers need to know and what the owner needs them to do next.</p>
           <div className="mt-14 grid gap-8 lg:grid-cols-2">
             <article className="overflow-hidden rounded-[1.75rem] border border-[#ffc8b8] bg-white shadow-[0_24px_70px_rgba(240,95,59,0.12)]">
               <div className="relative h-72 overflow-hidden">
@@ -199,8 +200,11 @@ export default function ResonateHome() {
                 <p className="absolute bottom-5 left-6 text-xs font-black uppercase tracking-[0.15em] text-white">MenuPilot | Mellow Moose</p>
               </div>
               <div className="p-8">
-                <h3 className="text-3xl font-black text-ink">One page takes customers from hungry to ordering.</h3>
-                <p className="mt-4 leading-7 text-muted">The menu, current hours, food photos, phone number, and directions are all easy to find on a phone.</p>
+                <p className="text-xs font-black uppercase tracking-[0.15em] text-[#f05f3b]">The problem</p>
+                <h3 className="mt-3 text-3xl font-black text-ink">Customers needed the menu, hours, and ordering details without hunting.</h3>
+                <p className="mt-4 leading-7 text-muted"><strong className="text-ink">What Resonate created:</strong> A mobile MenuPilot page with the menu, current hours, food photos, phone number, and directions together.</p>
+                <p className="mt-3 text-sm leading-6 text-muted"><strong className="text-ink">For customers:</strong> They can move from hungry to ordering in a few taps.</p>
+                <p className="mt-2 text-sm leading-6 text-muted"><strong className="text-ink">For the owner:</strong> One useful link is easier to share.</p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link href="/m/mellow-moose-burgers" className="rounded-full bg-[#f05f3b] px-5 py-3 text-sm font-black text-white hover:bg-ink">Open live example</Link>
                   <Link href="/menupilot" className="rounded-full border border-[#ffc8b8] bg-[#fff7f2] px-5 py-3 text-sm font-black text-ink hover:border-[#f05f3b]">Explore MenuPilot</Link>
@@ -215,8 +219,11 @@ export default function ResonateHome() {
               </div>
               <div className="p-8">
                 <p className="text-xs font-black uppercase tracking-[0.15em] text-[#ffd35e]">Excellent Pins &amp; Badges</p>
-                <h3 className="mt-3 text-3xl font-black">Buyers get answers before requesting a quote.</h3>
-                <p className="mt-4 leading-7 text-white/70">Customers can see their options, understand the differences, and send the details needed for an accurate quote.</p>
+                <p className="mt-4 text-xs font-black uppercase tracking-[0.15em] text-[#ffd35e]">The problem</p>
+                <h3 className="mt-3 text-3xl font-black">Custom-product buyers need clear options before anyone can quote the job.</h3>
+                <p className="mt-4 leading-7 text-white/70"><strong className="text-white">What Resonate created:</strong> A product page and guided quote request that accepts the project details and artwork.</p>
+                <p className="mt-3 text-sm leading-6 text-white/70"><strong className="text-white">For customers:</strong> They can understand the choices and send a complete request.</p>
+                <p className="mt-2 text-sm leading-6 text-white/70"><strong className="text-white">For the owner:</strong> Jack receives the request details and attached JPG or PDF together.</p>
                 <Link href="/excellent-pins" className="mt-7 inline-flex rounded-full bg-[#f05f3b] px-5 py-3 text-sm font-black text-white hover:bg-white hover:text-ink">See how it works</Link>
               </div>
             </article>
@@ -227,23 +234,13 @@ export default function ResonateHome() {
       <section id="about" className="scroll-mt-24 border-b border-[#eee5df] bg-white">
         <div className="mx-auto max-w-7xl px-5 py-16 md:py-24">
           <SectionLabel>A simple process</SectionLabel>
-          <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">Tell us where the business gets stuck. We will recommend a practical next step.</h2>
+          <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">You stay in control. Keeping the information useful gets easier.</h2>
           <ol className="mt-12 grid gap-8 md:grid-cols-2 xl:grid-cols-4">
-            {["Show us where customers or staff lose time", "We recommend the smallest useful system", "You review everything before it goes live", "We launch it and stay available when you need help"].map((step, index) => (
+            {["Show us what customers need to find", "We outline the clearest page for the business", "You review every detail before it goes live", "We publish the approved page and help when things change"].map((step, index) => (
               <li key={step} className={`rounded-2xl border p-5 ${index === 0 ? "border-[#ffc8b8] bg-[#fff1ec]" : index === 1 ? "border-[#f2dc92] bg-[#fff9df]" : index === 2 ? "border-[#a9dfd3] bg-[#eaf8f4]" : "border-[#d7d2ff] bg-[#f3f1ff]"}`}><span className="text-xs font-black uppercase tracking-[0.16em] text-[#f05f3b]">0{index + 1}</span><p className="mt-3 font-black leading-6 text-ink">{step}</p></li>
             ))}
           </ol>
-          <p className="mt-10 max-w-3xl leading-7 text-muted">You get a focused recommendation tied to the problem you showed us, with a clear scope before work begins.</p>
-        </div>
-      </section>
-
-      <section className="relative overflow-hidden bg-[#27243f] text-white">
-        <div className="pointer-events-none absolute -bottom-56 -right-48 h-[36rem] w-[36rem] rounded-full border border-[#b9b5ff]/30" aria-hidden="true" />
-        <div className="pointer-events-none absolute -bottom-36 -right-28 h-[24rem] w-[24rem] rounded-full border border-[#ff6c4c]/45" aria-hidden="true" />
-        <div className="pointer-events-none absolute -left-20 top-0 h-64 w-64 rounded-full bg-[#7bd7c4]/15 blur-3xl" aria-hidden="true" />
-        <div className="relative mx-auto grid max-w-7xl gap-10 px-5 py-16 md:py-20 lg:grid-cols-[0.7fr_1.3fr] lg:items-center">
-          <div><span className="inline-flex rounded-full border border-[#ffd35e]/40 bg-[#ffd35e]/10 px-4 py-2 text-xs font-black uppercase tracking-[0.16em] text-[#ffd35e]">Coming next</span><h2 className="mt-5 text-3xl font-black leading-tight md:text-4xl">Update it once. Keep the details customers see consistent.</h2></div>
-          <p className="max-w-3xl text-lg leading-8 text-white/72">We are working toward one owner-friendly place to update hours, menus, services, and other customer details across the channels Resonate supports. We will only announce connections after they are ready to use.</p>
+          <p className="mt-10 max-w-3xl leading-7 text-muted">Your business stays yours. You approve what customers see, and you choose whether to send future changes yourself or use Managed Page support.</p>
         </div>
       </section>
 
@@ -252,10 +249,10 @@ export default function ResonateHome() {
         <div className="pointer-events-none absolute -right-16 top-4 h-60 w-60 rounded-full bg-[#ffd35e]/30 blur-3xl" aria-hidden="true" />
         <div className="relative mx-auto max-w-4xl px-5 py-20 text-center md:py-28">
           <div className="flex justify-center"><SectionLabel light>Start here</SectionLabel></div>
-          <h2 className="mt-6 text-4xl font-black leading-tight md:text-5xl">Let's figure out what would help your business most.</h2>
-          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/85">Tell us what you sell, where customers get confused, and what work keeps repeating. We will recommend the most useful next step.</p>
-          <Link href="/checkout?plan=review" className="mt-9 inline-flex rounded-full bg-white px-7 py-4 font-black text-ink shadow-[0_18px_45px_rgba(97,35,37,0.25)] transition hover:-translate-y-0.5 hover:bg-[#fff5db]">Start Your Project Review</Link>
-          <p className="mt-5 text-xs font-semibold text-white/75">A short business review comes before any recommendation.</p>
+          <h2 className="mt-6 text-4xl font-black leading-tight md:text-5xl">Not sure what your customers need first?</h2>
+          <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/85">Start with a Free Page Plan. We review what you have, what customers need to find, and what would be most useful before you pay for a build.</p>
+          <Link href="/checkout?plan=review" className="mt-9 inline-flex rounded-full bg-white px-7 py-4 font-black text-ink shadow-[0_18px_45px_rgba(97,35,37,0.25)] transition hover:-translate-y-0.5 hover:bg-[#fff5db]">Get a Free Page Plan</Link>
+          <p className="mt-5 text-xs font-semibold text-white/75">No payment is required for the review.</p>
         </div>
       </section>
     </main>

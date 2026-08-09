@@ -32,7 +32,7 @@ export function IntakeForm() {
 
   async function onSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
-    setState({ status: "submitting", message: "Sending your free page plan request..." });
+    setState({ status: "submitting", message: "Sending your Free Page Plan request..." });
 
     const response = await fetch("/api/intake", {
       method: "POST",
@@ -58,10 +58,10 @@ export function IntakeForm() {
   return (
     <form onSubmit={onSubmit} className="grid gap-4 rounded-[1.75rem] border border-line bg-white p-6 shadow-sm">
       <div>
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Start with a free page plan</p>
-        <h2 className="mt-2 text-3xl font-black text-ink">Tell us what kind of page, menu, or services list you need.</h2>
+        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">Not sure what you need?</p>
+        <h2 className="mt-2 text-3xl font-black text-ink">Show us what customers need to find.</h2>
         <p className="mt-3 leading-7 text-muted">
-          Send the basics and Resonate will recommend the right page setup before you pay. Custom build work starts after the Launch payment.
+          Send the basics and Resonate will review what you have, what is missing, and the clearest next step before you pay for a build.
         </p>
       </div>
 
@@ -99,7 +99,7 @@ export function IntakeForm() {
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="grid gap-2 text-sm font-bold text-ink">
-          What do you need built or updated?
+          What do customers need help finding?
           <select required value={form.mainNeed} onChange={(event) => updateField("mainNeed", event.target.value)} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
             <option>We need a food menu</option>
             <option>We need a services list</option>
@@ -121,7 +121,7 @@ export function IntakeForm() {
       </div>
 
       <label className="grid gap-2 text-sm font-bold text-ink">
-        What should be created or updated?
+        What keeps confusing customers or taking up your time?
         <textarea value={form.notes} onChange={(event) => updateField("notes", event.target.value)} rows={4} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
       </label>
 
@@ -130,7 +130,7 @@ export function IntakeForm() {
       <input tabIndex={-1} autoComplete="off" value={form.confirmEmail} onChange={(event) => updateField("confirmEmail", event.target.value)} className="hidden" aria-hidden="true" />
 
       <button disabled={state.status === "submitting"} type="submit" className="rounded-full bg-coral px-6 py-3 font-black text-white shadow-soft hover:bg-ink disabled:cursor-not-allowed disabled:opacity-70">
-        {state.status === "submitting" ? "Sending..." : "Request Free Page Plan"}
+        {state.status === "submitting" ? "Sending..." : "Get a Free Page Plan"}
       </button>
 
       {state.message ? (
