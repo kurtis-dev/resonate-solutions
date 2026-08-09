@@ -9,11 +9,12 @@ export const metadata: Metadata = {
 export default function PricingPage() {
   return (
     <main className="bg-cream">
-      <section className="relative overflow-hidden border-b border-line bg-[#fffaf7]">
-        <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#202320,#f17855,#f6a15e,#202320)]" />
-        <div className="mx-auto max-w-7xl px-5 py-16">
+      <section className="section-seam section-glow-mint relative overflow-hidden border-b border-line">
+        <div className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full border border-coral/20" aria-hidden="true" />
+        <div className="pointer-events-none absolute -right-4 top-4 h-48 w-48 rounded-full border border-gold/35" aria-hidden="true" />
+        <div className="container-page relative py-16 md:py-20">
           <div className="max-w-4xl">
-            <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">Pricing</p>
+            <p className="eyebrow text-coral">Pricing</p>
             <h1 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-6xl">
               Build it first. Then choose how much help you want keeping it current.
             </h1>
@@ -23,10 +24,10 @@ export default function PricingPage() {
           </div>
         </div>
       </section>
-      <section className="mx-auto max-w-7xl px-5 py-14">
+      <section className="container-page py-14 md:py-20">
         <PricingCards />
-        <div className="mt-10 rounded-[1.75rem] border border-coral/25 bg-white p-7 shadow-sm">
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-coral">What happens next</p>
+        <div className="surface-card-tint mt-12 p-7 sm:p-9">
+          <p className="eyebrow text-coral">What happens next</p>
           <h2 className="mt-3 text-3xl font-extrabold text-ink">You approve the page before customers see it.</h2>
           <p className="mt-4 max-w-3xl leading-7 text-muted">
             Launch starts the build. Resonate organizes the approved content, creates a private preview, and checks the page on phone and desktop. Monthly support begins with Launch only when you choose Webpage Hosting or Managed Page at checkout.

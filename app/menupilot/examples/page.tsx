@@ -39,9 +39,10 @@ export default function MenuPilotExamplesPage() {
   return (
     <main className="bg-cream">
       <MenuPilotSubnav />
-      <section className="mx-auto grid max-w-7xl gap-10 px-5 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+      <section className="section-glow-mint border-b border-line">
+      <div className="container-page grid gap-10 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand">MenuPilot example</p>
+          <p className="eyebrow text-brand">MenuPilot example</p>
           <h1 className="mt-3 max-w-3xl text-5xl font-black leading-[0.98] text-ink md:text-7xl">
             One simple place for the information customers actually need.
           </h1>
@@ -49,13 +50,13 @@ export default function MenuPilotExamplesPage() {
             This live example brings the menu, current hours, location, ordering, photos, and business updates together in one mobile-friendly page.
           </p>
           <div className="mt-8">
-            <Link href="/m/mellow-moose-burgers" className="rounded-full bg-brand px-6 py-3 text-center font-black text-white shadow-soft hover:bg-brandDark">
+            <Link href="/m/mellow-moose-burgers" className="btn-coral">
               Open the live menu example
             </Link>
           </div>
         </div>
 
-        <div className="rounded-[1.75rem] border border-line bg-white p-4 shadow-soft">
+        <div className="surface-card rise-in p-4">
           <div className="rounded-[1.25rem] bg-[#f8f0e5] p-5">
             <div className="overflow-hidden rounded-2xl border border-[#dfd2c3] bg-white">
               <img src="/assets/mellow-moose-og-smashburger.jpg" alt="Burger featured on a MenuPilot customer page" className="h-72 w-full object-cover sm:h-80" />
@@ -76,13 +77,14 @@ export default function MenuPilotExamplesPage() {
             </div>
           </div>
         </div>
+      </div>
       </section>
 
       <section className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-16">
+        <div className="container-page py-16">
           <div className="grid gap-5 lg:grid-cols-3">
             {exampleFeatures.map((feature) => (
-              <article key={feature.title} className="rounded-[1.35rem] border border-line bg-cream p-6 shadow-sm">
+              <article key={feature.title} className="surface-card lift bg-cream p-6">
                 <p className="text-xs font-black uppercase tracking-[0.14em] text-brand">{feature.label}</p>
                 <h2 className="mt-3 text-2xl font-black leading-tight text-ink">{feature.title}</h2>
                 <p className="mt-3 leading-7 text-muted">{feature.text}</p>
@@ -92,20 +94,20 @@ export default function MenuPilotExamplesPage() {
         </div>
       </section>
 
-      <section className="mx-auto grid max-w-7xl gap-8 px-5 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+      <section className="container-page grid gap-8 py-16 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
         <div>
-          <p className="text-sm font-bold uppercase tracking-[0.18em] text-brand">When the business changes</p>
+          <p className="eyebrow text-brand">When the business changes</p>
           <h2 className="mt-3 text-4xl font-black leading-tight text-ink md:text-5xl">
             You run the business. Managed Page helps keep the page current.
           </h2>
           <p className="mt-5 leading-7 text-muted">
             You decide what changes. Resonate can update supplied hours, sellout notes, specials, menu details, links, and photos within the Managed Page scope.
           </p>
-          <Link href="/portal" className="mt-7 inline-flex rounded-full bg-ink px-6 py-3 font-black text-white hover:bg-brand">See how Managed Page works</Link>
+          <Link href="/portal" className="btn-ink mt-7">See how Managed Page works</Link>
         </div>
         <div className="grid gap-3 sm:grid-cols-2">
           {ownerControls.map((control) => (
-            <div key={control} className="rounded-2xl border border-line bg-white p-4 font-black text-ink shadow-sm">
+            <div key={control} className="surface-card lift rounded-2xl p-4 font-black text-ink">
               {control}
             </div>
           ))}

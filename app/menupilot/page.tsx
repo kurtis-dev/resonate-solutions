@@ -211,13 +211,12 @@ export default function MenuPilotPage() {
     <main className="bg-cream">
       <MenuPilotSubnav />
 
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#202320,#ff5a1f,#f8b737,#202320)]" />
+      <section className="section-seam section-glow-mint relative overflow-hidden">
         <div className="absolute -right-28 top-20 h-80 w-80 rounded-full bg-[#ff5a1f]/12 blur-3xl" />
         <div className="absolute left-1/3 top-12 h-52 w-52 rounded-full bg-[#f8b737]/12 blur-3xl" />
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-[1fr_0.85fr] lg:py-24">
+        <div className="container-page relative grid items-center gap-12 py-16 lg:grid-cols-[1fr_0.85fr] lg:py-24">
           <div>
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-coral">One clear customer page</p>
+            <p className="eyebrow text-coral">One clear customer page</p>
             <h1 className="mt-4 max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.01em] text-ink md:text-7xl">
               Give customers the <span className="text-[#ff5a1f] drop-shadow-[0_16px_34px_rgba(255,90,31,0.28)]">right answer</span> without the hunt.
             </h1>
@@ -229,7 +228,7 @@ export default function MenuPilotPage() {
                 <span className="absolute inset-y-0 left-0 w-1/3 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.22),transparent)] transition group-hover:translate-x-[220%]" />
                 <span className="relative">See a live example page</span>
               </Link>
-              <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">
+              <Link href="/pricing" className="btn-outline-ink px-7 py-4">
                 View Pricing
               </Link>
             </div>
@@ -248,23 +247,23 @@ export default function MenuPilotPage() {
       </section>
 
       <section id="owner-portal" className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-16">
+        <div className="container-page py-16">
           <div className="grid gap-8 lg:grid-cols-[0.82fr_1fr] lg:items-center">
             <div>
-              <p className="text-sm font-black uppercase tracking-[0.18em] text-coral">When details change</p>
+              <p className="eyebrow text-coral">When details change</p>
               <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
                 Keep the page useful without adding another chore to your week.
               </h2>
               <p className="mt-5 max-w-2xl leading-7 text-muted">
                 With Managed Page, you tell Resonate what changed. We review the request, update your Resonate-hosted page, and confirm when it is complete.
               </p>
-              <Link href="/portal" className="mt-7 inline-flex rounded-full border border-line px-5 py-3 font-black text-ink shadow-sm transition hover:border-coral hover:text-coral">
+              <Link href="/portal" className="btn-outline-ink mt-7">
                 See Managed Page support
               </Link>
             </div>
             <div className="grid gap-3 sm:grid-cols-2">
               {["Hours and closures", "Services and menu items", "Prices and availability", "Photos and announcements"].map((item) => (
-                <div key={item} className="rounded-[1.25rem] border border-line bg-cream p-5 shadow-sm">
+                <div key={item} className="surface-card lift rounded-[1.25rem] bg-cream p-5">
                   <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff0e9] text-coral"><MiniIcon name="check" /></span>
                   <p className="mt-4 font-extrabold text-ink">{item}</p>
                 </div>
@@ -278,7 +277,7 @@ export default function MenuPilotPage() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:72px_72px]" />
         <div className="absolute -bottom-32 -right-24 h-80 w-80 rounded-full bg-[#2f7d72]/25 blur-3xl" />
         <div className="absolute -top-28 left-1/4 h-72 w-72 rounded-full bg-coral/20 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-5 py-14">
+        <div className="container-page relative py-14">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1fr] lg:items-end">
             <div>
               <p className="inline-flex rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-gold">
@@ -337,7 +336,7 @@ export default function MenuPilotPage() {
       </section>
 
       <section id="custom-branding" className="border-y border-line bg-[#fffaf4]">
-        <div className="mx-auto max-w-7xl px-5 py-16">
+        <div className="container-page py-16">
           <div className="grid gap-10 lg:grid-cols-[0.82fr_1fr] lg:items-center">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.18em] text-coral">Custom branding</p>
@@ -349,7 +348,7 @@ export default function MenuPilotPage() {
               </p>
               <div className="mt-8 grid max-w-xl gap-3 sm:grid-cols-2">
                 {brandItems.map((item) => (
-                  <span key={item.label} className="inline-flex items-center gap-3 rounded-2xl border border-line bg-white px-5 py-4 text-sm font-black text-ink shadow-sm">
+                  <span key={item.label} className="lift inline-flex items-center gap-3 rounded-2xl border border-line bg-white px-5 py-4 text-sm font-black text-ink shadow-sm">
                     <span className="text-coral"><MiniIcon name={item.icon} /></span>
                     {item.label}
                   </span>
@@ -357,7 +356,7 @@ export default function MenuPilotPage() {
               </div>
             </div>
 
-            <div className="rounded-[1.75rem] border border-line bg-white p-5 text-ink shadow-soft">
+            <div className="surface-card p-5 text-ink">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-[#3a2418]/70">Your brand kit</p>
@@ -398,7 +397,7 @@ export default function MenuPilotPage() {
       </section>
 
       <section id="plans" className="bg-[#fffaf4]">
-        <div className="mx-auto max-w-7xl px-5 py-20">
+        <div className="container-page py-20">
           <div className="overflow-hidden rounded-[1.75rem] bg-[#202320] p-8 text-white shadow-soft md:p-12">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6a15e]">Plan the next step</p>
             <h2 className="mt-3 max-w-4xl text-4xl font-extrabold leading-tight tracking-[-0.01em] md:text-5xl">
@@ -408,7 +407,7 @@ export default function MenuPilotPage() {
               Every paid page begins with a custom Launch. After that, choose simple hosting or Managed Page support based on how much upkeep you want Resonate to handle.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/pricing" className="rounded-full bg-[#ff5a1f] px-7 py-4 text-center font-black text-white transition hover:bg-white hover:text-[#202320]">
+              <Link href="/pricing" className="btn-base bg-[#ff5a1f] px-7 py-4 text-white hover:bg-white hover:text-[#202320]">
                 View Pricing
               </Link>
               <Link href="/checkout?plan=review" className="rounded-full border border-white/30 px-7 py-4 text-center font-black text-white transition hover:border-white hover:bg-white hover:text-[#202320]">
@@ -420,7 +419,7 @@ export default function MenuPilotPage() {
       </section>
 
       <section className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-16">
+        <div className="container-page py-16">
           <div id="free-page-plan" className="mb-12 scroll-mt-28 overflow-hidden rounded-[1.75rem] border border-line bg-[#202320] p-7 text-white shadow-soft md:p-10">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6a15e]">Free Page Plan</p>
             <h2 className="mt-3 max-w-3xl text-3xl font-black leading-tight md:text-5xl">See what your customers need before deciding what to build.</h2>
@@ -443,10 +442,10 @@ export default function MenuPilotPage() {
                     Resonate reviews what customers need to find, what actions they should take, and what information your business needs to keep current.
                   </p>
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                    <Link href="/checkout?plan=review" className="rounded-full bg-coral px-7 py-4 text-center font-bold text-white shadow-sm transition hover:bg-ink">
+                    <Link href="/checkout?plan=review" className="btn-coral px-7 py-4">
                     Get a Free Page Plan
                     </Link>
-                    <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">
+                    <Link href="/pricing" className="btn-outline-ink px-7 py-4">
                       View Pricing
                     </Link>
                   </div>

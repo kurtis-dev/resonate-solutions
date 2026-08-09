@@ -54,16 +54,16 @@ export default async function CheckoutPage({
           : "";
 
   return (
-    <main className="mx-auto flex max-w-2xl overflow-x-hidden px-4 py-12 sm:px-5 sm:py-16">
-      <section className="w-full overflow-hidden rounded-[1.75rem] border border-line bg-white p-5 shadow-sm sm:p-8">
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-coral">{isFree ? "Free Page Plan" : "Checkout"}</p>
+    <main className="section-glow-mint flex min-h-[75vh] overflow-x-hidden px-4 py-12 sm:px-5 sm:py-16">
+      <section className="surface-card rise-in mx-auto w-full max-w-2xl overflow-hidden p-5 sm:p-8">
+        <p className="eyebrow text-coral">{isFree ? "Free Page Plan" : "Checkout"}</p>
         <h1 className="mt-3 text-4xl font-black text-ink">{heading}</h1>
         <p className="mt-4 leading-7 text-muted">
           You selected <strong>{plan?.name}</strong>. {intro}
         </p>
         {statusMessage ? <p className="mt-5 rounded-2xl bg-[#fff0e9] px-4 py-3 text-sm font-bold text-coral">{statusMessage}</p> : null}
         {!isFree ? (
-          <div className="mt-5 rounded-2xl border border-line bg-cream px-4 py-3 text-sm leading-6 text-muted" aria-label="Order summary">
+          <div className="mt-5 rounded-2xl border border-coral/25 bg-coral-tint px-4 py-3 text-sm leading-6 text-muted" aria-label="Order summary">
             <strong className="text-ink">Order summary: </strong>
             {isLaunchManagedPage
               ? "$478.99 today, then $79.99 per month for Managed Page. Hosting is included."
@@ -81,36 +81,36 @@ export default async function CheckoutPage({
           <div className="grid gap-4 md:grid-cols-2">
             <label className="grid gap-2 text-sm font-bold text-ink">
               Business name
-              <input required name="businessName" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+              <input required name="businessName" className="field-input font-normal" />
             </label>
             <label className="grid gap-2 text-sm font-bold text-ink">
               Contact name
-              <input required name="contactName" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+              <input required name="contactName" className="field-input font-normal" />
             </label>
             <label className="grid gap-2 text-sm font-bold text-ink">
               Email
-              <input required name="email" type="email" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" placeholder="owner@example.com" />
+              <input required name="email" type="email" className="field-input font-normal" placeholder="owner@example.com" />
             </label>
             <label className="grid gap-2 text-sm font-bold text-ink">
               Phone
-              <input name="phone" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+              <input name="phone" className="field-input font-normal" />
             </label>
             <label className="grid gap-2 text-sm font-bold text-ink">
               Business type
-              <input required name="businessType" placeholder="Restaurant, food truck, salon, lawn care..." className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+              <input required name="businessType" placeholder="Restaurant, food truck, salon, lawn care..." className="field-input font-normal" />
             </label>
             <label className="grid gap-2 text-sm font-bold text-ink">
               City or service area
-              <input required name="city" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+              <input required name="city" className="field-input font-normal" />
             </label>
           </div>
           <label className="grid gap-2 text-sm font-bold text-ink">
             Current website, menu, social, or Google profile link
-            <input name="currentMenuLink" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+            <input name="currentMenuLink" className="field-input font-normal" />
           </label>
           <label className="grid gap-2 text-sm font-bold text-ink">
             What do you need built or maintained?
-            <select required name="mainNeed" className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal">
+            <select required name="mainNeed" className="field-input font-normal">
               <option>We need a food menu</option>
               <option>We need a services list</option>
               <option>We need both menu and services</option>
@@ -121,9 +121,9 @@ export default async function CheckoutPage({
           </label>
           <label className="grid gap-2 text-sm font-bold text-ink">
             Anything Resonate should know before starting?
-            <textarea name="notes" rows={4} className="rounded-2xl border border-line bg-cream px-4 py-3 font-normal" />
+            <textarea name="notes" rows={4} className="field-input font-normal" />
           </label>
-          <button type="submit" className="rounded-full bg-coral px-5 py-3 text-center font-black text-white shadow-soft hover:bg-ink">
+          <button type="submit" className="btn-coral">
             {buttonText}
           </button>
         </form>
@@ -140,8 +140,8 @@ export default async function CheckoutPage({
           <p>Portal access is provided after Resonate activates the business account. Monthly billing is managed securely through Stripe.</p>
         </div>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          <Link href="/pricing" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back to pricing</Link>
-          {!isFree ? <Link href="/checkout?plan=review" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Get a Free Page Plan</Link> : null}
+          <Link href="/pricing" className="btn-outline-ink">Back to pricing</Link>
+          {!isFree ? <Link href="/checkout?plan=review" className="btn-quiet">Get a Free Page Plan</Link> : null}
         </div>
       </section>
     </main>

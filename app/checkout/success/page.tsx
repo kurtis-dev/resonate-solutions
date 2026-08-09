@@ -9,9 +9,9 @@ export default async function CheckoutSuccessPage({
   const isFreeRequest = params.status === "free-requested";
 
   return (
-    <main className="mx-auto flex max-w-2xl px-5 py-16">
-      <section className="w-full rounded-[1.75rem] border border-line bg-white p-8 shadow-sm">
-        <p className="text-sm font-bold uppercase tracking-[0.16em] text-brand">{isFreeRequest ? "Request received" : "Payment received"}</p>
+    <main className="section-glow-mint flex min-h-[70vh] items-center px-5 py-16">
+      <section className="surface-card rise-in mx-auto w-full max-w-2xl p-8 sm:p-10">
+        <p className="eyebrow text-brand">{isFreeRequest ? "Request received" : "Payment received"}</p>
         <h1 className="mt-3 text-4xl font-black text-ink">{isFreeRequest ? "We received your Free Page Plan request." : "Your Resonate order is confirmed."}</h1>
         <p className="mt-4 leading-7 text-muted">
           {isFreeRequest
@@ -19,9 +19,9 @@ export default async function CheckoutSuccessPage({
             : "Thank you. Resonate will match the order to your business details, confirm the approved scope, and follow up with the next step. Portal access is provided separately when the business account is ready."}
         </p>
         <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-          {!isFreeRequest ? <Link href="/portal" className="rounded-full bg-coral px-5 py-3 text-center font-black text-white">See Managed Page support</Link> : null}
-          {!isFreeRequest ? <Link href="/billing" className="rounded-full bg-ink px-5 py-3 text-center font-black text-white">Open billing</Link> : null}
-          <Link href="/" className="rounded-full border border-line px-5 py-3 text-center font-black text-ink">Back home</Link>
+          {!isFreeRequest ? <Link href="/portal" className="btn-coral">See Managed Page support</Link> : null}
+          {!isFreeRequest ? <Link href="/billing" className="btn-ink">Open billing</Link> : null}
+          <Link href="/" className="btn-outline-ink">Back home</Link>
         </div>
       </section>
     </main>

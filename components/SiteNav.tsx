@@ -31,7 +31,7 @@ export function SiteNav() {
         key={item.href}
         href={item.href}
         aria-current={active ? "page" : undefined}
-        className={`rounded-full px-3 py-2 transition hover:bg-white hover:text-ink ${active ? "bg-white text-ink shadow-sm" : ""}`}
+        className={`rounded-full px-3.5 py-2 transition hover:bg-white hover:text-ink ${active ? "bg-white text-ink shadow-sm" : ""}`}
       >
         {item.label}
       </Link>
@@ -55,13 +55,13 @@ export function SiteNav() {
   };
 
   return (
-    <header className="sticky top-0 z-30 border-b border-line bg-cream/90 backdrop-blur">
-      <div className="mx-auto flex max-w-7xl items-center justify-between px-5 py-4">
+    <header className="section-seam sticky top-0 z-30 border-b border-line bg-cream/90 pt-[3px] backdrop-blur-xl">
+      <div className="container-page flex items-center justify-between py-3.5">
         <Link href="/" className="flex items-center gap-3" aria-label="Resonate Solutions home">
           <img
             src="/assets/resonate-logo-transparent.png"
             alt="Resonate Solutions"
-            className="h-10 w-auto max-w-[150px] object-contain sm:max-w-[190px]"
+            className="h-9 w-auto max-w-[150px] object-contain sm:h-10 sm:max-w-[190px]"
           />
         </Link>
         <nav className="hidden items-center gap-1 text-sm font-medium text-muted lg:flex" aria-label="Primary navigation">
@@ -75,21 +75,21 @@ export function SiteNav() {
                 <path d="m4 6 4 4 4-4" strokeWidth="1.75" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </summary>
-            <div className="absolute left-0 top-full z-40 mt-2 grid min-w-52 gap-1 rounded-2xl border border-line bg-white p-2 shadow-soft">
+            <div className="surface-card absolute left-0 top-full z-40 mt-2 grid min-w-56 gap-1 p-2">
               {productNavigationLinks.map(renderDesktopLink)}
             </div>
           </details>
           {secondaryNavigationLinks.map(renderDesktopLink)}
         </nav>
         <div className="flex items-center gap-2">
-          <Link href={startProjectLink.href} className="hidden rounded-full bg-ink px-4 py-2 text-sm font-semibold text-white transition hover:bg-coral sm:inline-flex">{startProjectLink.label}</Link>
+          <Link href={startProjectLink.href} className="hidden rounded-full bg-coral px-5 py-2.5 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-ink sm:inline-flex">{startProjectLink.label}</Link>
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}
             aria-expanded={open}
             aria-controls="mobile-site-nav"
             aria-label={open ? "Close navigation" : "Open navigation"}
-            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-ink lg:hidden"
+            className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-line bg-white text-ink shadow-sm lg:hidden"
           >
             <span className="sr-only">{open ? "Close navigation" : "Open navigation"}</span>
             <span className="relative block h-4 w-5" aria-hidden="true">
@@ -103,7 +103,7 @@ export function SiteNav() {
       <nav
         id="mobile-site-nav"
         hidden={!open}
-        className="border-t border-line bg-cream px-5 py-4 lg:hidden"
+        className="border-t border-line bg-cream/95 px-5 py-4 shadow-soft backdrop-blur-xl lg:hidden"
         aria-label="Mobile navigation"
       >
           <div className="mx-auto grid max-w-7xl gap-1">
@@ -111,7 +111,7 @@ export function SiteNav() {
             <p className="px-4 pb-1 pt-3 text-xs font-black uppercase tracking-[0.16em] text-muted">Products</p>
             {productNavigationLinks.map((item) => renderMobileLink(item, true))}
             {secondaryNavigationLinks.map((item) => renderMobileLink(item))}
-            <Link onClick={() => setOpen(false)} href={startProjectLink.href} className="mt-2 rounded-full bg-coral px-5 py-3 text-center font-black text-white sm:hidden">{startProjectLink.label}</Link>
+            <Link onClick={() => setOpen(false)} href={startProjectLink.href} className="btn-coral mt-2 sm:hidden">{startProjectLink.label}</Link>
           </div>
       </nav>
     </header>
