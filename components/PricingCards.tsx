@@ -84,7 +84,7 @@ export function PricingCards() {
         <p className="eyebrow text-coral">Stage 1: Build it</p>
         <h2 className="mt-3 text-3xl font-black text-ink">Every paid Resonate page starts with Launch.</h2>
         <p className="mt-3 max-w-3xl leading-7 text-muted">We build the approved customer page, give you a private preview, and check it before the public link goes live.</p>
-        <div className="mt-7 max-w-3xl">
+        <div className="mx-auto mt-7 w-full max-w-4xl">
           <PlanCard plan={launchPlan} />
         </div>
       </div>
