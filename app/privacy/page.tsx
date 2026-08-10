@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Privacy Policy | Resonate Solutions",
+  description: "How Resonate Solutions collects, uses, and retains information for business pages, accounts, and related services.",
+  path: "/privacy"
+});
+
 export default function PrivacyPage() {
   return (
     <main className="mx-auto max-w-3xl px-5 py-16">

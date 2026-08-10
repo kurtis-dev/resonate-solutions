@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Terms of Use | Resonate Solutions",
+  description: "Terms governing Resonate Solutions business pages, customer-facing materials, paid builds, and monthly services.",
+  path: "/terms"
+});
+
 export default function TermsPage() {
   return (
     <main className="mx-auto max-w-3xl px-5 py-16">

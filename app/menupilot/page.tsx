@@ -1,8 +1,14 @@
-"use client";
-
+import type { Metadata } from "next";
 import Link from "next/link";
-import { OwnerPortalPreview } from "@/components/OwnerPortalPreview";
+import { JsonLd } from "@/components/JsonLd";
 import { MenuPilotSubnav } from "@/components/MenuPilotSubnav";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Online Menu & Service Pages for Small Businesses | MenuPilot",
+  description: "MenuPilot creates mobile-friendly online menu and service pages with hours, photos, directions, and clear customer actions in one place.",
+  path: "/menupilot"
+});
 
 type BusinessTheme = {
   label: string;
@@ -41,62 +47,27 @@ const heroTheme: BusinessTheme = {
 const controlWorkflowSteps = [
   {
     number: "01",
-    title: "Send the change",
-    text: "Use the portal, text, or email. One clear request is enough: closed early today, new special, changed menu price, or updated photo.",
+    title: "Tell us what changed",
+    text: "Send the new hours, price, service, photo, or announcement. One clear request is enough.",
     icon: "message"
   },
   {
     number: "02",
-    title: "We review it",
-    text: "We check the wording, timing, access, and details before the change is sent out.",
+    title: "Resonate reviews the request",
+    text: "We check the details and ask a question if anything is unclear before changing the page.",
     icon: "check"
   },
   {
     number: "03",
-    title: "We route it",
-    text: "Your MenuPilot page is updated first. Then we handle connected places like Google, Facebook, Instagram, and ordering links.",
-    icon: "external"
+    title: "Your page is updated",
+    text: "The approved change is made on your Resonate-hosted customer page within the scope of your plan.",
+    icon: "menu"
   },
   {
     number: "04",
     title: "You get confirmation",
-    text: "You get a short confirmation showing what changed, where it changed, and what still needs review.",
+    text: "You receive a clear confirmation when the request is complete.",
     icon: "star"
-  }
-];
-
-const managedChannels = [
-  {
-    name: "MenuPilot page",
-    status: "Always on",
-    text: "Your branded customer page, updated first every time.",
-    icon: "menu",
-    badgeClass: "bg-[#244235] text-[#bce8ce]",
-    iconClass: "bg-[#402014] text-coral"
-  },
-  {
-    name: "Google profile",
-    status: "Auto when connected",
-    text: "Hours, posts, offers, and key details when profile access is confirmed.",
-    icon: "pin",
-    badgeClass: "bg-[#173f3b] text-[#9de7dc]",
-    iconClass: "bg-[#123d3a] text-[#87d9d0]"
-  },
-  {
-    name: "Facebook + Instagram",
-    status: "Auto when connected",
-    text: "Matching posts, stories, photos, and captions after public copy is approved.",
-    icon: "camera",
-    badgeClass: "bg-[#1d3c2a] text-[#afe3bf]",
-    iconClass: "bg-[#173927] text-[#a7dfb9]"
-  },
-  {
-    name: "Ordering + delivery",
-    status: "Managed support",
-    text: "Ordering links and delivery platforms handled carefully where the platform allows.",
-    icon: "truck",
-    badgeClass: "bg-[#5a3b12] text-[#f7ce67]",
-    iconClass: "bg-[#4a3318] text-gold"
   }
 ];
 
@@ -240,32 +211,33 @@ function PhonePreview({ theme }: { theme: BusinessTheme }) {
 export default function MenuPilotPage() {
   return (
     <main className="bg-cream">
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "MenuPilot", path: "/menupilot" }])} />
       <MenuPilotSubnav />
 
-      <section className="relative overflow-hidden">
-        <div className="absolute inset-x-0 top-0 h-2 bg-[linear-gradient(90deg,#202320,#ff5a1f,#f8b737,#202320)]" />
+      <section className="section-seam section-glow-mint relative overflow-hidden">
         <div className="absolute -right-28 top-20 h-80 w-80 rounded-full bg-[#ff5a1f]/12 blur-3xl" />
         <div className="absolute left-1/3 top-12 h-52 w-52 rounded-full bg-[#f8b737]/12 blur-3xl" />
-        <div className="mx-auto grid max-w-7xl items-center gap-12 px-5 py-16 lg:grid-cols-[1fr_0.85fr] lg:py-24">
+        <div className="container-page relative grid items-center gap-12 py-16 lg:grid-cols-[1fr_0.85fr] lg:py-24">
           <div>
-            <h1 className="max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.01em] text-ink md:text-7xl">
-              MenuPilot pages for <span className="text-[#ff5a1f] drop-shadow-[0_16px_34px_rgba(255,90,31,0.28)]">service</span> businesses.
+            <p className="eyebrow text-coral">One clear customer page</p>
+            <h1 className="mt-4 max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.01em] text-ink md:text-7xl">
+              Give customers the <span className="text-[#ff5a1f] drop-shadow-[0_16px_34px_rgba(255,90,31,0.28)]">right answer</span> without the hunt.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
-              MenuPilot by Resonate Solutions gives customers one simple page they can open from a QR code, text, Google profile, or social link. Built around your services, photos, hours, booking info, and the questions people ask before they call or visit.
+              MenuPilot gives customers one simple place to find your current hours, services, photos, directions, and next step. Share it by QR code, text, or link.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/m/mellow-moose-burgers" className="group relative overflow-hidden rounded-full border-2 border-[#ffcf7a] bg-[#ff5a1f] px-7 py-4 text-center font-black text-white shadow-[0_18px_45px_rgba(255,90,31,0.32)] ring-4 ring-[#ff5a1f]/12 transition hover:-translate-y-0.5 hover:border-[#ff5a1f] hover:bg-[#3a2418] hover:shadow-[0_24px_65px_rgba(255,90,31,0.38)]">
                 <span className="absolute inset-y-0 left-0 w-1/3 bg-[linear-gradient(110deg,transparent,rgba(255,255,255,0.22),transparent)] transition group-hover:translate-x-[220%]" />
                 <span className="relative">See a live example page</span>
               </Link>
-              <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">
+              <Link href="/pricing" className="btn-outline-ink px-7 py-4">
                 View Pricing
               </Link>
             </div>
             <p className="mt-3 text-sm font-bold text-coral">See the kind of simple, polished page your customers can open from a QR code, text, or link.</p>
             <div className="mt-8 flex flex-wrap gap-5 text-sm font-bold text-muted">
-              {["Mobile-first", "Custom branded", "Built around your trade"].map((item) => (
+              {["Easy to use on a phone", "Branded for your business", "Built around customer questions"].map((item) => (
                 <span key={item} className="inline-flex items-center gap-2">
                   <span className="text-coral">{"\u2713"}</span>
                   {item}
@@ -278,20 +250,29 @@ export default function MenuPilotPage() {
       </section>
 
       <section id="owner-portal" className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-16">
-          <div className="mx-auto max-w-4xl text-center">
-            <p className="text-sm font-black uppercase tracking-[0.18em] text-coral">Owner portal</p>
-            <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
-              See what is live. Request what needs to change.
-            </h2>
-            <p className="mx-auto mt-5 max-w-2xl leading-7 text-muted">
-              The dashboard gives every business owner the same clear view of their customer page, open requests, and the next details Resonate needs before publishing.
-            </p>
-            <Link href="/portal" className="mt-7 inline-flex rounded-full border border-line px-5 py-3 font-black text-ink shadow-sm transition hover:border-coral hover:text-coral">
-              Explore the Owner Portal
-            </Link>
+        <div className="container-page py-16">
+          <div className="grid gap-8 lg:grid-cols-[0.82fr_1fr] lg:items-center">
+            <div>
+              <p className="eyebrow text-coral">When details change</p>
+              <h2 className="mt-3 text-4xl font-extrabold leading-tight tracking-[-0.01em] text-ink md:text-5xl">
+                Keep the page useful without adding another chore to your week.
+              </h2>
+              <p className="mt-5 max-w-2xl leading-7 text-muted">
+                With Managed Page, you tell Resonate what changed. We review the request, update your Resonate-hosted page, and confirm when it is complete.
+              </p>
+              <Link href="/portal" className="btn-outline-ink mt-7">
+                See Managed Page support
+              </Link>
+            </div>
+            <div className="grid gap-3 sm:grid-cols-2">
+              {["Hours and closures", "Services and menu items", "Prices and availability", "Photos and announcements"].map((item) => (
+                <div key={item} className="surface-card lift rounded-[1.25rem] bg-cream p-5">
+                  <span className="flex h-10 w-10 items-center justify-center rounded-full bg-[#fff0e9] text-coral"><MiniIcon name="check" /></span>
+                  <p className="mt-4 font-extrabold text-ink">{item}</p>
+                </div>
+              ))}
+            </div>
           </div>
-          <div className="mt-10"><OwnerPortalPreview showPortalLink /></div>
         </div>
       </section>
 
@@ -299,22 +280,22 @@ export default function MenuPilotPage() {
         <div className="absolute inset-0 bg-[linear-gradient(rgba(255,255,255,0.055)_1px,transparent_1px),linear-gradient(90deg,rgba(255,255,255,0.045)_1px,transparent_1px)] bg-[size:72px_72px]" />
         <div className="absolute -bottom-32 -right-24 h-80 w-80 rounded-full bg-[#2f7d72]/25 blur-3xl" />
         <div className="absolute -top-28 left-1/4 h-72 w-72 rounded-full bg-coral/20 blur-3xl" />
-        <div className="relative mx-auto max-w-7xl px-5 py-14">
+        <div className="container-page relative py-14">
           <div className="grid gap-8 lg:grid-cols-[0.9fr_1fr] lg:items-end">
             <div>
               <p className="inline-flex rounded-full border border-gold/30 bg-gold/10 px-4 py-2 text-xs font-black uppercase tracking-[0.18em] text-gold">
-                Where updates go
+                Managed Page
               </p>
               <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight tracking-[-0.01em]">
-                Reviewed push-button updates for the places customers check first.
+                You approve the change. Resonate handles the page update.
               </h2>
             </div>
             <p className="max-w-2xl text-base leading-7 text-white/75">
-              Customers get one simple place to request the change. Resonate checks the details, then updates the MenuPilot page and the approved channels connected to that business.
+              Resonate reviews each request with you, updates the hosted customer page, and confirms when the work is complete.
             </p>
           </div>
 
-          <div className="mt-8 grid gap-5 lg:grid-cols-[0.82fr_1fr]">
+          <div className="mt-8 grid gap-5 lg:grid-cols-[1fr_0.82fr]">
             <div className="relative grid gap-3">
               <div className="absolute bottom-10 left-5 top-10 hidden w-px bg-[linear-gradient(#dba63a,rgba(219,166,58,0.08))] sm:block" />
               {controlWorkflowSteps.map((step) => (
@@ -333,47 +314,24 @@ export default function MenuPilotPage() {
               ))}
             </div>
 
-            <aside className="rounded-[1.5rem] border border-gold/25 bg-[#24160f]/85 p-4 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur">
-              <div className="rounded-[1.1rem] border border-gold/35 bg-[linear-gradient(135deg,rgba(219,166,58,0.12),rgba(255,255,255,0.045))] p-4">
-                <p className="text-[11px] font-black uppercase tracking-[0.18em] text-gold">Owner request</p>
-                <p className="mt-2 text-lg font-extrabold leading-7">
-                  "Closing two hours early for the storm. Back tomorrow at 11."
-                </p>
-                <p className="mt-2 text-xs font-bold text-white/55">Received 3:42 PM - reviewed by Resonate</p>
-              </div>
-
-              <div className="mt-4 flex items-center gap-3">
-                <span className="h-px flex-1 bg-white/12" />
-                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-white/45">Routed to</span>
-                <span className="h-px flex-1 bg-white/12" />
-              </div>
-
-              <div className="mt-4 grid gap-2">
-                {managedChannels.map((channel) => (
-                  <article key={channel.name} className="grid gap-3 rounded-2xl border border-white/8 bg-black/16 p-3 sm:grid-cols-[auto_1fr_auto] sm:items-center">
-                    <span className={`flex h-10 w-10 items-center justify-center rounded-xl ${channel.iconClass}`}>
-                      <MiniIcon name={channel.icon} />
-                    </span>
-                    <span>
-                      <span className="block font-extrabold">{channel.name}</span>
-                      <span className="mt-1 block text-xs leading-5 text-white/62">{channel.text}</span>
-                    </span>
-                    <span className={`w-fit rounded-full px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em] ${channel.badgeClass}`}>
-                      {channel.status}
-                    </span>
-                  </article>
+            <aside className="rounded-[1.5rem] border border-gold/25 bg-[#24160f]/85 p-6 shadow-[0_28px_90px_rgba(0,0,0,0.3)] backdrop-blur">
+              <p className="text-xs font-black uppercase tracking-[0.18em] text-gold">A standard request can be</p>
+              <ul className="mt-5 grid gap-3 text-white/82">
+                {["Update regular or special hours", "Change text, a photo, a price, or availability", "Add or remove a standard menu or service item", "Post a short announcement on the customer page"].map((item) => (
+                  <li key={item} className="flex gap-3 rounded-2xl border border-white/10 bg-white/[0.055] p-4">
+                    <span className="mt-0.5 text-gold">{"\u2713"}</span>
+                    <span className="font-bold leading-6">{item}</span>
+                  </li>
                 ))}
-              </div>
-
-              <div className="mt-4 rounded-[1.1rem] border border-[#2f7d72]/45 bg-[#163b35]/70 p-4">
-                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#9de7dc]">Confirmation sent - 3:47 PM</p>
-                <p className="mt-2 text-sm font-bold leading-5 text-white/82">
-                  MenuPilot page and Google updated. Facebook post queued. Ordering link marked for managed support.
+              </ul>
+              <div className="mt-5 rounded-[1.1rem] border border-[#2f7d72]/45 bg-[#163b35]/70 p-4">
+                <p className="text-xs font-black uppercase tracking-[0.16em] text-[#9de7dc]">Clear scope</p>
+                <p className="mt-2 text-sm font-bold leading-6 text-white/82">
+                  Managed Page includes hosting and up to four standard update requests each month. Frequent or complex work is available by quote.
                 </p>
               </div>
-
-              <p className="mt-3 text-xs leading-5 text-white/50">
-                Ordering and delivery channels stay marked as managed support until account access and platform behavior are confirmed.
+              <p className="mt-4 text-xs leading-5 text-white/55">
+                Updates to outside profiles are included only when Resonate confirms the access, destination, and scope with you.
               </p>
             </aside>
           </div>
@@ -381,7 +339,7 @@ export default function MenuPilotPage() {
       </section>
 
       <section id="custom-branding" className="border-y border-line bg-[#fffaf4]">
-        <div className="mx-auto max-w-7xl px-5 py-16">
+        <div className="container-page py-16">
           <div className="grid gap-10 lg:grid-cols-[0.82fr_1fr] lg:items-center">
             <div>
               <p className="text-sm font-black uppercase tracking-[0.18em] text-coral">Custom branding</p>
@@ -393,7 +351,7 @@ export default function MenuPilotPage() {
               </p>
               <div className="mt-8 grid max-w-xl gap-3 sm:grid-cols-2">
                 {brandItems.map((item) => (
-                  <span key={item.label} className="inline-flex items-center gap-3 rounded-2xl border border-line bg-white px-5 py-4 text-sm font-black text-ink shadow-sm">
+                  <span key={item.label} className="lift inline-flex items-center gap-3 rounded-2xl border border-line bg-white px-5 py-4 text-sm font-black text-ink shadow-sm">
                     <span className="text-coral"><MiniIcon name={item.icon} /></span>
                     {item.label}
                   </span>
@@ -401,7 +359,7 @@ export default function MenuPilotPage() {
               </div>
             </div>
 
-            <div className="rounded-[1.75rem] border border-line bg-white p-5 text-ink shadow-soft">
+            <div className="surface-card p-5 text-ink">
               <div className="flex flex-wrap items-start justify-between gap-4">
                 <div>
                   <p className="text-xs font-black uppercase tracking-[0.18em] text-[#3a2418]/70">Your brand kit</p>
@@ -442,21 +400,21 @@ export default function MenuPilotPage() {
       </section>
 
       <section id="plans" className="bg-[#fffaf4]">
-        <div className="mx-auto max-w-7xl px-5 py-20">
+        <div className="container-page py-20">
           <div className="overflow-hidden rounded-[1.75rem] bg-[#202320] p-8 text-white shadow-soft md:p-12">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6a15e]">Plan the next step</p>
             <h2 className="mt-3 max-w-4xl text-4xl font-extrabold leading-tight tracking-[-0.01em] md:text-5xl">
               Choose the right level of support for your page.
             </h2>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-white/78">
-              MenuPilot pages begin with a custom Launch. Hosting and managed update options are available based on how much ongoing help your business needs.
+              Every paid page begins with a custom Launch. After that, choose simple hosting or Managed Page support based on how much upkeep you want Resonate to handle.
             </p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-              <Link href="/pricing" className="rounded-full bg-[#ff5a1f] px-7 py-4 text-center font-black text-white transition hover:bg-white hover:text-[#202320]">
+              <Link href="/pricing" className="btn-base bg-[#ff5a1f] px-7 py-4 text-white hover:bg-white hover:text-[#202320]">
                 View Pricing
               </Link>
               <Link href="/checkout?plan=review" className="rounded-full border border-white/30 px-7 py-4 text-center font-black text-white transition hover:border-white hover:bg-white hover:text-[#202320]">
-                Start a Project
+                Get a Free Page Plan
               </Link>
             </div>
           </div>
@@ -464,15 +422,15 @@ export default function MenuPilotPage() {
       </section>
 
       <section className="bg-white">
-        <div className="mx-auto max-w-7xl px-5 py-16">
+        <div className="container-page py-16">
           <div id="free-page-plan" className="mb-12 scroll-mt-28 overflow-hidden rounded-[1.75rem] border border-line bg-[#202320] p-7 text-white shadow-soft md:p-10">
             <p className="text-sm font-black uppercase tracking-[0.18em] text-[#f6a15e]">Free Page Plan</p>
-            <h2 className="mt-3 max-w-3xl text-3xl font-black leading-tight md:text-5xl">Send the business details once. We recommend the right build before you pay.</h2>
+            <h2 className="mt-3 max-w-3xl text-3xl font-black leading-tight md:text-5xl">See what your customers need before deciding what to build.</h2>
             <p className="mt-5 max-w-3xl leading-7 text-white/78">
-              Share your business name, services or menu, photos, hours, and links. Resonate reviews the details and recommends the most useful MenuPilot setup before custom work begins.
+              Tell us what customers ask, what they need to find, and what information changes most often. Resonate will recommend the clearest next step before any paid work begins.
             </p>
             <Link href="/checkout?plan=review" className="mt-8 inline-flex rounded-full bg-[#ff5a1f] px-7 py-4 text-center font-black text-white shadow-[0_16px_40px_rgba(255,90,31,0.28)] transition hover:bg-white hover:text-[#202320]">
-              Start a Project
+              Get a Free Page Plan
             </Link>
           </div>
           <div className="overflow-hidden rounded-[1.75rem] border border-line bg-[#fffaf4] shadow-soft">
@@ -487,10 +445,10 @@ export default function MenuPilotPage() {
                     Resonate reviews what customers need to find, what actions they should take, and what information your business needs to keep current.
                   </p>
                   <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-                    <Link href="/checkout?plan=review" className="rounded-full bg-coral px-7 py-4 text-center font-bold text-white shadow-sm transition hover:bg-ink">
-                      Start a Project
+                    <Link href="/checkout?plan=review" className="btn-coral px-7 py-4">
+                    Get a Free Page Plan
                     </Link>
-                    <Link href="/pricing" className="rounded-full border border-line bg-white px-7 py-4 text-center font-bold text-ink shadow-sm transition hover:border-coral">
+                    <Link href="/pricing" className="btn-outline-ink px-7 py-4">
                       View Pricing
                     </Link>
                   </div>

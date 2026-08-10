@@ -24,20 +24,19 @@ const publicRoutes = [
 const intentionalExceptions = ["/m/", "/excellent-pins", "/admin", "/dashboard", "/api/"];
 const requiredGlobalLinks = [
   ["Home", "/"],
-  ["Solutions", "/#solutions"],
-  ["Our Work", "/#work"],
+  ["How We Help", "/#solutions"],
+  ["Examples", "/#work"],
   ["MenuPilot", "/menupilot"],
-  ["Owner Portal", "/portal"],
+  ["Managed Page", "/portal"],
   ["Pricing", "/pricing"],
-  ["About", "/#about"],
-  ["Start a Project", "/checkout?plan=review"]
+  ["How It Works", "/#about"],
+  ["Get a Free Page Plan", "/checkout?plan=review"]
 ];
-const requiredPrimaryLinks = requiredGlobalLinks.filter(([label]) => label !== "Start a Project");
+const requiredPrimaryLinks = requiredGlobalLinks.filter(([label]) => label !== "Get a Free Page Plan");
 const expectedMenuPilotLinks = [
   ["Overview", "/menupilot"],
   ["Examples", "/menupilot/examples"],
-  ["Owner Portal", "/portal"],
-  ["How Updates Work", "/menupilot#owner-portal"],
+  ["Managed Page", "/portal"],
   ["Pricing", "/pricing"]
 ];
 
@@ -131,8 +130,8 @@ function auditPageMarkup(route, html) {
   assertNavigationLinks(route, "mobile", mobileLinks);
   assertNavigationLinks(route, "footer", footerLinks);
 
-  if (!allLinks.some((link) => link.label === "Start a Project" && link.href === "/checkout?plan=review")) {
-    failures.push(`${route} is missing Start a Project (/checkout?plan=review)`);
+  if (!allLinks.some((link) => link.label === "Get a Free Page Plan" && link.href === "/checkout?plan=review")) {
+    failures.push(`${route} is missing Get a Free Page Plan (/checkout?plan=review)`);
   }
 
   if (html.includes("—") || /&mdash;|&#8212;|&#x2014;/i.test(html)) {

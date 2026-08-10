@@ -457,7 +457,7 @@ export function slugify(value: string) {
 }
 
 export function publicMenuUrl(slug: string) {
-  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://resonate.solutions";
+  const baseUrl = process.env.NEXT_PUBLIC_SITE_URL || "https://www.resonate.solutions";
   return `${baseUrl.replace(/\/$/, "")}/m/${slug}`;
 }
 

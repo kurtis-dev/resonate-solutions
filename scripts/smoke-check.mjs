@@ -1,10 +1,35 @@
 const baseUrl = (process.env.BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 
 const checks = [
-  { path: "/", expect: "text/html" },
-  { path: "/menupilot", expect: "text/html" },
-  { path: "/menupilot/examples", expect: "text/html" },
-  { path: "/pricing", expect: "text/html" },
+  {
+    path: "/",
+    expect: "text/html",
+    expectText: ["Your customers should not have to hunt for the right answer.", "Get a Free Page Plan"],
+    rejectText: ["Practical Digital Systems", "Update it once"]
+  },
+  {
+    path: "/menupilot",
+    expect: "text/html",
+    expectText: ["Give customers the", "right answer", "up to four standard update requests"],
+    rejectText: ["push-button updates", "Auto when connected", "Google updated", "Facebook post queued", "delivery platforms"]
+  },
+  {
+    path: "/menupilot/examples",
+    expect: "text/html",
+    expectText: ["One simple place for the information customers actually need."]
+  },
+  {
+    path: "/portal",
+    expect: "text/html",
+    expectText: ["You run the business. We help keep the page current.", "$79.99", "up to 4 standard update requests"],
+    rejectText: ["unlimited", "automatic publishing"]
+  },
+  {
+    path: "/pricing",
+    expect: "text/html",
+    expectText: ["Stage 1", "Stage 2", "$399", "$17.99", "$79.99", "Hosting included"]
+  },
+  { path: "/billing", expect: "text/html" },
   { path: "/checkout?plan=setup", expect: "text/html" },
   { path: "/checkout?plan=launch-hosting", expect: "text/html" },
   { path: "/checkout?plan=launch-managed-page", expect: "text/html" },

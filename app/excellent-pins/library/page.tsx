@@ -1,16 +1,13 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Excellent Pins & Badges Example Library",
-  description:
-    "Browse custom pin, medal, coin, badge, keychain, and metal emblem examples before starting an Excellent Pins quote.",
-  openGraph: {
-    title: "Excellent Pins & Badges Example Library",
-    description:
-      "Browse custom pin, medal, coin, badge, keychain, and metal emblem examples before starting a quote.",
-    images: ["/assets/excellent-pins/excellent-pins-logo-mark.png"],
-  },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Custom Pin, Medal, Coin & Badge Examples | Excellent Pins",
+  description: "Browse custom pin, medal, coin, badge, keychain, and metal emblem examples before starting an Excellent Pins quote request.",
+  path: "/excellent-pins/library",
+  image: "/assets/excellent-pins/excellent-pins-logo-mark.png"
+});
 
 const librarySections = [
   {
@@ -102,6 +99,7 @@ const jumpLinks = [
 export default function ExcellentPinsLibraryPage() {
   return (
     <main className="excellent-pins-page min-h-screen bg-[#f4efe7] text-[#15110d]">
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Excellent Pins", path: "/excellent-pins" }, { name: "Example Library", path: "/excellent-pins/library" }])} />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Oswald:wght@400;500;600;700&display=swap');
         .excellent-pins-page { font-family: 'Oswald', Arial, sans-serif; }
