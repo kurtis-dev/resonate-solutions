@@ -135,6 +135,7 @@ export async function POST(request: Request) {
   }
 
   const session = await stripe.checkout.sessions.create({
+    managed_payments: { enabled: false },
     mode: plan.paymentMode,
     line_items: priceIds.map((price) => ({ price, quantity: 1 })),
     customer_email: email || undefined,
