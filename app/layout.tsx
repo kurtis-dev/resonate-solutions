@@ -1,11 +1,11 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Karla } from "next/font/google";
+import { Karla, Manrope } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { SiteNav } from "@/components/SiteNav";
 import { defaultSocialImage, siteName, siteUrl } from "@/lib/seo";
 
-const displayFont = Bricolage_Grotesque({
+const displayFont = Manrope({
   subsets: ["latin"],
   variable: "--font-display"
 });
