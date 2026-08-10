@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
 import { customerPortalUrl } from "@/lib/portal";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Managed Page | Routine Updates Without More Owner Upkeep",
-  description: "You decide what changes. Resonate handles supported routine updates to your customer page and confirms when the work is complete."
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Website Maintenance & Managed Updates for Small Businesses | Resonate",
+  description: "Managed Page includes hosting and up to four standard monthly update requests for text, photos, hours, menus, services, and announcements.",
+  path: "/portal"
+});
 
 const includedUpdates = [
   "Text and service details",
@@ -26,6 +29,7 @@ const requestSteps = [
 export default function ManagedPagePage() {
   return (
     <main className="min-h-screen bg-cream text-ink">
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Managed Page", path: "/portal" }])} />
       <section className="section-seam section-glow-mint relative overflow-hidden border-b border-line">
         <div className="pointer-events-none absolute -right-48 -top-52 h-[38rem] w-[38rem] rounded-full border border-coral/15" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-24 -top-28 h-[25rem] w-[25rem] rounded-full border border-gold/25" aria-hidden="true" />

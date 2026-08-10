@@ -1,25 +1,15 @@
 import type { Metadata } from "next";
 import { ExcellentPinsQuoteFlow } from "@/app/excellent-pins/QuoteFlow";
 import { productStyles } from "@/app/excellent-pins/productStyles";
+import { JsonLd } from "@/components/JsonLd";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Excellent Pins & Badges Custom Quotes",
-  description:
-    "Custom pins, badges, medals, coins, and metal emblems quoted from your artwork and project details.",
-  openGraph: {
-    title: "Excellent Pins & Badges Custom Quotes",
-    description:
-      "Custom pins, badges, medals, coins, and metal emblems quoted from your artwork and project details.",
-    images: ["/assets/excellent-pins/excellent-pins-logo-mark.png"],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Excellent Pins & Badges Custom Quotes",
-    description:
-      "Custom pins, badges, medals, coins, and metal emblems quoted from your artwork and project details.",
-    images: ["/assets/excellent-pins/excellent-pins-logo-mark.png"],
-  },
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Custom Pins, Badges, Medals & Coins | Excellent Pins",
+  description: "Request a custom quote for pins, badges, medals, coins, keychains, and metal emblems using your artwork and project details.",
+  path: "/excellent-pins",
+  image: "/assets/excellent-pins/excellent-pins-logo-mark.png"
+});
 
 const processSteps = [
   {
@@ -95,6 +85,7 @@ const heroActionLinks = [
 export default function ExcellentPinsPage() {
   return (
     <main className="excellent-pins-page min-h-screen bg-[#f4efe7] text-[#15110d]">
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Excellent Pins", path: "/excellent-pins" }])} />
       <style>{`
         @import url('https://fonts.googleapis.com/css2?family=League+Spartan:wght@700;800;900&family=Oswald:wght@400;500;600;700&display=swap');
         .excellent-pins-page { font-family: 'Oswald', Arial, sans-serif; }

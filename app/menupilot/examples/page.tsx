@@ -1,11 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
 import { MenuPilotSubnav } from "@/components/MenuPilotSubnav";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "MenuPilot Example | One Clear Place for Customer Information",
-  description: "See how a MenuPilot page brings menus, hours, photos, ordering, calling, and directions together for customers."
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Small Business Website & Customer Intake Examples | Resonate",
+  description: "See how a mobile-friendly MenuPilot page brings a small business menu, hours, photos, ordering, calling, and directions together.",
+  path: "/menupilot/examples"
+});
 
 const exampleFeatures = [
   {
@@ -38,6 +41,7 @@ const ownerControls = [
 export default function MenuPilotExamplesPage() {
   return (
     <main className="bg-cream">
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "MenuPilot", path: "/menupilot" }, { name: "Examples", path: "/menupilot/examples" }])} />
       <MenuPilotSubnav />
       <section className="section-glow-mint border-b border-line">
       <div className="container-page grid gap-10 py-16 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">

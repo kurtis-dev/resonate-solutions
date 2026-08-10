@@ -2,13 +2,16 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { questionsEmail } from "@/lib/contact";
 import { customerPortalUrl } from "@/lib/portal";
+import { pageMetadata } from "@/lib/seo";
 
 const portalUrl = process.env.NEXT_PUBLIC_STRIPE_CUSTOMER_PORTAL_URL || "";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title: "Billing | Launch, Hosting, and Managed Page",
-  description: "Start with the $399 Launch build, then choose no monthly plan, $17.99 Webpage Hosting, or $79.99 Managed Page support."
-};
+  description: "Start with the $399 Launch build, then choose no monthly plan, $17.99 Webpage Hosting, or $79.99 Managed Page support.",
+  path: "/billing",
+  robots: { index: false, follow: false }
+});
 
 const checkoutChoices = [
   {

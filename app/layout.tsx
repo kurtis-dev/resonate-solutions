@@ -3,6 +3,7 @@ import { Bricolage_Grotesque, Karla } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { SiteNav } from "@/components/SiteNav";
+import { defaultSocialImage, siteName, siteUrl } from "@/lib/seo";
 
 const displayFont = Bricolage_Grotesque({
   subsets: ["latin"],
@@ -15,17 +16,25 @@ const bodyFont = Karla({
 });
 
 export const metadata: Metadata = {
-  title: "Resonate Solutions | Clear Business Information for Customers",
-  description: "Give customers one clear place to find the right business information and give yourself an easier way to keep it current.",
-  metadataBase: new URL("https://resonate.solutions"),
+  title: "Small Business Web Design & Managed Updates | Resonate Solutions",
+  description: "Mobile-friendly customer pages, online menus, intake forms, hosting, and managed website updates for small businesses in Northwest Arkansas.",
+  metadataBase: new URL(siteUrl),
   icons: {
     icon: "/assets/resonate-icon-primary.png",
     apple: "/assets/resonate-icon-primary.png"
   },
   openGraph: {
-    title: "Resonate Solutions | Clear Business Information for Customers",
-    description: "Give customers one clear place to find the right answer and make business information easier to maintain.",
-    images: ["/assets/resonate-logo-flat.png"]
+    title: "Small Business Web Design & Managed Updates | Resonate Solutions",
+    description: "Mobile-friendly customer pages, online menus, intake forms, hosting, and managed website updates for small businesses in Northwest Arkansas.",
+    siteName,
+    type: "website",
+    images: [defaultSocialImage]
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Small Business Web Design & Managed Updates | Resonate Solutions",
+    description: "Mobile-friendly customer pages, online menus, intake forms, hosting, and managed website updates for small businesses in Northwest Arkansas.",
+    images: [defaultSocialImage]
   }
 };
 

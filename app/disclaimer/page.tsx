@@ -1,3 +1,12 @@
+import type { Metadata } from "next";
+import { pageMetadata } from "@/lib/seo";
+
+export const metadata: Metadata = pageMetadata({
+  title: "Disclaimer | Resonate Solutions",
+  description: "Important limitations concerning Resonate Solutions business information, customer-facing materials, and third-party platforms.",
+  path: "/disclaimer"
+});
+
 export default function DisclaimerPage() {
   return (
     <main className="mx-auto max-w-3xl px-5 py-16">

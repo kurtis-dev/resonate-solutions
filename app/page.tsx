@@ -1,22 +1,17 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
+import { absoluteUrl, pageMetadata, questionsEmail, siteName, siteUrl } from "@/lib/seo";
 
-const title = "Resonate Solutions | One Clear Place for the Right Answer";
+const title = "Small Business Web Design & Managed Updates | Resonate Solutions";
 const description =
-  "Resonate helps small businesses give customers clear, accurate information without creating more maintenance for the owner.";
+  "Resonate Solutions creates mobile-friendly web pages, online menus, intake forms, and managed website updates for small businesses in Northwest Arkansas.";
 
-export const metadata: Metadata = {
+export const metadata: Metadata = pageMetadata({
   title,
   description,
-  alternates: { canonical: "/" },
-  openGraph: {
-    title,
-    description,
-    type: "website",
-    url: "/",
-    images: ["/assets/resonate-logo-flat.png"]
-  }
-};
+  path: "/"
+});
 
 function SectionLabel({ children, light = false }: { children: React.ReactNode; light?: boolean }) {
   return (
@@ -62,18 +57,41 @@ const solutionAreas = [
 ];
 
 export default function ResonateHome() {
-  const organizationSchema = {
+  const siteIdentitySchema = {
     "@context": "https://schema.org",
-    "@type": "Organization",
-    name: "Resonate Solutions",
-    url: "https://resonate.solutions",
-    email: "questions@resonate.solutions",
-    description
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": `${siteUrl}/#organization`,
+        name: siteName,
+        url: siteUrl,
+        logo: absoluteUrl("/assets/resonate-logo-flat.png"),
+        email: questionsEmail,
+        description,
+        areaServed: {
+          "@type": "AdministrativeArea",
+          name: "Northwest Arkansas"
+        },
+        contactPoint: {
+          "@type": "ContactPoint",
+          contactType: "customer service",
+          email: questionsEmail
+        }
+      },
+      {
+        "@type": "WebSite",
+        "@id": `${siteUrl}/#website`,
+        name: siteName,
+        url: siteUrl,
+        publisher: { "@id": `${siteUrl}/#organization` },
+        inLanguage: "en-US"
+      }
+    ]
   };
 
   return (
     <main className="overflow-hidden bg-[#fffdf9]">
-      <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(organizationSchema) }} />
+      <JsonLd data={siteIdentitySchema} />
 
       <section className="relative border-b border-[#f3d8ca] bg-[radial-gradient(circle_at_12%_14%,rgba(255,211,94,0.22),transparent_28%),radial-gradient(circle_at_88%_20%,rgba(255,108,76,0.2),transparent_31%),linear-gradient(135deg,#fffdf9_0%,#fff5ee_54%,#f3fbf8_100%)]">
         <div className="pointer-events-none absolute -right-52 -top-56 h-[44rem] w-[44rem] rounded-full border border-[#ff6c4c]/20" aria-hidden="true" />
@@ -82,12 +100,16 @@ export default function ResonateHome() {
         <div className="container-page relative grid gap-14 py-16 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:py-24">
           <div>
             <SectionLabel>Clear answers for your customers</SectionLabel>
-            <h1 className="mt-5 max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.025em] text-ink md:text-7xl">
+            <p className="mt-5 text-xs font-black uppercase tracking-[0.16em] text-[#5d55a7]">
+              Small business web design <span aria-hidden="true">&bull;</span> online menu pages <span aria-hidden="true">&bull;</span> managed website updates
+            </p>
+            <h1 className="mt-4 max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.025em] text-ink md:text-7xl">
               Your customers should not have to hunt for the right answer.
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
-              Hours change. Prices change. Services change. Resonate gives your business one clear place for the
-              information customers need and an easier way to keep it current when things change.
+              Resonate Solutions designs mobile-friendly web pages, online menus and service pages, customer intake forms,
+              and managed website updates for small businesses in Northwest Arkansas. We make important customer information
+              easier to find and easier for owners to keep current.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <a href="#work" className="btn-coral px-7 py-4">See what your page could look like</a>
@@ -241,6 +263,49 @@ export default function ResonateHome() {
             ))}
           </ol>
           <p className="mt-10 max-w-3xl leading-7 text-muted">Your business stays yours. You approve what customers see, and you choose whether to send future changes yourself or use Managed Page support.</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="common-questions-heading" className="border-b border-[#d9eee7] bg-[linear-gradient(180deg,#f3fbf8_0%,#fffdf9_100%)]">
+        <div className="container-page py-16 md:py-24">
+          <SectionLabel>Common questions</SectionLabel>
+          <h2 id="common-questions-heading" className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">
+            Clear answers about Resonate services.
+          </h2>
+          <div className="mt-12 grid gap-5 md:grid-cols-2">
+            <article className="surface-card p-6">
+              <h3 className="text-xl font-black text-ink">What does Resonate Solutions do?</h3>
+              <p className="mt-3 leading-7 text-muted">Resonate creates mobile-friendly customer pages, online menus and service pages, customer intake forms, and managed website updates for small businesses.</p>
+            </article>
+            <article className="surface-card p-6">
+              <h3 className="text-xl font-black text-ink">What is MenuPilot?</h3>
+              <p className="mt-3 leading-7 text-muted"><Link href="/menupilot" className="font-black text-coral underline decoration-coral/30 underline-offset-4">MenuPilot online menu pages</Link> put a business&apos;s menu or services, hours, photos, location, and customer actions together in one mobile-friendly place.</p>
+            </article>
+            <article className="surface-card p-6">
+              <h3 className="text-xl font-black text-ink">What is Managed Page?</h3>
+              <p className="mt-3 leading-7 text-muted"><Link href="/portal" className="font-black text-coral underline decoration-coral/30 underline-offset-4">Managed website updates</Link> include hosting and up to four standard update requests per month for a Resonate-hosted customer page.</p>
+            </article>
+            <article className="surface-card p-6">
+              <h3 className="text-xl font-black text-ink">How much does a Resonate customer page cost?</h3>
+              <p className="mt-3 leading-7 text-muted">Every paid customer page starts with a $399 one-time Launch build. See <Link href="/pricing" className="font-black text-coral underline decoration-coral/30 underline-offset-4">small business website pricing</Link> for the optional $17.99 hosting and $79.99 Managed Page plans.</p>
+            </article>
+            <article className="surface-card p-6">
+              <h3 className="text-xl font-black text-ink">What is included with Webpage Hosting?</h3>
+              <p className="mt-3 leading-7 text-muted">Webpage Hosting includes hosting, SSL, routine platform maintenance, and basic uptime monitoring. Content updates are not included.</p>
+            </article>
+            <article className="surface-card p-6">
+              <h3 className="text-xl font-black text-ink">Does Resonate automatically update Google and social media?</h3>
+              <p className="mt-3 leading-7 text-muted">No. Resonate updates supported Resonate-hosted pages. External profiles may be managed manually only when access and scope are confirmed with the business owner.</p>
+            </article>
+            <article className="surface-card p-6">
+              <h3 className="text-xl font-black text-ink">What businesses does Resonate serve?</h3>
+              <p className="mt-3 leading-7 text-muted">Resonate serves small businesses that need clearer customer information, an online menu or service page, or a guided form such as the <Link href="/excellent-pins" className="font-black text-coral underline decoration-coral/30 underline-offset-4">Excellent Pins customer intake example</Link>.</p>
+            </article>
+            <article className="surface-card p-6">
+              <h3 className="text-xl font-black text-ink">Where does Resonate Solutions operate?</h3>
+              <p className="mt-3 leading-7 text-muted">Resonate Solutions operates in Northwest Arkansas.</p>
+            </article>
+          </div>
         </div>
       </section>
 

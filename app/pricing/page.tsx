@@ -1,14 +1,18 @@
 import type { Metadata } from "next";
+import { JsonLd } from "@/components/JsonLd";
 import { PricingCards } from "@/components/PricingCards";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "Pricing | Build Your Page, Then Choose Ongoing Help",
-  description: "Start with a $399 Launch build, then choose $17.99 Webpage Hosting or $79.99 Managed Page support with hosting included."
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Small Business Website Pricing | Resonate Solutions",
+  description: "Compare Resonate's $399 Launch build, $17.99 monthly Webpage Hosting, and $79.99 monthly Managed Page plan with hosting included.",
+  path: "/pricing"
+});
 
 export default function PricingPage() {
   return (
     <main className="bg-cream">
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "Pricing", path: "/pricing" }])} />
       <section className="section-seam section-glow-mint relative overflow-hidden border-b border-line">
         <div className="pointer-events-none absolute -right-24 -top-32 h-80 w-80 rounded-full border border-coral/20" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-4 top-4 h-48 w-48 rounded-full border border-gold/35" aria-hidden="true" />

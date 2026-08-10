@@ -1,12 +1,14 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { JsonLd } from "@/components/JsonLd";
 import { MenuPilotSubnav } from "@/components/MenuPilotSubnav";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
-export const metadata: Metadata = {
-  title: "MenuPilot | One Clear Page for Your Customers",
-  description:
-    "Give customers one clear place to find your hours, services, photos, directions, and next step."
-};
+export const metadata: Metadata = pageMetadata({
+  title: "Online Menu & Service Pages for Small Businesses | MenuPilot",
+  description: "MenuPilot creates mobile-friendly online menu and service pages with hours, photos, directions, and clear customer actions in one place.",
+  path: "/menupilot"
+});
 
 type BusinessTheme = {
   label: string;
@@ -209,6 +211,7 @@ function PhonePreview({ theme }: { theme: BusinessTheme }) {
 export default function MenuPilotPage() {
   return (
     <main className="bg-cream">
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "MenuPilot", path: "/menupilot" }])} />
       <MenuPilotSubnav />
 
       <section className="section-seam section-glow-mint relative overflow-hidden">

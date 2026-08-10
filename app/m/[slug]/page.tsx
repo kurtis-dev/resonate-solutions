@@ -1,6 +1,8 @@
 import { notFound } from "next/navigation";
+import { JsonLd } from "@/components/JsonLd";
 import { getMenuBusiness, publicMenuUrl, type MenuBusiness, type MenuItem, type MenuSection } from "@/lib/menu-store";
 import { mailtoLink, questionsEmail } from "@/lib/contact";
+import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 type PageProps = {
   params: Promise<{ slug: string }>;
@@ -19,14 +21,17 @@ export async function generateMetadata({ params }: PageProps) {
 
   if (!business) {
     return {
-      title: "Menu not found | Resonate Solutions"
+      title: "Menu not found | Resonate Solutions",
+      robots: { index: false, follow: false }
     };
   }
 
-  return {
-    title: `${business.businessName} menu`,
-    description: business.description || `${business.businessName} menu, hours, location, and customer links.`
-  };
+  return pageMetadata({
+    title: `${business.businessName} Menu, Hours & Ordering | MenuPilot`,
+    description: business.description || `View the ${business.businessName} menu, current hours, location, ordering details, photos, and customer links.`,
+    path: `/m/${business.slug}`,
+    image: business.heroImageUrl || "/assets/resonate-logo-flat.png"
+  });
 }
 
 function actionUrl(kind: "directions" | "phone", value?: string | null) {
@@ -495,21 +500,25 @@ export default async function PublicMenuPage({ params, searchParams }: PageProps
 
   if (isMellowMoose) {
     return (
-      <MellowMooseShell
-        business={business}
-        actionLinks={actionLinks}
-        activeMenu={activeMenu}
-        groupedSections={sectionsWithMore}
-        localFavorites={localFavorites}
-        menuUrl={menuUrl}
-        directionsUrl={directionsUrl}
-        phoneUrl={phoneUrl}
-      />
+      <>
+        <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "MenuPilot", path: "/menupilot" }, { name: business.businessName, path: `/m/${business.slug}` }])} />
+        <MellowMooseShell
+          business={business}
+          actionLinks={actionLinks}
+          activeMenu={activeMenu}
+          groupedSections={sectionsWithMore}
+          localFavorites={localFavorites}
+          menuUrl={menuUrl}
+          directionsUrl={directionsUrl}
+          phoneUrl={phoneUrl}
+        />
+      </>
     );
   }
 
   return (
     <main className="bg-cream">
+      <JsonLd data={breadcrumbSchema([{ name: "Home", path: "/" }, { name: "MenuPilot", path: "/menupilot" }, { name: business.businessName, path: `/m/${business.slug}` }])} />
       <section className="mx-auto max-w-6xl px-4 py-6 sm:px-5 sm:py-10">
         <div className="overflow-hidden rounded-[1.75rem] border border-line bg-white shadow-soft">
           <div className="relative min-h-[420px] bg-ink">
