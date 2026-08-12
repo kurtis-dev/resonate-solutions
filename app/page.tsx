@@ -5,7 +5,7 @@ import { absoluteUrl, pageMetadata, questionsEmail, siteName, siteUrl } from "@/
 
 const title = "Small Business Web Design & Managed Updates | Resonate Solutions";
 const description =
-  "Resonate Solutions creates mobile-friendly web pages, online menus, intake forms, and managed website updates for small businesses in Northwest Arkansas.";
+  "Resonate Solutions builds mobile-friendly web pages, online menus, intake forms, and managed updates around what each small business actually needs.";
 
 export const metadata: Metadata = pageMetadata({
   title,
@@ -53,6 +53,25 @@ const solutionAreas = [
     title: "Keep it current without doing it all yourself",
     copy: "You decide what changes. Resonate can handle routine page updates and basic checks when you want ongoing help.",
     items: ["Text, photo, hours, menu, and service updates", "Monthly page review", "Basic link and page-health checks", "Hosting and routine platform maintenance"]
+  }
+];
+
+const approachCards = [
+  {
+    title: "Built for your business",
+    copy: "Not squeezed into a generic template. The page starts with what customers need to find and what the owner needs to make easier."
+  },
+  {
+    title: "Predictable website costs",
+    copy: "Resonate webpage pricing is not based on how many people visit the page or how many customers the business serves."
+  },
+  {
+    title: "A real person helping you",
+    copy: "When something needs to change, the owner should not have to figure out another website builder alone."
+  },
+  {
+    title: "Built to keep improving",
+    copy: "Resonate keeps developing practical tools that make customer-facing business information easier to maintain."
   }
 ];
 
@@ -108,8 +127,8 @@ export default function ResonateHome() {
             </h1>
             <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
               Resonate Solutions designs mobile-friendly web pages, online menus and service pages, customer intake forms,
-              and managed website updates for small businesses in Northwest Arkansas. We make important customer information
-              easier to find and easier for owners to keep current.
+              and managed website updates around the way each small business actually works. We make important customer
+              information easier to find and easier for owners to keep current.
             </p>
             <div className="mt-9 flex flex-col gap-3 sm:flex-row">
               <a href="#work" className="btn-coral px-7 py-4">See what your page could look like</a>
@@ -190,6 +209,59 @@ export default function ResonateHome() {
         </div>
       </section>
 
+      <section className="relative border-b border-[#f1d8cc] bg-[radial-gradient(circle_at_15%_10%,rgba(255,211,94,0.18),transparent_26%),radial-gradient(circle_at_88%_78%,rgba(123,215,196,0.18),transparent_27%),#fff8f3]">
+        <div className="container-page grid gap-10 py-16 lg:grid-cols-[0.92fr_1.08fr] lg:items-start md:py-24">
+          <div>
+            <SectionLabel>Built around the business</SectionLabel>
+            <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">
+              Your business shouldn&apos;t have to fit the website builder.
+            </h2>
+            <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">
+              Most website platforms start with their tools, their templates, their plans, and their limits.
+              Resonate starts somewhere else: what does your business actually need?
+            </p>
+          </div>
+          <div className="surface-card p-7 sm:p-9">
+            <p className="text-xs font-black uppercase tracking-[0.18em] text-coral">We ask better questions first</p>
+            <div className="mt-6 grid gap-4 sm:grid-cols-2">
+              {[
+                "What are customers constantly asking you?",
+                "What information keeps getting outdated?",
+                "What should customers be able to do without calling you?",
+                "What are you paying for today that is not making the business easier to run?"
+              ].map((question) => (
+                <div key={question} className="rounded-2xl border border-[#f1d8cc] bg-[#fffdf9] p-4 text-sm font-bold leading-6 text-ink">
+                  {question}
+                </div>
+              ))}
+            </div>
+            <p className="mt-6 leading-7 text-muted">
+              Then we build around those answers. A restaurant may need a menu that is easy to keep current.
+              A service business may need a better way to collect quote requests. Another business may need
+              customers to send artwork, request an appointment, or simply know whether they are open.
+            </p>
+            <p className="mt-4 text-xl font-black leading-8 text-ink">
+              Different businesses have different problems. Your website should be allowed to solve them.
+            </p>
+          </div>
+        </div>
+      </section>
+
+      <section className="border-b border-[#d9eee7] bg-white">
+        <div className="container-page py-14 md:py-20">
+          <SectionLabel>Why Resonate is different</SectionLabel>
+          <div className="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
+            {approachCards.map((card, index) => (
+              <article key={card.title} className={`lift rounded-[1.5rem] border p-6 ${index === 0 ? "border-[#27243f] bg-[#27243f] text-white" : index === 1 ? "border-[#f2dc92] bg-[#fff9df]" : index === 2 ? "border-[#ffc8b8] bg-[#fff1ec]" : "border-[#a9dfd3] bg-[#eaf8f4]"}`}>
+                <p className={`text-[11px] font-black uppercase tracking-[0.18em] ${index === 0 ? "text-[#ffd35e]" : "text-coral"}`}>Idea 0{index + 1}</p>
+                <h3 className={`mt-4 text-xl font-black ${index === 0 ? "text-white" : "text-ink"}`}>{card.title}</h3>
+                <p className={`mt-3 text-sm leading-6 ${index === 0 ? "text-white/72" : "text-muted"}`}>{card.copy}</p>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
       <section id="solutions" className="scroll-mt-24 border-b border-[#d9eee7] bg-[linear-gradient(180deg,#f3fbf8_0%,#fffdf9_100%)]">
         <div className="container-page py-16 md:py-24">
           <SectionLabel>How we help</SectionLabel>
@@ -263,6 +335,37 @@ export default function ResonateHome() {
             ))}
           </ol>
           <p className="mt-10 max-w-3xl leading-7 text-muted">Your business stays yours. You approve what customers see, and you choose whether to send future changes yourself or use Managed Page support.</p>
+        </div>
+      </section>
+
+      <section className="relative overflow-hidden border-b border-[#f1d8cc] bg-[linear-gradient(135deg,#fffdf9_0%,#fff1ec_52%,#f3fbf8_100%)]">
+        <div className="pointer-events-none absolute -right-28 -top-32 h-72 w-72 rounded-full border border-coral/20" aria-hidden="true" />
+        <div className="container-page grid gap-10 py-16 lg:grid-cols-[0.8fr_1.2fr] lg:items-center md:py-24">
+          <div>
+            <SectionLabel>Why I built Resonate</SectionLabel>
+            <h2 className="mt-5 max-w-2xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">
+              Technology should adapt to the business, not the other way around.
+            </h2>
+          </div>
+          <div className="surface-card p-7 sm:p-9">
+            <p className="text-lg leading-8 text-muted">
+              I&apos;m Kurtis, and I started Resonate because I think small businesses deserve technology that adapts to them,
+              not the other way around.
+            </p>
+            <p className="mt-5 leading-7 text-muted">
+              I don&apos;t start by asking which template you want. I start by asking what your customers are trying to do,
+              what keeps creating extra work for you, and where better technology could make both easier.
+            </p>
+            <p className="mt-5 leading-7 text-muted">
+              Sometimes the answer is a better webpage. Sometimes it is an online menu, a smarter quote form, easier updates,
+              or something specific to the way your business works. That is the part I enjoy: finding the problem and building
+              the right solution around the business.
+            </p>
+            <div className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-center">
+              <Link href="/checkout?plan=review" className="btn-coral px-7 py-4">Tell me what&apos;s making your business harder</Link>
+              <p className="text-sm font-semibold leading-6 text-muted">Let&apos;s see whether better technology can make it simpler.</p>
+            </div>
+          </div>
         </div>
       </section>
 

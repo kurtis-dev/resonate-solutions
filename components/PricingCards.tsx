@@ -83,7 +83,7 @@ export function PricingCards() {
       <div className="mt-14">
         <p className="eyebrow text-coral">Stage 1: Build it</p>
         <h2 className="mt-3 text-3xl font-black text-ink">Every paid Resonate page starts with Launch.</h2>
-        <p className="mt-3 max-w-3xl leading-7 text-muted">We build the approved customer page, give you a private preview, and check it before the public link goes live.</p>
+        <p className="mt-3 max-w-3xl leading-7 text-muted">We build around what your customers need to find and what the page should make easier for the business. You get a private preview before the public link goes live.</p>
         <div className="mx-auto mt-7 w-full max-w-4xl">
           <PlanCard plan={launchPlan} />
         </div>
@@ -93,6 +93,9 @@ export function PricingCards() {
         <p className="eyebrow text-coral">Stage 2: Keep it running</p>
         <h2 className="mt-3 text-3xl font-black text-ink">Choose how much help you want after Launch.</h2>
         <p className="mt-3 max-w-3xl leading-7 text-muted">Choose hosting when you will send your own content changes. Choose Managed Page when you do not want another webpage to maintain.</p>
+        <p className="mt-4 max-w-3xl rounded-2xl border border-[#f2dc92] bg-[#fff9df] p-4 text-sm font-bold leading-6 text-ink">
+          More customers shouldn&apos;t mean a bigger website bill. These webpage plans are not priced by visitor count or by how many customers your business serves.
+        </p>
         <div className="mt-7 grid gap-6 lg:grid-cols-2">
           <PlanCard plan={hostingPlan} />
           <PlanCard plan={managedPlan} managed />
