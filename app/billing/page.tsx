@@ -128,7 +128,7 @@ export default function BillingPage() {
             <p className="eyebrow text-coral">Managed Page</p>
             <h2 className="mt-3 text-2xl font-extrabold text-ink">$79.99/month, hosting included</h2>
             <ul className="mt-5 grid gap-3 text-sm leading-6 text-muted">
-              <li>Up to 4 standard update requests per month</li>
+              <li>Request standard updates whenever your business changes</li>
               <li>Monthly page review</li>
               <li>Text, photo, hours, menu, and service updates</li>
               <li>Priority turnaround</li>
@@ -138,7 +138,7 @@ export default function BillingPage() {
         </div>
 
         <p className="mt-6 text-center text-sm font-semibold leading-6 text-muted">
-          Need frequent or complex updates? Custom management is available by quote.
+          Larger projects, new features, and substantial redesigns are scoped separately.
         </p>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[0.8fr_1fr]">

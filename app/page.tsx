@@ -386,7 +386,7 @@ export default function ResonateHome() {
             </article>
             <article className="surface-card p-6">
               <h3 className="text-xl font-black text-ink">What is Managed Page?</h3>
-              <p className="mt-3 leading-7 text-muted"><Link href="/portal" className="font-black text-coral underline decoration-coral/30 underline-offset-4">Managed website updates</Link> include hosting and up to four standard update requests per month for a Resonate-hosted customer page.</p>
+              <p className="mt-3 leading-7 text-muted"><Link href="/portal" className="font-black text-coral underline decoration-coral/30 underline-offset-4">Managed website updates</Link> include hosting for a Resonate-hosted customer page. Request standard updates whenever your business changes. Resonate reviews the change, updates your page, and confirms when it’s complete.</p>
             </article>
             <article className="surface-card p-6">
               <h3 className="text-xl font-black text-ink">How much does a Resonate customer page cost?</h3>

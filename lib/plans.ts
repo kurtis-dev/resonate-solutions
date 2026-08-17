@@ -93,10 +93,10 @@ export const plans: Plan[] = [
     billingPeriod: "mo",
     features: [
       { label: "Hosting included", detail: "Includes hosting, SSL, routine technical maintenance, and basic uptime monitoring." },
-      { label: "Up to 4 standard update requests", detail: "Four standard page-update requests are included each month." },
+      { label: "Standard updates when things change", detail: "Request standard updates whenever your business changes. Resonate reviews the change, updates your page, and confirms when it’s complete." },
       { label: "Monthly page review", detail: "Resonate reviews the page each month for obvious content and presentation issues." },
       { label: "Routine content updates", detail: "Includes supplied text, photo, hours, menu, and service updates." },
-      { label: "Priority turnaround", detail: "Standard update requests are handled ahead of hosting-only requests." },
+      { label: "Priority turnaround", detail: "Supported Managed Page updates are handled ahead of hosting-only support." },
       { label: "Basic link and page-health checks", detail: "Includes basic checks of important links and the customer-facing page." }
     ],
     cta: "Start Launch + Managed Page",

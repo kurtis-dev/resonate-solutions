@@ -6,7 +6,7 @@ import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Website Maintenance & Managed Updates for Small Businesses | Resonate",
-  description: "Managed Page includes hosting and up to four standard monthly update requests for text, photos, hours, menus, services, and announcements.",
+  description: "Managed Page includes hosting and reviewed standard updates when your business changes, with separately scoped support for larger projects and redesigns.",
   path: "/portal"
 });
 
@@ -46,7 +46,7 @@ export default function ManagedPagePage() {
                 Ask a question
               </a>
             </div>
-            <p className="mt-4 text-sm font-bold leading-6 text-muted">$79.99 per month. Hosting included. Up to 4 standard update requests per month.</p>
+            <p className="mt-4 text-sm font-bold leading-6 text-muted">$79.99 per month. Hosting included. Request standard updates whenever your business changes.</p>
           </div>
 
           <div className="surface-card rise-in p-6 sm:p-8">
@@ -86,8 +86,8 @@ export default function ManagedPagePage() {
         <div className="container-page grid gap-8 py-12 lg:grid-cols-[1fr_auto] lg:items-center">
           <div>
             <p className="text-xs font-black uppercase tracking-[0.18em] text-coral">What the plan includes</p>
-            <h2 className="mt-3 text-3xl font-black">Routine help with a clear monthly scope.</h2>
-            <p className="mt-4 max-w-3xl leading-7 text-white/70">Managed Page includes hosting, a monthly page review, priority turnaround, basic link and page-health checks, and up to 4 standard update requests each month. Frequent or complex work is available by quote.</p>
+            <h2 className="mt-3 text-3xl font-black">Routine help when your business changes.</h2>
+            <p className="mt-4 max-w-3xl leading-7 text-white/70">Request standard updates whenever your business changes. Resonate reviews the change, updates your page, and confirms when it’s complete. Larger projects, new features, and substantial redesigns are scoped separately.</p>
           </div>
           <Link href="/pricing" className="btn-base bg-white text-ink hover:bg-gold">View pricing</Link>
         </div>
