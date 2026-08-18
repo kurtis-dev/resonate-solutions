@@ -37,6 +37,33 @@ const valueCards = [
   }
 ];
 
+const valueCardStyles = [
+  {
+    card: "border-[#27243f] bg-[#27243f] text-white shadow-[0_28px_80px_rgba(39,36,63,0.24)]",
+    number: "text-white/10",
+    label: "text-[#ffd35e]",
+    title: "text-white",
+    copy: "text-white/72",
+    rule: "bg-[#ffd35e]"
+  },
+  {
+    card: "border-[#d9c8b6] bg-white text-ink",
+    number: "text-[#f05f3b]/12",
+    label: "text-[#b94727]",
+    title: "text-ink",
+    copy: "text-muted",
+    rule: "bg-[#f05f3b]"
+  },
+  {
+    card: "border-[#d9c8b6] bg-white text-ink",
+    number: "text-[#166f61]/12",
+    label: "text-[#166f61]",
+    title: "text-ink",
+    copy: "text-muted",
+    rule: "bg-[#166f61]"
+  }
+];
+
 const pricingCards = [
   {
     title: "Launch",
@@ -45,7 +72,7 @@ const pricingCards = [
     copy: "We build the approved customer page, give you a private preview, and check it before the public link goes live.",
     href: "/checkout?plan=setup",
     cta: "Start Launch",
-    accent: "border-[#ffc8b8] bg-white"
+    accent: "border-[#d9c8b6] bg-white"
   },
   {
     title: "Webpage Hosting",
@@ -54,7 +81,7 @@ const pricingCards = [
     copy: "Hosting, SSL, routine platform maintenance, and basic uptime monitoring. You handle your own content updates.",
     href: "/checkout?plan=launch-hosting",
     cta: "Start Launch + Hosting",
-    accent: "border-[#f2dc92] bg-[#fff9df]"
+    accent: "border-[#d9c8b6] bg-white"
   },
   {
     title: "Managed Page",
@@ -80,6 +107,27 @@ const fitCards = [
   {
     title: "A real person helps",
     copy: "When something needs to change, you should not have to fight another website builder alone."
+  }
+];
+
+const fitCardStyles = [
+  {
+    card: "border-[#27243f] bg-[#27243f] text-white shadow-[0_24px_70px_rgba(39,36,63,0.22)]",
+    title: "text-white",
+    copy: "text-white/72",
+    bar: "bg-[#ffd35e]"
+  },
+  {
+    card: "border-[#d9c8b6] bg-white",
+    title: "text-ink",
+    copy: "text-muted",
+    bar: "bg-[#d59b18]"
+  },
+  {
+    card: "border-[#d9c8b6] bg-white",
+    title: "text-ink",
+    copy: "text-muted",
+    bar: "bg-[#f05f3b]"
   }
 ];
 
@@ -162,7 +210,7 @@ export default function ResonateHome() {
           </div>
 
           <figure className="rise-in relative mx-auto w-full max-w-[410px]">
-            <div className="overflow-hidden rounded-[2.5rem] border-[8px] border-ink bg-white shadow-[0_34px_100px_rgba(68,53,120,0.2)]">
+            <div className="overflow-hidden rounded-[2.5rem] border-[8px] border-ink bg-white ring-1 ring-[#ffd35e]/45 shadow-[0_8px_18px_rgba(45,27,18,0.16),0_38px_110px_rgba(39,36,63,0.28)]">
               <div className="flex items-center justify-between bg-ink px-6 py-3 text-[10px] font-black uppercase tracking-[0.14em] text-white"><span>MenuPilot</span><span className="text-[#ffd35e]">Live page</span></div>
               <div className="relative min-h-[235px] overflow-hidden">
                 <img src="/assets/mellow-moose-og-smashburger.jpg" alt="Mellow Moose smash burger" className="absolute inset-0 h-full w-full object-cover" />
@@ -186,7 +234,7 @@ export default function ResonateHome() {
         </div>
       </section>
 
-      <section id="solutions" className="scroll-mt-24 border-b border-[#d9eee7] bg-white">
+      <section id="solutions" className="scroll-mt-24 border-b border-[#d9c8b6] bg-white">
         <div className="container-page py-16 md:py-24">
           <SectionLabel>What Resonate helps with</SectionLabel>
           <h2 className="mt-5 max-w-4xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">Get found. Give the right answer. Keep it current.</h2>
@@ -194,18 +242,23 @@ export default function ResonateHome() {
             Start with one useful customer page, then add the right level of support. The point is simple: clearer answers for customers, less upkeep for the owner.
           </p>
           <div className="mt-12 grid gap-6 lg:grid-cols-3">
-            {valueCards.map((card, index) => (
-              <article key={card.title} className={`lift rounded-[1.75rem] border p-7 shadow-[0_20px_55px_rgba(46,52,49,0.08)] ${index === 0 ? "border-[#27243f] bg-[#27243f] text-white" : index === 1 ? "border-[#ffc8b8] bg-[#fff1ec]" : "border-[#a9dfd3] bg-[#eaf8f4]"}`}>
-                <p className={`text-xs font-black uppercase tracking-[0.18em] ${index === 0 ? "text-[#ffd35e]" : index === 1 ? "text-coral" : "text-[#1f7566]"}`}>0{index + 1}</p>
-                <h3 className={`mt-4 text-2xl font-black ${index === 0 ? "text-white" : "text-ink"}`}>{card.title}</h3>
-                <p className={`mt-4 leading-7 ${index === 0 ? "text-white/72" : "text-muted"}`}>{card.copy}</p>
+            {valueCards.map((card, index) => {
+              const style = valueCardStyles[index];
+              return (
+              <article key={card.title} className={`lift relative overflow-hidden rounded-[1.75rem] border p-7 shadow-[0_2px_6px_rgba(72,42,24,0.08),0_24px_66px_rgba(72,42,24,0.14)] ${style.card}`}>
+                <span className={`pointer-events-none absolute -right-1 top-1 font-display text-[7rem] font-black leading-none tracking-[-0.08em] ${style.number}`} aria-hidden="true">0{index + 1}</span>
+                <div className={`relative h-1.5 w-14 rounded-full ${style.rule}`} aria-hidden="true" />
+                <p className={`relative mt-6 text-xs font-black uppercase tracking-[0.18em] ${style.label}`}>0{index + 1}</p>
+                <h3 className={`relative mt-4 text-2xl font-black ${style.title}`}>{card.title}</h3>
+                <p className={`relative mt-4 leading-7 ${style.copy}`}>{card.copy}</p>
               </article>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
 
-      <section className="border-b border-[#f1d8cc] bg-[linear-gradient(180deg,#fff8f3_0%,#fffdf9_100%)]">
+      <section className="border-b border-[#d9c8b6] bg-[linear-gradient(180deg,#f8efe3_0%,#fffdf9_100%)]">
         <div className="container-page py-16 md:py-24">
           <SectionLabel>Simple pricing path</SectionLabel>
           <div className="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -217,21 +270,22 @@ export default function ResonateHome() {
           </div>
           <div className="mt-12 grid gap-6 lg:grid-cols-3">
             {pricingCards.map((card) => (
-              <article key={card.title} className={`lift flex flex-col rounded-[1.75rem] border p-7 shadow-[0_20px_55px_rgba(46,52,49,0.08)] ${card.accent}`}>
+              <article key={card.title} className={`lift relative flex flex-col overflow-hidden rounded-[1.75rem] border p-7 shadow-[0_2px_6px_rgba(72,42,24,0.08),0_24px_66px_rgba(72,42,24,0.14)] ${card.accent}`}>
+                <span className={`absolute inset-x-0 top-0 h-1.5 ${card.featured ? "bg-[#ffd35e]" : card.title === "Launch" ? "bg-[#f05f3b]" : "bg-[#d59b18]"}`} aria-hidden="true" />
                 {card.featured ? <p className="text-xs font-black uppercase tracking-[0.18em] text-[#ffd35e]">Hosting included</p> : <p className="text-xs font-black uppercase tracking-[0.18em] text-coral">Resonate page</p>}
                 <h3 className={`mt-4 text-2xl font-black ${card.featured ? "text-white" : "text-ink"}`}>{card.title}</h3>
                 <p className={`mt-5 text-4xl font-black ${card.featured ? "text-white" : "text-ink"}`}>{card.price}<span className={`ml-2 text-sm font-black ${card.featured ? "text-white/70" : "text-muted"}`}>{card.cadence}</span></p>
                 <p className={`mt-5 leading-7 ${card.featured ? "text-white/72" : "text-muted"}`}>{card.copy}</p>
                 {card.featured ? <p className="mt-4 rounded-2xl border border-white/15 bg-white/8 p-4 text-sm font-semibold leading-6 text-white/78">Larger projects, new features, and substantial redesigns are scoped separately.</p> : null}
-                <Link href={card.href} className={`mt-7 inline-flex rounded-full px-5 py-3 text-sm font-black transition ${card.featured ? "bg-[#f05f3b] text-white hover:bg-white hover:text-ink" : "border border-[#ffc8b8] bg-white text-ink hover:border-[#f05f3b] hover:bg-[#fff7f2]"}`}>{card.cta}</Link>
+                <Link href={card.href} className={`mt-7 inline-flex rounded-full px-5 py-3 text-sm font-black shadow-[0_10px_22px_rgba(72,42,24,0.1)] transition ${card.featured ? "bg-[#f05f3b] text-white hover:bg-white hover:text-ink" : "border border-[#d9c8b6] bg-white text-ink hover:border-[#f05f3b] hover:bg-[#27243f] hover:text-white"}`}>{card.cta}</Link>
               </article>
             ))}
           </div>
         </div>
       </section>
 
-      <section className="relative border-b border-[#efe1d9] bg-white">
-        <div className="pointer-events-none absolute -left-24 top-16 h-56 w-56 rounded-full bg-[#b9b5ff]/15 blur-3xl" aria-hidden="true" />
+      <section className="relative border-b border-[#d9c8b6] bg-white">
+        <div className="pointer-events-none absolute -left-24 top-16 h-56 w-56 rounded-full bg-[#ffd35e]/16 blur-3xl" aria-hidden="true" />
         <div className="container-page relative py-16 md:py-24">
           <div className="grid gap-10 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
             <div>
@@ -240,23 +294,29 @@ export default function ResonateHome() {
               <p className="mt-5 max-w-2xl text-lg leading-8 text-muted">Most website tools start with templates and limits. Resonate starts with the business problem: what customers need to know, what they need to do next, and what keeps creating extra work for the owner.</p>
             </div>
             <div className="grid gap-5 sm:grid-cols-3 lg:grid-cols-1">
-              {fitCards.map((card, index) => (
-                <article key={card.title} className={`lift rounded-2xl border p-5 ${index === 0 ? "border-[#27243f] bg-[#27243f] text-white" : index === 1 ? "border-[#f2dc92] bg-[#fff9df]" : "border-[#ffc8b8] bg-[#fff1ec]"}`}>
-                  <h3 className={`text-lg font-black ${index === 0 ? "text-white" : "text-ink"}`}>{card.title}</h3>
-                  <p className={`mt-3 text-sm leading-6 ${index === 0 ? "text-white/72" : "text-muted"}`}>{card.copy}</p>
+              {fitCards.map((card, index) => {
+                const style = fitCardStyles[index];
+                return (
+                <article key={card.title} className={`lift overflow-hidden rounded-2xl border shadow-[0_2px_5px_rgba(72,42,24,0.08),0_18px_46px_rgba(72,42,24,0.12)] ${style.card}`}>
+                  <div className={`h-1.5 ${style.bar}`} aria-hidden="true" />
+                  <div className="p-5">
+                    <h3 className={`text-lg font-black ${style.title}`}>{card.title}</h3>
+                    <p className={`mt-3 text-sm leading-6 ${style.copy}`}>{card.copy}</p>
+                  </div>
                 </article>
-              ))}
+                );
+              })}
             </div>
           </div>
         </div>
       </section>
 
-      <section id="work" className="scroll-mt-24 border-b border-[#f1d8cc] bg-[radial-gradient(circle_at_92%_8%,rgba(185,181,255,0.23),transparent_25%),radial-gradient(circle_at_8%_90%,rgba(255,211,94,0.18),transparent_27%),#fff8f3]">
+      <section id="work" className="scroll-mt-24 border-b border-[#d9c8b6] bg-[radial-gradient(circle_at_92%_8%,rgba(39,36,63,0.12),transparent_25%),radial-gradient(circle_at_8%_90%,rgba(255,211,94,0.2),transparent_27%),#f8efe3]">
         <div className="container-page py-16 md:py-24">
           <SectionLabel>See it in action</SectionLabel>
           <h2 className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">Real pages for real business questions.</h2>
           <div className="mt-12 grid gap-8 lg:grid-cols-2">
-            <article className="lift overflow-hidden rounded-[1.75rem] border border-[#ffc8b8] bg-white shadow-[0_24px_70px_rgba(240,95,59,0.12)]">
+            <article className="lift overflow-hidden rounded-[1.75rem] border border-[#d9c8b6] bg-white shadow-[0_3px_10px_rgba(72,42,24,0.1),0_30px_82px_rgba(72,42,24,0.18)]">
               <div className="relative h-72 overflow-hidden">
                 <img src="/assets/mellow-moose-og-smashburger.jpg" alt="Mellow Moose smash burger" className="h-full w-full object-cover object-center transition duration-500 hover:scale-[1.02]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent" />
@@ -267,11 +327,11 @@ export default function ResonateHome() {
                 <p className="mt-4 leading-7 text-muted">Customers can see the menu, check hours, order, call, or get directions from one mobile-friendly page.</p>
                 <div className="mt-7 flex flex-wrap gap-3">
                   <Link href="/m/mellow-moose-burgers" className="rounded-full bg-[#f05f3b] px-5 py-3 text-sm font-black text-white hover:bg-ink">Open live example</Link>
-                  <Link href="/menupilot" className="rounded-full border border-[#ffc8b8] bg-[#fff7f2] px-5 py-3 text-sm font-black text-ink hover:border-[#f05f3b]">Explore MenuPilot</Link>
+                  <Link href="/menupilot" className="rounded-full border border-[#d9c8b6] bg-white px-5 py-3 text-sm font-black text-ink shadow-[0_10px_22px_rgba(72,42,24,0.1)] transition hover:border-[#f05f3b] hover:bg-[#27243f] hover:text-white">Explore MenuPilot</Link>
                 </div>
               </div>
             </article>
-            <article className="lift overflow-hidden rounded-[1.75rem] border border-[#4b466d] bg-[#27243f] text-white shadow-[0_26px_75px_rgba(39,36,63,0.2)]">
+            <article className="lift overflow-hidden rounded-[1.75rem] border border-[#4b466d] bg-[#27243f] text-white shadow-[0_3px_10px_rgba(39,36,63,0.18),0_32px_88px_rgba(39,36,63,0.32)]">
               <div className="relative h-72 overflow-hidden bg-[#f6eee6]">
                 <img src="/assets/excellent-pins/lovable/pin-event.jpg" alt="Colorful custom enamel event badge" className="h-full w-full object-cover object-[50%_58%] transition duration-500 hover:scale-[1.02]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#27243f]/75 via-transparent to-transparent" />
@@ -287,7 +347,7 @@ export default function ResonateHome() {
         </div>
       </section>
 
-      <section id="about" className="scroll-mt-24 relative overflow-hidden border-b border-[#f1d8cc] bg-[linear-gradient(135deg,#fffdf9_0%,#fff1ec_52%,#f3fbf8_100%)]">
+      <section id="about" className="scroll-mt-24 relative overflow-hidden border-b border-[#d9c8b6] bg-[linear-gradient(135deg,#fffdf9_0%,#f8efe3_54%,#fff7ed_100%)]">
         <div className="pointer-events-none absolute -right-28 -top-32 h-72 w-72 rounded-full border border-coral/20" aria-hidden="true" />
         <div className="container-page grid gap-8 py-16 lg:grid-cols-[0.75fr_1.25fr] lg:items-center md:py-20">
           <div>
@@ -302,7 +362,7 @@ export default function ResonateHome() {
         </div>
       </section>
 
-      <section aria-labelledby="common-questions-heading" className="border-b border-[#d9eee7] bg-[linear-gradient(180deg,#f3fbf8_0%,#fffdf9_100%)]">
+      <section aria-labelledby="common-questions-heading" className="border-b border-[#d9c8b6] bg-[linear-gradient(180deg,#fffdf9_0%,#f8efe3_100%)]">
         <div className="container-page py-16 md:py-24">
           <SectionLabel>Common questions</SectionLabel>
           <h2 id="common-questions-heading" className="mt-5 max-w-3xl text-4xl font-extrabold leading-tight text-ink md:text-5xl">Clear answers before you start.</h2>
@@ -317,7 +377,7 @@ export default function ResonateHome() {
         </div>
       </section>
 
-      <section id="free-page-plan" className="relative overflow-hidden bg-[linear-gradient(135deg,#f05f3b_0%,#ff7d57_48%,#e85089_100%)] text-white">
+      <section id="free-page-plan" className="relative overflow-hidden bg-[radial-gradient(circle_at_74%_12%,rgba(255,211,94,0.32),transparent_22rem),linear-gradient(135deg,#f05f3b_0%,#ff704a_45%,#d93f73_100%)] text-white">
         <div className="pointer-events-none absolute -bottom-52 left-1/2 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full border border-white/20" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-16 top-4 h-60 w-60 rounded-full bg-[#ffd35e]/30 blur-3xl" aria-hidden="true" />
         <div className="relative mx-auto max-w-4xl px-5 py-20 text-center md:py-28">
