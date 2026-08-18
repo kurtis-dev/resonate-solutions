@@ -165,7 +165,7 @@ export default function ResonateHome() {
             <div className="overflow-hidden rounded-[2.5rem] border-[8px] border-ink bg-white shadow-[0_34px_100px_rgba(68,53,120,0.2)]">
               <div className="flex items-center justify-between bg-ink px-6 py-3 text-[10px] font-black uppercase tracking-[0.14em] text-white"><span>MenuPilot</span><span className="text-[#ffd35e]">Live page</span></div>
               <div className="relative min-h-[235px] overflow-hidden">
-                <img src="/assets/mellow-moose-og-smashburger.jpg" alt="Mellow Moose smash burger" className="absolute inset-0 h-full w-full object-cover" />
+                <img src="/assets/mellow-moose-slammer-jammer.jpg" alt="Mellow Moose smash burger" className="absolute inset-0 h-full w-full object-cover object-center" />
                 <div className="absolute inset-0 bg-gradient-to-t from-[#2d1b12]/90 via-[#2d1b12]/25 to-transparent" />
                 <div className="absolute inset-x-0 bottom-0 p-6 text-white">
                   <span className="rounded-full bg-[#f05f3b] px-3 py-1 text-[10px] font-black uppercase tracking-[0.12em]">Open today</span>
@@ -258,7 +258,7 @@ export default function ResonateHome() {
           <div className="mt-12 grid gap-8 lg:grid-cols-2">
             <article className="lift overflow-hidden rounded-[1.75rem] border border-[#ffc8b8] bg-white shadow-[0_24px_70px_rgba(240,95,59,0.12)]">
               <div className="relative h-72 overflow-hidden">
-                <img src="/assets/mellow-moose-buffalo-chicken-fries.jpg" alt="Mellow Moose buffalo chicken fries" className="h-full w-full object-cover object-center transition duration-500 hover:scale-[1.02]" />
+                <img src="/assets/mellow-moose-slammer-jammer.jpg" alt="Mellow Moose smash burger" className="h-full w-full object-cover object-center transition duration-500 hover:scale-[1.02]" />
                 <div className="absolute inset-0 bg-gradient-to-t from-ink/80 via-transparent to-transparent" />
                 <p className="absolute bottom-5 left-6 text-xs font-black uppercase tracking-[0.15em] text-white">MenuPilot | Mellow Moose</p>
               </div>
