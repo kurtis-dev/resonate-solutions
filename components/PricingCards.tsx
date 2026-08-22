@@ -92,7 +92,7 @@ export function PricingCards() {
       <div className="mt-14">
         <p className="eyebrow text-coral">Stage 2: Keep it running</p>
         <h2 className="mt-3 text-3xl font-black text-ink">Choose how much help you want after Launch.</h2>
-        <p className="mt-3 max-w-3xl leading-7 text-muted">Choose hosting when you will send your own content changes. Choose Managed Page when you do not want another webpage to maintain.</p>
+        <p className="mt-3 max-w-3xl leading-7 text-muted">Choose hosting when you only need the approved page kept live. Choose Managed Page when you want Resonate app access for update requests, status tracking, and help keeping the page current.</p>
         <p className="mt-4 max-w-3xl rounded-2xl border border-[#f2dc92] bg-[#fff9df] p-4 text-sm font-bold leading-6 text-ink">
           More customers shouldn&apos;t mean a bigger website bill. These webpage plans are not priced by visitor count or by how many customers your business serves.
         </p>

@@ -6,7 +6,7 @@ import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Website Maintenance & Managed Updates for Small Businesses | Resonate",
-  description: "Managed Page includes hosting and reviewed standard updates when your business changes, with separately scoped support for larger projects and redesigns.",
+  description: "Managed Page includes hosting, Resonate app access for update requests and status tracking, and reviewed standard updates when your business changes.",
   path: "/portal"
 });
 
@@ -20,7 +20,7 @@ const includedUpdates = [
 ];
 
 const requestSteps = [
-  ["Tell us what changed", "Send one clear request with the new information and any files we need."],
+  ["Open the Resonate app", "Send one clear request with the new information, notes, and any files we need."],
   ["We review the request", "Resonate checks the current page, the proposed change, and whether anything needs clarification."],
   ["We update the supported page", "The approved change is made to the Resonate-hosted customer page within the plan scope."],
   ["You get confirmation", "Resonate confirms when the request is complete so you know what customers can see."]
@@ -37,7 +37,7 @@ export default function ManagedPagePage() {
           <div>
             <p className="eyebrow text-coral">Managed Page</p>
             <h1 className="mt-5 text-4xl font-black leading-tight tracking-[-0.02em] md:text-6xl">You run the business. We help keep the page current.</h1>
-            <p className="mt-6 max-w-xl text-lg leading-8 text-muted">You decide what changes. Resonate handles supported routine updates to the customer page and confirms when the work is complete.</p>
+            <p className="mt-6 max-w-xl text-lg leading-8 text-muted">You get access to the Resonate app so updates are close at hand. Send changes, add notes or files, see request status, and get confirmation when the customer page is current.</p>
             <div className="mt-8 flex flex-col gap-3 sm:flex-row">
               <Link href="/checkout?plan=launch-managed-page" className="btn-coral">
                 Start Launch + Managed Page
@@ -46,7 +46,7 @@ export default function ManagedPagePage() {
                 Ask a question
               </a>
             </div>
-            <p className="mt-4 text-sm font-bold leading-6 text-muted">$79.99 per month. Hosting included. Request standard updates whenever your business changes.</p>
+            <p className="mt-4 text-sm font-bold leading-6 text-muted">$79.99 per month. Hosting and Resonate app access included.</p>
           </div>
 
           <div className="surface-card rise-in p-6 sm:p-8">

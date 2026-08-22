@@ -16,8 +16,8 @@ const checks = [
   {
     path: "/",
     expect: "text/html",
-    expectText: ["Your customers should not have to hunt for the right answer.", "Get a Free Page Plan"],
-    rejectText: ["Practical Digital Systems", "Update it once"]
+    expectText: ["Your customers should not have to hunt for the right answer.", "Get a Free Page Plan", "access to the Resonate app"],
+    rejectText: ["Practical Digital Systems", "Update it once", "You handle your own content updates"]
   },
   {
     path: "/menupilot",
@@ -36,15 +36,15 @@ const checks = [
     expectText: [
       "You run the business. We help keep the page current.",
       "$79.99",
-      "Request standard updates whenever your business changes",
+      "Resonate app access",
       "Larger projects, new features, and substantial redesigns are scoped separately"
     ],
-    rejectText: ["unlimited", "automatic publishing"]
+    rejectText: ["unlimited", "automatic publishing", "You handle your own content changes"]
   },
   {
     path: "/pricing",
     expect: "text/html",
-    expectText: ["Stage 1", "Stage 2", "$399", "$17.99", "$79.99", "Hosting included"]
+    expectText: ["Stage 1", "Stage 2", "$399", "$17.99", "$79.99", "Resonate app access"]
   },
   { path: "/billing", expect: "text/html" },
   { path: "/checkout?plan=setup", expect: "text/html" },

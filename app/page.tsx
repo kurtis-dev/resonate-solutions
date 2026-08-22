@@ -78,7 +78,7 @@ const pricingCards = [
     title: "Webpage Hosting",
     price: "$17.99",
     cadence: "per month",
-    copy: "Hosting, SSL, routine platform maintenance, and basic uptime monitoring. You handle your own content updates.",
+    copy: "Hosting, SSL, routine platform maintenance, and basic uptime monitoring. Content changes are handled separately.",
     href: "/checkout?plan=launch-hosting",
     cta: "Start Launch + Hosting",
     accent: "border-[#d9c8b6] bg-white"
@@ -87,7 +87,7 @@ const pricingCards = [
     title: "Managed Page",
     price: "$79.99",
     cadence: "per month",
-    copy: "Hosting included. Resonate handles supported routine updates to your Resonate-hosted page when your business changes.",
+    copy: "Hosting included, plus access to the Resonate app to request updates, share details, track status, and get confirmation when your page is current.",
     href: "/checkout?plan=launch-managed-page",
     cta: "Start Launch + Managed Page",
     accent: "border-[#27243f] bg-[#27243f] text-white",
@@ -142,7 +142,7 @@ const faqs = [
   },
   {
     question: "What happens after launch?",
-    answer: "Choose Webpage Hosting when you plan to handle content changes yourself. Choose Managed Page when you want Resonate to handle supported routine updates."
+    answer: "Choose Webpage Hosting when you only need the approved page kept live. Choose Managed Page when you want app-based update requests, status tracking, and Resonate support keeping the page current."
   },
   {
     question: "Where should I start?",
