@@ -64,7 +64,7 @@ export const plans: Plan[] = [
     id: "hosting",
     name: "Webpage Hosting",
     price: "$17.99",
-    description: "Keep the approved page live and technically maintained while you handle your own content changes.",
+    description: "Keep the approved page live, secure, and technically maintained. Content changes are handled separately.",
     limit: "Keep the page live",
     billingPeriod: "mo",
     features: [
@@ -72,7 +72,7 @@ export const plans: Plan[] = [
       { label: "SSL", detail: "Keeps the hosted page served over a secure HTTPS connection." },
       { label: "Routine technical maintenance", detail: "Covers routine upkeep needed to keep the approved page available." },
       { label: "Basic uptime monitoring", detail: "Includes basic checks that the hosted page remains available." },
-      { label: "No content updates", detail: "Text, photo, hours, menu, and service changes are not included in this plan." }
+      { label: "Content updates not included", detail: "Text, photo, hours, menu, and service changes are handled through Managed Page or scoped separately." }
     ],
     cta: "Start Launch + Hosting",
     checkoutUrl: "/checkout?plan=launch-hosting",
@@ -88,15 +88,16 @@ export const plans: Plan[] = [
     id: "managed-page",
     name: "Managed Page",
     price: "$79.99",
-    description: "For owners who do not want another webpage to maintain. You decide what changes, and Resonate handles the routine update.",
-    limit: "Let Resonate handle updates",
+    description: "For owners who want updates at their fingertips. Use the Resonate app to request changes, share details, track status, and get confirmation when your page is current.",
+    limit: "Resonate app access included",
     billingPeriod: "mo",
     features: [
       { label: "Hosting included", detail: "Includes hosting, SSL, routine technical maintenance, and basic uptime monitoring." },
-      { label: "Up to 4 standard update requests", detail: "Four standard page-update requests are included each month." },
+      { label: "Resonate app access", detail: "Submit update requests, add notes or files, and see request status from one owner-friendly place." },
+      { label: "Standard updates when things change", detail: "Request standard updates whenever your business changes. Resonate reviews the change, updates your page, and confirms when it’s complete." },
       { label: "Monthly page review", detail: "Resonate reviews the page each month for obvious content and presentation issues." },
       { label: "Routine content updates", detail: "Includes supplied text, photo, hours, menu, and service updates." },
-      { label: "Priority turnaround", detail: "Standard update requests are handled ahead of hosting-only requests." },
+      { label: "Priority turnaround", detail: "Supported Managed Page updates are handled ahead of hosting-only support." },
       { label: "Basic link and page-health checks", detail: "Includes basic checks of important links and the customer-facing page." }
     ],
     cta: "Start Launch + Managed Page",
@@ -138,7 +139,7 @@ const launchManagedPagePlan: Plan = {
   id: "launch-managed-page",
   name: "Launch + Managed Page",
   price: "$478.99",
-  description: "Build the approved customer page, include hosting, and let Resonate handle routine monthly updates.",
+  description: "Build the approved customer page, include hosting, and give you Resonate app access for update requests and status tracking.",
   limit: "$399 once + $79.99 monthly",
   billingPeriod: "first payment",
   features: [

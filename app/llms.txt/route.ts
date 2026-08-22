@@ -13,8 +13,9 @@ const content = `# Resonate Solutions
 
 ## Verified service facts
 - Every paid Resonate customer page starts with a $399 one-time Launch build.
-- Webpage Hosting is $17.99 per month and includes hosting, SSL, routine platform maintenance, and basic uptime monitoring. Content updates are not included.
-- Managed Page is $79.99 per month and includes hosting plus up to four standard update requests per month.
+- Webpage Hosting is $17.99 per month and includes hosting, SSL, routine platform maintenance, and basic uptime monitoring. Content changes are handled separately.
+- Managed Page is $79.99 per month and includes hosting plus Resonate app access. Customers can request updates, share details and files, track status, and receive confirmation when supported updates are complete.
+- Larger projects, new features, and substantial redesigns are scoped separately.
 - Resonate-hosted page updates are supported. External profiles are not automatically updated and may be managed manually only when access and scope are confirmed.
 
 ## Contact

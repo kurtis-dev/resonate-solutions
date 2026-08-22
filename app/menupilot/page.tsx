@@ -327,7 +327,7 @@ export default function MenuPilotPage() {
               <div className="mt-5 rounded-[1.1rem] border border-[#2f7d72]/45 bg-[#163b35]/70 p-4">
                 <p className="text-xs font-black uppercase tracking-[0.16em] text-[#9de7dc]">Clear scope</p>
                 <p className="mt-2 text-sm font-bold leading-6 text-white/82">
-                  Managed Page includes hosting and up to four standard update requests each month. Frequent or complex work is available by quote.
+                  Request standard updates whenever your business changes. Resonate reviews the change, updates your page, and confirms when it’s complete. Larger projects, new features, and substantial redesigns are scoped separately.
                 </p>
               </div>
               <p className="mt-4 text-xs leading-5 text-white/55">

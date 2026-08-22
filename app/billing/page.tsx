@@ -27,7 +27,7 @@ const checkoutChoices = [
     name: "Webpage Hosting",
     price: "$17.99",
     billing: "per month with Launch",
-    description: "Keep the approved page live and technically maintained. You handle your own content changes.",
+    description: "Keep the approved page live, secure, and technically maintained. Content changes are handled separately.",
     href: "/checkout?plan=launch-hosting",
     cta: "Choose Hosting after Launch",
     highlighted: false
@@ -36,7 +36,7 @@ const checkoutChoices = [
     name: "Managed Page",
     price: "$79.99",
     billing: "per month with Launch",
-    description: "For owners who do not want another webpage to maintain. Hosting and routine content updates are included.",
+    description: "Hosting included, plus Resonate app access for update requests, notes, files, status tracking, and completion confirmation.",
     href: "/checkout?plan=launch-managed-page",
     cta: "Choose Managed Page after Launch",
     highlighted: true
@@ -120,7 +120,7 @@ export default function BillingPage() {
               <li>Hosting and SSL</li>
               <li>Routine technical maintenance</li>
               <li>Basic uptime monitoring</li>
-              <li>No content updates</li>
+              <li>Content updates handled separately</li>
             </ul>
           </section>
 
@@ -128,7 +128,9 @@ export default function BillingPage() {
             <p className="eyebrow text-coral">Managed Page</p>
             <h2 className="mt-3 text-2xl font-extrabold text-ink">$79.99/month, hosting included</h2>
             <ul className="mt-5 grid gap-3 text-sm leading-6 text-muted">
-              <li>Up to 4 standard update requests per month</li>
+              <li>Request standard updates whenever your business changes</li>
+              <li>Use the Resonate app to send details, files, and notes</li>
+              <li>Track request status and completion</li>
               <li>Monthly page review</li>
               <li>Text, photo, hours, menu, and service updates</li>
               <li>Priority turnaround</li>
@@ -138,7 +140,7 @@ export default function BillingPage() {
         </div>
 
         <p className="mt-6 text-center text-sm font-semibold leading-6 text-muted">
-          Need frequent or complex updates? Custom management is available by quote.
+          Larger projects, new features, and substantial redesigns are scoped separately.
         </p>
 
         <div className="mt-8 grid gap-6 lg:grid-cols-[0.8fr_1fr]">

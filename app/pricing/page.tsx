@@ -5,7 +5,7 @@ import { breadcrumbSchema, pageMetadata } from "@/lib/seo";
 
 export const metadata: Metadata = pageMetadata({
   title: "Small Business Website Pricing | Resonate Solutions",
-  description: "Compare Resonate's $399 Launch build, $17.99 monthly Webpage Hosting, and $79.99 monthly Managed Page plan with hosting included.",
+  description: "Compare Resonate's $399 Launch build, $17.99 monthly Webpage Hosting, and $79.99 monthly Managed Page plan. Pricing is not based on customer traffic.",
   path: "/pricing"
 });
 
@@ -24,6 +24,9 @@ export default function PricingPage() {
             </h1>
             <p className="mt-5 max-w-3xl text-lg leading-8 text-muted">
               Every paid Resonate page starts with Launch. After the approved page is built, choose simple hosting or let Resonate handle routine content updates for you.
+            </p>
+            <p className="mt-5 max-w-3xl rounded-2xl border border-[#f2dc92] bg-[#fff9df] p-5 font-bold leading-7 text-ink">
+              More customers shouldn&apos;t mean a bigger website bill. Resonate webpage pricing is not based on how many people visit your page or how many customers your business serves.
             </p>
           </div>
         </div>

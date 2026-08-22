@@ -1,16 +1,28 @@
 const baseUrl = (process.env.BASE_URL || process.env.NEXT_PUBLIC_SITE_URL || "http://localhost:3000").replace(/\/$/, "");
 
+const obsoleteQuotaText = [
+  "up to four standard update requests",
+  "up to 4 standard update requests",
+  "Up to 4 standard update requests",
+  "four standard page-update requests",
+  "Four standard page-update requests",
+  "standard update requests each month",
+  "standard update requests per month",
+  "request quota",
+  "monthly request allowance"
+];
+
 const checks = [
   {
     path: "/",
     expect: "text/html",
-    expectText: ["Your customers should not have to hunt for the right answer.", "Get a Free Page Plan"],
-    rejectText: ["Practical Digital Systems", "Update it once"]
+    expectText: ["Your customers should not have to hunt for the right answer.", "Get a Free Page Plan", "access to the Resonate app"],
+    rejectText: ["Practical Digital Systems", "Update it once", "You handle your own content updates"]
   },
   {
     path: "/menupilot",
     expect: "text/html",
-    expectText: ["Give customers the", "right answer", "up to four standard update requests"],
+    expectText: ["Give customers the", "right answer", "Request standard updates whenever your business changes"],
     rejectText: ["push-button updates", "Auto when connected", "Google updated", "Facebook post queued", "delivery platforms"]
   },
   {
@@ -21,13 +33,18 @@ const checks = [
   {
     path: "/portal",
     expect: "text/html",
-    expectText: ["You run the business. We help keep the page current.", "$79.99", "up to 4 standard update requests"],
-    rejectText: ["unlimited", "automatic publishing"]
+    expectText: [
+      "You run the business. We help keep the page current.",
+      "$79.99",
+      "Resonate app access",
+      "Larger projects, new features, and substantial redesigns are scoped separately"
+    ],
+    rejectText: ["unlimited", "automatic publishing", "You handle your own content changes"]
   },
   {
     path: "/pricing",
     expect: "text/html",
-    expectText: ["Stage 1", "Stage 2", "$399", "$17.99", "$79.99", "Hosting included"]
+    expectText: ["Stage 1", "Stage 2", "$399", "$17.99", "$79.99", "Resonate app access"]
   },
   { path: "/billing", expect: "text/html" },
   { path: "/checkout?plan=setup", expect: "text/html" },
@@ -71,10 +88,11 @@ for (const check of checks) {
       continue;
     }
 
-    if (check.expectText || check.rejectText) {
-      const body = await response.text();
+    let body = "";
+    if (check.expect === "text/html" || check.expectText || check.rejectText) {
+      body = await response.text();
       const missingText = (check.expectText || []).filter((text) => !body.includes(text));
-      const rejectedText = (check.rejectText || []).filter((text) => body.includes(text));
+      const rejectedText = [...(check.rejectText || []), ...obsoleteQuotaText].filter((text) => body.includes(text));
 
       if (missingText.length) {
         failures.push(`${check.path} did not include expected text: ${missingText.join(", ")}`);
