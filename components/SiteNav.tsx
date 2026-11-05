@@ -55,13 +55,13 @@ export function SiteNav() {
   };
 
   return (
-    <header className="section-seam sticky top-0 z-30 border-b border-line bg-cream/90 pt-[3px] backdrop-blur-xl">
+    <header className="section-seam sticky top-0 z-30 border-b border-line bg-white pt-[3px]">
       <div className="container-page flex items-center justify-between py-3.5">
         <Link href="/" className="flex items-center gap-3" aria-label="Resonate Solutions home">
           <img
-            src="/assets/resonate-logo-transparent.png"
+            src="/assets/resonate-logo-primary.png"
             alt="Resonate Solutions"
-            className="h-9 w-auto max-w-[150px] object-contain sm:h-10 sm:max-w-[190px]"
+            className="resonate-logo-lockup h-9 w-auto max-w-[150px] object-contain sm:h-10 sm:max-w-[190px]"
           />
         </Link>
         <nav className="hidden items-center gap-1 text-sm font-medium text-muted lg:flex" aria-label="Primary navigation">
@@ -82,7 +82,7 @@ export function SiteNav() {
           {secondaryNavigationLinks.map(renderDesktopLink)}
         </nav>
         <div className="flex items-center gap-2">
-          <Link href={startProjectLink.href} className="hidden rounded-full bg-coral px-5 py-2.5 text-sm font-black text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-ink sm:inline-flex">{startProjectLink.label}</Link>
+          <Link href={startProjectLink.href} className="btn-coral hidden min-h-10 px-5 py-2.5 sm:inline-flex">{startProjectLink.label}</Link>
           <button
             type="button"
             onClick={() => setOpen((value) => !value)}

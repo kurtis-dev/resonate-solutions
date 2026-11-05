@@ -18,9 +18,9 @@ export function Footer() {
         <div>
           <Link href="/" aria-label="Resonate Solutions home" className="inline-flex">
             <img
-              src="/assets/resonate-logo-transparent.png"
+              src="/assets/resonate-logo-primary.png"
               alt="Resonate Solutions"
-              className="h-12 w-auto max-w-[230px] object-contain"
+              className="resonate-logo-lockup h-12 w-auto max-w-[230px] object-contain"
             />
           </Link>
           <p className="mt-2 max-w-xl text-sm leading-6 text-muted">

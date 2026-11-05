@@ -90,32 +90,32 @@ export default function ResonateHome() {
   };
 
   return (
-    <main className="overflow-hidden bg-[#fffdf9]">
+    <main className="resonate-marketing overflow-hidden bg-[#fffdf9]">
       <JsonLd data={siteIdentitySchema} />
 
-      <section className="relative border-b border-[#f3d8ca] bg-[radial-gradient(circle_at_12%_14%,rgba(255,211,94,0.22),transparent_28%),radial-gradient(circle_at_88%_20%,rgba(255,108,76,0.2),transparent_31%),linear-gradient(135deg,#fffdf9_0%,#fff5ee_54%,#f3fbf8_100%)]">
+      <section className="resonate-grain-surface resonate-hero-ombre relative border-b border-[#f3d8ca]">
         <div className="pointer-events-none absolute -right-52 -top-56 h-[44rem] w-[44rem] rounded-full border border-[#ff6c4c]/20" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-28 -top-32 h-[29rem] w-[29rem] rounded-full border border-[#f5bd35]/35" aria-hidden="true" />
         <div className="pointer-events-none absolute -bottom-24 left-[38%] h-56 w-56 rounded-full bg-[#7bd7c4]/15 blur-3xl" aria-hidden="true" />
-        <div className="container-page relative grid gap-14 py-16 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:py-24">
+        <div className="resonate-content-layer container-page grid gap-12 py-14 lg:grid-cols-[1.08fr_0.92fr] lg:items-center lg:py-16">
           <div>
             <SectionLabel>Clear answers for your customers</SectionLabel>
             <p className="mt-5 text-xs font-black uppercase tracking-[0.16em] text-[#5d55a7]">
               Small business web design <span aria-hidden="true">&bull;</span> online menu pages <span aria-hidden="true">&bull;</span> managed website updates
             </p>
-            <h1 className="mt-4 max-w-4xl text-5xl font-extrabold leading-[1.02] tracking-[-0.025em] text-ink md:text-7xl">
+            <h1 className="mt-4 max-w-4xl text-5xl font-extrabold leading-[1.01] tracking-[-0.03em] text-ink md:text-6xl xl:text-[4rem]">
               Your customers should not have to hunt for the right answer.
             </h1>
-            <p className="mt-7 max-w-2xl text-lg leading-8 text-muted">
+            <p className="mt-5 max-w-2xl text-[1.05rem] leading-7 text-muted">
               Resonate Solutions designs mobile-friendly web pages, online menus and service pages, customer intake forms,
               and managed website updates for small businesses in Northwest Arkansas. We make important customer information
               easier to find and easier for owners to keep current.
             </p>
-            <div className="mt-9 flex flex-col gap-3 sm:flex-row">
+            <div className="mt-7 flex flex-col gap-3 sm:flex-row">
               <a href="#work" className="btn-coral px-7 py-4">See what your page could look like</a>
               <Link href="/m/mellow-moose-burgers" className="btn-outline-ink bg-white/65 px-7 py-4">View a live example</Link>
             </div>
-            <div className="mt-8 grid max-w-2xl gap-2 border-l-2 border-[#f5bd35] pl-5 text-sm font-black text-ink sm:grid-cols-3">
+            <div className="mt-6 grid max-w-2xl gap-2 border-l-2 border-[#f5bd35] pl-5 text-sm font-black text-ink sm:grid-cols-3">
               <span>Fewer repeated questions.</span>
               <span>Fewer outdated details.</span>
               <span>A clearer next step.</span>
@@ -309,10 +309,10 @@ export default function ResonateHome() {
         </div>
       </section>
 
-      <section id="free-page-plan" className="relative overflow-hidden bg-[linear-gradient(135deg,#f05f3b_0%,#ff7d57_48%,#e85089_100%)] text-white">
+      <section id="free-page-plan" className="resonate-grain-surface resonate-cta-ombre relative overflow-hidden text-white">
         <div className="pointer-events-none absolute -bottom-52 left-1/2 h-[34rem] w-[34rem] -translate-x-1/2 rounded-full border border-white/20" aria-hidden="true" />
         <div className="pointer-events-none absolute -right-16 top-4 h-60 w-60 rounded-full bg-[#ffd35e]/30 blur-3xl" aria-hidden="true" />
-        <div className="relative mx-auto max-w-4xl px-5 py-20 text-center md:py-28">
+        <div className="resonate-content-layer mx-auto max-w-4xl px-5 py-20 text-center md:py-28">
           <div className="flex justify-center"><SectionLabel light>Start here</SectionLabel></div>
           <h2 className="mt-6 text-4xl font-black leading-tight md:text-5xl">Not sure what your customers need first?</h2>
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-white/85">Start with a Free Page Plan. We review what you have, what customers need to find, and what would be most useful before you pay for a build.</p>
