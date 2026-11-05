@@ -1,14 +1,9 @@
 import type { Metadata } from "next";
-import { Bricolage_Grotesque, Karla } from "next/font/google";
+import { Karla } from "next/font/google";
 import "./globals.css";
 import { Footer } from "@/components/Footer";
 import { SiteNav } from "@/components/SiteNav";
 import { defaultSocialImage, siteName, siteUrl } from "@/lib/seo";
-
-const displayFont = Bricolage_Grotesque({
-  subsets: ["latin"],
-  variable: "--font-display"
-});
 
 const bodyFont = Karla({
   subsets: ["latin"],
@@ -45,7 +40,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${displayFont.variable} ${bodyFont.variable}`}>
+      <body className={bodyFont.variable}>
         <SiteNav />
         {children}
         <Footer />

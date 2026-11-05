@@ -22,7 +22,7 @@ Runtime ownership lives in `app/globals.css`. Tailwind aliases remain in `tailwi
 
 ## Typography
 
-- Display: Bricolage Grotesque
+- Display: the native system sans stack (`-apple-system`, `BlinkMacSystemFont`, `Segoe UI`, Helvetica, Arial). Headings should feel familiar and unobtrusive, with conventional letterforms instead of stylized startup-template typography.
 - Body and interface copy: Karla
 - Headlines are compact and confident; body copy stays conversational and easy to scan.
 
