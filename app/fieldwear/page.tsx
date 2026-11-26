@@ -1,4 +1,6 @@
 import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
 import { Archive, Search } from "lucide-react";
 import { DailyScout } from "@/components/fieldwear/daily-scout";
 import { ListingChecker } from "@/components/fieldwear/listing-checker";
@@ -16,7 +18,8 @@ import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences }
 import { readLiveSearch } from "@/lib/fieldwear/live-search";
 import { searchShopifyCatalog } from "@/lib/fieldwear/shopify-catalog";
 import { marketplaceBrowse, marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
-import { redeemOwnerLink, requestOwnerLink, searchScoutLook, searchScoutNow, signOutScout } from "./actions";
+import { firstDibsEnabled } from "@/lib/fieldwear/first-dibs";
+import { setFirstDibs, redeemOwnerLink, requestOwnerLink, searchScoutLook, searchScoutNow, signOutScout } from "./actions";
 import "./scout.css";
 
 export const dynamic = "force-dynamic";
@@ -29,12 +32,17 @@ export const metadata: Metadata = {
 const inputClass = "scout-control mt-2 w-full";
 const buttonClass = "scout-primary mt-4";
 
+function ResonateLogo() {
+  return <Link href="/" className="scout-brand-link"><Image src="/assets/resonate-logo-transparent.png" alt="Resonate Solutions" width={148} height={41} className="scout-brand-logo" /></Link>;
+}
+
 function OwnerSignIn({ token, status }: { token?: string; status?: string }) {
   const validToken = token && /^[a-f0-9]{64}$/.test(token);
   return (
     <main className="fieldwear-scout px-4 py-14 sm:px-7">
       <section className="mx-auto max-w-md rounded border border-[var(--line)] p-6 sm:p-8">
-        <h1 className="text-2xl font-semibold">Fieldwear Scout</h1>
+        <ResonateLogo />
+        <h1 className="mt-4 text-2xl font-semibold">Fieldwear Scout</h1>
         {validToken ? (
           <form action={redeemOwnerLink} noValidate>
             <p className="mt-3">Use your one-time link to sign in on this device.</p>
@@ -75,7 +83,10 @@ function FreshScout({
   return (
     <section id="fresh" aria-labelledby="fresh-title" className="scroll-mt-4">
       <div className="pt-5 md:pt-7">
-        <h1 id="fresh-title" className="text-2xl font-semibold tracking-tight md:text-[28px]">Workwear catalog</h1>
+        <div className="flex flex-wrap items-center justify-between gap-x-2">
+          <h1 id="fresh-title" className="text-2xl font-semibold tracking-tight md:text-[28px]">Workwear catalog</h1>
+          <a href="#first-dibs" className="inline-flex min-h-11 items-center text-xs font-semibold text-[var(--accent)] underline underline-offset-4 sm:hidden">First dibs</a>
+        </div>
         <p className="mt-1 text-xs leading-5 text-[var(--muted-ink)]" aria-label="Saved search sizes">
           {departmentLabels[preferences.department]} · Shirts {preferences.shirtSizes.join(", ") || "any size"} · Bottoms {preferences.pantsSizes.join(", ") || "any size"}{preferences.pantsBudget != null ? ` · Up to $${preferences.pantsBudget}` : ""}
         </p>
@@ -201,17 +212,18 @@ function LookFinds({ similar, browning, preferences, decisions }: {
   );
 }
 
-export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string; preferences?: string; view?: string; source?: string; catalog?: string }> }) {
+export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string; preferences?: string; view?: string; source?: string; catalog?: string; alerts?: string }> }) {
   const params = await searchParams;
   if (!(await isScoutOwner())) {
     return <OwnerSignIn token={params.access} status={params.signIn} />;
   }
 
   const sql = await scoutDatabase();
-  const [recorded, edition, preferences] = await Promise.all([
+  const [recorded, edition, preferences, alertsEnabled] = await Promise.all([
     sql`SELECT source, external_id, verdict, listing FROM fieldwear_decisions` as Promise<Decision[]>,
     params.view === "archive" ? readScoutEdition() : Promise.resolve(null),
     readScoutPreferences(),
+    firstDibsEnabled(),
   ]);
   const [run, similar, browning] = await Promise.all([
     readLiveSearch(preferences), readLiveSearch(preferences, "similar"), readLiveSearch(preferences, "browning"),
@@ -269,10 +281,14 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
   return (
     <main className="fieldwear-scout pb-12">
       <header className="border-b border-[var(--line)]">
-        <div className="scout-container flex min-h-14 items-center justify-between gap-2">
-          <a href="/fieldwear" aria-label="Fieldwear Scout" className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap text-[15px] font-semibold tracking-tight">Fieldwear<span className="ml-1 font-normal text-[var(--muted-ink)]">Scout</span></a>
+        <div className="scout-container flex min-h-16 items-center justify-between gap-2">
+          <div className="scout-brand-lockup">
+            <ResonateLogo />
+            <a href="/fieldwear" className="scout-app-name">Fieldwear Scout</a>
+          </div>
           <nav className="flex items-center text-sm" aria-label="Fieldwear">
             <a href={archived ? "/fieldwear#find-similar" : "#find-similar"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]" aria-label="Find similar listings">Similar</a>
+            <a href="#first-dibs" className="hidden min-h-11 items-center rounded px-2 hover:bg-[var(--matte)] sm:inline-flex">First dibs</a>
             <a href="#preferences" className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]" aria-label="Size and search preferences">Sizes</a>
             <a href={archived ? "/fieldwear#saved" : "#saved"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]">Saved</a>
           </nav>
@@ -307,6 +323,20 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
             <a href="/fieldwear?view=archive#archive" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[var(--accent)] underline underline-offset-4"><Archive aria-hidden="true" size={16} />Browse catalog archive</a>
           </>
         )}
+        <section id="first-dibs" aria-labelledby="first-dibs-title" className="scout-first-dibs">
+          <div>
+            <h2 id="first-dibs-title" className="text-xl font-semibold tracking-tight">Get first dibs</h2>
+            <p id="first-dibs-description" className="mt-1 text-sm">Get a daily email when Scout finds more workwear in your saved sizes and budget.</p>
+          </div>
+          <form action={setFirstDibs} aria-describedby="first-dibs-description" className="scout-first-dibs-form">
+            <input type="hidden" name="enabled" value={alertsEnabled ? "off" : "on"} />
+            <ScoutSubmit className={alertsEnabled ? "scout-control" : "scout-primary"} label={alertsEnabled ? "Turn off emails" : "Sign me up"} pendingLabel="Saving…" />
+            <p className="text-xs" role="status">{params.alerts === "enabled" ? "You’re signed up. Scout uses your sign-in email."
+              : params.alerts === "disabled" ? "First dibs emails are off."
+              : params.alerts === "unavailable" ? "Scout couldn’t update your email settings. Try again."
+              : alertsEnabled ? "Emails are on." : "Sent to your Scout sign-in email."}</p>
+          </form>
+        </section>
         <ScoutPreferencesForm preferences={preferences} status={params.preferences} />
         <form action={signOutScout} noValidate><button className="min-h-11 rounded text-sm font-medium text-[var(--accent)] hover:underline">Sign out</button></form>
       </div>
@@ -346,6 +376,7 @@ function toListingView(
     url:input.url,
     title:input.title,
     imageUrl:input.imageUrl ?? null,
+    imageUrls:input.imageUrls,
     priceCents:input.priceCents ?? null,
     priceKind:input.priceKind,
     shippingCents:input.shippingCents ?? null,

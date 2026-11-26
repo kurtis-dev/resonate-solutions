@@ -38,6 +38,16 @@ export function initializeScoutDatabase() {
       profile text PRIMARY KEY,
       settings jsonb NOT NULL
     )`;
+    await sql`CREATE TABLE IF NOT EXISTS fieldwear_email_settings (
+      profile text PRIMARY KEY,
+      enabled boolean NOT NULL DEFAULT false
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS fieldwear_email_digests (
+      day date PRIMARY KEY,
+      body text NOT NULL,
+      listing_keys text[] NOT NULL,
+      sent_at timestamptz
+    )`;
     await sql`CREATE TABLE IF NOT EXISTS fieldwear_live_search (
       profile text PRIMARY KEY,
       settings jsonb NOT NULL,

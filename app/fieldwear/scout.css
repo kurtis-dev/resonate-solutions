@@ -58,3 +58,32 @@
     padding-inline: 32px;
   }
 }
+
+.fieldwear-scout .scout-brand-lockup {
+  display: grid;
+  gap: 2px;
+  align-items: start;
+  padding-block: 8px;
+}
+.fieldwear-scout .scout-brand-link { display: inline-flex; align-items: center; width: fit-content; }
+.fieldwear-scout .scout-brand-logo { display: block; width: 122px; height: auto; }
+.fieldwear-scout .scout-app-name { width: fit-content; font-size: 0.82rem; font-weight: 650; color: var(--accent); }
+@media (min-width: 768px) {
+  .fieldwear-scout .scout-brand-lockup { grid-auto-flow: column; align-items: center; gap: 18px; }
+  .fieldwear-scout .scout-brand-logo { width: 145px; }
+  .fieldwear-scout .scout-app-name { border-inline-start: 1px solid var(--line); padding-inline-start: 18px; }
+}
+.fieldwear-scout .scout-first-dibs {
+  display: grid;
+  gap: 16px;
+  margin-block: 36px 24px;
+  padding: 18px;
+  border: 1px dashed #8a8072;
+  border-radius: 5px;
+  background: #fbf9f3;
+}
+.fieldwear-scout .scout-first-dibs p { color: var(--muted-ink); }
+.fieldwear-scout .scout-first-dibs-form { display: grid; justify-items: start; gap: 6px; }
+@media (min-width: 640px) {
+  .fieldwear-scout .scout-first-dibs { grid-template-columns: 1fr auto; align-items: center; padding: 22px 24px; }
+}

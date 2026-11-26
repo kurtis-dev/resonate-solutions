@@ -4,6 +4,7 @@ import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { sendCustomerEmail } from "@/lib/customer-emails";
 import { exchangeOwnerLink, isScoutOwner, issueOwnerLink, readScoutPreferences, revokeOwnerSession, scoutDatabase } from "@/lib/fieldwear/owner-access";
+import { firstDibsConfigured, updateFirstDibs } from "@/lib/fieldwear/first-dibs";
 import { readScoutEdition } from "@/lib/fieldwear/editions";
 import { parseScoutPreferences } from "@/lib/fieldwear/preferences";
 import { readLiveSearch, runAndStoreLiveSearch } from "@/lib/fieldwear/live-search";
@@ -38,6 +39,18 @@ export async function redeemOwnerLink(form: FormData) {
   const token = String(form.get("access") ?? "");
   const hasSession = await exchangeOwnerLink(token);
   redirect(hasSession ? "/fieldwear#fresh" : "/fieldwear?signIn=expired");
+}
+
+export async function setFirstDibs(form: FormData) {
+  if (!(await isScoutOwner())) redirect("/fieldwear");
+  const enabled = form.get("enabled") === "on";
+  if (enabled && !firstDibsConfigured()) redirect("/fieldwear?alerts=unavailable#first-dibs");
+  try {
+    await updateFirstDibs(enabled);
+  } catch {
+    redirect("/fieldwear?alerts=unavailable#first-dibs");
+  }
+  redirect(enabled ? "/fieldwear?alerts=enabled#first-dibs" : "/fieldwear?alerts=disabled#first-dibs");
 }
 
 export async function signOutScout() {

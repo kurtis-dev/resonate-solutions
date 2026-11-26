@@ -30,6 +30,7 @@ type EbayItem = {
   itemEndDate?: string;
   title?: string;
   image?: { imageUrl?: string };
+  additionalImages?: { imageUrl?: string }[];
   price?: EbayMoney;
   currentBidPrice?: EbayMoney;
   buyingOptions?: string[];
@@ -99,6 +100,10 @@ function moneyCents(price?: EbayMoney) {
   return Number.isFinite(value) && value >= 0 ? Math.round(value * 100) : null;
 }
 
+function ebayGallery(item: EbayItem) {
+  return (item.additionalImages ?? []).flatMap(({ imageUrl }) => imageUrl && /^https:\/\/(?:[\w-]+\.)*ebayimg\.com\//i.test(imageUrl) ? [imageUrl] : []).slice(0, 7);
+}
+
 function mapItem(item: EbayItem, now: number): LiveListing | null {
   const listedAt = item.itemOriginDate ?? item.itemCreationDate;
   if (item.itemEndDate && Date.parse(item.itemEndDate) <= now) return null;
@@ -112,7 +117,7 @@ function mapItem(item: EbayItem, now: number): LiveListing | null {
   const fit = garment === "pants" ? shopSize(item.title, description ?? "", "", "pants") : {};
   const auction = item.buyingOptions?.includes("AUCTION") && !item.buyingOptions.includes("FIXED_PRICE");
   return {
-    source: "ebay", externalId: id, title: item.title, imageUrl, listedAt: listedAt && Number.isFinite(Date.parse(listedAt)) ? listedAt : new Date(now).toISOString(), endsAt: item.itemEndDate,
+    source: "ebay", externalId: id, title: item.title, imageUrl, imageUrls: ebayGallery(item), listedAt: listedAt && Number.isFinite(Date.parse(listedAt)) ? listedAt : new Date(now).toISOString(), endsAt: item.itemEndDate,
     url: `https://www.ebay.com/itm/${id}`, description, condition: item.condition, size: fit.size ?? (sizes.join(" / ") || undefined), sizeBasis: fit.sizeBasis,
     priceCents: moneyCents(auction ? item.currentBidPrice ?? item.price : item.price ?? item.currentBidPrice),
     priceKind: auction || (!item.price && item.currentBidPrice) ? "bid" : undefined,
@@ -192,6 +197,8 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { now
     if (detail.image?.imageUrl && /^https:\/\/(?:[\w-]+\.)*ebayimg\.com\//i.test(detail.image.imageUrl)) {
       hit.listing.imageUrl = detail.image.imageUrl;
     }
+    const gallery = ebayGallery(detail);
+    if (gallery.length) hit.listing.imageUrls = gallery;
     const facts = detail.localizedAspects ?? [];
     hit.listing.color = facts.find(({ name }) => /^colou?r$/i.test(name ?? ""))?.value?.trim() || undefined;
     if (hunt || hit.verifySize) {

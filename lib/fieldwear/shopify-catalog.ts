@@ -59,8 +59,11 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
       if (["reworked.carhartt.com", "secondhand.levi.com", "wornwear.patagonia.com"].includes(url.hostname)) continue;
       // Global Catalog can still index products from this password-gated storefront.
       if (url.hostname.replace(/^www\./, "") === "badplaidthrift.com") continue;
-      const photo = safeUrl((variant.media ?? product.media)?.find((media) => media.type === "image")?.url);
-      if (!photo || photo.hostname !== "cdn.shopify.com") continue;
+      const [imageUrl, ...imageUrls] = (variant.media?.length ? variant.media : product.media ?? []).flatMap((media) => {
+        const url = media.type === "image" ? safeUrl(media.url) : null;
+        return url?.hostname === "cdn.shopify.com" ? [url.href] : [];
+      }).slice(0, 8);
+      if (!imageUrl) continue;
       const option = (name: RegExp) => variant.options?.find((value) => name.test(value.name))?.label ?? "";
       const fit = shopSize(normalizeSize(title), description, normalizeSize(option(/^size$/i)), "pants");
       if (!fit.size?.includes("x") || !matchesScoutFit({ title, size: fit.size, sizeBasis: fit.sizeBasis, garmentKind: "pants" }, preferences)) continue;
@@ -68,7 +71,7 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
       const condition = description.match(/^(?:condition|flaws)\s*:\s*(.+)$/im)?.[1] || option(/^condition$/i) || "Secondhand";
       unique.set(url.hostname + url.pathname, {
         source: "shopifycatalog", externalId: id, title, description, size: fit.size, sizeBasis: fit.sizeBasis,
-        imageUrl: photo.href, url: url.href, priceCents: price, seller, condition,
+        imageUrl, imageUrls, url: url.href, priceCents: price, seller, condition,
         color: option(/^colou?r$/i) || description.match(/^colou?r\s*:\s*([^\n.]{2,35})$/im)?.[1],
       });
     }

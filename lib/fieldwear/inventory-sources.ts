@@ -236,12 +236,12 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       const price = variant.price && /^\d{1,6}(?:\.\d{1,2})?$/.test(variant.price) ? Math.round(Number(variant.price) * 100) : null;
       const budget = garmentKind === "shirt" ? preferences.shirtBudget : preferences.pantsBudget;
       if (price == null || (budget != null && price > Math.round(budget * 100))) continue;
-      const imageUrl = product.images?.map((image) => httpsImage(image.src, "cdn.shopify.com", host)).find(Boolean);
+      const [imageUrl, ...imageUrls] = (product.images ?? []).flatMap((image) => httpsImage(image.src, "cdn.shopify.com", host) ?? []).slice(0, 8);
       if (!imageUrl) continue;
       const condition = notes.match(/^(?:condition|flaws)\s*:\s*(.+)$/im)?.[1]
         ?? notes.match(/^pre[- ]owned\s*[-–:]\s*(.+)$/im)?.[1];
       listings.set(externalId, {
-        source: shop.source, externalId, title, description, imageUrl, size, sizeBasis, condition, color: labeledColor || undefined,
+        source: shop.source, externalId, title, description, imageUrl, imageUrls, size, sizeBasis, condition, color: labeledColor || undefined,
         listedAt: new Date(product.published_at).toISOString(), priceCents: price,
         url: `${shop.origin}/products/${product.handle}${variantSize && Number.isSafeInteger(variant.id) ? `?variant=${variant.id}` : ""}`,
       });
@@ -298,13 +298,13 @@ export async function searchEtsy(preferences: ScoutPreferences, keywords: string
     if (response.status === 404) return null;
     if (!response.ok) throw new Error("Etsy listing image unavailable");
     const { results } = await response.json() as { results?: { rank?: number; url_fullxfull?: string }[] };
-    const best = results?.slice().sort((a, b) => (a.rank ?? 0) - (b.rank ?? 0))[0];
-    const imageUrl = httpsImage(best?.url_fullxfull, "etsystatic.com");
+    const [imageUrl, ...imageUrls] = (results ?? []).toSorted((a, b) => (a.rank ?? 0) - (b.rank ?? 0))
+      .flatMap((photo) => httpsImage(photo.url_fullxfull, "etsystatic.com") ?? []).slice(0, 8);
     if (!imageUrl) return null;
     const { amount, divisor, currency_code } = item.price ?? {};
     const priceCents = currency_code === "USD" && typeof amount === "number" && amount >= 0 && typeof divisor === "number" && divisor > 0
       ? Math.round(amount / divisor * 100) : null;
     return { source: "etsy", externalId: String(item.listing_id), url: `https://www.etsy.com/listing/${item.listing_id}`, title,
-      description, imageUrl, listedAt, priceCents };
+      description, imageUrl, imageUrls, listedAt, priceCents };
   }, status);
 }

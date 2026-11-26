@@ -34,7 +34,9 @@ export function vintageSignals({ title, description }: Pick<ListingInput, "title
     : cotton || wool ? `Listing mentions ${cotton && wool ? "cotton and wool" : cotton ? "cotton" : "wool"} in the shell. Check the fiber tag for percentages.`
     : substantial ? "Listing mentions a substantial fabric or reinforced construction."
     : null;
-  return { period, build, natural, eraNote, fabricNote, cotton, wool, sturdyBlend: mixedFibers && substantial && !pureSynthetic && !light.test(shell), canvas: canvas.test(shell) };
+  const decade = !modern.test(text) && /\b(?:(?:20)?00[’']?s|early 2000s|y2k|(?:made in|dated|circa|year manufactured:)\s*200\d)\b/i.test(text) ? "y2k"
+    : period > 0 && (sometime90s.test(text) || /\b(?:from|made in|dated|circa|year manufactured:)\s*199\d\b/i.test(text)) ? "90s" : null;
+  return { decade, period, build, natural, eraNote, fabricNote, cotton, wool, sturdyBlend: mixedFibers && substantial && !pureSynthetic && !light.test(shell), canvas: canvas.test(shell) };
 }
 
 export function listingMeasurements(description = "") {

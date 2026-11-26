@@ -11,6 +11,7 @@ type CustomerEmailInput = {
   subject: string;
   text: string;
   replyTo?: string;
+  idempotencyKey?: string;
   attachments?: Array<{
     filename: string;
     content: string;
@@ -41,7 +42,8 @@ export async function sendCustomerEmail(input: CustomerEmailInput): Promise<Emai
       method: "POST",
       headers: {
         Authorization: `Bearer ${apiKey}`,
-        "Content-Type": "application/json"
+        "Content-Type": "application/json",
+        ...(input.idempotencyKey ? { "Idempotency-Key": input.idempotencyKey } : {})
       },
       body: JSON.stringify({
         from,

@@ -10,6 +10,9 @@ import {
   SlidersHorizontal,
   Filter,
   ImageOff,
+  Store,
+  ZoomIn,
+  ZoomOut,
   Search,
   ShieldQuestion,
   ThumbsDown,
@@ -25,7 +28,7 @@ import type { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import "@/app/fieldwear/catalog.css";
 
 export type ListingView = {
-  source:string; externalId:string; url:string; title:string; imageUrl:string|null;
+  source:string; externalId:string; url:string; title:string; imageUrl:string|null; imageUrls?:string[];
   priceCents:number|null; priceKind?:"bid"; shippingCents:number|null; size:string|null; condition:string|null;
   sizeBasis?:"tag" | "seller-fit" | "measured";
   sellerName?:string | null;
@@ -385,6 +388,8 @@ export function ListingShelf({ id, label, description, items, comparePrices = fa
 }
 
 const freshPageSize = 12;
+const collections = [["all", "All workwear"], ["90s", "90s"], ["y2k", "Y2K"], ["canvas", "Canvas & duck"], ["lined", "Lined layers"]] as const;
+type Collection = (typeof collections)[number][0];
 const priceForSort = (item: ListingView) => item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
 const garmentOptions = {
   shirt: [["work", "Work shirts"], ["chamois", "Chamois shirts"], ["lined", "Shirt-jackets"]],
@@ -430,6 +435,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const filterDialog = useRef<HTMLDialogElement>(null);
   const [marketplace, setMarketplace] = useState(initialSource);
   const [order, setOrder] = useState("relevance");
+  const [collection, setCollection] = useState<Collection>("all");
   const [min, setMin] = useState("");
   const [max, setMax] = useState("");
   const [garmentType, setGarmentType] = useState("");
@@ -447,6 +453,9 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const { results, colorCounts } = useMemo(() => {
     const shownUrls = new Set<string>();
     const base = items.filter((item) => {
+      if (collection === "canvas" && !item.vintage.canvas) return false;
+      if (collection === "lined" && !matchesFreshType(item, "lined")) return false;
+      if ((collection === "90s" || collection === "y2k") && item.vintage.decade !== collection) return false;
       if ((kind !== "all" && item.garmentKind !== kind) || (marketplace.startsWith("shopifycatalog:") ? item.source !== "shopifycatalog" || item.sellerName !== marketplace.slice(15) : !matchesMarketplace(item.source, marketplace)) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
       const cents = priceForSort(item);
       if ((min !== "" || max !== "") && (cents == null || (min !== "" && cents < Number(min) * 100) || (max !== "" && cents > Number(max) * 100))) return false;
@@ -470,14 +479,15 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
       return order === "high" ? right - left : left - right;
     });
     return { results: filtered, colorCounts: counts };
-  }, [items, kind, marketplace, garmentType, era, fabric, tagSize, colors, invalidRange, min, max, order]);
+  }, [items, kind, marketplace, collection, garmentType, era, fabric, tagSize, colors, invalidRange, min, max, order]);
   const lastPage = Math.max(1, Math.ceil(results.length / freshPageSize));
   const currentPage = Math.min(page, lastPage);
   const from = (currentPage - 1) * freshPageSize;
   const visible = results.slice(from, from + freshPageSize);
   const control = "mt-1 min-h-11 w-full rounded-[4px] border border-[var(--line)] bg-white px-3 text-base font-normal text-[var(--ink)]";
-  const hasFilters = Boolean(marketplace || garmentType || era || fabric || tagSize || colors.length || min || max);
+  const hasFilters = Boolean(collection !== "all" || marketplace || garmentType || era || fabric || tagSize || colors.length || min || max);
   const clearFilters = () => {
+    setCollection("all");
     setGarmentType("");
     setMarketplace("");
     setEra("");
@@ -504,6 +514,13 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
 
   return (
     <div>
+      <div className="scout-collections" role="group" aria-label="Workwear collections">
+        <span className="scout-collections-label" aria-hidden="true">Collections</span>
+        {collections.map(([id, label]) => (
+          <button key={id} type="button" className="scout-collection" aria-pressed={collection === id}
+            onClick={() => { setCollection(id); setPage(1); }}>{label}</button>
+        ))}
+      </div>
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-2 border-y border-[var(--line)]">
         <div className="flex items-center gap-1 sm:gap-3" role="group" aria-label="Garment category">
           {tabs.map(([value, label]) => (
@@ -666,8 +683,9 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
 
   return (
     <article className={grid ? "min-w-0" : "w-[66vw] min-w-[200px] max-w-[290px] shrink-0 snap-start sm:w-[255px]"}>
-      <button type="button" className="scout-photo-well" onClick={openDetails} aria-label={`Open ${item.title}`} aria-haspopup="dialog">
+      <button type="button" className="scout-photo-well" onClick={openDetails} aria-label={`Open ${item.title}, ${displayPrice}`} aria-haspopup="dialog">
         <ListingPhoto key={item.imageUrl} imageUrl={item.imageUrl} title={item.title} priority={priority} />
+        {item.priceCents != null ? <span className="scout-price-tag" aria-hidden="true">{displayPrice}</span> : null}
       </button>
       <div className="scout-card-copy">
         <div className="flex items-start justify-between gap-1">
@@ -681,8 +699,8 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
             </button>
           </form> : null}
         </div>
-        <p className="text-sm tabular-nums"><span className="font-semibold">{displayPrice}</span>{item.size ? <span className="text-[var(--muted-ink)]"> · {item.size}</span> : null}</p>
-        <p className="mt-1 text-xs text-[var(--muted-ink)]">{sourceLabel}</p>
+        <p className="text-sm tabular-nums">{item.priceCents == null ? <span className="font-semibold">{displayPrice}{item.size ? " · " : ""}</span> : null}{item.size ? <span className="text-[var(--muted-ink)]">{item.size}</span> : null}</p>
+        <p className="scout-source"><Store size={13} aria-hidden="true" /><span>{sourceLabel}</span></p>
       </div>
 
       <dialog ref={dialog} onClose={() => setDetailsOpen(false)} className="scout-dialog scout-item-dialog" aria-label={item.title}>
@@ -692,9 +710,7 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
         </div>
         {detailsOpen ? (
           <div className="scout-item-layout">
-            <div className="scout-photo-well">
-              <ListingPhoto key={item.imageUrl} imageUrl={item.imageUrl} title={item.title} priority />
-            </div>
+            <ListingGallery item={item} />
             <div className="min-w-0">
               <h2 className="text-xl font-semibold leading-tight">{item.title}</h2>
               <p className="mt-2 text-xl font-semibold tabular-nums">{displayPrice}</p>
@@ -731,6 +747,44 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
         ) : null}
       </dialog>
     </article>
+  );
+}
+
+function ListingGallery({ item }: { item: ListingView }) {
+  const photos = Array.from(new Set([item.imageUrl, ...(item.imageUrls ?? [])].filter((url): url is string => Boolean(url))));
+  const [selected, setSelected] = useState(0);
+  const [zoomed, setZoomed] = useState(false);
+  const current = photos[selected];
+  const scrollArea = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+    const area = scrollArea.current;
+    if (zoomed && area) area.scrollTo((area.scrollWidth - area.clientWidth) / 2, (area.scrollHeight - area.clientHeight) / 2);
+  }, [zoomed]);
+  return (
+    <div className="min-w-0">
+      <div ref={scrollArea} className="scout-gallery-scroll" data-zoomed={zoomed}>
+        {current ? (
+          <button type="button" className="scout-photo-well scout-gallery-photo" onClick={() => setZoomed(!zoomed)} aria-label={zoomed ? "Zoom out" : "Zoom in"}>
+            <ListingPhoto key={current} imageUrl={current} title={item.title} priority />
+          </button>
+        ) : <div className="scout-photo-well"><ListingPhoto imageUrl={null} title={item.title} /></div>}
+      </div>
+      {current ? <div className="scout-gallery-toolbar">
+        <span aria-live="polite">{photos.length > 1 ? `Photo ${selected + 1} of ${photos.length}` : "Seller photo"}</span>
+        <button type="button" className="scout-toolbar-button" onClick={() => setZoomed(!zoomed)}>
+          {zoomed ? <ZoomOut size={16} aria-hidden="true" /> : <ZoomIn size={16} aria-hidden="true" />}
+          {zoomed ? "Zoom out" : "Zoom in"}
+        </button>
+      </div> : null}
+      {photos.length > 1 ? <div className="scout-thumbnails" role="group" aria-label="Seller photos">
+        {photos.map((url, index) => (
+          <button key={url} className="scout-thumbnail" type="button" aria-label={`Photo ${index + 1}`} aria-pressed={selected === index}
+            onClick={() => { setSelected(index); setZoomed(false); }}>
+            <ListingPhoto imageUrl={url} title="" />
+          </button>
+        ))}
+      </div> : null}
+    </div>
   );
 }
 

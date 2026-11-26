@@ -22,6 +22,7 @@ export type ListingInput = {
   title: string;
   description?: string;
   imageUrl?: string | null;
+  imageUrls?: string[];
   priceCents?: number | null;
   shippingCents?: number | null;
   priceKind?: "bid";
