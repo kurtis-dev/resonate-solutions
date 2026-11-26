@@ -165,13 +165,14 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
     if (!product.available || !imageUrl || !Number.isSafeInteger(id)) return null;
     const published = product.published_at ?? listedAt;
     if (!isFresh(published, window)) return null;
-    const description = plainText(product.description);
+    const description = plainText(product.description).replace(/\b(PIT TO PIT:\s*\d+(?:\.\d+)?\s*["″])\s+LENGTH\s*:/gi, "$1 Body length:");
     if (!terms.every((term) => `${title} ${description}`.toLowerCase().replace(/[.']/g, "").includes(term))) return null;
     const sizeTag = description.match(/\bsize tag:\s*(.+?)(?=\s+(?:pit to pit|length|waist|inseam|collar|flaws)\s*:|$)/i)?.[1];
     const knownWaist = title.match(/\b(?:tagged(?: size)?|size)\s*W?\s*(\d{2})\b/i)?.[1];
     const size = garmentKind === "pants"
       ? pantsSizeTokens(title).filter((value) => value.includes("x")).join(" / ") || (knownWaist ? `W${knownWaist}` : undefined)
       : shirtSizeTokens(sizeTag ?? title.replace(/\b(?:[a-z]\.){2,}/gi, "")).join(" / ") || undefined;
+    if ((!listedAt || preferences.matchingOnly) && !matchesScoutFit({ title, size, garmentKind }, preferences)) return null;
     const price = product.variants?.find((variant) => variant.available)?.price;
     return { source: shop.source, externalId: String(id), url, title, description, imageUrl, size,
       listedAt: new Date(published).toISOString(), priceCents: typeof price === "number" && Number.isSafeInteger(price) && price >= 0 ? price : null };
