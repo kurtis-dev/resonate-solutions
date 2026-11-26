@@ -1,0 +1,144 @@
+.fieldwear-scout .scout-photo-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 30px 12px;
+}
+.fieldwear-scout .scout-photo-well {
+  position: relative;
+  display: grid;
+  width: 100%;
+  aspect-ratio: 4 / 5;
+  place-items: center;
+  overflow: hidden;
+  border-radius: 4px;
+  background: var(--matte);
+}
+.fieldwear-scout button.scout-photo-well { cursor: pointer; }
+.fieldwear-scout .scout-photo-well img {
+  position: absolute;
+  inset: 7%;
+  width: 86%;
+  height: 86%;
+  object-fit: contain;
+}
+.fieldwear-scout .scout-photo-fallback {
+  display: grid;
+  justify-items: center;
+  gap: 8px;
+  color: var(--muted-ink);
+  font-size: 0.75rem;
+}
+.fieldwear-scout .scout-card-copy { padding-top: 4px; }
+.fieldwear-scout .scout-icon,
+.fieldwear-scout .scout-tab,
+.fieldwear-scout .scout-toolbar-button,
+.fieldwear-scout .scout-sort,
+.fieldwear-scout .scout-decision {
+  display: inline-flex;
+  min-height: 44px;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 4px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+.fieldwear-scout .scout-icon { width: 44px; color: var(--accent); }
+.fieldwear-scout .scout-tab,
+.fieldwear-scout .scout-toolbar-button,
+.fieldwear-scout .scout-sort { padding-inline: 8px; }
+.fieldwear-scout .scout-tab { position: relative; color: var(--muted-ink); }
+.fieldwear-scout .scout-tab[aria-pressed="true"] { color: var(--ink); font-weight: 600; }
+.fieldwear-scout .scout-tab[aria-pressed="true"]::after {
+  position: absolute;
+  right: 7px;
+  bottom: 0;
+  left: 7px;
+  height: 2px;
+  background: var(--ink);
+  content: "";
+}
+.fieldwear-scout .scout-sort { position: relative; }
+.fieldwear-scout .scout-sort select {
+  position: absolute;
+  inset: 0;
+  height: 100%;
+  width: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+.fieldwear-scout .scout-sort:focus-within { outline: 2px solid var(--accent); }
+.fieldwear-scout .scout-icon:hover,
+.fieldwear-scout .scout-tab:hover,
+.fieldwear-scout .scout-toolbar-button:hover,
+.fieldwear-scout .scout-sort:hover,
+.fieldwear-scout .scout-decision:hover { background: var(--matte); }
+.fieldwear-scout .scout-decision { border: 1px solid var(--line); }
+.fieldwear-scout .scout-decision[aria-pressed="true"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: white;
+}
+.fieldwear-scout .scout-dialog {
+  position: fixed;
+  inset: 0;
+  margin: auto;
+  max-height: min(90dvh, 860px);
+  overflow: auto;
+  overscroll-behavior: contain;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  color: var(--ink);
+}
+.fieldwear-scout .scout-dialog::backdrop { background: rgb(22 24 27 / .35); }
+.fieldwear-scout:has(.scout-dialog[open]) { overscroll-behavior: contain; }
+html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
+.fieldwear-scout .scout-filter-dialog { width: min(450px, calc(100% - 32px)); }
+.fieldwear-scout .scout-item-dialog { width: min(960px, calc(100% - 32px)); }
+.fieldwear-scout .scout-dialog-header,
+.fieldwear-scout .scout-dialog-footer {
+  position: sticky;
+  z-index: 1;
+  display: flex;
+  min-height: 48px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  padding-inline: 16px;
+  background: var(--paper);
+}
+.fieldwear-scout .scout-dialog-header { top: 0; border-bottom: 1px solid var(--line); }
+.fieldwear-scout .scout-dialog-footer { bottom: 0; border-top: 1px solid var(--line); padding-block: 8px; }
+.fieldwear-scout .scout-item-layout { display: grid; align-items: start; gap: 20px; padding: 16px; }
+.fieldwear-scout .scout-item-layout .scout-photo-well { max-height: 70dvh; }
+@media (max-width: 639px) {
+  .fieldwear-scout .scout-filter-dialog {
+    inset: auto 0 0;
+    width: 100%;
+    max-height: 85dvh;
+    max-width: none;
+    margin: 0;
+    border-radius: 8px 8px 0 0;
+  }
+  .fieldwear-scout .scout-item-dialog {
+    inset: 0;
+    width: 100%;
+    height: 100dvh;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    border: 0;
+    border-radius: 0;
+  }
+}
+@media (min-width: 640px) {
+  .fieldwear-scout .scout-photo-grid { column-gap: 20px; }
+  .fieldwear-scout .scout-item-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; padding: 24px; }
+}
+@media (min-width: 768px) {
+  .fieldwear-scout .scout-photo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+}
+@media (min-width: 1024px) {
+  .fieldwear-scout .scout-photo-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px 24px; }
+}

@@ -3,15 +3,15 @@ import { saveScoutPreferences } from "@/app/fieldwear/actions";
 import { departmentLabels, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { ScoutSubmit } from "./scout-submit";
 
-const control = "mt-1 block min-h-12 w-full rounded-xl border border-black/20 bg-white px-3 text-base";
+const control = "scout-control mt-1 block w-full text-base";
 
 export function ScoutPreferencesForm({ preferences, status }: { preferences: ScoutPreferences; status?: string }) {
   return (
-    <details id="preferences" open={status ? true : undefined} className="mb-5 scroll-mt-24 rounded-2xl border border-black/10 bg-[var(--card)] px-4">
-      <summary className="min-h-12 cursor-pointer py-3 font-bold text-[var(--pine)]">
-        <SlidersHorizontal aria-hidden="true" size={17} className="mr-2 inline-block" />Scout preferences
+    <details id="preferences" open={status ? true : undefined} className="mt-4 scroll-mt-6 border-y border-[var(--line)]">
+      <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-[var(--accent)]">
+        <SlidersHorizontal aria-hidden="true" size={16} className="mr-2 inline-block" />Size and search preferences
       </summary>
-      <form action={saveScoutPreferences} className="border-t border-black/10 pb-4 pt-3">
+      <form action={saveScoutPreferences} className="border-t border-[var(--line)] pb-4 pt-3">
         <p className="mb-4 text-sm text-[var(--muted-ink)]">Saving checks connected sources with these settings.</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label className="text-sm font-bold">Department
@@ -39,7 +39,7 @@ export function ScoutPreferencesForm({ preferences, status }: { preferences: Sco
           Only show matching sizes and compatible departments
         </label>
         <p className="text-sm text-[var(--muted-ink)]">Listings without a department label can still appear. Saved finds stay available.</p>
-        <ScoutSubmit label="Save & search" className="mt-4 min-h-11 rounded-xl bg-[var(--pine)] px-4 font-bold text-white" />
+        <ScoutSubmit label="Save & search" className="scout-primary mt-4 text-sm" />
         {status === "invalid" ? <p className="mt-2 text-sm font-semibold text-[var(--rust)]" role="alert">Check the size format and budgets. Enter up to 12 comma-separated sizes per group.</p> : null}
       </form>
     </details>

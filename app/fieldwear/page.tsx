@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Archive, Bookmark, Search, ShieldQuestion } from "lucide-react";
+import { Archive, Search } from "lucide-react";
 import { DailyScout } from "@/components/fieldwear/daily-scout";
 import { ListingChecker } from "@/components/fieldwear/listing-checker";
 import { FreshCatalog, ListingShelf, ListingWorkbench, type ListingView } from "@/components/fieldwear/listing-workbench";
@@ -24,15 +24,15 @@ export const metadata: Metadata = {
   referrer: "no-referrer",
 };
 
-const inputClass = "mt-2 min-h-12 w-full rounded-xl border border-black/20 bg-white px-4";
-const buttonClass = "mt-4 min-h-12 rounded-xl bg-[var(--pine)] px-5 font-bold text-white hover:opacity-90";
+const inputClass = "scout-control mt-2 w-full";
+const buttonClass = "scout-primary mt-4";
 
 function OwnerSignIn({ token, status }: { token?: string; status?: string }) {
   const validToken = token && /^[a-f0-9]{64}$/.test(token);
   return (
-    <main className="fieldwear-scout bg-[var(--paper)] px-4 py-14 text-[var(--ink)] sm:px-7">
-      <section className="mx-auto max-w-md rounded-3xl border border-black/10 bg-white p-6 sm:p-8">
-        <h1 className="font-display text-4xl">Fieldwear Scout</h1>
+    <main className="fieldwear-scout px-4 py-14 sm:px-7">
+      <section className="mx-auto max-w-md rounded border border-[var(--line)] p-6 sm:p-8">
+        <h1 className="text-2xl font-semibold">Fieldwear Scout</h1>
         {validToken ? (
           <form action={redeemOwnerLink} noValidate>
             <p className="mt-3">Use your one-time link to sign in on this device.</p>
@@ -74,33 +74,34 @@ function FreshScout({
     : items.length === 0 ? "No matches in this window. Try fewer keywords or a wider date range."
     : `${items.length} matches · ${checked === undefined ? "" : `${checked} sources checked · `}${summary}`;
   return (
-    <section id="fresh" aria-labelledby="fresh-title" className="scroll-mt-24">
-      <div className="mb-5 rounded-[24px] bg-[var(--pine)] px-5 py-6 text-[var(--paper)] sm:px-8">
-        <h1 id="fresh-title" className="font-display text-4xl leading-none sm:text-5xl">Fresh finds</h1>
-        <form action={searchScoutNow} className="mt-4 flex max-w-2xl flex-col gap-2 sm:flex-row sm:items-end">
-          <label className="flex-1 text-sm font-bold">
-            Keywords <span className="font-normal text-[var(--sand)]">(optional)</span>
-            <input key={run?.searchedAt} name="keywords" defaultValue={run?.keywords ?? ""} placeholder="Chamois, L.L.Bean, carpenter jeans…" maxLength={80} className="mt-1 block min-h-12 w-full rounded-xl border border-white/25 bg-white px-3 text-base font-normal text-[var(--ink)]" />
+    <section id="fresh" aria-labelledby="fresh-title" className="scroll-mt-4">
+      <div className="pt-5 md:pt-7">
+        <h1 id="fresh-title" className="text-2xl font-semibold tracking-tight md:text-[28px]">Fresh finds</h1>
+        <p className="mt-1 text-xs leading-5 text-[var(--muted-ink)]" aria-label="Saved search sizes">
+          {departmentLabels[preferences.department]} · Shirts {preferences.shirtSizes.join(", ") || "any size"} · Bottoms {preferences.pantsSizes.join(", ") || "any size"}
+        </p>
+        <form action={searchScoutNow} className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:max-w-2xl sm:grid-cols-[minmax(0,1fr)_auto_auto]">
+          <label className="relative col-span-2 min-w-0 sm:col-span-1">
+            <span className="sr-only">Keywords (optional)</span>
+            <Search aria-hidden="true" size={16} strokeWidth={1.6} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-ink)]" />
+            <input key={run?.searchedAt} name="keywords" type="search" defaultValue={run?.keywords ?? ""} placeholder="Chamois, L.L.Bean, carpenter jeans…" maxLength={80} className="scout-control scout-keywords w-full text-base sm:text-sm" />
           </label>
-          <label className="text-sm font-bold">
-            Listed in
-            <select name="days" key={run?.searchedAt} defaultValue={String(days)} className="mt-1 block min-h-12 w-full rounded-xl bg-white px-3 text-base font-normal text-[var(--ink)]">
+          <label className="min-w-0">
+            <span className="sr-only">Listed in</span>
+            <select name="days" key={run?.searchedAt} defaultValue={String(days)} className="scout-control w-full text-base sm:text-sm">
               <option value="7">Last 7 days</option>
               <option value="30">Last 30 days</option>
             </select>
           </label>
-          <ScoutSubmit label="Search now" className="min-h-12 shrink-0 rounded-xl bg-[var(--sand)] px-5 font-bold text-[var(--pine)]" />
+          <ScoutSubmit label="Search now" className="scout-primary w-[9.5rem] whitespace-nowrap text-sm" />
         </form>
-        <p className="mt-3 text-sm text-[var(--sand)]">
-          {departmentLabels[preferences.department]} · Shirts {preferences.shirtSizes.join(", ") || "any size"} · Bottoms {preferences.pantsSizes.join(", ") || "any size"}
-        </p>
-        <a href="#find-similar" className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-[var(--sand)] underline underline-offset-4">Find me more like this</a>
       </div>
-      <p className="mb-5 text-sm text-[var(--muted-ink)]" role="status">{message}</p>
+      <p className="pb-3 pt-2 text-xs leading-5 text-[var(--muted-ink)]" role="status">{message}</p>
+      {items.length > 0 ? <FreshCatalog key={`${run?.searchedAt}:${initialSource ?? ""}`} items={items} initialSource={initialSource} /> : null}
       {coverage && run && !run.expired ? (
-        <details className="mb-5 rounded-2xl border border-black/10 bg-[var(--card)] px-4">
-          <summary className="min-h-11 cursor-pointer py-3 text-sm font-bold text-[var(--pine)]">Source coverage{run.status === "partial" ? " · Some checks failed" : ""}</summary>
-          <ul className="grid gap-x-5 border-t border-black/10 py-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
+        <details className="mt-5 border-y border-[var(--line)]">
+          <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-[var(--accent)]">Source coverage{run.status === "partial" ? " · Some checks failed" : ""}</summary>
+          <ul className="grid gap-x-5 border-t border-[var(--line)] py-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
             {coverage.map(({ source, status }) => {
               const count = items.filter((item) => item.source === source).length;
               return <li key={source} className="flex items-baseline justify-between gap-2 py-2"><strong>{marketplaceName(source)}</strong><span className="text-right text-[var(--muted-ink)]">{sourceStatus[status]}{status === "searched" || status === "partial" ? ` · ${count} matches` : ""}</span></li>;
@@ -109,9 +110,8 @@ function FreshScout({
         </details>
       ) : null}
       {coverage?.some(({ source, status }) => source === "etsy" && (status === "searched" || status === "partial")) ? (
-        <p className="mb-5 text-sm text-[var(--muted-ink)]">The term &apos;Etsy&apos; is a trademark of Etsy, Inc. This Application uses Etsy&apos;s API, but is not endorsed or certified by Etsy.</p>
+        <p className="mt-2 text-xs leading-5 text-[var(--muted-ink)]">The term &apos;Etsy&apos; is a trademark of Etsy, Inc. This Application uses Etsy&apos;s API, but is not endorsed or certified by Etsy.</p>
       ) : null}
-      {items.length > 0 ? <FreshCatalog key={`${run?.searchedAt}:${initialSource ?? ""}`} items={items} initialSource={initialSource} /> : null}
     </section>
   );
 }
@@ -130,7 +130,7 @@ function LookFinds({ similar, browning, preferences, decisions }: {
   similar: LiveRun; browning: LiveRun; preferences: ScoutPreferences; decisions: Map<string, Decision>;
 }) {
   const reference = curatedListings.find((item) => item.source === "grailed" && item.externalId === beanReferenceId);
-  const button = "min-h-11 rounded-full bg-[var(--pine)] px-4 text-sm font-bold text-white hover:opacity-90";
+  const button = "scout-control text-sm font-medium hover:bg-[var(--matte)]";
   const listings = (run: LiveRun) => run?.listings.flatMap((item) => {
     const decision = decisions.get(`${item.source}:${item.externalId}`)?.verdict ?? null;
     const match = run.hunt && matchLook(item, run.hunt);
@@ -146,14 +146,14 @@ function LookFinds({ similar, browning, preferences, decisions }: {
   const error = (run: LiveRun) => run?.status === "unavailable" ? "The listing sources couldn’t finish. Try running this search again."
     : run?.expired ? "Run this search again for current listings." : null;
   return (
-    <section id="find-similar" aria-labelledby="find-similar-title" className="mb-8 scroll-mt-24">
-      <h2 id="find-similar-title" className="font-display text-2xl sm:text-3xl">Find me more like this</h2>
+    <section id="find-similar" aria-labelledby="find-similar-title" className="mt-8 scroll-mt-6 border-t border-[var(--line)] pt-5">
+      <h2 id="find-similar-title" className="text-xl font-semibold">Find me more like this</h2>
       <div className="mt-3 grid gap-3 md:grid-cols-2">
         {reference ? (
-          <div className="flex min-w-0 gap-4 rounded-2xl border border-black/10 bg-[var(--card)] p-4">
+          <div className="flex min-w-0 gap-4 rounded border border-[var(--line)] p-4">
             <a href={reference.url} target="_blank" rel="noreferrer" className="shrink-0" aria-label="Open the L.L.Bean reference on Grailed">
               {/* eslint-disable-next-line @next/next/no-img-element -- marketplace reference photo */}
-              <img src={reference.imageUrl ?? ""} alt="L.L.Bean lined denim reference" className="h-28 w-24 rounded-lg bg-[var(--paper)] object-contain" />
+              <img src={reference.imageUrl ?? ""} alt="L.L.Bean lined denim reference" className="h-28 w-24 rounded bg-[var(--matte)] object-contain p-1" />
             </a>
             <div className="min-w-0">
               <h3 className="font-bold">L.L.Bean lined denim shirt</h3>
@@ -165,7 +165,7 @@ function LookFinds({ similar, browning, preferences, decisions }: {
             </div>
           </div>
         ) : null}
-        <div className="rounded-2xl border border-black/10 bg-[var(--card)] p-4">
+        <div className="rounded border border-[var(--line)] p-4">
           <h3 className="font-bold">Browning with leather elbows</h3>
           <p className="mb-3 mt-1 text-sm text-[var(--muted-ink)]">Field shirts with leather or suede elbow patches.</p>
           <form action={searchScoutLook}>
@@ -248,46 +248,49 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
   const archived = params.view === "archive";
 
   return (
-    <main className="fieldwear-scout bg-[var(--paper)] px-4 pb-28 pt-6 text-[var(--ink)] sm:px-7">
-      <div className="mx-auto max-w-[1440px]">
-        <div className="mb-4 flex items-center justify-between gap-3">
-          <p className="text-lg font-bold">Fieldwear Scout</p>
-          <form action={signOutScout} noValidate><button className="min-h-11 rounded-full border border-black/15 bg-white px-4 font-semibold">Sign out</button></form>
+    <main className="fieldwear-scout pb-12">
+      <header className="border-b border-[var(--line)]">
+        <div className="scout-container flex min-h-14 items-center justify-between gap-2">
+          <a href="/fieldwear" aria-label="Fieldwear Scout" className="inline-flex min-h-11 shrink-0 items-center whitespace-nowrap text-[15px] font-semibold tracking-tight">Fieldwear<span className="ml-1 font-normal text-[var(--muted-ink)]">Scout</span></a>
+          <nav className="flex items-center text-sm" aria-label="Fieldwear">
+            <a href={archived ? "/fieldwear#find-similar" : "#find-similar"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]" aria-label="Find similar listings">Similar</a>
+            <a href="#preferences" className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]" aria-label="Size and search preferences">Sizes</a>
+            <a href={archived ? "/fieldwear#saved" : "#saved"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]">Saved</a>
+          </nav>
         </div>
-        <ScoutPreferencesForm preferences={preferences} status={params.preferences} />
+      </header>
+      <div className="scout-container">
         {archived ? (
           <>
-            <div id="archive" className="mb-5 scroll-mt-24 rounded-2xl border border-black/10 bg-[var(--card)] p-4">
-              <p className="font-bold">Catalog archive</p>
+            <div id="archive" className="mb-5 scroll-mt-6 border-b border-[var(--line)] pb-3 pt-5">
+              <h1 className="text-2xl font-semibold tracking-tight">Catalog archive</h1>
               <p className="mt-1 text-sm text-[var(--muted-ink)]">Earlier marketplace checks and references. Open the original listing to confirm availability.</p>
-              <a href="/fieldwear#fresh" className="mt-2 inline-flex min-h-11 items-center font-bold text-[var(--pine)] underline underline-offset-4">Back to fresh finds</a>
+              <a href="/fieldwear#fresh" className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--accent)] underline underline-offset-4">Back to fresh finds</a>
             </div>
             <DailyScout edition={edition} items={daily.sort((a, b) => fitPriority(b, preferences) - fitPriority(a, preferences))} preferences={preferences} />
             <ListingWorkbench listings={Array.from(entries.values())} preferences={preferences} />
+            <details className="mt-8 border-t border-[var(--line)]">
+              <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-[var(--accent)]">Check a listing</summary>
+              <ListingChecker preferences={preferences} />
+            </details>
           </>
         ) : (
           <>
-            <LookFinds similar={similar} browning={browning} preferences={preferences} decisions={decisions} />
             <FreshScout run={run} items={live} preferences={preferences} source={params.source} />
-            {saved.length || savedLinks.length ? (
-              <section id="saved" className="mt-8 scroll-mt-24" aria-label="Saved listings">
-                {saved.length ? <ListingShelf id="saved-cards" label="Saved" description="Pieces you marked to revisit." items={saved} /> : null}
-                {savedLinks.length ? <ul className="grid gap-2">{savedLinks.map((item, index) => (
-                  <li key={item.externalId}><a href={item.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-bold text-[var(--pine)] underline underline-offset-4">Open saved Etsy listing {index + 1}</a></li>
-                ))}</ul> : null}
-              </section>
-            ) : null}
-            <a href="/fieldwear?view=archive#archive" className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-[var(--pine)] underline underline-offset-4"><Archive size={17} />Browse catalog archive</a>
+            <LookFinds similar={similar} browning={browning} preferences={preferences} decisions={decisions} />
+            <section id="saved" className="mt-8 scroll-mt-6 border-t border-[var(--line)] pt-5" aria-label="Saved listings">
+              {saved.length ? <ListingShelf id="saved-cards" label="Saved" description="" items={saved} /> : <h2 className="text-xl font-semibold">Saved</h2>}
+              {savedLinks.length ? <ul className="grid gap-2">{savedLinks.map((item, index) => (
+                <li key={item.externalId}><a href={item.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--accent)] underline underline-offset-4">Open saved Etsy listing {index + 1}</a></li>
+              ))}</ul> : null}
+              {!saved.length && !savedLinks.length ? <p className="mt-1 text-sm text-[var(--muted-ink)]">Nothing saved yet.</p> : null}
+            </section>
+            <a href="/fieldwear?view=archive#archive" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[var(--accent)] underline underline-offset-4"><Archive aria-hidden="true" size={16} />Browse catalog archive</a>
           </>
         )}
-        <div className="mt-12"><ListingChecker preferences={preferences} /></div>
+        <ScoutPreferencesForm preferences={preferences} status={params.preferences} />
+        <form action={signOutScout} noValidate><button className="min-h-11 rounded text-sm font-medium text-[var(--accent)] hover:underline">Sign out</button></form>
       </div>
-      <nav aria-label="Fieldwear" className="fixed bottom-[calc(.75rem+env(safe-area-inset-bottom))] left-1/2 z-30 flex w-[min(390px,calc(100%-24px))] -translate-x-1/2 rounded-2xl bg-[var(--pine)] px-1 py-2 text-white shadow-lg sm:hidden">
-        <a href="/fieldwear#fresh" className="grid min-h-12 flex-1 place-items-center text-xs"><Search size={18}/>Fresh</a>
-        {saved.length || savedLinks.length ? <a href="/fieldwear#saved" className="grid min-h-12 flex-1 place-items-center text-xs"><Bookmark size={18}/>Saved</a> : null}
-        <a href="/fieldwear?view=archive#archive" className="grid min-h-12 flex-1 place-items-center text-xs"><Archive size={18}/>Archive</a>
-        <a href="#check" className="grid min-h-12 flex-1 place-items-center text-xs"><ShieldQuestion size={18}/>Check</a>
-      </nav>
     </main>
   );
 }

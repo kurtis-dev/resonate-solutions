@@ -2,13 +2,12 @@
 
 import { useMemo, useRef, useState } from "react";
 import {
-  AlertCircle,
-  ArrowRight,
+  ExternalLink,
   Bookmark,
   Check,
   ChevronLeft,
   ChevronRight,
-  Clock3,
+  SlidersHorizontal,
   Filter,
   ImageOff,
   Search,
@@ -22,6 +21,7 @@ import type { GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { marketplaceName } from "@/lib/fieldwear/marketplace-directory";
 import type { vintageSignals } from "@/lib/fieldwear/vintage-signals";
+import "@/app/fieldwear/catalog.css";
 
 export type ListingView = {
   source:string; externalId:string; url:string; title:string; imageUrl:string|null;
@@ -371,7 +371,7 @@ export function ListingShelf({ id, label, description, items, comparePrices = fa
           className="-mx-4 flex snap-x snap-mandatory gap-4 overflow-x-auto overscroll-x-contain px-4 pb-5 sm:-mx-2 sm:px-2"
           style={{ scrollbarGutter:"stable" }}
         >
-          <p className="sr-only">Scroll horizontally to browse. Each image and View link opens the original marketplace page.</p>
+          <p className="sr-only">Scroll horizontally to browse. Open a piece for its details and original marketplace link.</p>
           {displayed.map((item) => <ListingCard key={`${id}:${item.source}:${item.externalId}`} item={item} />)}
           <span aria-hidden="true" className="w-px shrink-0" />
         </div>
@@ -408,8 +408,8 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
 }
 
 export function FreshCatalog({ items, initialSource = "" }: { items: ListingView[]; initialSource?: string }) {
-  const startingItems = initialSource ? items.filter((item) => item.source === initialSource) : items;
-  const [kind, setKind] = useState<"shirt" | "pants">(() => startingItems.some((item) => item.garmentKind === "shirt") ? "shirt" : "pants");
+  const [kind, setKind] = useState<"all" | "shirt" | "pants">("all");
+  const filterDialog = useRef<HTMLDialogElement>(null);
   const [marketplace, setMarketplace] = useState(initialSource);
   const [order, setOrder] = useState("relevance");
   const [min, setMin] = useState("");
@@ -417,13 +417,15 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
   const [garmentType, setGarmentType] = useState("");
   const [era, setEra] = useState("");
   const [fabric, setFabric] = useState("");
+  const [tagSize, setTagSize] = useState("");
   const [page, setPage] = useState(1);
   const resultsRef = useRef<HTMLDivElement>(null);
   const invalidRange = min !== "" && max !== "" && Number(min) > Number(max);
   const marketplaces = Array.from(new Set(items.map((item) => item.source))).sort((a, b) => marketplaceName(a).localeCompare(marketplaceName(b)));
+  const tagSizes = Array.from(new Set(items.flatMap(({ size }) => size ? [size] : []))).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   const results = useMemo(() => {
     const filtered = items.filter((item) => {
-      if (item.garmentKind !== kind || (marketplace && item.source !== marketplace) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
+      if ((kind !== "all" && item.garmentKind !== kind) || (marketplace && item.source !== marketplace) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
       if (min === "" && max === "") return true;
       const cents = priceForSort(item);
       return cents != null && (min === "" || cents >= Number(min) * 100) && (max === "" || cents <= Number(max) * 100);
@@ -438,18 +440,19 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
       return order === "high" ? right - left : left - right;
     });
     return filtered;
-  }, [items, kind, marketplace, garmentType, era, fabric, invalidRange, min, max, order]);
+  }, [items, kind, marketplace, garmentType, era, fabric, tagSize, invalidRange, min, max, order]);
   const lastPage = Math.max(1, Math.ceil(results.length / freshPageSize));
   const currentPage = Math.min(page, lastPage);
   const from = (currentPage - 1) * freshPageSize;
   const visible = results.slice(from, from + freshPageSize);
-  const control = "mt-1 min-h-11 w-full rounded-xl border border-black/15 bg-white px-3 text-base font-normal text-[var(--ink)]";
-  const hasFilters = Boolean(marketplace || garmentType || era || fabric || min || max);
+  const control = "mt-1 min-h-11 w-full rounded-[4px] border border-[var(--line)] bg-white px-3 text-base font-normal text-[var(--ink)]";
+  const hasFilters = Boolean(marketplace || garmentType || era || fabric || tagSize || min || max);
   const clearFilters = () => {
     setGarmentType("");
     setMarketplace("");
     setEra("");
     setFabric("");
+    setTagSize("");
     setMin("");
     setMax("");
     setPage(1);
@@ -460,29 +463,54 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
     resultsRef.current?.scrollIntoView({ block: "start" });
   };
 
+  const tabs = [["all", "All"], ["shirt", "Shirts"], ["pants", "Bottoms"]] as const;
+
   return (
     <div>
-      <div className="flex flex-wrap gap-2" aria-label="Garment type" role="group">
-        {([["shirt", "Shirts"], ["pants", "Bottoms"]] as const).map(([value, label]) => (
-          <button key={value} type="button" aria-pressed={kind === value} onClick={() => { if (kind !== value) { setKind(value); setGarmentType(""); } setPage(1); }} className={`min-h-11 rounded-full border px-4 text-sm font-bold ${kind === value ? "border-[var(--pine)] bg-[var(--pine)] text-white" : "border-black/15 bg-white text-[var(--pine)]"}`}>
-            {label} <span className="ml-1 tabular-nums">{items.filter((item) => item.garmentKind === value && (!marketplace || item.source === marketplace)).length}</span>
+      <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-2 border-y border-[var(--line)]">
+        <div className="flex items-center gap-1 sm:gap-3" role="group" aria-label="Garment category">
+          {tabs.map(([value, label]) => (
+            <button key={value} type="button" aria-pressed={kind === value}
+              onClick={() => { if (kind !== value) { setKind(value); setGarmentType(""); setTagSize(""); } setPage(1); }}
+              className="scout-tab">{label}</button>
+          ))}
+        </div>
+        <div className="ml-auto flex items-center gap-1 sm:gap-2">
+          <button type="button" className="scout-toolbar-button" aria-haspopup="dialog" onClick={() => filterDialog.current?.showModal()}>
+            <SlidersHorizontal size={16} aria-hidden="true" />Filters{hasFilters ? " •" : ""}
           </button>
-        ))}
+          <label className="scout-sort">
+            <span>Sort</span>
+            <select aria-label="Sort listings" value={order} onChange={(event) => { setOrder(event.target.value); setPage(1); }}>
+              <option value="relevance">Best match</option>
+              <option value="newest">Recently listed</option>
+              <option value="oldest-garment">Older garment clues</option>
+              <option value="low">Price + shipping, low to high</option>
+              <option value="high">Price + shipping, high to low</option>
+            </select>
+            <ChevronRight size={13} className="rotate-90" aria-hidden="true" />
+          </label>
+        </div>
       </div>
-      <div className="my-4 grid grid-cols-2 items-end gap-3 rounded-2xl border border-black/10 bg-[var(--card)] p-3 sm:grid-cols-3">
-        <label className="min-w-0 text-xs font-bold">Garment type
+      <dialog ref={filterDialog} className="scout-dialog scout-filter-dialog" aria-labelledby="scout-filter-title">
+        <div className="scout-dialog-header">
+          <h2 id="scout-filter-title" className="text-base font-semibold">Filters</h2>
+          <form method="dialog"><button className="scout-icon" aria-label="Close filters"><X size={19} /></button></form>
+        </div>
+        <div className="grid grid-cols-2 gap-x-3 gap-y-4 px-4 py-4 sm:px-6">
+        <label className="min-w-0 text-xs font-medium">Garment type
           <select value={garmentType} onChange={(event) => { setGarmentType(event.target.value); setPage(1); }} className={control}>
-            <option value="">All {kind === "shirt" ? "shirts" : "bottoms"}</option>
-            {garmentOptions[kind].map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            <option value="">Any type</option>
+            {(kind === "all" ? [...garmentOptions.shirt, ...garmentOptions.pants] : garmentOptions[kind]).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label>
-        <label className="min-w-0 text-xs font-bold">Marketplace
+        <label className="min-w-0 text-xs font-medium">Marketplace
           <select value={marketplace} onChange={(event) => { setMarketplace(event.target.value); setPage(1); }} className={control}>
             <option value="">All marketplaces</option>
             {marketplaces.map((source) => <option key={source} value={source}>{marketplaceName(source)}</option>)}
           </select>
         </label>
-        <label className="min-w-0 text-xs font-bold">Era
+        <label className="min-w-0 text-xs font-medium">Era
           <select value={era} onChange={(event) => { setEra(event.target.value); setPage(1); }} className={control}>
             <option value="">Any era</option>
             <option value="pre-1999">Pre-1999 clues</option>
@@ -490,7 +518,7 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
             <option value="undated">Undated</option>
           </select>
         </label>
-        <label className="min-w-0 text-xs font-bold">Fabric
+        <label className="min-w-0 text-xs font-medium">Fabric
           <select value={fabric} onChange={(event) => { setFabric(event.target.value); setPage(1); }} className={control}>
             <option value="">Any fabric</option>
             <option value="either">Cotton or wool</option>
@@ -500,24 +528,26 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
             <option value="blend">Sturdy blends</option>
           </select>
         </label>
-        <label className="min-w-0 text-xs font-bold">Sort by
-          <select value={order} onChange={(event) => { setOrder(event.target.value); setPage(1); }} className={control}>
-            <option value="relevance">Best match</option>
-            <option value="newest">Recently listed</option>
-            <option value="oldest-garment">Older garment clues</option>
-            <option value="low">Price low to high</option>
-            <option value="high">Price high to low</option>
-          </select>
-        </label>
-        <label className="text-xs font-bold">Min price ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={min} onChange={(event) => { setMin(event.target.value); setPage(1); }} className={control} /></label>
-        <label className="text-xs font-bold">Max price ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={max} onChange={(event) => { setMax(event.target.value); setPage(1); }} className={control} /></label>
-        {hasFilters ? <button type="button" onClick={clearFilters} className="col-span-full min-h-11 justify-self-start px-2 text-sm font-bold text-[var(--pine)] underline underline-offset-4">Clear filters</button> : null}
-      </div>
-      <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 pb-3 text-sm text-[var(--muted-ink)]" role="status">
+          <label className="col-span-2 min-w-0 text-xs font-medium">Tag size
+            <select value={tagSize} onChange={(event) => { setTagSize(event.target.value); setPage(1); }} className={control}>
+              <option value="">Any tag size</option>
+              {tagSizes.map((size) => <option key={size} value={size}>{size}</option>)}
+            </select>
+          </label>
+          <label className="text-xs font-medium">Min price + shipping ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={min} onChange={(event) => { setMin(event.target.value); setPage(1); }} className={control} /></label>
+          <label className="text-xs font-medium">Max price + shipping ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={max} onChange={(event) => { setMax(event.target.value); setPage(1); }} className={control} /></label>
+          {invalidRange ? <p className="col-span-full text-sm" role="alert">Minimum price must be at or below the maximum.</p> : null}
+        </div>
+        <div className="scout-dialog-footer">
+          <button type="button" onClick={clearFilters} disabled={!hasFilters} className="scout-toolbar-button disabled:opacity-40">Clear filters</button>
+          <form method="dialog"><button className="scout-primary">Show {results.length} {results.length === 1 ? "piece" : "pieces"}</button></form>
+        </div>
+      </dialog>
+      <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 py-3 text-sm text-[var(--muted-ink)]" role="status">
         {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : "No listings match these filters."}
       </div>
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-        {visible.map((item) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid />)}
+      <div className="scout-photo-grid">
+        {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid priority={index < 4} />)}
       </div>
       {lastPage > 1 ? (
         <nav className="mt-5 flex items-center justify-between gap-4" aria-label="Fresh finds pages">
@@ -530,70 +560,115 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
   );
 }
 
-function ListingCard({ item, grid = false }: { item:ListingView; grid?:boolean }) {
-  const total = item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
+function ListingPhoto({ imageUrl, title, priority = false }: Pick<ListingView, "imageUrl" | "title"> & { priority?: boolean }) {
+  const [failed, setFailed] = useState(false);
+  return imageUrl && !failed ? (
+    // eslint-disable-next-line @next/next/no-img-element -- seller image hosts vary by connected source.
+    <img src={imageUrl} alt={title} loading={priority ? "eager" : "lazy"} decoding="async" referrerPolicy="no-referrer" onError={() => setFailed(true)} />
+  ) : (
+    <span className="scout-photo-fallback"><ImageOff size={20} aria-hidden="true" />Photo unavailable</span>
+  );
+}
+
+function ListingCard({ item, grid = false, priority = false }: { item: ListingView; grid?: boolean; priority?: boolean }) {
+  const dialog = useRef<HTMLDialogElement>(null);
+  const [detailsOpen, setDetailsOpen] = useState(false);
+  const displayPrice = item.priceCents == null ? "Price unlisted" : money(item.priceCents);
+  const total = item.priceCents != null && item.shippingCents != null ? money(item.priceCents + item.shippingCents) : null;
   const sourceLabel = marketplaceName(item.source);
+  const openDetails = () => {
+    setDetailsOpen(true);
+    dialog.current?.showModal();
+  };
+  const details = [
+    { label: "Tag size", value: item.size },
+    { label: "Measurements", value: item.measurements.join(" · ") },
+    { label: "Condition", value: item.condition },
+    { label: "Fabric", value: item.vintage.fabricNote },
+    { label: "Era", value: item.vintage.eraNote },
+    { label: "Listed", value: item.listedAt ? new Date(item.listedAt).toLocaleDateString("en-US", { timeZone: "America/Chicago", dateStyle: "medium" }) : null },
+    { label: "Shipping", value: item.shippingCents == null ? "Unknown" : money(item.shippingCents) },
+    { label: "Item + shipping", value: total },
+  ];
 
   return (
-    <article className={`${grid ? "min-w-0" : "w-[82vw] min-w-[278px] max-w-[348px] shrink-0 snap-start sm:w-[326px]"} overflow-hidden rounded-[24px] border border-black/8 bg-white shadow-[0_14px_38px_rgba(44,38,27,.08)]`}>
-      <a href={item.url} target="_blank" rel="noreferrer" className="group relative block aspect-[4/5] overflow-hidden bg-[#e5e0d6]" aria-label={`View ${item.title} on ${sourceLabel}`}>
-        {item.imageUrl ? (
-          // eslint-disable-next-line @next/next/no-img-element -- marketplace hosts are dynamic, so a fixed Image allowlist would reject valid imports.
-          <img src={item.imageUrl} alt={item.title} loading="lazy" className="h-full w-full object-contain transition duration-300 group-hover:scale-[1.015]" />
-        ) : (
-          <span className="grid h-full place-items-center text-[var(--muted-ink)]"><ImageOff size={30} /><span className="sr-only">No marketplace photo supplied</span></span>
-        )}
-        <span className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/65 to-transparent" aria-hidden="true" />
-        <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.12em] text-[var(--pine)]">{item.garmentKind === "pants" ? "Pants · " : item.garmentKind === "shirt" ? "Shirt · " : ""}{sourceLabel}</span>
-      </a>
-
-      <div className="p-4">
-        <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-[.11em] text-[var(--rust)]">
-          <span className="max-w-[58%] truncate" title={item.size ?? "Size unconfirmed"}>{item.size ?? "Size unconfirmed"}</span>
-          <span className="flex shrink-0 items-center gap-1 text-[var(--muted-ink)]"><Clock3 size={12} />{item.listedAt ? "Listed" : "Checked"} {relativeTime(item.listedAt ?? item.lastSeenAt)}</span>
-        </div>
-        <a href={item.url} target="_blank" rel="noreferrer" className="mt-2 block rounded-sm hover:text-[var(--rust)]">
-          <h3 className="line-clamp-2 min-h-12 text-base font-bold leading-6">{item.title}</h3>
-        </a>
-
-        <div className="mt-3 flex items-end justify-between gap-3">
-          <div>
-            <p className="text-2xl font-black tabular-nums">{total == null ? "Price unlisted" : money(total)}</p>
-            <p className="text-[10px] text-[var(--muted-ink)]">{item.shippingCents == null ? "Shipping not confirmed" : item.shippingCents === 0 ? "Free shipping listed" : "Item + shipping"}</p>
-          </div>
-          <a href={item.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-[var(--pine)] px-3.5 text-xs font-bold text-white transition hover:bg-[#2b4432] active:scale-[.98]" aria-label={`View ${item.title} on ${sourceLabel}`}>View <ArrowRight size={14} /></a>
-        </div>
-
-        {item.lookNote ? <p className="mt-3 text-xs font-medium text-[var(--muted-ink)]">{item.lookNote}</p> : null}
-        <details className="mt-4 rounded-xl bg-[var(--paper)] px-3 py-2">
-          <summary className="min-h-10 cursor-pointer py-2 text-xs font-bold">Listing details</summary>
-          {item.measurements.length > 0 ? <Evidence title="Seller measurements" items={item.measurements} /> : null}
-          <Evidence title="Age and construction" items={[item.vintage.eraNote, ...(item.vintage.fabricNote ? [item.vintage.fabricNote] : [])]} />
-          {item.evidence.visualClues.length > 0 ? <Evidence title="Corroborating clues" items={item.evidence.visualClues} /> : null}
-          {item.evidence.sellerClaims.length > 0 ? <Evidence title="Seller claims" items={item.evidence.sellerClaims} /> : null}
-          {item.condition ? <Evidence title="Listed condition" items={[item.condition]} /> : null}
-        </details>
-
-        {(item.garmentKind === "shirt" || item.garmentKind === "pants") && item.decision !== "pass" ? (
-          <form action={searchScoutLook} className="mt-3">
+    <article className={grid ? "min-w-0" : "w-[66vw] min-w-[200px] max-w-[290px] shrink-0 snap-start sm:w-[255px]"}>
+      <button type="button" className="scout-photo-well" onClick={openDetails} aria-label={`Open ${item.title}`} aria-haspopup="dialog">
+        <ListingPhoto key={item.imageUrl} imageUrl={item.imageUrl} title={item.title} priority={priority} />
+      </button>
+      <div className="scout-card-copy">
+        <div className="flex items-start justify-between gap-1">
+          <h3 className="min-w-0 flex-1 text-sm font-semibold leading-[1.35]">
+            <button type="button" className="line-clamp-2 min-h-10 text-left hover:underline" onClick={openDetails} aria-haspopup="dialog">{item.title}</button>
+          </h3>
+          <form action={decideListing}>
             <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
-            <ScoutSubmit label="Find me more like this" className="min-h-11 w-full rounded-xl border border-[var(--pine)]/25 px-3 text-sm font-bold text-[var(--pine)] hover:bg-[var(--paper)]" />
+            <button name="verdict" value="save" className="scout-icon -mr-1" aria-label={`Save ${item.title}`} aria-pressed={item.decision === "save"} title={item.decision === "save" ? "Saved" : "Save"}>
+              <Bookmark size={17} fill={item.decision === "save" ? "currentColor" : "none"} aria-hidden="true" />
+            </button>
           </form>
-        ) : null}
-        <form action={decideListing} className="mt-3 grid grid-cols-3 gap-2">
-          <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
-          <Decision active={item.decision === "save"} value="save" icon={<Bookmark size={15} />} label="Save" />
-          <Decision active={item.decision === "proof"} value="proof" icon={<ShieldQuestion size={15} />} label="Proof" />
-          <Decision active={item.decision === "pass"} value="pass" icon={<ThumbsDown size={15} />} label="Pass" />
-        </form>
+        </div>
+        <p className="text-sm tabular-nums"><span className="font-semibold">{displayPrice}</span>{item.size ? <span className="text-[var(--muted-ink)]"> · {item.size}</span> : null}</p>
+        <p className="mt-1 text-xs text-[var(--muted-ink)]">{sourceLabel}</p>
       </div>
+
+      <dialog ref={dialog} onClose={() => setDetailsOpen(false)} className="scout-dialog scout-item-dialog" aria-label={item.title}>
+        <div className="scout-dialog-header">
+          <span className="text-sm text-[var(--muted-ink)]">{sourceLabel}</span>
+          <form method="dialog"><button className="scout-icon" aria-label="Close listing"><X size={21} /></button></form>
+        </div>
+        {detailsOpen ? (
+          <div className="scout-item-layout">
+            <div className="scout-photo-well">
+              <ListingPhoto key={item.imageUrl} imageUrl={item.imageUrl} title={item.title} priority />
+            </div>
+            <div className="min-w-0">
+              <h2 className="text-xl font-semibold leading-tight">{item.title}</h2>
+              <p className="mt-2 text-xl font-semibold tabular-nums">{displayPrice}</p>
+              <dl className="mt-4">
+                {details.filter(({ value }) => value).map(({ label, value }) => (
+                  <div key={label} className="grid grid-cols-[6.5rem_1fr] gap-2 border-t border-[var(--line)] py-2 text-sm">
+                    <dt className="text-[var(--muted-ink)]">{label}</dt><dd>{value}</dd>
+                  </div>
+                ))}
+              </dl>
+              {item.lookNote ? <p className="mt-2 text-sm text-[var(--muted-ink)]">{item.lookNote}</p> : null}
+              <a href={item.url} target="_blank" rel="noreferrer" className="scout-primary mt-4 inline-flex items-center gap-2">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
+              {(item.garmentKind === "shirt" || item.garmentKind === "pants") && item.decision !== "pass" ? (
+                <form action={searchScoutLook} className="mt-2">
+                  <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
+                  <ScoutSubmit label="Find me more like this" className="scout-toolbar-button" />
+                </form>
+              ) : null}
+              {item.evidence.visualClues.length || item.evidence.sellerClaims.length ? (
+                <details className="mt-3 border-t border-[var(--line)] text-sm">
+                  <summary className="cursor-pointer py-3">Listing notes</summary>
+                  {item.evidence.sellerClaims.length ? <Evidence title="Seller claims" items={item.evidence.sellerClaims} /> : null}
+                  {item.evidence.visualClues.length ? <Evidence title="Corroborating clues" items={item.evidence.visualClues} /> : null}
+                </details>
+              ) : null}
+              <form action={decideListing} className="mt-3 grid grid-cols-3 gap-2">
+                <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
+                <Decision active={item.decision === "save"} value="save" icon={<Bookmark size={15} />} label="Save" />
+                <Decision active={item.decision === "proof"} value="proof" icon={<ShieldQuestion size={15} />} label="Proof" />
+                <Decision active={item.decision === "pass"} value="pass" icon={<ThumbsDown size={15} />} label="Pass" />
+              </form>
+            </div>
+          </div>
+        ) : null}
+      </dialog>
     </article>
   );
 }
 
-function Decision({ active, value, icon, label }:{ active:boolean; value:string; icon:React.ReactNode; label:string }) {
-  return <button name="verdict" value={value} aria-pressed={active} className={`flex min-h-11 cursor-pointer items-center justify-center gap-1 rounded-xl border text-xs font-bold transition active:scale-[.98] ${active ? "border-[var(--pine)] bg-[var(--pine)] text-white" : "border-black/10 bg-white text-[var(--muted-ink)] hover:border-[var(--pine)] hover:text-[var(--pine)]"}`}>{active ? <Check size={14} /> : icon}{label}</button>;
+function Decision({ active, value, icon, label }: { active: boolean; value: string; icon: React.ReactNode; label: string }) {
+  return <button name="verdict" value={value} aria-pressed={active} className="scout-decision">{active ? <Check size={14} /> : icon}{label}</button>;
 }
-function Evidence({ title, items, warning=false }:{ title:string; items:string[]; warning?:boolean }) { return <div className="border-t border-black/8 py-2"><p className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-[.1em] ${warning ? "text-[var(--rust)]" : "text-[var(--pine)]"}`}>{warning ? <AlertCircle size={12} /> : null}{title}</p><ul className="mt-1 space-y-1 text-[11px] leading-4 text-[var(--muted-ink)]">{items.slice(0,4).map((item) => <li key={item}>• {item}</li>)}</ul></div>; }
-function money(cents:number) { return new Intl.NumberFormat("en-US", { style:"currency", currency:"USD" }).format(cents / 100); }
-function relativeTime(value:string) { const hours = Math.max(0, Math.round((Date.now() - new Date(value).getTime()) / 3600000)); return hours < 1 ? "now" : hours < 24 ? `${hours}h ago` : `${Math.round(hours/24)}d ago`; }
+
+function Evidence({ title, items }: { title: string; items: string[] }) {
+  return <div className="py-2"><p className="text-xs font-semibold">{title}</p><ul className="mt-1 list-disc space-y-1 pl-4 text-xs text-[var(--muted-ink)]">{items.slice(0, 4).map((item) => <li key={item}>{item}</li>)}</ul></div>;
+}
+
+function money(cents: number) {
+  return new Intl.NumberFormat("en-US", { style: "currency", currency: "USD" }).format(cents / 100);
+}
