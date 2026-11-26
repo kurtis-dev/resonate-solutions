@@ -57,6 +57,8 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
       if (!url || !id || !/\/products\/[^/]+\/?$/.test(url.pathname)) continue;
       // Brand-operated resale uses representative photos, so prefer exact-item listings in this shelf.
       if (["reworked.carhartt.com", "secondhand.levi.com", "wornwear.patagonia.com"].includes(url.hostname)) continue;
+      // Global Catalog can still index products from this password-gated storefront.
+      if (url.hostname.replace(/^www\./, "") === "badplaidthrift.com") continue;
       const photo = safeUrl((variant.media ?? product.media)?.find((media) => media.type === "image")?.url);
       if (!photo || photo.hostname !== "cdn.shopify.com") continue;
       const option = (name: RegExp) => variant.options?.find((value) => name.test(value.name))?.label ?? "";
