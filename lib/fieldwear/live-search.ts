@@ -1,8 +1,9 @@
 import { classifyGarment, scoreListing } from "./listing-model";
-import { departmentMatch, fitPriority, matchesScoutFit, type ScoutPreferences } from "./preferences";
+import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 import { scoutDatabase } from "./owner-access";
 import { searchEtsy, searchVintageShop, type LiveListing, type SourceResult } from "./inventory-sources";
 import { vintageShops } from "./marketplace-directory";
+import { vintageSignals } from "./vintage-signals";
 
 export const freshListingDays = 7;
 const day = 86_400_000;
@@ -20,6 +21,7 @@ type SearchResult = {
 
 type EbayMoney = { value?: string; currency?: string };
 type EbayItem = {
+  itemId?: string;
   legacyItemId?: string;
   itemWebUrl?: string;
   itemCreationDate?: string;
@@ -32,6 +34,7 @@ type EbayItem = {
   shippingOptions?: { shippingCost?: EbayMoney }[];
   condition?: string;
   shortDescription?: string;
+  localizedAspects?: { name?: string; value?: string }[];
 };
 
 let tokenCache: { value: string; expires: number } | undefined;
@@ -66,7 +69,14 @@ function buildQueries(preferences: ScoutPreferences, keywords: string) {
   const customKind = classifyGarment({ title: keywords });
   const lanes = keywords
     ? (customKind === "pants" ? [[pants, keywords]] : customKind === "shirt" ? [[shirt, keywords]] : [[shirt, `${keywords} shirt`], [pants, `${keywords} pants`]])
-    : [[shirt, "cotton work shirt"], [shirt, "chamois shirt"], [shirt, "flannel lined shirt jacket"], [shirt, "wool work shirt"], [pants, "canvas carpenter pants"], [pants, "straight denim jeans"], [pants, "wool trousers"]];
+    : [
+      [shirt, "cotton work shirt"], [shirt, "chamois shirt"], [shirt, "flannel lined shirt jacket"], [shirt, "wool work shirt"],
+      [shirt, "chambray work shirt"], [shirt, '("Big Mac","Big Yank",Fieldmaster,Hercules) shirt'],
+      [shirt, '("union made","made in usa",ACTWU) work shirt'],
+      [pants, "canvas carpenter pants"], [pants, "straight denim jeans"], [pants, "wool trousers"],
+      [pants, '("Key Imperial","Round House","Stan Ray") pants'], [pants, '("OG-107","cotton sateen") fatigue pants'],
+      [pants, '("union made","made in usa",ACTWU) work pants'], [pants, '(1980s,1990s,80s,90s) jeans'],
+    ];
   return Array.from(new Set(lanes.map(([sizes, garment]) => [department, sizes, garment].filter(Boolean).join(" "))));
 }
 
@@ -86,9 +96,11 @@ function mapItem(item: EbayItem, start: number, now: number): LiveListing | null
   const imageUrl = item.image?.imageUrl;
   if (!url || id !== url[1] || !imageUrl || !/^https:\/\/(?:[\w-]+\.)*ebayimg\.com\//i.test(imageUrl) || !item.title) return null;
   const description = item.shortDescription?.replace(/<[^>]*>/g, " ").slice(0, 1000);
+  const garment = classifyGarment({ title: item.title });
+  const sizes = (garment === "pants" ? pantsSizeTokens : shirtSizeTokens)(item.title.replace(/\b(?:[a-z]\.){2,}|\b[LS]\/[LS]\b/gi, ""));
   return {
     source: "ebay", externalId: id, title: item.title, imageUrl, listedAt,
-    url: `https://www.ebay.com/itm/${id}`, description, condition: item.condition,
+    url: `https://www.ebay.com/itm/${id}`, description, condition: item.condition, size: sizes.join(" / ") || undefined,
     priceCents: moneyCents(item.price ?? item.currentBidPrice),
     shippingCents: moneyCents(item.shippingOptions?.[0]?.shippingCost),
   };
@@ -114,17 +126,61 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { sta
     const { itemSummaries } = await response.json() as { itemSummaries?: EbayItem[] };
     return (itemSummaries ?? []).flatMap((item) => {
       const listing = mapItem(item, start, now);
-      return listing ? [listing] : [];
+      return listing ? [{ listing, itemId: item.itemId }] : [];
     });
   }));
-  const hits = new Map<string, LiveListing>();
+  const hits = new Map<string, { listing: LiveListing; itemId?: string }>();
   let succeeded = 0;
   for (const outcome of settled) {
     if (outcome.status !== "fulfilled") continue;
     succeeded++;
-    for (const listing of outcome.value) hits.set(listing.externalId, listing);
+    for (const hit of outcome.value) hits.set(hit.listing.externalId, hit);
   }
-  return { status: succeeded === queries.length ? "searched" : succeeded ? "partial" : "unavailable", listings: Array.from(hits.values()) };
+  const candidates = Array.from(hits.values());
+  const detailTargets = garmentTypes.flatMap((kind) => candidates
+    .filter(({ listing, itemId }) => itemId && !excluded.test(listing.title) && classifyGarment(listing) === kind &&
+      matchesScoutFit({ ...listing, garmentKind: kind }, preferences) && withinBudget(listing, kind, preferences))
+    .map((hit) => ({ hit, ...listingRank(hit.listing, preferences) }))
+    .sort(compareQuality)
+    .map(({ hit }) => hit)
+    .slice(0, 10));
+  // Details are optional so a slow single-item endpoint cannot stop Fresh finds.
+  await Promise.allSettled(detailTargets.map(async (hit) => {
+    const response = await fetch(`${ebay}/buy/browse/v1/item/${encodeURIComponent(hit.itemId!)}`, {
+      headers: { Authorization: `Bearer ${token}`, "X-EBAY-C-MARKETPLACE-ID": "EBAY_US" },
+      cache: "no-store", signal: AbortSignal.timeout(3500),
+    });
+    if (!response.ok) return;
+    const detail = await response.json() as EbayItem & { description?: string };
+    if (detail.image?.imageUrl && /^https:\/\/(?:[\w-]+\.)*ebayimg\.com\//i.test(detail.image.imageUrl)) {
+      hit.listing.imageUrl = detail.image.imageUrl;
+    }
+    const facts = detail.localizedAspects ?? [];
+    const labeled = facts.filter(({ name, value }) => value && /^(?:material|fabric type|decade|year manufactured|country of origin|inseam)$/i.test(name ?? ""))
+      .map(({ name, value }) => `${name}: ${/^inseam$/i.test(name ?? "") && /^\d{2}(?:\.\d+)?$/.test(value ?? "") ? `${value} in` : value}`);
+    const description = detail.description?.replace(/<\/?(?:p|div|li|tr|br)\b[^>]*>/gi, "\n").replace(/<[^>]*>/g, " ")
+      .replace(/&nbsp;/gi, " ").replace(/&quot;|&#34;/gi, '"').trim().slice(0, 4200);
+    hit.listing.description = [description || hit.listing.description, ...labeled].filter(Boolean).join("\n");
+  }));
+  return { status: succeeded === queries.length ? "searched" : succeeded ? "partial" : "unavailable", listings: candidates.map(({ listing }) => listing) };
+}
+
+function withinBudget(listing: LiveListing, kind: string, preferences: ScoutPreferences) {
+  const budget = kind === "pants" ? preferences.pantsBudget : preferences.shirtBudget;
+  return budget == null || listing.priceCents == null || listing.priceCents + (listing.shippingCents ?? 0) <= Math.round(budget * 100);
+}
+
+function listingRank(listing: LiveListing, preferences: ScoutPreferences) {
+  const signals = vintageSignals(listing);
+  return {
+    fit: fitPriority({ ...listing, garmentKind: classifyGarment(listing) }, preferences),
+    quality: signals.period * 17 + signals.build * 14 + scoreListing(listing, preferences).tasteMatch / 4,
+    listing,
+  };
+}
+
+function compareQuality(a: ReturnType<typeof listingRank>, b: ReturnType<typeof listingRank>) {
+  return b.fit - a.fit || b.quality - a.quality || b.listing.listedAt.localeCompare(a.listing.listedAt);
 }
 
 export async function searchNewListings(preferences: ScoutPreferences, keywords: string): Promise<SearchResult> {
@@ -145,12 +201,9 @@ export async function searchNewListings(preferences: ScoutPreferences, keywords:
     const fit = { ...listing, garmentKind };
     if ((garmentKind !== "shirt" && garmentKind !== "pants") || !departmentMatch(fit, preferences.department)) return [];
     if (preferences.matchingOnly && !matchesScoutFit(fit, preferences)) return [];
-    const budget = garmentKind === "pants" ? preferences.pantsBudget : preferences.shirtBudget;
-    if (budget != null && listing.priceCents != null && listing.priceCents + (listing.shippingCents ?? 0) > Math.round(budget * 100)) return [];
-    const score = scoreListing(listing, preferences);
-    if (score.fiberVerdict === "blend-or-synthetic") return [];
-    return [{ listing, garmentKind, fit: fitPriority(fit, preferences), quality: score.tasteMatch }];
-  }).sort((a, b) => b.fit - a.fit || b.quality - a.quality || b.listing.listedAt.localeCompare(a.listing.listedAt));
+    if (!withinBudget(listing, garmentKind, preferences)) return [];
+    return [{ ...listingRank(listing, preferences), garmentKind }];
+  }).sort(compareQuality);
   const listings = garmentTypes.flatMap((kind) => {
     const candidates = ranked.filter((item) => item.garmentKind === kind);
     const represented = results.flatMap(({ source }) => candidates.filter(({ listing }) => listing.source === source).slice(0, 2));

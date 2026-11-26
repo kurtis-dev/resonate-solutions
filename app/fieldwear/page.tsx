@@ -7,6 +7,7 @@ import { ScoutPreferencesForm } from "@/components/fieldwear/scout-preferences";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { curatedListings, type CuratedListing } from "@/lib/fieldwear/curated-listings";
 import { classifyGarment, scoreListing, type ListingInput } from "@/lib/fieldwear/listing-model";
+import { listingMeasurements, vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { readScoutEdition } from "@/lib/fieldwear/editions";
 import { isScoutOwner, readScoutPreferences, scoutDatabase } from "@/lib/fieldwear/owner-access";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
@@ -249,6 +250,8 @@ function toListingView(
     priceCents:input.priceCents ?? null,
     shippingCents:input.shippingCents ?? null,
     size:input.size ?? null,
+    measurements:listingMeasurements(input.description),
+    vintage:vintageSignals(input),
     condition:input.condition ?? null,
     firstSeenAt,
     lastSeenAt,

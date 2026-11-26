@@ -20,10 +20,12 @@ import { decideListing } from "@/app/fieldwear/actions";
 import type { GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { marketplaceName } from "@/lib/fieldwear/marketplace-directory";
+import type { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 
 export type ListingView = {
   source:string; externalId:string; url:string; title:string; imageUrl:string|null;
   priceCents:number|null; shippingCents:number|null; size:string|null; condition:string|null;
+  measurements:string[]; vintage:ReturnType<typeof vintageSignals>;
   firstSeenAt:string; lastSeenAt:string; totalScore:number; fitScore:number; constructionScore:number;
   listedAt?:string;
   ageScore:number; conditionScore:number; valueScore:number; documentationScore:number;
@@ -42,7 +44,7 @@ type ShelfDefinition = {
   compare?:(a:ListingView, b:ListingView) => number;
 };
 
-type QuickFilter = "all"|"my-sizes"|"natural-fibers"|"pre-1985"|"under-budget";
+type QuickFilter = "all"|"my-sizes"|"natural-fibers"|"pre-1999"|"under-budget";
 type SortMode = "match"|"era"|"price"|"recent";
 type CatalogScope = "all"|"shirts"|"pants";
 
@@ -50,18 +52,16 @@ const HEAVY_TERMS = /\b(chamois|heavy(?:weight)?|flannel|canvas|duck|overshirt|w
 const LINED_TERMS = /\b(?:blanket|flannel|fleece|quilt(?:ed)?|sherpa)[- ]lined\b|\blined\b|\binsulated\b|\bshirt[- ]?(?:jacket|jac)\b|\bshacket\b/i;
 const PATTERN_TERMS = /\b(plaid|check(?:ed)?|tartan|buffalo)\b/i;
 const PLAIN_WORK_TERMS = /\b(work|utility|chore|chambray|denim|canvas|duck|button[- ]?(?:down|front))\b/i;
-const SYNTHETIC_TERMS = /\b(polyester|poly blend|acrylic|nylon)\b/i;
 
 function listingText(item:ListingView) {
   return [item.source, item.title, ...item.evidence.confirmed, ...item.evidence.sellerClaims, ...item.evidence.visualClues].join(" ");
 }
 
 function matchesQuickFilter(item:ListingView, filter:QuickFilter, preferences:ScoutPreferences) {
-  const text = listingText(item);
   const total = item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
   if (filter === "my-sizes") return matchesScoutFit(item, preferences);
-  if (filter === "natural-fibers") return /\b(?:100%\s*)?(?:cotton|wool|chamois)\b/i.test(text) && !SYNTHETIC_TERMS.test(text);
-  if (filter === "pre-1985") return item.eraConfidence >= 40;
+  if (filter === "natural-fibers") return item.vintage.natural;
+  if (filter === "pre-1999") return item.vintage.period > 1;
   if (filter === "under-budget") {
     const budget = item.garmentKind === "pants" ? preferences.pantsBudget : preferences.shirtBudget;
     return budget == null || (total != null && total <= Math.round(budget * 100));
@@ -71,7 +71,7 @@ function matchesQuickFilter(item:ListingView, filter:QuickFilter, preferences:Sc
 
 function compareListings(mode:SortMode) {
   return (a:ListingView, b:ListingView) => {
-    if (mode === "era") return b.eraConfidence-a.eraConfidence || b.totalScore-a.totalScore;
+    if (mode === "era") return b.vintage.period-a.vintage.period || b.totalScore-a.totalScore;
     if (mode === "price") {
       const aPrice = a.priceCents == null ? Number.MAX_SAFE_INTEGER : a.priceCents + (a.shippingCents ?? 0);
       const bPrice = b.priceCents == null ? Number.MAX_SAFE_INTEGER : b.priceCents + (b.shippingCents ?? 0);
@@ -86,7 +86,7 @@ type GarmentShelf = "plain-work"|"heavy-cotton"|"lined-shirt-jackets"|null;
 
 function garmentShelf(item:ListingView):GarmentShelf {
   const text = listingText(item);
-  if (SYNTHETIC_TERMS.test(text)) return null;
+  if (item.vintage.build < 0) return null;
   if (item.curatedCategory === "lined-shirt-jackets" || LINED_TERMS.test(text)) return "lined-shirt-jackets";
   if (item.curatedCategory === "heavy-cotton-chamois") return "heavy-cotton";
   if (item.curatedCategory === "plain-work-shirts") return "plain-work";
@@ -275,7 +275,7 @@ export function ListingWorkbench({ listings, preferences }: { listings:ListingVi
             ["all", "Everything"],
             ["my-sizes", "My sizes"],
             ["natural-fibers", "Natural fibers"],
-            ["pre-1985", "Likely pre-1985"],
+            ["pre-1999", "Pre-1999 clues"],
             ["under-budget", "Under budget"],
           ] as const).map(([value, label]) => (
             <button key={value} type="button" aria-pressed={quickFilter === value} onClick={() => setQuickFilter(value)} className={`min-h-10 shrink-0 cursor-pointer rounded-full border px-4 text-xs font-bold transition active:scale-[.98] ${quickFilter === value ? "border-[var(--pine)] bg-[var(--pine)] text-white" : "border-black/10 bg-white text-[var(--muted-ink)] hover:border-[var(--pine)] hover:text-[var(--pine)]"}`}>{label}</button>
@@ -375,8 +375,6 @@ export function ListingShelf({ id, label, description, items }:{ id:string; labe
 function ListingCard({ item }: { item:ListingView }) {
   const total = item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
   const sourceLabel = marketplaceName(item.source);
-  const scoreLabel = item.totalScore >= 75 ? "Strong lead" : item.totalScore >= 60 ? "Worth a look" : "Needs proof";
-  const confidenceLabel = item.eraConfidence >= 40 ? `${item.eraConfidence}% era confidence` : item.tasteMatch >= 55 ? `${item.tasteMatch}% taste match` : scoreLabel;
 
   return (
     <article className="w-[82vw] min-w-[278px] max-w-[348px] shrink-0 snap-start overflow-hidden rounded-[24px] border border-black/8 bg-white shadow-[0_14px_38px_rgba(44,38,27,.08)] sm:w-[326px]">
@@ -388,8 +386,6 @@ function ListingCard({ item }: { item:ListingView }) {
           <span className="grid h-full place-items-center text-[var(--muted-ink)]"><ImageOff size={30} /><span className="sr-only">No marketplace photo supplied</span></span>
         )}
         <span className="absolute inset-x-0 bottom-0 h-28 bg-gradient-to-t from-black/65 to-transparent" aria-hidden="true" />
-        <span className="absolute left-3 top-3 rounded-full bg-[rgba(31,48,36,.92)] px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.1em] text-white">{confidenceLabel}</span>
-        <span className="absolute right-3 top-3 grid h-12 w-12 place-items-center rounded-full bg-white text-sm font-black text-[var(--pine)] shadow" aria-label={`Quality score ${item.totalScore} out of 100`}>{item.totalScore}</span>
         <span className="absolute bottom-3 left-3 rounded-full bg-white/95 px-3 py-1.5 text-[10px] font-bold uppercase tracking-[.12em] text-[var(--pine)]">{item.garmentKind === "pants" ? "Pants · " : item.garmentKind === "shirt" ? "Shirt · " : ""}{sourceLabel}</span>
       </a>
 
@@ -411,15 +407,12 @@ function ListingCard({ item }: { item:ListingView }) {
         </div>
 
         <details className="mt-4 rounded-xl bg-[var(--paper)] px-3 py-2">
-          <summary className="min-h-10 cursor-pointer py-2 text-xs font-bold">Evidence & scoring</summary>
-          <div className="grid grid-cols-3 gap-2 border-t border-black/8 py-3 text-center text-[10px]"><Score label="Fit" value={item.fitScore} max={25} /><Score label="Build" value={item.constructionScore} max={25} /><Score label="Age" value={item.ageScore} max={20} /><Score label="Condition" value={item.conditionScore} max={15} /><Score label="Value" value={item.valueScore} max={10} /><Score label="Proof" value={item.documentationScore} max={5} /></div>
-          {item.evidence.confirmed.length > 0 ? <Evidence title="Confirmed" items={item.evidence.confirmed} /> : null}
-          {item.tasteReasons.length > 0 ? <Evidence title="Why it matches" items={item.tasteReasons} /> : null}
-          {item.eraReasons.length > 0 ? <Evidence title="Era assessment" items={item.eraReasons} warning={item.eraConfidence < 40} /> : null}
+          <summary className="min-h-10 cursor-pointer py-2 text-xs font-bold">Listing details</summary>
+          {item.measurements.length > 0 ? <Evidence title="Seller measurements" items={item.measurements} /> : null}
+          <Evidence title="Age and construction" items={[item.vintage.eraNote, ...(item.vintage.fabricNote ? [item.vintage.fabricNote] : [])]} />
           {item.evidence.visualClues.length > 0 ? <Evidence title="Corroborating clues" items={item.evidence.visualClues} /> : null}
           {item.evidence.sellerClaims.length > 0 ? <Evidence title="Seller claims" items={item.evidence.sellerClaims} /> : null}
-          {item.missing.length > 0 ? <Evidence title="Still missing" items={item.missing} warning /> : null}
-          {item.concerns.length > 0 ? <Evidence title="Concerns" items={item.concerns} warning /> : null}
+          {item.condition ? <Evidence title="Listed condition" items={[item.condition]} /> : null}
         </details>
 
         <form action={decideListing} className="mt-3 grid grid-cols-3 gap-2">
@@ -436,7 +429,6 @@ function ListingCard({ item }: { item:ListingView }) {
 function Decision({ active, value, icon, label }:{ active:boolean; value:string; icon:React.ReactNode; label:string }) {
   return <button name="verdict" value={value} aria-pressed={active} className={`flex min-h-11 cursor-pointer items-center justify-center gap-1 rounded-xl border text-xs font-bold transition active:scale-[.98] ${active ? "border-[var(--pine)] bg-[var(--pine)] text-white" : "border-black/10 bg-white text-[var(--muted-ink)] hover:border-[var(--pine)] hover:text-[var(--pine)]"}`}>{active ? <Check size={14} /> : icon}{label}</button>;
 }
-function Score({ label, value, max }:{ label:string; value:number; max:number }) { return <div className="rounded-lg bg-white px-1 py-2"><strong className="block text-sm">{value}<span className="font-normal text-black/40">/{max}</span></strong><span className="text-[var(--muted-ink)]">{label}</span></div>; }
 function Evidence({ title, items, warning=false }:{ title:string; items:string[]; warning?:boolean }) { return <div className="border-t border-black/8 py-2"><p className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-[.1em] ${warning ? "text-[var(--rust)]" : "text-[var(--pine)]"}`}>{warning ? <AlertCircle size={12} /> : null}{title}</p><ul className="mt-1 space-y-1 text-[11px] leading-4 text-[var(--muted-ink)]">{items.slice(0,4).map((item) => <li key={item}>• {item}</li>)}</ul></div>; }
 function money(cents:number) { return new Intl.NumberFormat("en-US", { style:"currency", currency:"USD" }).format(cents / 100); }
 function relativeTime(value:string) { const hours = Math.max(0, Math.round((Date.now() - new Date(value).getTime()) / 3600000)); return hours < 1 ? "now" : hours < 24 ? `${hours}h ago` : `${Math.round(hours/24)}d ago`; }
