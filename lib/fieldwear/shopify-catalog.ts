@@ -100,10 +100,9 @@ export async function searchShopifyCatalog(preferences: ScoutPreferences, keywor
   const results = await Promise.allSettled(lanes.map(async (lane, index) => {
     const sizeWords = index < 3 ? sizes.join(" ") : sizes[index % sizes.length] ?? "";
     const fetchPage = async (cursor?: string) => {
-      const response = await fetch(endpoint, {
+      const request: RequestInit = {
         method: "POST",
         cache: "no-store",
-        signal: AbortSignal.timeout(8_000),
         headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
         body: JSON.stringify({
           jsonrpc: "2.0", id: 1, method: "tools/call",
@@ -119,7 +118,16 @@ export async function searchShopifyCatalog(preferences: ScoutPreferences, keywor
             },
           } },
         }),
-      });
+      };
+      const send = () => fetch(endpoint, { ...request, signal: AbortSignal.timeout(8_000) });
+      let response = await send();
+      if (response.status === 429) {
+        const seconds = Number(response.headers.get("retry-after") ?? 1);
+        if (seconds >= 0 && seconds <= 2) {
+          await new Promise((resolve) => setTimeout(resolve, Math.max(1, seconds) * 1000));
+          response = await send();
+        }
+      }
       if (!response.ok) throw new Error(`Shopify HTTP ${response.status}`);
       const body = await response.json() as { result?: { structuredContent?: { products?: CatalogProduct[]; pagination?: { cursor?: string; has_next_page?: boolean } } } };
       const products = body.result?.structuredContent?.products;
