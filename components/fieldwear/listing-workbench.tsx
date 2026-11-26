@@ -26,7 +26,7 @@ import "@/app/fieldwear/catalog.css";
 
 export type ListingView = {
   source:string; externalId:string; url:string; title:string; imageUrl:string|null;
-  priceCents:number|null; shippingCents:number|null; size:string|null; condition:string|null;
+  priceCents:number|null; priceKind?:"bid"; shippingCents:number|null; size:string|null; condition:string|null;
   sizeBasis?:"tag" | "seller-fit" | "measured";
   sellerName?:string | null;
   colors:ColorFamily[];
@@ -441,12 +441,13 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const resultsRef = useRef<HTMLDivElement>(null);
   const invalidRange = min !== "" && max !== "" && Number(min) > Number(max);
   const marketplaces = Array.from(new Set(items.map((item) => item.source))).sort((a, b) => marketplaceName(a).localeCompare(marketplaceName(b)));
+  const catalogMerchants = Array.from(new Set(items.flatMap((item) => item.source === "shopifycatalog" && item.sellerName ? [item.sellerName] : []))).sort();
   const tagSizes = Array.from(new Set(items.flatMap(({ size }) => size ? [size] : []))).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   const hasVintageShops = marketplaces.some(isVintageShop);
   const { results, colorCounts } = useMemo(() => {
     const shownUrls = new Set<string>();
     const base = items.filter((item) => {
-      if ((kind !== "all" && item.garmentKind !== kind) || !matchesMarketplace(item.source, marketplace) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
+      if ((kind !== "all" && item.garmentKind !== kind) || (marketplace.startsWith("shopifycatalog:") ? item.source !== "shopifycatalog" || item.sellerName !== marketplace.slice(15) : !matchesMarketplace(item.source, marketplace)) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
       const cents = priceForSort(item);
       if ((min !== "" || max !== "") && (cents == null || (min !== "" && cents < Number(min) * 100) || (max !== "" && cents > Number(max) * 100))) return false;
       const url = URL.canParse(item.url) ? new URL(item.url) : null;
@@ -460,7 +461,6 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
       for (const color of itemColors) counts.set(color, (counts.get(color) ?? 0) + 1);
     }
     const filtered = colors.length ? base.filter((item) => item.colors.some((color) => colors.includes(color))) : base;
-    if (order === "newest") filtered.sort((a, b) => (b.listedAt ?? "").localeCompare(a.listedAt ?? ""));
     if (order === "oldest-garment") filtered.sort((a, b) => b.vintage.period - a.vintage.period);
     if (order === "low" || order === "high") filtered.sort((a, b) => {
       const left = priceForSort(a);
@@ -520,7 +520,6 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
             <span>Sort</span>
             <select aria-label="Sort listings" value={order} onChange={(event) => { setOrder(event.target.value); setPage(1); }}>
               <option value="relevance">Best match</option>
-              <option value="newest">Recently listed</option>
               <option value="oldest-garment">Older garment clues</option>
               <option value="low">Price + shipping, low to high</option>
               <option value="high">Price + shipping, high to low</option>
@@ -546,6 +545,9 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
             <option value="">All marketplaces</option>
             {hasVintageShops ? <option value="shops">Vintage shops</option> : null}
             {marketplaces.map((source) => <option key={source} value={source}>{marketplaceName(source)}</option>)}
+            {catalogMerchants.length ? <optgroup label="Shops found via Shopify">
+              {catalogMerchants.map((merchant) => <option key={merchant} value={`shopifycatalog:${merchant}`}>{merchant}</option>)}
+            </optgroup> : null}
           </select>
         </label>
         <label className="min-w-0 text-xs font-medium">Era
@@ -605,7 +607,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
           onClick={() => { setMarketplace(shopsSelected ? "" : "shops"); setPage(1); }}>Vintage shops</button> : null}
         </div>
       </div>
-      {expired ? <p role="status" className="mb-3 text-xs text-[var(--muted-ink)]">Shopify prices and stock expired. Use Search now to check again.</p> : null}
+      {expired ? <p role="status" className="mb-3 text-xs text-[var(--muted-ink)]">Use Search now to check Shopify stock again.</p> : null}
       {colors.length > 0 ? (
         <div className="mb-3 flex flex-wrap gap-2" aria-label="Selected colors">
           {colorFamilies.filter(({ label }) => colors.includes(label)).map(({ label, swatch }) => (
@@ -620,7 +622,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid priority={index < 4} />)}
       </div>
       {lastPage > 1 ? (
-        <nav className="mt-5 flex items-center justify-between gap-4" aria-label="Fresh finds pages">
+        <nav className="mt-5 flex items-center justify-between gap-4" aria-label="Workwear catalog pages">
           <button type="button" aria-label="Previous page" disabled={currentPage === 1} onClick={() => go(currentPage - 1)} className="min-h-11 rounded-full border border-black/15 bg-white px-4 text-sm font-bold disabled:opacity-40">Previous</button>
           <span className="text-sm tabular-nums">Page {currentPage} of {lastPage}</span>
           <button type="button" aria-label="Next page" disabled={currentPage === lastPage} onClick={() => go(currentPage + 1)} className="min-h-11 rounded-full border border-black/15 bg-white px-4 text-sm font-bold disabled:opacity-40">Next</button>
@@ -643,7 +645,7 @@ function ListingPhoto({ imageUrl, title, priority = false }: Pick<ListingView, "
 function ListingCard({ item, grid = false, priority = false }: { item: ListingView; grid?: boolean; priority?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
-  const displayPrice = item.priceCents == null ? "Price unlisted" : money(item.priceCents);
+  const displayPrice = item.priceCents == null ? "Price unlisted" : `${money(item.priceCents)}${item.priceKind === "bid" ? " bid" : ""}`;
   const total = item.priceCents != null && item.shippingCents != null ? money(item.priceCents + item.shippingCents) : null;
   const sourceLabel = item.sellerName ?? marketplaceName(item.source);
   const catalogItem = item.source === "shopifycatalog";
@@ -658,9 +660,8 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
     { label: "Fabric", value: item.vintage.fabricNote },
     { label: "Color", value: item.colors.join(", ") },
     { label: "Era", value: item.vintage.eraNote },
-    { label: "Listed", value: item.listedAt ? new Date(item.listedAt).toLocaleDateString("en-US", { timeZone: "America/Chicago", dateStyle: "medium" }) : null },
     { label: "Shipping", value: item.shippingCents == null ? "Unknown" : money(item.shippingCents) },
-    { label: "Item + shipping", value: total },
+    { label: item.priceKind === "bid" ? "Bid + shipping" : "Item + shipping", value: total },
   ];
 
   return (

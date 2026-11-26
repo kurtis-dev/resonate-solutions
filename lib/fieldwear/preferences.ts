@@ -45,14 +45,20 @@ export function pantsSizeTokens(input: string) {
   return dimensions.length ? dimensions : shirtSizeTokens(input);
 }
 
-export type FitListing = { title: string; size?: string | null; garmentKind: string };
+export function reportedPantsFit(title: string) {
+  const fit = title.match(/\b(?:fits?(?:[ -]+like)?|actual(?:[ -]+(?:size|fit))?|measures)\s*[:=]?[ -]*W?\s*(\d{2}(?:\.\d{1,2})?)\s*[x×]\s*L?\s*(\d{2}(?:\.\d{1,2})?)\b/i);
+  return fit ? `${fit[1]}x${fit[2]}` : undefined;
+}
+
+export type FitListing = { title: string; size?: string | null; sizeBasis?: "tag" | "seller-fit" | "measured"; garmentKind: string };
 
 export function sizeMatch(item: FitListing, preferences: ScoutPreferences) {
   const pants = item.garmentKind === "pants";
   const targets = pants ? preferences.pantsSizes : preferences.shirtSizes;
   if (!targets.length) return true;
   const parse = pants ? pantsSizeTokens : shirtSizeTokens;
-  const field = item.size?.trim() ?? "";
+  const reported = pants && item.sizeBasis !== "measured" ? reportedPantsFit(item.title) : undefined;
+  const field = reported ?? item.size?.trim() ?? "";
   const tagged = parse(field);
   if (/^\d{1,2}(?:\.5)?$/.test(field)) tagged.push(field);
   const title = item.title.replace(/\b(?:[a-z]\.){2,}/gi, "");

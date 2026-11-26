@@ -12,10 +12,24 @@ export const vintageShops = [
 
 export type VintageShopSource = (typeof vintageShops)[number]["source"];
 
+export const marketplaceBrowse: Readonly<Record<string, { name: string; url: string }>> = {
+  etsy: { name: "Etsy", url: "https://www.etsy.com/market/carhartt_work_pants" },
+  grailed: { name: "Grailed", url: "https://www.grailed.com/browse/carhartt-work-pants" },
+  mercari: { name: "Mercari", url: "https://www.mercari.com/us/shop/carhartt-work-pants/" },
+  depop: { name: "Depop", url: "https://www.depop.com/search/?q=carhartt%20work%20pants" },
+  poshmark: { name: "Poshmark", url: "https://poshmark.com/browse/mens-work-pants-carhartt" },
+  vinted: { name: "Vinted", url: "https://www.vinted.com/catalog/583-pants/brand/362-carhartt" },
+  shopgoodwill: { name: "ShopGoodwill", url: "https://shopgoodwill.com/" },
+  carharttreworked: { name: "Carhartt Reworked", url: "https://reworked.carhartt.com/collections/mens-pants-jeans-shorts-loose-fit" },
+  geartrade: { name: "Geartrade", url: "https://geartrade.com/" },
+  salvationarmy: { name: "ShopTheSalvationArmy", url: "https://www.shopthesalvationarmy.com/Browse/C160719-C187090/" },
+  wornwear: { name: "Patagonia Worn Wear", url: "https://wornwear.patagonia.com/" },
+};
+
 export function marketplaceName(source: string) {
   if (source === "shopifycatalog") return "Shopify Global Catalog";
   if (source === "ebay") return "eBay";
-  if (source === "shopgoodwill") return "ShopGoodwill";
+  if (marketplaceBrowse[source]) return marketplaceBrowse[source].name;
   return vintageShops.find((shop) => shop.source === source)?.name
     ?? (source ? source[0].toUpperCase() + source.slice(1) : "Marketplace");
 }

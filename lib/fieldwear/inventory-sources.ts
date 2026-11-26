@@ -2,9 +2,9 @@ import { classifyGarment, type ListingInput } from "./listing-model";
 import { setTimeout as delay } from "node:timers/promises";
 import { vintageShops } from "./marketplace-directory";
 import { vintageSignals } from "./vintage-signals";
-import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, shirtSizeTokens, type ScoutPreferences } from "./preferences";
+import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, reportedPantsFit, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 
-export type LiveListing = ListingInput & { listedAt: string };
+export type LiveListing = ListingInput & { listedAt: string; endsAt?: string };
 export type SourceResult = {
   status: "searched" | "partial" | "unavailable" | "needs-access" | "no-feed";
   listings: LiveListing[];
@@ -151,6 +151,8 @@ export function shopSize(title: string, notes: string, option: string, garmentKi
   if (inlineDimensions) return { size: `${Number(inlineDimensions[1])}x${Number(inlineDimensions[2])}`, sizeBasis: "measured" };
   const fitDimensions = pantsSizeTokens(fitSize ?? "").filter((size) => size.includes("x"));
   if (fitDimensions.length) return { size: fitDimensions.join(" / "), sizeBasis: "seller-fit" };
+  const reported = reportedPantsFit(title);
+  if (reported) return { size: reported, sizeBasis: "seller-fit" };
   const dimensions = pantsSizeTokens(title).filter((size) => size.includes("x"));
   if (dimensions.length) return { size: dimensions.join(" / "), sizeBasis: "seller-fit" };
   const tagged = pantsSizeTokens(taggedSize ?? "").filter((size) => size.includes("x")).join(" / ");
@@ -269,7 +271,7 @@ export async function searchEtsy(preferences: ScoutPreferences, keywords: string
     return sizes[0] ? [phrase, `${phrase} ${sizes[0]}`] : [phrase];
   }));
   const settled = await Promise.allSettled(Array.from(querySet, async (keywords) => {
-    const params = new URLSearchParams({ keywords, sort_on: "created", sort_order: "desc", limit: "50", currency: "USD", buyer_country: "US" });
+    const params = new URLSearchParams({ keywords, sort_on: "score", limit: "50", currency: "USD", buyer_country: "US" });
     const response = await fetchEtsy(`/listings/active?${params}`, options, signal);
     if (!response.ok) throw new Error(`Etsy search status ${response.status}`);
     return ((await response.json()) as { results: EtsyListing[] }).results;

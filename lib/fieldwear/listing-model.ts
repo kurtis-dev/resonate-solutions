@@ -24,6 +24,7 @@ export type ListingInput = {
   imageUrl?: string | null;
   priceCents?: number | null;
   shippingCents?: number | null;
+  priceKind?: "bid";
   size?: string | null;
   sizeBasis?: "tag" | "seller-fit" | "measured";
   color?: string | null;

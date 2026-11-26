@@ -1,13 +1,11 @@
 import { classifyGarment, scoreListing } from "./listing-model";
 import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 import { scoutDatabase } from "./owner-access";
-import { searchEtsy, searchVintageShop, type LiveListing, type SourceResult } from "./inventory-sources";
+import { isSturdyShopGarment, searchEtsy, searchVintageShop, type LiveListing, type SourceResult } from "./inventory-sources";
 import { isVintageShop, vintageShops } from "./marketplace-directory";
 import { vintageSignals } from "./vintage-signals";
-import { lookDays, matchLook, type LookHunt, type LookProfile } from "./look-search";
+import { matchLook, type LookHunt, type LookProfile } from "./look-search";
 
-export const freshListingDays = 7;
-export type ListingDays = 7 | 30;
 const day = 86_400_000;
 const ebay = "https://api.ebay.com";
 const excluded = /\b(?:reproduction|replica|vintage[- ]style|print.on.demand|dry rot|sewing pattern|digital download|graphic tee|t-?shirt)\b/i;
@@ -16,7 +14,6 @@ const garmentTypes = ["shirt", "pants"] as const;
 type SearchResult = {
   searchedAt: string;
   keywords: string;
-  days?: ListingDays;
   hunt?: LookHunt;
   status: "ok" | "partial" | "unavailable" | "unconfigured";
   listings: LiveListing[];
@@ -78,6 +75,7 @@ function buildQueries(preferences: ScoutPreferences, keywords: string, hunt?: Lo
       [shirt, "chambray work shirt"], [shirt, '("Big Mac","Big Yank",Fieldmaster,Hercules) shirt'],
       [shirt, '("union made","made in usa",ACTWU) work shirt'],
       [pants, "canvas carpenter pants"], [pants, "straight denim jeans"], [pants, "wool trousers"],
+      [pants, "(Carhartt,Dickies,Wrangler) double knee work pants"], [pants, "(Ben Davis,Red Kap,Big Smith) work pants"],
       [pants, '("Key Imperial","Round House","Stan Ray") pants'], [pants, '("OG-107","cotton sateen") fatigue pants'],
       [pants, '("union made","made in usa",ACTWU) work pants'], [pants, '(1980s,1990s,80s,90s) jeans'],
     ];
@@ -100,10 +98,8 @@ function moneyCents(price?: EbayMoney) {
   return Number.isFinite(value) && value >= 0 ? Math.round(value * 100) : null;
 }
 
-function mapItem(item: EbayItem, start: number, now: number): LiveListing | null {
+function mapItem(item: EbayItem, now: number): LiveListing | null {
   const listedAt = item.itemOriginDate ?? item.itemCreationDate;
-  const listedTime = Date.parse(listedAt ?? "");
-  if (!listedAt || !(listedTime >= start && listedTime <= now)) return null;
   if (item.itemEndDate && Date.parse(item.itemEndDate) <= now) return null;
   const url = item.itemWebUrl?.match(/^https:\/\/(?:www\.)?ebay\.com\/itm\/(?:[^/?#]+\/)?(\d+)(?:[/?#]|$)/i);
   const id = item.legacyItemId ?? url?.[1];
@@ -113,14 +109,15 @@ function mapItem(item: EbayItem, start: number, now: number): LiveListing | null
   const garment = classifyGarment({ title: item.title });
   const sizes = (garment === "pants" ? pantsSizeTokens : shirtSizeTokens)(item.title.replace(/\b(?:[a-z]\.){2,}|\b[LS]\/[LS]\b/gi, ""));
   return {
-    source: "ebay", externalId: id, title: item.title, imageUrl, listedAt,
+    source: "ebay", externalId: id, title: item.title, imageUrl, listedAt: listedAt && Number.isFinite(Date.parse(listedAt)) ? listedAt : new Date(now).toISOString(), endsAt: item.itemEndDate,
     url: `https://www.ebay.com/itm/${id}`, description, condition: item.condition, size: sizes.join(" / ") || undefined,
     priceCents: moneyCents(item.price ?? item.currentBidPrice),
+    priceKind: !item.price && item.currentBidPrice ? "bid" : undefined,
     shippingCents: moneyCents(item.shippingOptions?.[0]?.shippingCost),
   };
 }
 
-async function searchEbay(preferences: ScoutPreferences, keywords: string, { start, now }: { start: number; now: number }, hunt?: LookHunt): Promise<SourceResult> {
+async function searchEbay(preferences: ScoutPreferences, keywords: string, { now }: { now: number }, hunt?: LookHunt): Promise<SourceResult> {
   const client = process.env.EBAY_CLIENT_ID;
   const secret = process.env.EBAY_CLIENT_SECRET;
   if (!client || !secret) return { status: "needs-access", listings: [] };
@@ -130,9 +127,13 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { sta
     const fetchPage = async (offset: number) => {
       const params = new URLSearchParams({
         q, limit: verifySize ? "30" : "100", offset: String(offset),
-        filter: `conditions:{USED},buyingOptions:{${hunt ? "FIXED_PRICE" : "FIXED_PRICE|AUCTION"}},itemStartDate:[${new Date(start).toISOString()}..${new Date(now).toISOString()}]`,
+        filter: [
+          "conditions:{USED}",
+          `buyingOptions:{${hunt ? "FIXED_PRICE" : "FIXED_PRICE|AUCTION"}}`,
+          classifyGarment({ title: q }) === "pants" && preferences.pantsBudget != null
+            ? `price:[0..${preferences.pantsBudget}],priceCurrency:USD` : "",
+        ].filter(Boolean).join(","),
       });
-      if (!hunt) params.set("sort", "newlyListed");
       const response = await fetch(`${ebay}/buy/browse/v1/item_summary/search?${params}`, {
         headers: { Authorization: `Bearer ${token}`, "X-EBAY-C-MARKETPLACE-ID": "EBAY_US" },
         cache: "no-store", signal: AbortSignal.timeout(offset === 0 ? 7000 : 4000),
@@ -142,11 +143,12 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { sta
     };
     const first = await fetchPage(0);
     const second = first.next && !verifySize ? await fetchPage(100).catch(() => null) : undefined;
-    const hits = [...(first.itemSummaries ?? []), ...(second?.itemSummaries ?? [])].flatMap((item) => {
-      const listing = mapItem(item, start, now);
+    const third = !hunt && second?.next ? await fetchPage(200).catch(() => null) : undefined;
+    const hits = [...(first.itemSummaries ?? []), ...(second?.itemSummaries ?? []), ...(third?.itemSummaries ?? [])].flatMap((item) => {
+      const listing = mapItem(item, now);
       return listing ? [{ listing, itemId: item.itemId, verifySize }] : [];
     });
-    return { hits, partial: second === null };
+    return { hits, partial: second === null || third === null };
   }));
   const hits = new Map<string, { listing: LiveListing; itemId?: string; verifySize: boolean }>();
   let succeeded = 0;
@@ -176,7 +178,7 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { sta
       ...matching.filter((hit) => !isBrowning(hit)).slice(0, 14),
     ];
   });
-  // Details are optional so a slow single-item endpoint cannot stop Fresh finds.
+  // Details are optional so a slow single-item endpoint cannot stop the catalog.
   await Promise.allSettled(detailTargets.map(async (hit) => {
     const response = await fetch(`${ebay}/buy/browse/v1/item/${encodeURIComponent(hit.itemId!)}`, {
       headers: { Authorization: `Bearer ${token}`, "X-EBAY-C-MARKETPLACE-ID": "EBAY_US" },
@@ -235,12 +237,12 @@ function listingRank(listing: LiveListing, preferences: ScoutPreferences) {
 }
 
 function compareQuality(a: ReturnType<typeof listingRank>, b: ReturnType<typeof listingRank>) {
-  return b.fit - a.fit || b.quality - a.quality || b.listing.listedAt.localeCompare(a.listing.listedAt);
+  return b.fit - a.fit || b.quality - a.quality || (a.listing.priceCents ?? Infinity) - (b.listing.priceCents ?? Infinity);
 }
 
-export async function searchNewListings(preferences: ScoutPreferences, keywords: string, days: ListingDays = freshListingDays, hunt?: LookHunt): Promise<SearchResult> {
+export async function searchNewListings(preferences: ScoutPreferences, keywords: string, hunt?: LookHunt): Promise<SearchResult> {
   const now = Date.now();
-  const window = { now, start: now - (hunt ? lookDays : days) * day };
+  const window = { now, start: 0 };
   const otherKeywords = hunt ? (hunt.profile === "browning" ? "suede elbow shirt" : hunt.traits.slice(0, 2).join(" ")) : keywords;
   const requests = [
     { source: "ebay", run: searchEbay(preferences, keywords, window, hunt) },
@@ -256,8 +258,10 @@ export async function searchNewListings(preferences: ScoutPreferences, keywords:
     const garmentKind = hunt ? classifyGarment({ title: listing.title, size: listing.size }) : classifyGarment(listing);
     const fit = { ...listing, garmentKind };
     if ((garmentKind !== "shirt" && garmentKind !== "pants") || !departmentMatch(fit, preferences.department)) return [];
-    if ((hunt || preferences.matchingOnly) && !matchesScoutFit(fit, preferences)) return [];
+    if ((hunt || preferences.matchingOnly || garmentKind === "pants") && !matchesScoutFit(fit, preferences)) return [];
     if (!withinBudget(listing, garmentKind, preferences)) return [];
+    if (garmentKind === "pants" && preferences.pantsBudget != null && listing.priceCents == null) return [];
+    if (!hunt && garmentKind === "pants" && !isSturdyShopGarment(listing.title, listing.description ?? "", "pants")) return [];
     const look = hunt ? matchLook(listing, hunt) : undefined;
     if (hunt && (garmentKind !== hunt.kind || !look || listing.priceCents == null)) return [];
     return [{ ...listingRank(listing, preferences), garmentKind, look: look?.rank ?? 0 }];
@@ -266,21 +270,21 @@ export async function searchNewListings(preferences: ScoutPreferences, keywords:
     const candidates = ranked.filter((item) => item.garmentKind === kind);
     const marketplace = candidates.filter(({ listing }) => !isVintageShop(listing.source));
     const represented = results.flatMap(({ source }) => marketplace.filter(({ listing }) => listing.source === source).slice(0, 2));
-    const shopListings = vintageShops.flatMap(({ source }) => candidates.filter(({ listing }) => listing.source === source).slice(0, 24));
-    const included = new Set([...Array.from(new Set([...represented, ...marketplace])).slice(0, 120), ...shopListings]);
+    const shopListings = vintageShops.flatMap(({ source }) => candidates.filter(({ listing }) => listing.source === source).slice(0, 48));
+    const included = new Set([...Array.from(new Set([...represented, ...marketplace])).slice(0, kind === "pants" ? 360 : 120), ...shopListings]);
     return candidates.filter((item) => included.has(item)).map(({ listing }) => listing);
   });
   const succeeded = results.some(({ status }) => status === "searched" || status === "partial");
   const status = succeeded ? (results.some(({ status }) => status === "unavailable" || status === "partial") ? "partial" : "ok") : "unavailable";
   const coverage: NonNullable<SearchResult["coverage"]> = [
     ...results.map(({ source, status }) => ({ source, status })),
-    ...["grailed", "mercari", "depop", "poshmark", "vinted", "shopgoodwill"].map((source) => ({ source, status: "no-feed" as const })),
+    ...["grailed", "mercari", "depop", "poshmark", "vinted", "shopgoodwill", "carharttreworked", "geartrade", "salvationarmy", "wornwear"].map((source) => ({ source, status: "no-feed" as const })),
   ];
-  return { searchedAt: new Date(now).toISOString(), keywords, days, hunt, status, listings, coverage };
+  return { searchedAt: new Date(now).toISOString(), keywords, hunt, status, listings, coverage };
 }
 
-export async function runAndStoreLiveSearch(preferences: ScoutPreferences, keywords: string, days?: ListingDays, hunt?: LookHunt) {
-  const result = await searchNewListings(preferences, keywords, days, hunt);
+export async function runAndStoreLiveSearch(preferences: ScoutPreferences, keywords: string, hunt?: LookHunt) {
+  const result = await searchNewListings(preferences, keywords, hunt);
   const sql = await scoutDatabase();
   await sql`INSERT INTO fieldwear_live_search (profile, settings, searched_at, result)
     VALUES (${hunt?.profile ?? "owner"}, ${JSON.stringify(preferences)}::jsonb, ${result.searchedAt}::timestamptz, ${JSON.stringify(result)}::jsonb)
@@ -298,9 +302,6 @@ export async function readLiveSearch(preferences?: ScoutPreferences, profile: Lo
   const expired = Date.parse(row.result.searchedAt) < now - day / 4;
   return {
     ...row.result, expired,
-    listings: expired ? [] : row.result.listings.filter((item) => {
-      const days = row.result.hunt ? lookDays : row.result.days ?? freshListingDays;
-      return isVintageShop(item.source) || Date.parse(item.listedAt) >= now - days * day;
-    }),
+    listings: expired ? [] : row.result.listings.filter((item) => !item.endsAt || !(Date.parse(item.endsAt) <= now)),
   };
 }

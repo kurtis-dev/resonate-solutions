@@ -54,15 +54,15 @@ export async function saveScoutPreferences(form: FormData) {
     VALUES ('owner', ${JSON.stringify(preferences)}::jsonb)
     ON CONFLICT (profile) DO UPDATE SET settings = EXCLUDED.settings`;
   const previous = await readLiveSearch();
-  await runAndStoreLiveSearch(preferences, previous?.keywords ?? "", previous?.days);
+  await runAndStoreLiveSearch(preferences, previous?.keywords ?? "");
   revalidatePath("/fieldwear");
-  redirect("/fieldwear#fresh");
+  redirect("/fieldwear?catalog=1#fresh");
 }
 
 export async function searchScoutNow(form: FormData) {
   if (!(await isScoutOwner())) redirect("/fieldwear");
-  const keywords = String(form.get("keywords") ?? "").trim().replace(/\s+/g, " ").slice(0, 80);
-  await runAndStoreLiveSearch(await readScoutPreferences(), keywords, form.get("days") === "30" ? 30 : 7);
+  const keywords = String(form.get("keywords") ?? "").replace(/\bvintage\b/gi, "").trim().replace(/\s+/g, " ").slice(0, 80);
+  await runAndStoreLiveSearch(await readScoutPreferences(), keywords);
   revalidatePath("/fieldwear");
   redirect("/fieldwear?catalog=1#fresh");
 }
@@ -71,7 +71,7 @@ export async function searchScoutLook(form: FormData) {
   if (!(await isScoutOwner())) redirect("/fieldwear");
   const preferences = await readScoutPreferences();
   if (form.get("hunt") === "browning") {
-    await runAndStoreLiveSearch(preferences, "", undefined, browningHunt);
+    await runAndStoreLiveSearch(preferences, "", browningHunt);
     revalidatePath("/fieldwear");
     redirect("/fieldwear#browning-results");
   }
@@ -89,7 +89,7 @@ export async function searchScoutLook(form: FormData) {
     ?? saved[0]?.listing ?? edition?.finds.find(matches);
   const hunt = reference && similarHunt(reference);
   if (!hunt) redirect("/fieldwear#find-similar");
-  await runAndStoreLiveSearch(preferences, "", undefined, hunt);
+  await runAndStoreLiveSearch(preferences, "", hunt);
   revalidatePath("/fieldwear");
   redirect("/fieldwear#similar-results");
 }

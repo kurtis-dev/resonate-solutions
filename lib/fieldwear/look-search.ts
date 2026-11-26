@@ -3,7 +3,6 @@ import { vintageSignals } from "./vintage-signals";
 
 export const beanReferenceId = "87148811";
 export type LookProfile = "similar" | "browning";
-export const lookDays = 365;
 
 const traits = {
   denim: /\b(?:denim|jeans)\b/i,

@@ -61,7 +61,7 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
       if (!photo || photo.hostname !== "cdn.shopify.com") continue;
       const option = (name: RegExp) => variant.options?.find((value) => name.test(value.name))?.label ?? "";
       const fit = shopSize(normalizeSize(title), description, normalizeSize(option(/^size$/i)), "pants");
-      if (!fit.size?.includes("x") || !matchesScoutFit({ title, size: fit.size, garmentKind: "pants" }, preferences)) continue;
+      if (!fit.size?.includes("x") || !matchesScoutFit({ title, size: fit.size, sizeBasis: fit.sizeBasis, garmentKind: "pants" }, preferences)) continue;
       const seller = variant.seller?.name?.trim() || url.hostname.replace(/^www\./, "");
       const condition = description.match(/^(?:condition|flaws)\s*:\s*(.+)$/im)?.[1] || option(/^condition$/i) || "Secondhand";
       unique.set(url.hostname + url.pathname, {
@@ -79,42 +79,60 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
 }
 
 export async function searchShopifyCatalog(preferences: ScoutPreferences, keywords: string, profile = profileUrl) {
-  const sizes = preferences.pantsSizes.slice(0, 6).join(" ");
+  const sizes = preferences.pantsSizes.slice(0, 6);
+  const department = { any: "", men: "men's", women: "women's", unisex: "unisex" }[preferences.department];
   const terms = keywords.replace(/\bvintage\b/gi, "").trim();
   const lanes = terms ? [terms + " work pants"] : [
     "duck canvas carpenter work pants",
     "double knee heavy cotton work pants",
     "straight heavyweight denim work jeans",
+    "Carhartt Dickies Dungarees carpenter work pants",
+    "Wrangler 13MWZ Lee Riders Levi's 505 straight denim",
+    "Key Imperial Big Smith Round House Stan Ray painter pants",
+    "Red Kap Ben Davis cotton twill work trousers",
+    "herringbone cotton sateen utility fatigue pants",
+    "Carhartt B11 B01 B136 cotton duck work pants",
+    "Dickies 1939 duck canvas heavyweight carpenter",
+    "Wrangler Riggs reinforced carpenter cotton denim",
+    "cotton work dungarees utility pants reinforced pockets",
   ];
   const checkedAt = Date.now();
-  const results = await Promise.allSettled(lanes.map(async (lane) => {
-    const response = await fetch(endpoint, {
-      method: "POST",
-      cache: "no-store",
-      signal: AbortSignal.timeout(8_000),
-      headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
-      body: JSON.stringify({
-        jsonrpc: "2.0", id: 1, method: "tools/call",
-        params: { name: "search_catalog", arguments: {
-          meta: { "ucp-agent": { profile } },
-          catalog: {
-            query: `${preferences.department === "any" ? "" : preferences.department === "unisex" ? "unisex " : preferences.department + "'s "}used ${lane} ${sizes}`, view: "compact", limit: 10, context: { address_country: "US" },
-            filters: {
-              ships_to: { country: "US" }, condition: ["secondhand"], available: true,
-              ...(preferences.pantsBudget == null ? {} : { price: { max: Math.round(preferences.pantsBudget * 100) } }),
+  const results = await Promise.allSettled(lanes.map(async (lane, index) => {
+    const sizeWords = index < 3 ? sizes.join(" ") : sizes[index % sizes.length] ?? "";
+    const fetchPage = async (cursor?: string) => {
+      const response = await fetch(endpoint, {
+        method: "POST",
+        cache: "no-store",
+        signal: AbortSignal.timeout(8_000),
+        headers: { "content-type": "application/json", accept: "application/json, text/event-stream" },
+        body: JSON.stringify({
+          jsonrpc: "2.0", id: 1, method: "tools/call",
+          params: { name: "search_catalog", arguments: {
+            meta: { "ucp-agent": { profile } },
+            catalog: {
+              query: [department, "used", lane, sizeWords].filter(Boolean).join(" "), view: "compact",
+              pagination: { limit: index < 3 ? 40 : 22, ...(cursor ? { cursor } : {}) }, context: { address_country: "US" },
+              filters: {
+                ships_to: { country: "US" }, condition: ["secondhand"], available: true,
+                ...(preferences.pantsBudget == null ? {} : { price: { max: Math.round(preferences.pantsBudget * 100) } }),
+              },
             },
-          },
-        } },
-      }),
-    });
-    if (!response.ok) throw new Error(`Shopify HTTP ${response.status}`);
-    const body = await response.json() as { result?: { structuredContent?: { products?: CatalogProduct[] } } };
-    const products = body.result?.structuredContent?.products;
-    if (!Array.isArray(products)) throw new Error("Missing Shopify catalog response");
-    return products;
+          } },
+        }),
+      });
+      if (!response.ok) throw new Error(`Shopify HTTP ${response.status}`);
+      const body = await response.json() as { result?: { structuredContent?: { products?: CatalogProduct[]; pagination?: { cursor?: string; has_next_page?: boolean } } } };
+      const products = body.result?.structuredContent?.products;
+      if (!Array.isArray(products)) throw new Error("Missing Shopify catalog response");
+      return { products, pagination: body.result?.structuredContent?.pagination };
+    };
+    const first = await fetchPage();
+    const cursor = first.pagination?.has_next_page && first.pagination.cursor;
+    const second = cursor && index < 3 ? await fetchPage(cursor).catch(() => null) : undefined;
+    return { products: [...first.products, ...(second?.products ?? [])], partial: second === null };
   }));
-  const products = results.flatMap((result) => result.status === "fulfilled" ? result.value : []);
-  const status = results.every((result) => result.status === "rejected") ? "unavailable"
-    : results.some((result) => result.status === "rejected") ? "partial" : "searched";
+  const products = results.flatMap((result) => result.status === "fulfilled" ? result.value.products : []);
+  const status: "searched" | "partial" | "unavailable" = results.every((result) => result.status === "rejected") ? "unavailable"
+    : results.some((result) => result.status === "rejected" || result.value.partial) ? "partial" : "searched";
   return { status, listings: catalogListings(products, preferences), checkedAt, expiresAt: checkedAt + ageLimit };
 }

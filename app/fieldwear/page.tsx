@@ -13,9 +13,9 @@ import { beanReferenceId, matchLook } from "@/lib/fieldwear/look-search";
 import { readScoutEdition } from "@/lib/fieldwear/editions";
 import { isScoutOwner, readScoutPreferences, scoutDatabase } from "@/lib/fieldwear/owner-access";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
-import { freshListingDays, readLiveSearch } from "@/lib/fieldwear/live-search";
+import { readLiveSearch } from "@/lib/fieldwear/live-search";
 import { searchShopifyCatalog } from "@/lib/fieldwear/shopify-catalog";
-import { marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
+import { marketplaceBrowse, marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
 import { redeemOwnerLink, requestOwnerLink, searchScoutLook, searchScoutNow, signOutScout } from "./actions";
 import "./scout.css";
 
@@ -59,44 +59,33 @@ function OwnerSignIn({ token, status }: { token?: string; status?: string }) {
 
 type Decision = { source: string; external_id: string; verdict: string; listing: (ListingInput & { listedAt?: string; checkedAt?: string; linkOnly?: boolean }) | null };
 
-const searchDate = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", dateStyle: "medium", timeStyle: "short" });
 const sourceStatus = { searched: "Checked", partial: "Partially checked", unavailable: "Check failed", "needs-access": "API access needed", "no-feed": "Live feed unavailable" } as const;
 
 function FreshScout({
   run, preferences, items, source, catalog,
 }: { run: Awaited<ReturnType<typeof readLiveSearch>>; preferences: ScoutPreferences; items: ListingView[]; source?: string; catalog?: Awaited<ReturnType<typeof searchShopifyCatalog>> }) {
   const coverage = run?.coverage;
+  const sources: { source: string; status: keyof typeof sourceStatus }[] = [...(coverage ?? []), ...(catalog ? [{ source: "shopifycatalog", status: catalog.status }] : [])];
   const initialSource = source && items.some((item) => matchesMarketplace(item.source, source)) ? source : undefined;
-  const days = run?.days ?? freshListingDays;
-  const checked = coverage?.filter((entry) => entry.status === "searched" || entry.status === "partial").length;
-  const liveCount = items.filter((item) => item.source !== "shopifycatalog").length;
-  const summary = run ? `Searched ${searchDate.format(new Date(run.searchedAt))} CT` : "";
-  const message = !run ? "Run a search to see what’s new."
-    : run.expired ? "Your last search is over six hours old. Run it again for current results."
-    : run.status === "unconfigured" || run.status === "unavailable" ? "The connected sources couldn’t complete this search. Try again."
-    : items.length === 0 ? "No matches in this window. Try fewer keywords or a wider date range."
-    : `${liveCount} matches · ${checked === undefined ? "" : `${checked} sources checked · `}${summary}`;
+  const sourceCount = sources.filter((entry) => entry.status === "searched" || entry.status === "partial").length;
+  const message = items.length ? `${items.length} matches · ${sourceCount} sources checked`
+    : !run || run.expired ? "Search connected shops and marketplaces for available workwear."
+    : run.status === "unconfigured" || run.status === "unavailable" ? "The connected marketplaces couldn’t complete this search. Try again."
+    : "No available listings matched. Try fewer keywords.";
   return (
     <section id="fresh" aria-labelledby="fresh-title" className="scroll-mt-4">
       <div className="pt-5 md:pt-7">
-        <h1 id="fresh-title" className="text-2xl font-semibold tracking-tight md:text-[28px]">Fresh finds</h1>
+        <h1 id="fresh-title" className="text-2xl font-semibold tracking-tight md:text-[28px]">Workwear catalog</h1>
         <p className="mt-1 text-xs leading-5 text-[var(--muted-ink)]" aria-label="Saved search sizes">
-          {departmentLabels[preferences.department]} · Shirts {preferences.shirtSizes.join(", ") || "any size"} · Bottoms {preferences.pantsSizes.join(", ") || "any size"}
+          {departmentLabels[preferences.department]} · Shirts {preferences.shirtSizes.join(", ") || "any size"} · Bottoms {preferences.pantsSizes.join(", ") || "any size"}{preferences.pantsBudget != null ? ` · Up to ${preferences.pantsBudget}` : ""}
         </p>
-        <form action={searchScoutNow} className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:max-w-2xl sm:grid-cols-[minmax(0,1fr)_auto_auto]">
-          <label className="relative col-span-2 min-w-0 sm:col-span-1">
+        <form action={searchScoutNow} className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:max-w-2xl">
+          <label className="relative min-w-0">
             <span className="sr-only">Keywords (optional)</span>
             <Search aria-hidden="true" size={16} strokeWidth={1.6} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-ink)]" />
             <input key={run?.searchedAt} name="keywords" type="search" defaultValue={run?.keywords ?? ""} placeholder="Chamois, L.L.Bean, carpenter jeans…" maxLength={80} className="scout-control scout-keywords w-full text-base sm:text-sm" />
           </label>
-          <label className="min-w-0">
-            <span className="sr-only">Marketplace listing age</span>
-            <select name="days" key={run?.searchedAt} defaultValue={String(days)} className="scout-control w-full text-base sm:text-sm">
-              <option value="7">Last 7 days</option>
-              <option value="30">Last 30 days</option>
-            </select>
-          </label>
-          <ScoutSubmit label="Search now" className="scout-primary w-[9.5rem] whitespace-nowrap text-sm" />
+          <ScoutSubmit label="Search now" className="scout-primary whitespace-nowrap px-4 text-sm" />
         </form>
       </div>
       <p className="pb-3 pt-2 text-xs leading-5 text-[var(--muted-ink)]" role="status">{message}</p>
@@ -108,17 +97,17 @@ function FreshScout({
       ) : null}
       {coverage && run && !run.expired ? (
         <details className="mt-5 border-y border-[var(--line)]">
-          <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-[var(--accent)]">Source coverage{run.status === "partial" ? " · Some checks failed" : ""}</summary>
-          <p className="border-t border-[var(--line)] pt-3 text-xs text-[var(--muted-ink)]">The listing date filter applies to marketplaces. Vintage shops are checked for items in stock.</p>
+          <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-[var(--accent)]">Source coverage{run.status === "partial" || catalog?.status === "partial" || catalog?.status === "unavailable" ? " · Some checks failed" : ""}</summary>
+          <p className="border-t border-[var(--line)] pt-3 text-xs text-[var(--muted-ink)]">“Browse on site” opens a separate marketplace search.</p>
           <ul className="grid gap-x-5 py-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
-            {coverage.map(({ source, status }) => {
+            {sources.map(({ source, status }) => {
               const count = items.filter((item) => item.source === source).length;
               return (
                 <li key={source} className="flex items-baseline justify-between gap-2 py-2">
                   <strong>{marketplaceName(source)}</strong>
-                  {source === "vinted" && status === "no-feed" ? (
-                    <a href="https://www.vinted.com/catalog/583-pants/brand/362-carhartt" target="_blank" rel="noreferrer" className="text-[var(--accent)] underline underline-offset-4">
-                      Browse Carhartt pants on Vinted
+                  {(status === "no-feed" || status === "needs-access") && marketplaceBrowse[source] ? (
+                    <a href={marketplaceBrowse[source].url} target="_blank" rel="noreferrer" className="text-right text-[var(--accent)] underline underline-offset-4" aria-label={`Browse ${marketplaceName(source)} on its website`}>
+                      Browse on site
                     </a>
                   ) : (
                     <span className="text-right text-[var(--muted-ink)]">{sourceStatus[status]}{status === "searched" || status === "partial" ? ` · ${count} matches` : ""}</span>
@@ -270,7 +259,7 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
     const checkedAt = new Date(catalog.checkedAt).toISOString();
     return toListingView(item, checkedAt, checkedAt, null, preferences);
   }) ?? [];
-  const freshItems = [...catalogItems, ...live];
+  const freshItems = Array.from(new Map([...catalogItems, ...live].map((item) => [canonicalListingKey(item.url), item])).values());
   const saved = Array.from(entries.values()).filter((item) => item.decision === "save");
   const savedLinks = Array.from(decisions.values()).flatMap(({ verdict, listing }) =>
     verdict === "save" && listing?.linkOnly && !entries.has(canonicalListingKey(listing.url)) ? [listing] : [],
@@ -295,7 +284,7 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
             <div id="archive" className="mb-5 scroll-mt-6 border-b border-[var(--line)] pb-3 pt-5">
               <h1 className="text-2xl font-semibold tracking-tight">Catalog archive</h1>
               <p className="mt-1 text-sm text-[var(--muted-ink)]">Earlier marketplace checks and references. Open the original listing to confirm availability.</p>
-              <a href="/fieldwear#fresh" className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--accent)] underline underline-offset-4">Back to fresh finds</a>
+              <a href="/fieldwear#fresh" className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--accent)] underline underline-offset-4">Back to workwear catalog</a>
             </div>
             <DailyScout edition={edition} items={daily.sort((a, b) => fitPriority(b, preferences) - fitPriority(a, preferences))} preferences={preferences} />
             <ListingWorkbench listings={Array.from(entries.values())} preferences={preferences} />
@@ -358,6 +347,7 @@ function toListingView(
     title:input.title,
     imageUrl:input.imageUrl ?? null,
     priceCents:input.priceCents ?? null,
+    priceKind:input.priceKind,
     shippingCents:input.shippingCents ?? null,
     size:input.size ?? null,
     sizeBasis:input.sizeBasis,
