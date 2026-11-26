@@ -320,6 +320,12 @@ const searchKey = (scope: SearchScope, profile: CatalogProfile) => profile === "
 export async function runAndStoreLiveSearch(preferences: ScoutPreferences, keywords: string, hunt?: LookHunt, profile: CatalogProfile = "owner", daily = false) {
   const result = await searchNewListings(preferences, keywords, hunt);
   if (daily && (!result.listings.length || result.status === "unavailable")) return { count: 0, status: result.status };
+  if (daily) {
+    const previous = await readLiveSearch(undefined, "daily", profile);
+    const key = (item: LiveListing) => `${item.source}:${item.externalId}`;
+    const known = new Set(previous?.listings.map(key));
+    result.listings.sort((a, b) => Number(known.has(key(a))) - Number(known.has(key(b))));
+  }
   const sql = await scoutDatabase();
   await sql`INSERT INTO fieldwear_live_search (profile, settings, searched_at, result)
     VALUES (${searchKey(daily ? "daily" : hunt?.profile ?? "owner", profile)}, ${JSON.stringify(preferences)}::jsonb, ${result.searchedAt}::timestamptz, ${JSON.stringify(result)}::jsonb)

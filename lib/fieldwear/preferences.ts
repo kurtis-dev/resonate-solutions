@@ -44,9 +44,10 @@ function normalizeAlpha(value: string) {
 }
 
 export function shirtSizeTokens(input: string) {
-  const spelled = input.replace(/\b(extra small|extra large|large tall|medium tall|xl extra long)\b/gi, (match) =>
+  const spelled = input.replace(/\b(women|men|ladie|girl|boy)[’']s\b/gi, "$1s").replace(/\b(extra small|extra large|large tall|medium tall|xl extra long)\b/gi, (match) =>
     ({ "extra small": "XS", "extra large": "XL", "large tall": "LT", "medium tall": "MT", "xl extra long": "XLT" })[match.toLowerCase()] ?? match);
-  const numeric = Array.from(spelled.matchAll(/\b(?:tagged(?: size)?|size|sz|us)\s*[:.=]?\s*(\d{1,2}(?:\.5)?)\b/gi), ([, value]) => value);
+  const numeric = Array.from(spelled.matchAll(/\b(?:tagged(?: size)?|size|sz|us|womens?)\s*[:.=]?\s*(\d{1,2}(?:\.5)?w?)\b/gi), ([, value]) => value.toUpperCase());
+  if (/^\d{1,2}(?:\.5)?W?$/i.test(spelled.trim())) numeric.push(spelled.trim().toUpperCase());
   return Array.from(new Set([...(spelled.match(alphaSize) ?? []).map(normalizeAlpha), ...numeric]));
 }
 
@@ -70,7 +71,7 @@ export function sizeMatch(item: FitListing, preferences: ScoutPreferences) {
   const reported = pants && item.sizeBasis !== "measured" ? reportedPantsFit(item.title) : undefined;
   const field = reported ?? item.size?.trim() ?? "";
   const tagged = parse(field);
-  if (/^\d{1,2}(?:\.5)?$/.test(field)) tagged.push(field);
+
   const title = item.title.replace(/\b(?:[a-z]\.){2,}/gi, "");
   const candidates = tagged.length ? tagged : parse(title);
   if (pants && candidates.length > 1) return candidates.every((size) => targets.includes(size));
@@ -117,7 +118,7 @@ export function parseScoutPreferences(form: FormData): ScoutPreferences | null {
     const sizes = tokens.map((token) => {
       const dimensions = pants ? Array.from(token.matchAll(waistInseam)) : [];
       if (dimensions[0]?.[0] === token) return `${dimensions[0][1]}x${dimensions[0][2]}`;
-      if (/^\d{1,2}(?:\.5)?$/.test(token)) return token;
+      if (/^\d{1,2}(?:\.5)?W?$/i.test(token)) return token.toUpperCase();
       if (/^(?:XXS|XS|S|M|L|XL|X{2,4}L|XLT|TXL|XL[ -]?(?:TALL|LONG|EXTRA LONG)|[ML](?:T|[ -]?TALL)|[1-9]\s*-?\s*X(?:L|T|LT|L[ -]?TALL)?|small|medium|large|extra small|extra large|large tall|medium tall)$/i.test(token)) return shirtSizeTokens(token)[0];
       return undefined;
     });
