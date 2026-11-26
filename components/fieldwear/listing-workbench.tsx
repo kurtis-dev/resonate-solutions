@@ -374,18 +374,45 @@ export function ListingShelf({ id, label, description, items }:{ id:string; labe
 
 const freshPageSize = 12;
 const priceForSort = (item: ListingView) => item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
+const garmentOptions = {
+  shirt: [["work", "Work shirts"], ["chamois", "Chamois shirts"], ["lined", "Shirt-jackets"]],
+  pants: [["canvas", "Canvas & duck pants"], ["denim", "Jeans & denim pants"], ["trousers", "Trousers"]],
+} as const;
+
+function matchesFreshType(item: ListingView, type: string) {
+  if (!type) return true;
+  if (type === "canvas") return item.vintage.canvas;
+  if (type === "denim") return /\b(?:jeans?|denim)\b/i.test(item.title);
+  if (type === "trousers") return /\b(?:trousers?|dress pants|slacks)\b/i.test(item.title);
+  if (type === "chamois") return /\bchamois\b/i.test(item.title);
+  if (type === "lined") return LINED_TERMS.test(item.title);
+  return !LINED_TERMS.test(item.title) && (PLAIN_WORK_TERMS.test(item.title) || /\b(?:flannel|chamois)\b/i.test(item.title));
+}
+
+function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
+  const { period, cotton, wool, natural, sturdyBlend } = item.vintage;
+  if (era && (era === "pre-1999" ? period !== 2 : era === "1990s" ? period !== 1 : period !== 0)) return false;
+  if (fabric === "cotton") return cotton;
+  if (fabric === "wool") return wool;
+  if (fabric === "pure") return natural && (cotton || wool);
+  if (fabric === "blend") return sturdyBlend;
+  return !fabric || cotton || wool;
+}
 
 export function FreshCatalog({ items }: { items: ListingView[] }) {
   const [kind, setKind] = useState<"shirt" | "pants">(() => items.some((item) => item.garmentKind === "shirt") ? "shirt" : "pants");
   const [order, setOrder] = useState("relevance");
   const [min, setMin] = useState("");
   const [max, setMax] = useState("");
+  const [garmentType, setGarmentType] = useState("");
+  const [era, setEra] = useState("");
+  const [fabric, setFabric] = useState("");
   const [page, setPage] = useState(1);
   const resultsRef = useRef<HTMLDivElement>(null);
   const invalidRange = min !== "" && max !== "" && Number(min) > Number(max);
   const results = useMemo(() => {
     const filtered = items.filter((item) => {
-      if (item.garmentKind !== kind || invalidRange) return false;
+      if (item.garmentKind !== kind || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
       if (min === "" && max === "") return true;
       const cents = priceForSort(item);
       return cents != null && (min === "" || cents >= Number(min) * 100) && (max === "" || cents <= Number(max) * 100);
@@ -400,12 +427,21 @@ export function FreshCatalog({ items }: { items: ListingView[] }) {
       return order === "high" ? right - left : left - right;
     });
     return filtered;
-  }, [items, kind, invalidRange, min, max, order]);
+  }, [items, kind, garmentType, era, fabric, invalidRange, min, max, order]);
   const lastPage = Math.max(1, Math.ceil(results.length / freshPageSize));
   const currentPage = Math.min(page, lastPage);
   const from = (currentPage - 1) * freshPageSize;
   const visible = results.slice(from, from + freshPageSize);
   const control = "mt-1 min-h-11 w-full rounded-xl border border-black/15 bg-white px-3 text-base font-normal text-[var(--ink)]";
+  const hasFilters = Boolean(garmentType || era || fabric || min || max);
+  const clearFilters = () => {
+    setGarmentType("");
+    setEra("");
+    setFabric("");
+    setMin("");
+    setMax("");
+    setPage(1);
+  };
   const go = (nextPage: number) => {
     setPage(nextPage);
     resultsRef.current?.focus({ preventScroll: true });
@@ -416,13 +452,37 @@ export function FreshCatalog({ items }: { items: ListingView[] }) {
     <div>
       <div className="flex flex-wrap gap-2" aria-label="Garment type" role="group">
         {([["shirt", "Shirts"], ["pants", "Bottoms"]] as const).map(([value, label]) => (
-          <button key={value} type="button" aria-pressed={kind === value} onClick={() => { setKind(value); setPage(1); }} className={`min-h-11 rounded-full border px-4 text-sm font-bold ${kind === value ? "border-[var(--pine)] bg-[var(--pine)] text-white" : "border-black/15 bg-white text-[var(--pine)]"}`}>
+          <button key={value} type="button" aria-pressed={kind === value} onClick={() => { if (kind !== value) { setKind(value); setGarmentType(""); } setPage(1); }} className={`min-h-11 rounded-full border px-4 text-sm font-bold ${kind === value ? "border-[var(--pine)] bg-[var(--pine)] text-white" : "border-black/15 bg-white text-[var(--pine)]"}`}>
             {label} <span className="ml-1 tabular-nums">{items.filter((item) => item.garmentKind === value).length}</span>
           </button>
         ))}
       </div>
-      <div className="my-4 grid grid-cols-2 gap-3 rounded-2xl border border-black/10 bg-[var(--card)] p-3 sm:grid-cols-[minmax(0,2fr)_1fr_1fr_auto] sm:items-end">
-        <label className="col-span-2 text-xs font-bold sm:col-span-1">Sort by
+      <div className="my-4 grid grid-cols-2 items-end gap-3 rounded-2xl border border-black/10 bg-[var(--card)] p-3 sm:grid-cols-3">
+        <label className="min-w-0 text-xs font-bold">Garment type
+          <select value={garmentType} onChange={(event) => { setGarmentType(event.target.value); setPage(1); }} className={control}>
+            <option value="">All {kind === "shirt" ? "shirts" : "bottoms"}</option>
+            {garmentOptions[kind].map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+        </label>
+        <label className="min-w-0 text-xs font-bold">Era
+          <select value={era} onChange={(event) => { setEra(event.target.value); setPage(1); }} className={control}>
+            <option value="">Any era</option>
+            <option value="pre-1999">Pre-1999 clues</option>
+            <option value="1990s">1990s, year open</option>
+            <option value="undated">Undated</option>
+          </select>
+        </label>
+        <label className="min-w-0 text-xs font-bold">Fabric
+          <select value={fabric} onChange={(event) => { setFabric(event.target.value); setPage(1); }} className={control}>
+            <option value="">Any fabric</option>
+            <option value="either">Cotton or wool</option>
+            <option value="cotton">Cotton</option>
+            <option value="wool">Wool</option>
+            <option value="pure">100% cotton or wool</option>
+            <option value="blend">Sturdy blends</option>
+          </select>
+        </label>
+        <label className="min-w-0 text-xs font-bold">Sort by
           <select value={order} onChange={(event) => { setOrder(event.target.value); setPage(1); }} className={control}>
             <option value="relevance">Best match</option>
             <option value="newest">Recently listed</option>
@@ -433,7 +493,7 @@ export function FreshCatalog({ items }: { items: ListingView[] }) {
         </label>
         <label className="text-xs font-bold">Min price ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={min} onChange={(event) => { setMin(event.target.value); setPage(1); }} className={control} /></label>
         <label className="text-xs font-bold">Max price ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={max} onChange={(event) => { setMax(event.target.value); setPage(1); }} className={control} /></label>
-        <button type="button" onClick={() => { setMin(""); setMax(""); setPage(1); }} disabled={min === "" && max === ""} className="col-span-2 min-h-11 px-3 text-sm font-bold text-[var(--pine)] underline underline-offset-4 disabled:opacity-45 sm:col-span-1">Clear price</button>
+        {hasFilters ? <button type="button" onClick={clearFilters} className="col-span-full min-h-11 justify-self-start px-2 text-sm font-bold text-[var(--pine)] underline underline-offset-4">Clear filters</button> : null}
       </div>
       <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 pb-3 text-sm text-[var(--muted-ink)]" role="status">
         {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : "No listings match these filters."}

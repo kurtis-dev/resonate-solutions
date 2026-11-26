@@ -9,14 +9,20 @@ const durableFabric = /\b(?:duck(?: canvas)?|canvas|denim|chamois|sateen|moleski
 const durableBuild = /\b(?:double[- ]knee|reinforced|bar[- ]?tack|flat[- ]?fell(?:ed)?|felled seams|triple[- ]stitched|gusset(?:ed)?|riveted|blanket[- ]lined|flannel[- ]lined)\b/i;
 const synthetic = /\b(?:polyester|poly[- ]?cotton|cotton[- ]poly|poly blend|nylon|acrylic|spandex|elastane|synthetic)\b/i;
 const light = /\b(?:light[- ]?weight|thin fabric|sheer|performance|moisture[- ]wicking|quick[- ]dry)\b/i;
+const lining = /\b(?:lining|liner|fill|padding|insulation)\s*[:=-]\s*(?:(?!\b(?:shell|outer(?: fabric| material)?|body)\s*[:=-])[^\n;])*/gi;
+const liningMaterial = /\b(?:\d{1,3}\s*%\s*)?(?:cotton|wool|polyester|nylon|acrylic|synthetic)(?:[- ](?:blend|flannel|fleece|twill))?[- ](?:lining|liner|fill|padding|insulation|lined)\b|\b(?:lined|padded)\s+with\s+(?:\d{1,3}\s*%\s*)?(?:cotton|wool|polyester|nylon|acrylic|synthetic)\b/gi;
+const canvas = /\b(?:canvas|duck(?!\s+head\b|\s+camo\b))\b/i;
 
 export function vintageSignals({ title, description }: Pick<ListingInput, "title" | "description">) {
   const text = [title, description].filter(Boolean).join("\n").replace(/[’‘]/g, "'");
-  const shell = text.replace(/\b(?:lining|liner|fill|padding|insulation)\s*[:=-]?\s*(?:\d{1,3}\s*%?\s*)?(?:polyester|nylon|acrylic|synthetic)\b|\b(?:\d{1,3}\s*%?\s*)?(?:polyester|nylon|acrylic|synthetic)\s+(?:lining|liner|fill|padding|insulation)\b/gi, "");
-  const substantial = durableFabric.test(shell) || durableBuild.test(shell);
+  const shell = text.replace(lining, "").replace(liningMaterial, "").replace(/\b(?:lining|liner|fill|padding|insulation)\s+(?:\d{1,3}\s*%\s*)?(?:cotton|wool|polyester|nylon|acrylic|synthetic)\b/gi, "");
+  const substantial = durableFabric.test(shell) || durableBuild.test(text);
   const blend = synthetic.test(shell);
   const pureSynthetic = /\b100\s*%\s*(?:polyester|nylon|acrylic)\b/i.test(shell);
-  const natural = /\b(?:100\s*%\s*(?:cotton|wool)|pure wool|all wool)\b/i.test(shell) && !blend;
+  const mixedFibers = blend || /\b(?:blend(?:ed)?|mixed[- ]fiber)\b/i.test(shell);
+  const natural = /\b(?:100\s*%\s*(?:cotton|wool)|pure wool|all wool)\b/i.test(shell) && !mixedFibers;
+  const cotton = !mixedFibers && /\bcotton\b/i.test(shell);
+  const wool = !mixedFibers && /\bwool\b/i.test(shell);
   const period = modern.test(text) || newer.test(text) ? -2 : old.test(text) || historicLabels.test(text) ? 2 : sometime90s.test(text) ? 1 : 0;
   const build = pureSynthetic || (blend && (light.test(shell) || !substantial)) ? -2 : substantial && (natural || durableBuild.test(shell)) ? 2 : substantial || natural ? 1 : 0;
   const eraNote = period < 0 ? "Listing wording points to a newer garment or reissue."
@@ -24,10 +30,11 @@ export function vintageSignals({ title, description }: Pick<ListingInput, "title
     : period === 1 ? "Seller mentions the 1990s. The exact year is open."
     : "Garment date is open.";
   const fabricNote = natural ? "Listing states 100% cotton or wool."
-    : blend && substantial && build > 0 ? "Listing describes a substantial fabric or reinforced build and mentions synthetic fiber."
+    : mixedFibers && substantial && build > 0 ? "Listing describes a blend with a substantial fabric or reinforced build."
+    : cotton || wool ? `Listing mentions ${cotton && wool ? "cotton and wool" : cotton ? "cotton" : "wool"} in the shell. Check the fiber tag for percentages.`
     : substantial ? "Listing mentions a substantial fabric or reinforced construction."
     : null;
-  return { period, build, natural, eraNote, fabricNote };
+  return { period, build, natural, eraNote, fabricNote, cotton, wool, sturdyBlend: mixedFibers && substantial && !pureSynthetic && !light.test(shell), canvas: canvas.test(shell) };
 }
 
 export function listingMeasurements(description = "") {
