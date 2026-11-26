@@ -142,3 +142,45 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
 @media (min-width: 1024px) {
   .fieldwear-scout .scout-photo-grid { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 40px 24px; }
 }
+
+.fieldwear-scout button.scout-photo-well img {
+  inset: 3%;
+  width: 94%;
+  height: 94%;
+}
+.fieldwear-scout .scout-toolbar-button[aria-pressed="true"] {
+  background: var(--matte);
+  box-shadow: inset 0 0 0 1px var(--accent);
+}
+.fieldwear-scout .scout-color-option,
+.fieldwear-scout .scout-color-chip {
+  display: flex;
+  min-height: 44px;
+  align-items: center;
+  gap: 6px;
+  border-radius: 4px;
+  padding-inline: 7px;
+  font-size: 0.8125rem;
+}
+.fieldwear-scout .scout-color-option:has(:checked),
+.fieldwear-scout .scout-color-option:hover,
+.fieldwear-scout .scout-color-chip:hover {
+  background: var(--matte);
+}
+.fieldwear-scout .scout-color-option input {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  accent-color: var(--accent);
+}
+.fieldwear-scout .scout-color-chip {
+  border: 1px solid var(--line);
+  padding-inline: 10px;
+}
+.fieldwear-scout .scout-swatch {
+  width: 15px;
+  height: 15px;
+  flex: 0 0 auto;
+  border: 1px solid rgb(22 24 27 / .25);
+  border-radius: 50%;
+}

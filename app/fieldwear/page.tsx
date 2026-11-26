@@ -7,13 +7,14 @@ import { ScoutPreferencesForm } from "@/components/fieldwear/scout-preferences";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { curatedListings, type CuratedListing } from "@/lib/fieldwear/curated-listings";
 import { classifyGarment, scoreListing, type ListingInput } from "@/lib/fieldwear/listing-model";
+import { listingColors } from "@/lib/fieldwear/listing-colors";
 import { listingMeasurements, vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { beanReferenceId, matchLook } from "@/lib/fieldwear/look-search";
 import { readScoutEdition } from "@/lib/fieldwear/editions";
 import { isScoutOwner, readScoutPreferences, scoutDatabase } from "@/lib/fieldwear/owner-access";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { freshListingDays, readLiveSearch } from "@/lib/fieldwear/live-search";
-import { marketplaceName } from "@/lib/fieldwear/marketplace-directory";
+import { marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
 import { redeemOwnerLink, requestOwnerLink, searchScoutLook, searchScoutNow, signOutScout } from "./actions";
 import "./scout.css";
 
@@ -64,7 +65,7 @@ function FreshScout({
   run, preferences, items, source,
 }: { run: Awaited<ReturnType<typeof readLiveSearch>>; preferences: ScoutPreferences; items: ListingView[]; source?: string }) {
   const coverage = run?.coverage;
-  const initialSource = items.some((item) => item.source === source) ? source : undefined;
+  const initialSource = source && items.some((item) => matchesMarketplace(item.source, source)) ? source : undefined;
   const days = run?.days ?? freshListingDays;
   const checked = coverage?.filter((entry) => entry.status === "searched" || entry.status === "partial").length;
   const summary = run ? `Searched ${searchDate.format(new Date(run.searchedAt))} CT` : "";
@@ -87,7 +88,7 @@ function FreshScout({
             <input key={run?.searchedAt} name="keywords" type="search" defaultValue={run?.keywords ?? ""} placeholder="Chamois, L.L.Bean, carpenter jeans…" maxLength={80} className="scout-control scout-keywords w-full text-base sm:text-sm" />
           </label>
           <label className="min-w-0">
-            <span className="sr-only">Listed in</span>
+            <span className="sr-only">Marketplace listing age</span>
             <select name="days" key={run?.searchedAt} defaultValue={String(days)} className="scout-control w-full text-base sm:text-sm">
               <option value="7">Last 7 days</option>
               <option value="30">Last 30 days</option>
@@ -101,7 +102,8 @@ function FreshScout({
       {coverage && run && !run.expired ? (
         <details className="mt-5 border-y border-[var(--line)]">
           <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-[var(--accent)]">Source coverage{run.status === "partial" ? " · Some checks failed" : ""}</summary>
-          <ul className="grid gap-x-5 border-t border-[var(--line)] py-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
+          <p className="border-t border-[var(--line)] pt-3 text-xs text-[var(--muted-ink)]">The listing date filter applies to marketplaces. Vintage shops are checked for items in stock.</p>
+          <ul className="grid gap-x-5 py-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
             {coverage.map(({ source, status }) => {
               const count = items.filter((item) => item.source === source).length;
               return <li key={source} className="flex items-baseline justify-between gap-2 py-2"><strong>{marketplaceName(source)}</strong><span className="text-right text-[var(--muted-ink)]">{sourceStatus[status]}{status === "searched" || status === "partial" ? ` · ${count} matches` : ""}</span></li>;
@@ -329,6 +331,8 @@ function toListingView(
     priceCents:input.priceCents ?? null,
     shippingCents:input.shippingCents ?? null,
     size:input.size ?? null,
+    sizeBasis:input.sizeBasis,
+    colors:listingColors(input.title, input.color),
     measurements:listingMeasurements(input.description),
     vintage:vintageSignals(input),
     condition:input.condition ?? null,

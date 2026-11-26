@@ -19,13 +19,16 @@ import { decideListing, searchScoutLook } from "@/app/fieldwear/actions";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import type { GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
-import { marketplaceName } from "@/lib/fieldwear/marketplace-directory";
+import { isVintageShop, marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
+import { colorFamilies, type ColorFamily } from "@/lib/fieldwear/listing-colors";
 import type { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import "@/app/fieldwear/catalog.css";
 
 export type ListingView = {
   source:string; externalId:string; url:string; title:string; imageUrl:string|null;
   priceCents:number|null; shippingCents:number|null; size:string|null; condition:string|null;
+  sizeBasis?:"tag" | "seller-fit" | "measured";
+  colors:ColorFamily[];
   measurements:string[]; vintage:ReturnType<typeof vintageSignals>;
   lookNote?: string | null;
   firstSeenAt:string; lastSeenAt:string; totalScore:number; fitScore:number; constructionScore:number;
@@ -418,18 +421,25 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
   const [era, setEra] = useState("");
   const [fabric, setFabric] = useState("");
   const [tagSize, setTagSize] = useState("");
+  const [colors, setColors] = useState<ColorFamily[]>([]);
   const [page, setPage] = useState(1);
   const resultsRef = useRef<HTMLDivElement>(null);
   const invalidRange = min !== "" && max !== "" && Number(min) > Number(max);
   const marketplaces = Array.from(new Set(items.map((item) => item.source))).sort((a, b) => marketplaceName(a).localeCompare(marketplaceName(b)));
   const tagSizes = Array.from(new Set(items.flatMap(({ size }) => size ? [size] : []))).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
-  const results = useMemo(() => {
-    const filtered = items.filter((item) => {
-      if ((kind !== "all" && item.garmentKind !== kind) || (marketplace && item.source !== marketplace) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
+  const hasVintageShops = marketplaces.some(isVintageShop);
+  const { results, colorCounts } = useMemo(() => {
+    const base = items.filter((item) => {
+      if ((kind !== "all" && item.garmentKind !== kind) || !matchesMarketplace(item.source, marketplace) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
       if (min === "" && max === "") return true;
       const cents = priceForSort(item);
       return cents != null && (min === "" || cents >= Number(min) * 100) && (max === "" || cents <= Number(max) * 100);
     });
+    const counts = new Map<ColorFamily, number>();
+    for (const { colors: itemColors } of base) {
+      for (const color of itemColors) counts.set(color, (counts.get(color) ?? 0) + 1);
+    }
+    const filtered = colors.length ? base.filter((item) => item.colors.some((color) => colors.includes(color))) : base;
     if (order === "newest") filtered.sort((a, b) => (b.listedAt ?? "").localeCompare(a.listedAt ?? ""));
     if (order === "oldest-garment") filtered.sort((a, b) => b.vintage.period - a.vintage.period);
     if (order === "low" || order === "high") filtered.sort((a, b) => {
@@ -439,20 +449,21 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
       if (right == null) return -1;
       return order === "high" ? right - left : left - right;
     });
-    return filtered;
-  }, [items, kind, marketplace, garmentType, era, fabric, tagSize, invalidRange, min, max, order]);
+    return { results: filtered, colorCounts: counts };
+  }, [items, kind, marketplace, garmentType, era, fabric, tagSize, colors, invalidRange, min, max, order]);
   const lastPage = Math.max(1, Math.ceil(results.length / freshPageSize));
   const currentPage = Math.min(page, lastPage);
   const from = (currentPage - 1) * freshPageSize;
   const visible = results.slice(from, from + freshPageSize);
   const control = "mt-1 min-h-11 w-full rounded-[4px] border border-[var(--line)] bg-white px-3 text-base font-normal text-[var(--ink)]";
-  const hasFilters = Boolean(marketplace || garmentType || era || fabric || tagSize || min || max);
+  const hasFilters = Boolean(marketplace || garmentType || era || fabric || tagSize || colors.length || min || max);
   const clearFilters = () => {
     setGarmentType("");
     setMarketplace("");
     setEra("");
     setFabric("");
     setTagSize("");
+    setColors([]);
     setMin("");
     setMax("");
     setPage(1);
@@ -463,6 +474,12 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
     resultsRef.current?.scrollIntoView({ block: "start" });
   };
 
+  const toggleColor = (color: ColorFamily) => {
+    setColors((selected) => selected.includes(color) ? selected.filter((value) => value !== color) : [...selected, color]);
+    setPage(1);
+  };
+  const visibleColors = colorFamilies.filter(({ label }) => colorCounts.get(label) || colors.includes(label));
+  const shopsSelected = marketplace === "shops";
   const tabs = [["all", "All"], ["shirt", "Shirts"], ["pants", "Bottoms"]] as const;
 
   return (
@@ -507,6 +524,7 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
         <label className="min-w-0 text-xs font-medium">Marketplace
           <select value={marketplace} onChange={(event) => { setMarketplace(event.target.value); setPage(1); }} className={control}>
             <option value="">All marketplaces</option>
+            {hasVintageShops ? <option value="shops">Vintage shops</option> : null}
             {marketplaces.map((source) => <option key={source} value={source}>{marketplaceName(source)}</option>)}
           </select>
         </label>
@@ -528,14 +546,27 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
             <option value="blend">Sturdy blends</option>
           </select>
         </label>
-          <label className="col-span-2 min-w-0 text-xs font-medium">Tag size
+          <label className="col-span-2 min-w-0 text-xs font-medium">Listing size
             <select value={tagSize} onChange={(event) => { setTagSize(event.target.value); setPage(1); }} className={control}>
-              <option value="">Any tag size</option>
+              <option value="">Any listing size</option>
               {tagSizes.map((size) => <option key={size} value={size}>{size}</option>)}
             </select>
           </label>
           <label className="text-xs font-medium">Min price + shipping ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={min} onChange={(event) => { setMin(event.target.value); setPage(1); }} className={control} /></label>
           <label className="text-xs font-medium">Max price + shipping ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={max} onChange={(event) => { setMax(event.target.value); setPage(1); }} className={control} /></label>
+          <fieldset className="col-span-full min-w-0">
+            <legend className="text-xs font-medium">Color</legend>
+            {visibleColors.length ? <div className="mt-1 grid grid-cols-2 gap-x-2 gap-y-1">
+              {visibleColors.map(({ label, swatch }) => (
+                <label key={label} className="scout-color-option">
+                  <input type="checkbox" checked={colors.includes(label)} onChange={() => toggleColor(label)} />
+                  <span className="scout-swatch" style={{ background: swatch }} aria-hidden="true" />
+                  <span>{label}</span>
+                  <span className="ml-auto text-xs tabular-nums text-[var(--muted-ink)]" aria-hidden="true">{colorCounts.get(label) ?? 0}</span>
+                </label>
+              ))}
+            </div> : <p className="mt-1 text-sm text-[var(--muted-ink)]">No colors listed for these results.</p>}
+          </fieldset>
           {invalidRange ? <p className="col-span-full text-sm" role="alert">Minimum price must be at or below the maximum.</p> : null}
         </div>
         <div className="scout-dialog-footer">
@@ -543,9 +574,23 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
           <form method="dialog"><button className="scout-primary">Show {results.length} {results.length === 1 ? "piece" : "pieces"}</button></form>
         </div>
       </dialog>
-      <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 py-3 text-sm text-[var(--muted-ink)]" role="status">
-        {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : "No listings match these filters."}
+      <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-2">
+        <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 py-2 text-sm text-[var(--muted-ink)]" role="status">
+          {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : "No listings match these filters."}
+        </div>
+        {hasVintageShops ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" aria-pressed={shopsSelected}
+          onClick={() => { setMarketplace(shopsSelected ? "" : "shops"); setPage(1); }}>Vintage shops</button> : null}
       </div>
+      {colors.length > 0 ? (
+        <div className="mb-3 flex flex-wrap gap-2" aria-label="Selected colors">
+          {colorFamilies.filter(({ label }) => colors.includes(label)).map(({ label, swatch }) => (
+            <button key={label} type="button" className="scout-color-chip" onClick={() => toggleColor(label)} aria-label={`Remove ${label} color filter`}>
+              <span className="scout-swatch" style={{ background: swatch }} aria-hidden="true" />
+              {label}<X size={14} aria-hidden="true" />
+            </button>
+          ))}
+        </div>
+      ) : null}
       <div className="scout-photo-grid">
         {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid priority={index < 4} />)}
       </div>
@@ -581,10 +626,11 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
     dialog.current?.showModal();
   };
   const details = [
-    { label: "Tag size", value: item.size },
+    { label: item.sizeBasis === "measured" ? "Measured size" : item.sizeBasis === "seller-fit" ? "Seller fit" : "Size", value: item.size },
     { label: "Measurements", value: item.measurements.join(" · ") },
     { label: "Condition", value: item.condition },
     { label: "Fabric", value: item.vintage.fabricNote },
+    { label: "Color", value: item.colors.join(", ") },
     { label: "Era", value: item.vintage.eraNote },
     { label: "Listed", value: item.listedAt ? new Date(item.listedAt).toLocaleDateString("en-US", { timeZone: "America/Chicago", dateStyle: "medium" }) : null },
     { label: "Shipping", value: item.shippingCents == null ? "Unknown" : money(item.shippingCents) },

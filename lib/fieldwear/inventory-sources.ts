@@ -1,6 +1,7 @@
 import { classifyGarment, type ListingInput } from "./listing-model";
 import { setTimeout as delay } from "node:timers/promises";
 import { vintageShops } from "./marketplace-directory";
+import { vintageSignals } from "./vintage-signals";
 import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 
 export type LiveListing = ListingInput & { listedAt: string };
@@ -94,89 +95,136 @@ async function resolveCandidates<T>(candidates: T[], load: (candidate: T) => Pro
   return { status: failed && failed === candidates.length ? "unavailable" : failed ? "partial" : status, listings };
 }
 
+// Recheck available shop stock on every run. Preserve the seller's original publication date.
+export const shopStockDays = 365;
+const shopPageSize = 100;
+const shopExcluded = /\b(?:reworked|reproduction|replica|reissue|cropped|cut.off|tie[- ]dye|short[- ]sleeve|shorts?|track pants|joggers?|sweatpants|hoodies?|tees?|t[- ]?shirts?|sportswear)\b/i;
+const workShirtClues = /\b(?:work(?:wear)?|field|utility|chore|flannel|two[- ]pocket|double[- ]pocket|pearl[- ]snap|western|chambray|pendleton|woolrich|filson|browning|big mac|big yank|five brother|saddle king|dee cee|oshkosh)\b/i;
+const workPantsClues = /\b(?:carpenter|work(?:wear)?|double[- ]knee|painter|fatigue|cargo|riveted|straight[- ]leg|chinos?)\b/i;
+const newerThanPreferred = /\b(?:2010s|2020s|(?:produced|manufactured|made|dated) in 20[12]\d)\b/i;
+const structuralDamage = /\b(?:dry rot|broken zip(?:per)?|heavy staining|large holes?|major tears?|rips)\b/i;
+
+type ShopProduct = {
+  id?: number;
+  title?: string;
+  handle?: string;
+  body_html?: string;
+  published_at?: string;
+  product_type?: string;
+  images?: { src?: string }[];
+  variants?: { available?: boolean; price?: string; option1?: string; option2?: string; option3?: string }[];
+  options?: { name?: string; position?: number }[];
+};
+
+function shopSellerNotes(html = "") {
+  return decodeText(html.replace(/<\/?(?:p|div|li|br)\b[^>]*>/gi, "\n").replace(/<[^>]*>/g, " "))
+    .split(/\b(?:please note|all flaws mentioned)\b/i, 1)[0]
+    .split(/\n+/).map((line) => line.replace(/\s+/g, " ").trim()).filter(Boolean).join("\n").slice(0, 1800);
+}
+
+function shopSize(title: string, notes: string, option: string, garmentKind: "shirt" | "pants"): {
+  size?: string;
+  sizeBasis?: "tag" | "seller-fit" | "measured";
+} {
+  const fitSize = notes.match(/^(?:recommended|modern) size\s*:\s*(.+)$/im)?.[1];
+  const taggedSize = notes.match(/^(?:tagged size|size(?: tag)?)\s*:\s*(.+)$/im)?.[1];
+  if (garmentKind === "shirt") {
+    const choices = [
+      [fitSize, "seller-fit"],
+      [taggedSize, "tag"],
+      [option, "seller-fit"],
+      [title.replace(/\b(?:[a-z]\.){2,}|\b[LS]\/[LS]\b/gi, ""), "seller-fit"],
+    ] as const;
+    for (const [raw, sizeBasis] of choices) {
+      const size = shirtSizeTokens(raw ?? "").join(" / ");
+      if (size) return { size, sizeBasis };
+    }
+    return {};
+  }
+  const fitDimensions = pantsSizeTokens(fitSize ?? "").filter((size) => size.includes("x"));
+  if (fitDimensions.length) return { size: fitDimensions.join(" / "), sizeBasis: "seller-fit" };
+  const waist = notes.match(/\bwaist(\s+flat|\s+laid flat)?\s*:\s*(\d{2}(?:\.\d+)?)\s*(?:["″]|in\b|inches\b|$)/im);
+  const inseam = notes.match(/\binseam\s*:\s*(\d{2}(?:\.\d+)?)\s*(?:["″]|in\b|inches\b|$)/im);
+  if (waist && inseam) return { size: `${Number(waist[2]) * (waist[1] ? 2 : 1)}x${Number(inseam[1])}`, sizeBasis: "measured" };
+  const dimensions = pantsSizeTokens(title).filter((size) => size.includes("x"));
+  if (dimensions.length) return { size: dimensions.join(" / "), sizeBasis: "seller-fit" };
+  const tagged = pantsSizeTokens(taggedSize ?? "").filter((size) => size.includes("x")).join(" / ");
+  if (tagged) return { size: tagged, sizeBasis: "tag" };
+  const optionSize = shirtSizeTokens(option).join(" / ");
+  return optionSize ? { size: optionSize, sizeBasis: "seller-fit" } : {};
+}
+
 export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, window: Window): Promise<SourceResult> {
-  const signal = AbortSignal.timeout(10_000);
-  const options: RequestInit = { cache: "no-store", signal, redirect: "error" };
-  const phrases = keywords ? [keywords] : [
-    ...preferences.shirtSizes.slice(0, 3).map((size) => `work shirt ${size}`),
-    ...preferences.pantsSizes.slice(0, 4),
-  ];
-  const [feed, cart, suggestions] = await Promise.all([
-    fetch(`${shop.origin}/collections/${shop.collection}.atom`, options).catch(() => null),
+  const options: RequestInit = { cache: "no-store", signal: AbortSignal.timeout(9_000), redirect: "error" };
+  const stockWindow = { ...window, start: Math.min(window.start, window.now - shopStockDays * 86_400_000) };
+  const [cart, pages] = await Promise.all([
     fetch(`${shop.origin}/cart.js`, options),
-    Promise.allSettled(phrases.map(async (q) => {
-      const params = new URLSearchParams({ q, "resources[type]": "product", "resources[options][unavailable_products]": "hide" });
-      const response = await fetch(`${shop.origin}/search/suggest.json?${params}`, options);
-      if (!response.ok) throw new Error("Shop search unavailable");
-      const data = await response.json() as { resources?: { results?: { products?: { url?: string; title?: string; available?: boolean; product_type?: string; type?: string }[] } } };
-      if (!Array.isArray(data.resources?.results?.products)) throw new Error("Invalid shop search response");
-      return data.resources.results.products;
+    Promise.allSettled(shop.collections.map(async (collection) => {
+      const loadPage = async (page: number) => {
+        const response = await fetch(`${shop.origin}/collections/${collection}/products.json?limit=${shopPageSize}&page=${page}`, options);
+        if (!response.ok) throw new Error(`Shop collection status ${response.status}`);
+        const { products } = await response.json() as { products?: ShopProduct[] };
+        if (!Array.isArray(products)) throw new Error("Invalid shop collection response");
+        return products;
+      };
+      const first = await loadPage(1);
+      const second = first.length === shopPageSize ? await loadPage(2).catch(() => null) : [];
+      return { products: [...first, ...(second ?? [])], complete: second !== null };
     })),
   ]);
-  if (!cart.ok) return { status: "unavailable", listings: [] };
-  const { currency } = await cart.json() as { currency?: string };
-  if (currency !== "USD") return { status: "unavailable", listings: [] };
-  const xml = feed?.ok ? await feed.text() : "";
-  const hasFeed = xml.includes("http://www.w3.org/2005/Atom");
-  if (!hasFeed && !suggestions.some((result) => result.status === "fulfilled")) return { status: "unavailable", listings: [] };
-  const tokens = keywords.toLowerCase().replace(/[.']/g, "").match(/[a-z0-9]+/g) ?? [];
+  if (!cart.ok || (await cart.json() as { currency?: string }).currency !== "USD") return { status: "unavailable", listings: [] };
+  const catalogs = pages.flatMap((result) => result.status === "fulfilled" ? [result.value] : []);
+  if (!catalogs.length) return { status: "unavailable", listings: [] };
+
+  const words = (value: string) => value.toLowerCase().replace(/[.']/g, "");
+  const terms = (words(keywords).match(/[a-z0-9]+/g) ?? [])
+    .filter((word) => !/^(?:shirts?|pants?|trousers?|jeans?|vintage)$/.test(word));
   const kindRequested = classifyGarment({ title: keywords });
-  const terms = tokens.filter((token) => !/^(?:shirts?|pants?|trousers?|jeans?|vintage)$/.test(token));
-  const candidateFor = (rawUrl: string, title: string, listedAt: string, type = "") => {
-    const productPath = rawUrl.startsWith(shop.origin + "/") ? rawUrl.slice(shop.origin.length) : rawUrl;
-    const handle = /^\/products\/([\w-]+)(?:[?#]|$)/.exec(productPath)?.[1];
-    if (!handle || !title || /\b(?:reworked|cropped|cut.off|graphic tee|track pants|joggers?|sweatpants)\b/i.test(title)) return null;
-    const inferred = classifyGarment({ title });
-    const garmentKind = inferred === "unknown" && /^(?:button ups?|shirts?)$/i.test(type) ? "shirt" : inferred;
-    const candidate = { title, handle, url: `${shop.origin}/products/${handle}`, garmentKind, listedAt };
-    if (!fitsSearch(candidate, preferences)) return null;
-    if ((kindRequested === "shirt" || kindRequested === "pants") && kindRequested !== garmentKind) return null;
-    return candidate;
-  };
-  const feedCandidates = Array.from(xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g), ([, entry]) => {
-    const url = decodeText(entry.match(/<link\b[^>]*\brel="alternate"[^>]*\bhref="([^"]+)"/)?.[1] ?? "");
-    const title = plainText(entry.match(/<title[^>]*>([\s\S]*?)<\/title>/)?.[1]);
-    const published = entry.match(/<published>([^<]+)<\/published>/)?.[1] ?? "";
-    const summary = plainText(entry.match(/<!\[CDATA\[([\s\S]*?)\]\]>/)?.[1]);
-    const searchable = `${title} ${summary}`.toLowerCase().replace(/[.']/g, "");
-    return isFresh(published, window) && terms.every((term) => searchable.includes(term)) ? candidateFor(url, title, published) : null;
-  }).filter((item) => item !== null);
-  const candidates = new Map(feedCandidates.map((item) => [item.handle, item]));
-  for (const result of suggestions) {
-    if (result.status !== "fulfilled") continue;
-    for (const product of result.value) {
-      if (!product.url || !product.title || product.available !== true) continue;
-      const item = candidateFor(product.url, plainText(product.title), "", product.product_type ?? product.type);
-      if (item && !candidates.has(item.handle)) candidates.set(item.handle, item);
+  const host = new URL(shop.origin).hostname;
+  const listings = new Map<string, LiveListing>();
+  for (const { products } of catalogs) {
+    for (const product of products) {
+      if (!Number.isSafeInteger(product.id) || !product.handle || !/^[\w-]+$/.test(product.handle)) continue;
+      const externalId = String(product.id);
+      if (listings.has(externalId) || !product.published_at || !isFresh(product.published_at, stockWindow)) continue;
+      const variant = product.variants?.find((value) => value.available === true);
+      const title = plainText(product.title);
+      if (!variant || !title || shopExcluded.test(title) || newerThanPreferred.test(title)) continue;
+      const rawType = product.product_type?.trim() ?? "";
+      const inferred = classifyGarment({ title });
+      const garmentKind = inferred !== "unknown" ? inferred
+        : /^(?:button ups?|shirts?)$/i.test(rawType) ? "shirt" : "unknown";
+      if (garmentKind !== "shirt" && garmentKind !== "pants") continue;
+      if ((kindRequested === "shirt" || kindRequested === "pants") && kindRequested !== garmentKind) continue;
+
+      const optionValue = (name: RegExp) => {
+        const position = product.options?.find((option) => name.test(option.name ?? ""))?.position ?? 0;
+        return [variant.option1, variant.option2, variant.option3][position - 1]?.trim() ?? "";
+      };
+      const notes = shopSellerNotes(product.body_html);
+      const labeledColor = optionValue(/^colou?r$/i) || notes.match(/^colou?r\s*:\s*([^\n.]{2,35})$/im)?.[1];
+      const { size, sizeBasis } = shopSize(title, notes, optionValue(/^size$/i), garmentKind);
+      if (!matchesScoutFit({ title, size, garmentKind }, preferences)) continue;
+      const description = [notes, inferred === "unknown" ? "Garment type: shirt." : ""].filter(Boolean).join("\n");
+      if (!terms.every((term) => words(`${title} ${description} ${labeledColor ?? ""}`).includes(term))) continue;
+      const quality = vintageSignals({ title, description });
+      const explicitWorkwear = (garmentKind === "shirt" ? workShirtClues : workPantsClues).test(`${title} ${description}`);
+      if (quality.build < 0 || (!quality.build && !explicitWorkwear) || newerThanPreferred.test(notes) || structuralDamage.test(notes)) continue;
+      const price = variant.price && /^\d{1,6}(?:\.\d{1,2})?$/.test(variant.price) ? Math.round(Number(variant.price) * 100) : null;
+      const budget = garmentKind === "shirt" ? preferences.shirtBudget : preferences.pantsBudget;
+      if (price == null || (budget != null && price > Math.round(budget * 100))) continue;
+      const imageUrl = product.images?.map((image) => httpsImage(image.src, "cdn.shopify.com", host)).find(Boolean);
+      if (!imageUrl) continue;
+      const condition = notes.match(/^(?:condition|flaws)\s*:\s*(.+)$/im)?.[1];
+      listings.set(externalId, {
+        source: shop.source, externalId, title, description, imageUrl, size, sizeBasis, condition, color: labeledColor || undefined,
+        listedAt: new Date(product.published_at).toISOString(), priceCents: price,
+        url: `${shop.origin}/products/${product.handle}`,
+      });
     }
   }
-
-  const sourceStatus = hasFeed && suggestions.every((result) => result.status === "fulfilled") ? "searched" : "partial";
-  return resolveCandidates(shortlist(Array.from(candidates.values()), preferences), async ({ handle, url, title, listedAt, garmentKind }) => {
-    const response = await fetch(`${shop.origin}/products/${handle}.js`, options);
-    if (response.status === 404 || response.status === 410) return null;
-    if (!response.ok) throw new Error("Shop product details unavailable");
-    const product = await response.json() as {
-      id?: number; available?: boolean; published_at?: string; description?: string;
-      featured_image?: string; variants?: { price?: number; available?: boolean }[];
-    };
-    const imageUrl = httpsImage(product.featured_image, "cdn.shopify.com", new URL(shop.origin).hostname);
-    const id = product.id;
-    if (!product.available || !imageUrl || !Number.isSafeInteger(id)) return null;
-    const published = product.published_at ?? listedAt;
-    if (!isFresh(published, window)) return null;
-    const description = plainText(product.description).replace(/\b(PIT TO PIT:\s*\d+(?:\.\d+)?\s*["″])\s+LENGTH\s*:/gi, "$1 Body length:");
-    if (!terms.every((term) => `${title} ${description}`.toLowerCase().replace(/[.']/g, "").includes(term))) return null;
-    const sizeTag = description.match(/\bsize tag:\s*(.+?)(?=\s+(?:pit to pit|length|waist|inseam|collar|flaws)\s*:|$)/i)?.[1];
-    const knownWaist = title.match(/\b(?:tagged(?: size)?|size)\s*W?\s*(\d{2})\b/i)?.[1];
-    const size = garmentKind === "pants"
-      ? pantsSizeTokens(title).filter((value) => value.includes("x")).join(" / ") || (knownWaist ? `W${knownWaist}` : undefined)
-      : shirtSizeTokens(sizeTag ?? title.replace(/\b(?:[a-z]\.){2,}/gi, "")).join(" / ") || undefined;
-    if ((!listedAt || preferences.matchingOnly) && !matchesScoutFit({ title, size, garmentKind }, preferences)) return null;
-    const price = product.variants?.find((variant) => variant.available)?.price;
-    return { source: shop.source, externalId: String(id), url, title, description, imageUrl, size,
-      listedAt: new Date(published).toISOString(), priceCents: typeof price === "number" && Number.isSafeInteger(price) && price >= 0 ? price : null };
-  }, sourceStatus);
+  const status = catalogs.length === pages.length && catalogs.every((catalog) => catalog.complete) ? "searched" : "partial";
+  return { status, listings: Array.from(listings.values()) };
 }
 
 type EtsyListing = {
@@ -194,7 +242,7 @@ export async function searchEtsy(preferences: ScoutPreferences, keywords: string
   const customKind = classifyGarment({ title: keywords });
   const lanes = keywords
     ? (customKind === "shirt" || customKind === "pants" ? [[customKind, keywords]] : [["shirt", keywords + " shirt"], ["pants", keywords + " pants"]])
-    : [["shirt", "vintage cotton work shirt"], ["shirt", "vintage chamois shirt"], ["shirt", "vintage lined shirt jacket"], ["pants", "vintage carpenter work pants"], ["pants", "vintage denim jeans"]];
+    : [["shirt", "cotton work shirt"], ["shirt", "chamois shirt"], ["shirt", "lined shirt jacket"], ["pants", "carpenter work pants"], ["pants", "denim jeans"]];
   const querySet = new Set(lanes.flatMap(([kind, phrase]) => {
     const sizes = kind === "pants" ? preferences.pantsSizes : preferences.shirtSizes;
     // Broad searches catch alternate sizing language. A focused search gives the priority size its own result page.
