@@ -1,8 +1,8 @@
 import type { ListingInput } from "./listing-model";
 
 const modern = /\b(?:reissue|reproduction|replica|vintage[- ]style|retro[- ]inspired|lvc|levi'?s vintage clothing|ll bean signature|unite here)\b/i;
-const old = /\b(?:pre[- ]?1999|(?:19)?[4-8]0s|(?:early|mid)[ -](?:19)?90s|(?:year manufactured:|from|dated|made in|circa|c\.)\s*(?:19[4-8]\d|199[0-8]))\b/i;
-const sometime90s = /\b(?:1990s|90s)\b/i;
+const old = /\b(?:pre[- ]?1999|(?:19)?[4-8]0'?s|(?:early|mid)[ -](?:19)?90'?s|(?:year manufactured:|from|dated|made in|circa|c\.)\s*(?:19[4-8]\d|199[0-8])|(?:tag|label)\s+dated\s+(?:0?[1-9]|1[0-2])[/.-](?:19)?(?:[4-8]\d|9[0-8]))\b/i;
+const sometime90s = /\b(?:19)?90'?s\b/i;
 const newer = /\b(?:(?:year manufactured:|from|dated|made in|circa)\s*(?:1999|20[0-2]\d)|(?:20)?00s|2010s|2020s|y2k)\b/i;
 const historicLabels = /\b(?:actwu|acwa|amalgamated clothing (?:and textile )?workers|gimbels|(?:made in|country of origin:)\s*(?:west germany|czechoslovakia|u\.?s\.?s\.?r\.?))\b/i;
 const durableFabric = /\b(?:duck(?: canvas)?|canvas|denim|chamois|sateen|moleskin|melton|twill|herringbone|wool whipcord|heavy[- ]?weight|heavy cotton|heavy flannel)\b/i;

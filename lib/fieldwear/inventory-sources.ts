@@ -102,7 +102,7 @@ const workPantsClues = /\b(?:carpenter|work(?:wear)?|double[- ]knee|painter|fati
 const newerThanPreferred = /\b(?:2010s|2020s|(?:produced|manufactured|made|dated) in 20[12]\d)\b/i;
 const structuralDamage = /\b(?:dry rot|broken zip(?:per)?|heavy staining|large holes?|(?:major|unrepaired) tears?|rips?|(?:missing|ripped|torn) belt loops?|belt loops? (?:missing|ripped|torn)|tear on (?:the )?back pocket|torn open)\b/i;
 const damageDenial = /\b(?:no|without)\s+(?:visible\s+)?(?:(?:(?:major|large|heavy)\s+)?(?:rips?|holes?|tears?|stains?)|flaws|damage)(?:(?:\s*,\s*(?:(?:and|or)\s+)?|\s+(?:and|or)\s+)(?:(?:(?:major|large|heavy)\s+)?(?:rips?|holes?|tears?|stains?)|flaws|damage))*/gi;
-const lightweightPants = /\b(?:city flex|tactical lightweight|four[- ]way stretch|moisture[- ]wicking)\b/i;
+const lightweightPants = /\b(?:city flex|tactical lightweight|four[- ]way stretch|moisture[- ]wicking|slim[- ]fit\b[^\n.]{0,65}\bstretch)\b/i;
 
 type ShopProduct = {
   id?: number;
