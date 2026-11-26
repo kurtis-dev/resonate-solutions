@@ -3,7 +3,7 @@ import { vintageSignals } from "./vintage-signals";
 
 export const beanReferenceId = "87148811";
 export type LookProfile = "similar" | "browning";
-export const lookDays = 90;
+export const lookDays = 365;
 
 const traits = {
   denim: /\b(?:denim|jeans)\b/i,
@@ -42,6 +42,9 @@ export const browningHunt: LookHunt = {
     'Browning ("super naturals",upland,shooting) shirt',
     'Browning (denim,canvas,cotton) hunting shirt',
     '(suede,leather) ("elbow patch","elbow patches") shirt',
+    'Woolrich suede elbow shirt',
+    'Pendleton (suede,leather) ("elbow patch","elbow patches") shirt',
+    '(Woolrich,Pendleton,Orvis,RedHead) ("elbow patch","elbow patches") shirt',
   ],
 };
 
@@ -67,11 +70,11 @@ export function matchLook(input: ListingInput, hunt: LookHunt): { rank: number; 
   if (quality.build < 0 || /\b(?:costume|distressed\s+beyond|thrashed|faux suede)\b/i.test(input.title)) return null;
   const stylePenalty = flashy.test(input.title) ? 10 : 0;
   if (hunt.profile === "browning") {
-    if (/\b(?:short[- ]sleeve|polo shirt|rugby|t[- ]?shirt)\b/i.test(input.title)) return null;
+    if (/\b(?:short[- ]sleeve|polo shirt|rugby|t[- ]?shirt|rocawear)\b/i.test(input.title)) return null;
     const isBrowning = browning.test(input.title);
     const patched = elbows.test(text) && material.test(text.replace(/\bbuck suede\b/gi, "")) && !faux.test(text)
       && !/\b(?:canvas|cotton|cordura)[- ]+(?:forearm\/)?elbow[- ]+patch/i.test(text);
-    const suitable = otherBrand.test(input.title) || quality.cotton || quality.wool || quality.sturdyBlend;
+    const suitable = otherBrand.test(input.title) || quality.build > 0 && /\b(?:field|work|utility|outdoor|wool)\b/i.test(input.title);
     if (patched && (isBrowning || suitable)) return {
       rank: (isBrowning ? 110 : 86) + (otherBrand.test(text) ? 4 : 0) + quality.build * 3 - stylePenalty,
       group: isBrowning ? "browning-patched" : "other-patched",

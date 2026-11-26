@@ -148,13 +148,20 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { sta
     for (const hit of outcome.value.hits) hits.set(hit.listing.externalId, hit);
   }
   const candidates = Array.from(hits.values());
-  const detailTargets = (hunt ? [hunt.kind] : garmentTypes).flatMap((kind) => candidates
+  const detailTargets = (hunt ? [hunt.kind] : garmentTypes).flatMap((kind) => {
+    const rankedHits = candidates
     .filter(({ listing, itemId }) => itemId && !excluded.test(listing.title) && classifyGarment(hunt ? { title: listing.title, size: listing.size } : listing) === kind &&
       matchesScoutFit({ ...listing, garmentKind: kind }, preferences) && withinBudget(listing, kind, preferences))
     .map((hit) => ({ hit, look: hunt ? probeRank(hit.listing, hunt) : 0, ...listingRank(hit.listing, preferences) }))
     .sort((a, b) => b.look - a.look || compareQuality(a, b))
-    .map(({ hit }) => hit)
-    .slice(0, hunt ? 24 : 10));
+    .map(({ hit }) => hit);
+    if (hunt?.profile !== "browning") return rankedHits.slice(0, hunt ? 24 : 10);
+    const isBrowning = ({ listing }: (typeof rankedHits)[number]) => /\bbrowning\b/i.test(listing.title);
+    return [
+      ...rankedHits.filter(isBrowning).slice(0, 14),
+      ...rankedHits.filter((hit) => !isBrowning(hit)).slice(0, 14),
+    ];
+  });
   // Details are optional so a slow single-item endpoint cannot stop Fresh finds.
   await Promise.allSettled(detailTargets.map(async (hit) => {
     const response = await fetch(`${ebay}/buy/browse/v1/item/${encodeURIComponent(hit.itemId!)}`, {
