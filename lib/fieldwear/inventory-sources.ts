@@ -1,4 +1,5 @@
 import { classifyGarment, type ListingInput } from "./listing-model";
+import { setTimeout as delay } from "node:timers/promises";
 import { vintageShops } from "./marketplace-directory";
 import { departmentMatch, fitPriority, matchesScoutFit, type ScoutPreferences } from "./preferences";
 
@@ -12,6 +13,30 @@ type Window = { start: number; now: number };
 type Shop = (typeof vintageShops)[number];
 const etsy = "https://openapi.etsy.com/v3/application";
 const parallelLimit = 6;
+// Keep a margin under Etsy's five requests per second for this app key.
+const etsyRequestInterval = 250;
+let etsyRequestQueue = Promise.resolve();
+let nextEtsyRequest = 0;
+
+async function fetchEtsy(path: string, options: RequestInit, signal: AbortSignal) {
+  const ready = etsyRequestQueue.then(async () => {
+    while (nextEtsyRequest > performance.now()) {
+      await delay(Math.ceil(nextEtsyRequest - performance.now()), undefined, { signal });
+    }
+    signal.throwIfAborted();
+    nextEtsyRequest = performance.now() + etsyRequestInterval;
+  });
+  etsyRequestQueue = ready.catch(() => {});
+  await ready;
+  const response = await fetch(`${etsy}${path}`, options);
+  if (response.status === 429) {
+    const retryAfter = Number(response.headers.get("retry-after"));
+    if (retryAfter > 0 && Number.isFinite(retryAfter)) {
+      nextEtsyRequest = Math.max(nextEtsyRequest, performance.now() + retryAfter * 1000);
+    }
+  }
+  return response;
+}
 
 export function isFresh(value: string, { start, now }: Window) {
   const date = Date.parse(value);
@@ -126,7 +151,7 @@ export async function searchEtsy(preferences: ScoutPreferences, keywords: string
   const key = process.env.ETSY_API_KEY?.trim();
   const secret = process.env.ETSY_SHARED_SECRET?.trim();
   if (!key || !secret) return { status: "needs-access", listings: [] };
-  const signal = AbortSignal.timeout(10_000);
+  const signal = AbortSignal.timeout(15_000);
   const options: RequestInit = { cache: "no-store", signal, redirect: "error", headers: { "x-api-key": `${key}:${secret}` } };
   const customKind = classifyGarment({ title: keywords });
   const lanes = keywords
@@ -139,7 +164,7 @@ export async function searchEtsy(preferences: ScoutPreferences, keywords: string
   }));
   const settled = await Promise.allSettled(Array.from(querySet, async (keywords) => {
     const params = new URLSearchParams({ keywords, sort_on: "created", sort_order: "desc", limit: "50", currency: "USD", buyer_country: "US" });
-    const response = await fetch(`${etsy}/listings/active?${params}`, options);
+    const response = await fetchEtsy(`/listings/active?${params}`, options, signal);
     if (!response.ok) throw new Error(`Etsy search status ${response.status}`);
     return ((await response.json()) as { results: EtsyListing[] }).results;
   }));
@@ -159,7 +184,7 @@ export async function searchEtsy(preferences: ScoutPreferences, keywords: string
   });
   const status = successes.length === settled.length ? "searched" : "partial";
   return resolveCandidates(shortlist(candidates, preferences), async ({ item, listedAt, title, description }) => {
-    const response = await fetch(`${etsy}/listings/${item.listing_id}/images`, options);
+    const response = await fetchEtsy(`/listings/${item.listing_id}/images`, options, signal);
     if (response.status === 404) return null;
     if (!response.ok) throw new Error("Etsy listing image unavailable");
     const { results } = await response.json() as { results?: { rank?: number; url_fullxfull?: string }[] };
