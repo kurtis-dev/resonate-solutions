@@ -178,6 +178,7 @@ export function classifyGarment(input: Pick<ListingInput, "title" | "description
   if (/\b(?:pants?|jeans?|dungarees?|trousers?|carpenters?|painters?|overalls?)\b|\b(?:38|40)\s?[x×]\s?(?:32|34)\b/i.test(text)) return "pants";
   if (/\b(?:coat|parka|blazer|outerwear)\b|\bjacket\b(?![- ]?shirt)/i.test(text) && !/shirt[- ]?(?:jacket|jac)|shacket/i.test(text)) return "outerwear";
   if (/\b(?:shirts?|flannel|chamois|overshirt|shirt[- ]?(?:jacket|jac)|shacket)\b/i.test(text)) return "shirt";
+  if (/\bbutton[- ](?:up|down|front)\b/i.test(input.title) && /\b(?:workwear|long[- ]sleeve)\b/i.test(input.title) && !/\b(?:cardigan|dress|sweater|blouse|skirt)\b/i.test(input.title)) return "shirt";
   return "unknown";
 }
 

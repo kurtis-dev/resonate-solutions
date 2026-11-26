@@ -81,7 +81,17 @@ function buildQueries(preferences: ScoutPreferences, keywords: string, hunt?: Lo
       [pants, '("Key Imperial","Round House","Stan Ray") pants'], [pants, '("OG-107","cotton sateen") fatigue pants'],
       [pants, '("union made","made in usa",ACTWU) work pants'], [pants, '(1980s,1990s,80s,90s) jeans'],
     ];
-  return Array.from(new Set(lanes.map(([sizes, garment]) => [department, sizes, garment].filter(Boolean).join(" "))));
+  const sized = Array.from(new Set(lanes.map(([sizes, garment]) => [department, sizes, garment].filter(Boolean).join(" "))));
+  // Some sellers leave size out of the title. Probe a bounded set and admit only saved-size matches.
+  const broader = hunt ? [] : keywords
+    ? lanes.filter(([sizes]) => Boolean(sizes)).map(([, garment]) => garment)
+    : [...(shirt ? ["cotton canvas button up work shirt", "denim flannel lined shirt jacket"] : []),
+      ...(pants ? ["double knee duck canvas work pants"] : [])];
+  return [
+    ...sized.map((q) => ({ q, verifySize: false })),
+    ...Array.from(new Set(broader.map((phrase) => [department, phrase].filter(Boolean).join(" "))))
+      .filter((q) => !sized.includes(q)).map((q) => ({ q, verifySize: true })),
+  ];
 }
 
 function moneyCents(price?: EbayMoney) {
@@ -116,10 +126,10 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { sta
   if (!client || !secret) return { status: "needs-access", listings: [] };
   const token = await ebayToken(client, secret);
   const queries = buildQueries(preferences, keywords, hunt);
-  const settled = await Promise.allSettled(queries.map(async (q) => {
+  const settled = await Promise.allSettled(queries.map(async ({ q, verifySize }) => {
     const fetchPage = async (offset: number) => {
       const params = new URLSearchParams({
-        q, limit: "100", offset: String(offset),
+        q, limit: verifySize ? "30" : "100", offset: String(offset),
         filter: `conditions:{USED},buyingOptions:{${hunt ? "FIXED_PRICE" : "FIXED_PRICE|AUCTION"}},itemStartDate:[${new Date(start).toISOString()}..${new Date(now).toISOString()}]`,
       });
       if (!hunt) params.set("sort", "newlyListed");
@@ -131,35 +141,39 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { sta
       return response.json() as Promise<{ itemSummaries?: EbayItem[]; next?: string }>;
     };
     const first = await fetchPage(0);
-    const second = first.next ? await fetchPage(100).catch(() => null) : undefined;
+    const second = first.next && !verifySize ? await fetchPage(100).catch(() => null) : undefined;
     const hits = [...(first.itemSummaries ?? []), ...(second?.itemSummaries ?? [])].flatMap((item) => {
       const listing = mapItem(item, start, now);
-      return listing ? [{ listing, itemId: item.itemId }] : [];
+      return listing ? [{ listing, itemId: item.itemId, verifySize }] : [];
     });
     return { hits, partial: second === null };
   }));
-  const hits = new Map<string, { listing: LiveListing; itemId?: string }>();
+  const hits = new Map<string, { listing: LiveListing; itemId?: string; verifySize: boolean }>();
   let succeeded = 0;
   let incomplete = false;
   for (const outcome of settled) {
     if (outcome.status !== "fulfilled") continue;
     succeeded++;
     incomplete ||= outcome.value.partial;
-    for (const hit of outcome.value.hits) hits.set(hit.listing.externalId, hit);
+    for (const hit of outcome.value.hits) if (!hits.has(hit.listing.externalId)) hits.set(hit.listing.externalId, hit);
   }
   const candidates = Array.from(hits.values());
   const detailTargets = (hunt ? [hunt.kind] : garmentTypes).flatMap((kind) => {
     const rankedHits = candidates
     .filter(({ listing, itemId }) => itemId && !excluded.test(listing.title) && classifyGarment(hunt ? { title: listing.title, size: listing.size } : listing) === kind &&
-      matchesScoutFit({ ...listing, garmentKind: kind }, preferences) && withinBudget(listing, kind, preferences))
+      withinBudget(listing, kind, preferences))
     .map((hit) => ({ hit, look: hunt ? probeRank(hit.listing, hunt) : 0, ...listingRank(hit.listing, preferences) }))
     .sort((a, b) => b.look - a.look || compareQuality(a, b))
     .map(({ hit }) => hit);
-    if (hunt?.profile !== "browning") return rankedHits.slice(0, hunt ? 24 : 10);
+    const matching = rankedHits.filter(({ listing }) => matchesScoutFit({ ...listing, garmentKind: kind }, preferences));
+    if (hunt?.profile !== "browning") return [
+      ...matching.filter((hit) => !hit.verifySize).slice(0, hunt ? 24 : 10),
+      ...rankedHits.filter((hit) => hit.verifySize && (!hit.listing.size || matchesScoutFit({ ...hit.listing, garmentKind: kind }, preferences))).slice(0, 6),
+    ];
     const isBrowning = ({ listing }: (typeof rankedHits)[number]) => /\bbrowning\b/i.test(listing.title);
     return [
-      ...rankedHits.filter(isBrowning).slice(0, 14),
-      ...rankedHits.filter((hit) => !isBrowning(hit)).slice(0, 14),
+      ...matching.filter(isBrowning).slice(0, 14),
+      ...matching.filter((hit) => !isBrowning(hit)).slice(0, 14),
     ];
   });
   // Details are optional so a slow single-item endpoint cannot stop Fresh finds.
@@ -174,11 +188,15 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { sta
       hit.listing.imageUrl = detail.image.imageUrl;
     }
     const facts = detail.localizedAspects ?? [];
-    if (hunt) {
+    if (hunt || hit.verifySize) {
       const size = facts.find(({ name }) => /^size$/i.test(name ?? ""))?.value;
-      const fit = hunt.kind === "pants" ? pantsSizeTokens : shirtSizeTokens;
-      const sizes = size && fit(size);
-      if (sizes && sizes.length > 0 && (hunt.kind === "shirt" || sizes.some((value) => value.includes("x")))) {
+      const kind = hunt?.kind ?? classifyGarment(hit.listing);
+      const waist = facts.find(({ name }) => /^waist size$/i.test(name ?? ""))?.value?.match(/^\s*(\d{2}(?:\.\d+)?)(?:\s*(?:in\.?|inches|"))?\s*$/i)?.[1];
+      const inseam = facts.find(({ name }) => /^inseam$/i.test(name ?? ""))?.value?.match(/^\s*(\d{2}(?:\.\d+)?)(?:\s*(?:in\.?|inches|"))?\s*$/i)?.[1];
+      const sizes = kind === "pants"
+        ? waist && inseam ? [`${waist}x${inseam}`] : pantsSizeTokens(size ?? "").filter((value) => value.includes("x"))
+        : shirtSizeTokens(size ?? "");
+      if (sizes.length) {
         hit.listing.size = sizes.join(" / ");
       }
     }
@@ -188,7 +206,9 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { sta
       .replace(/&nbsp;/gi, " ").replace(/&quot;|&#34;/gi, '"').trim().slice(0, 4200);
     hit.listing.description = [description || hit.listing.description, ...labeled].filter(Boolean).join("\n");
   }));
-  return { status: succeeded === queries.length && !incomplete ? "searched" : succeeded ? "partial" : "unavailable", listings: candidates.map(({ listing }) => listing) };
+  const listings = candidates.filter(({ listing, verifySize }) => !verifySize ||
+    matchesScoutFit({ ...listing, garmentKind: classifyGarment(listing) }, preferences)).map(({ listing }) => listing);
+  return { status: succeeded === queries.length && !incomplete ? "searched" : succeeded ? "partial" : "unavailable", listings };
 }
 
 function probeRank(listing: LiveListing, hunt: LookHunt) {

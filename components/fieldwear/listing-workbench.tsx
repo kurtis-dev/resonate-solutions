@@ -407,8 +407,10 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items }: { items: ListingView[] }) {
-  const [kind, setKind] = useState<"shirt" | "pants">(() => items.some((item) => item.garmentKind === "shirt") ? "shirt" : "pants");
+export function FreshCatalog({ items, initialSource = "" }: { items: ListingView[]; initialSource?: string }) {
+  const startingItems = initialSource ? items.filter((item) => item.source === initialSource) : items;
+  const [kind, setKind] = useState<"shirt" | "pants">(() => startingItems.some((item) => item.garmentKind === "shirt") ? "shirt" : "pants");
+  const [marketplace, setMarketplace] = useState(initialSource);
   const [order, setOrder] = useState("relevance");
   const [min, setMin] = useState("");
   const [max, setMax] = useState("");
@@ -418,9 +420,10 @@ export function FreshCatalog({ items }: { items: ListingView[] }) {
   const [page, setPage] = useState(1);
   const resultsRef = useRef<HTMLDivElement>(null);
   const invalidRange = min !== "" && max !== "" && Number(min) > Number(max);
+  const marketplaces = Array.from(new Set(items.map((item) => item.source))).sort((a, b) => marketplaceName(a).localeCompare(marketplaceName(b)));
   const results = useMemo(() => {
     const filtered = items.filter((item) => {
-      if (item.garmentKind !== kind || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
+      if (item.garmentKind !== kind || (marketplace && item.source !== marketplace) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
       if (min === "" && max === "") return true;
       const cents = priceForSort(item);
       return cents != null && (min === "" || cents >= Number(min) * 100) && (max === "" || cents <= Number(max) * 100);
@@ -435,15 +438,16 @@ export function FreshCatalog({ items }: { items: ListingView[] }) {
       return order === "high" ? right - left : left - right;
     });
     return filtered;
-  }, [items, kind, garmentType, era, fabric, invalidRange, min, max, order]);
+  }, [items, kind, marketplace, garmentType, era, fabric, invalidRange, min, max, order]);
   const lastPage = Math.max(1, Math.ceil(results.length / freshPageSize));
   const currentPage = Math.min(page, lastPage);
   const from = (currentPage - 1) * freshPageSize;
   const visible = results.slice(from, from + freshPageSize);
   const control = "mt-1 min-h-11 w-full rounded-xl border border-black/15 bg-white px-3 text-base font-normal text-[var(--ink)]";
-  const hasFilters = Boolean(garmentType || era || fabric || min || max);
+  const hasFilters = Boolean(marketplace || garmentType || era || fabric || min || max);
   const clearFilters = () => {
     setGarmentType("");
+    setMarketplace("");
     setEra("");
     setFabric("");
     setMin("");
@@ -461,7 +465,7 @@ export function FreshCatalog({ items }: { items: ListingView[] }) {
       <div className="flex flex-wrap gap-2" aria-label="Garment type" role="group">
         {([["shirt", "Shirts"], ["pants", "Bottoms"]] as const).map(([value, label]) => (
           <button key={value} type="button" aria-pressed={kind === value} onClick={() => { if (kind !== value) { setKind(value); setGarmentType(""); } setPage(1); }} className={`min-h-11 rounded-full border px-4 text-sm font-bold ${kind === value ? "border-[var(--pine)] bg-[var(--pine)] text-white" : "border-black/15 bg-white text-[var(--pine)]"}`}>
-            {label} <span className="ml-1 tabular-nums">{items.filter((item) => item.garmentKind === value).length}</span>
+            {label} <span className="ml-1 tabular-nums">{items.filter((item) => item.garmentKind === value && (!marketplace || item.source === marketplace)).length}</span>
           </button>
         ))}
       </div>
@@ -470,6 +474,12 @@ export function FreshCatalog({ items }: { items: ListingView[] }) {
           <select value={garmentType} onChange={(event) => { setGarmentType(event.target.value); setPage(1); }} className={control}>
             <option value="">All {kind === "shirt" ? "shirts" : "bottoms"}</option>
             {garmentOptions[kind].map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+          </select>
+        </label>
+        <label className="min-w-0 text-xs font-bold">Marketplace
+          <select value={marketplace} onChange={(event) => { setMarketplace(event.target.value); setPage(1); }} className={control}>
+            <option value="">All marketplaces</option>
+            {marketplaces.map((source) => <option key={source} value={source}>{marketplaceName(source)}</option>)}
           </select>
         </label>
         <label className="min-w-0 text-xs font-bold">Era

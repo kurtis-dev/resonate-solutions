@@ -1,7 +1,7 @@
 import { classifyGarment, type ListingInput } from "./listing-model";
 import { setTimeout as delay } from "node:timers/promises";
 import { vintageShops } from "./marketplace-directory";
-import { departmentMatch, fitPriority, matchesScoutFit, type ScoutPreferences } from "./preferences";
+import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 
 export type LiveListing = ListingInput & { listedAt: string };
 export type SourceResult = {
@@ -97,32 +97,62 @@ async function resolveCandidates<T>(candidates: T[], load: (candidate: T) => Pro
 export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, window: Window): Promise<SourceResult> {
   const signal = AbortSignal.timeout(10_000);
   const options: RequestInit = { cache: "no-store", signal, redirect: "error" };
-  const [feed, cart] = await Promise.all([
-    fetch(`${shop.origin}/collections/${shop.collection}.atom`, options),
+  const phrases = keywords ? [keywords] : [
+    ...preferences.shirtSizes.slice(0, 3).map((size) => `work shirt ${size}`),
+    ...preferences.pantsSizes.slice(0, 4),
+  ];
+  const [feed, cart, suggestions] = await Promise.all([
+    fetch(`${shop.origin}/collections/${shop.collection}.atom`, options).catch(() => null),
     fetch(`${shop.origin}/cart.js`, options),
+    Promise.allSettled(phrases.map(async (q) => {
+      const params = new URLSearchParams({ q, "resources[type]": "product", "resources[options][unavailable_products]": "hide" });
+      const response = await fetch(`${shop.origin}/search/suggest.json?${params}`, options);
+      if (!response.ok) throw new Error("Shop search unavailable");
+      const data = await response.json() as { resources?: { results?: { products?: { url?: string; title?: string; available?: boolean; product_type?: string; type?: string }[] } } };
+      if (!Array.isArray(data.resources?.results?.products)) throw new Error("Invalid shop search response");
+      return data.resources.results.products;
+    })),
   ]);
-  if (!feed.ok || !cart.ok) return { status: "unavailable", listings: [] };
+  if (!cart.ok) return { status: "unavailable", listings: [] };
   const { currency } = await cart.json() as { currency?: string };
-  const xml = await feed.text();
-  if (currency !== "USD" || !xml.includes("http://www.w3.org/2005/Atom")) return { status: "unavailable", listings: [] };
+  if (currency !== "USD") return { status: "unavailable", listings: [] };
+  const xml = feed?.ok ? await feed.text() : "";
+  const hasFeed = xml.includes("http://www.w3.org/2005/Atom");
+  if (!hasFeed && !suggestions.some((result) => result.status === "fulfilled")) return { status: "unavailable", listings: [] };
   const tokens = keywords.toLowerCase().replace(/[.']/g, "").match(/[a-z0-9]+/g) ?? [];
   const kindRequested = classifyGarment({ title: keywords });
   const terms = tokens.filter((token) => !/^(?:shirts?|pants?|trousers?|jeans?|vintage)$/.test(token));
-  const candidates = Array.from(xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g), ([, entry]) => {
+  const candidateFor = (rawUrl: string, title: string, listedAt: string, type = "") => {
+    const productPath = rawUrl.startsWith(shop.origin + "/") ? rawUrl.slice(shop.origin.length) : rawUrl;
+    const handle = /^\/products\/([\w-]+)(?:[?#]|$)/.exec(productPath)?.[1];
+    if (!handle || !title || /\b(?:reworked|cropped|cut.off|graphic tee|track pants|joggers?|sweatpants)\b/i.test(title)) return null;
+    const inferred = classifyGarment({ title });
+    const garmentKind = inferred === "unknown" && /^(?:button ups?|shirts?)$/i.test(type) ? "shirt" : inferred;
+    const candidate = { title, handle, url: `${shop.origin}/products/${handle}`, garmentKind, listedAt };
+    if (!fitsSearch(candidate, preferences)) return null;
+    if ((kindRequested === "shirt" || kindRequested === "pants") && kindRequested !== garmentKind) return null;
+    return candidate;
+  };
+  const feedCandidates = Array.from(xml.matchAll(/<entry>([\s\S]*?)<\/entry>/g), ([, entry]) => {
     const url = decodeText(entry.match(/<link\b[^>]*\brel="alternate"[^>]*\bhref="([^"]+)"/)?.[1] ?? "");
     const title = plainText(entry.match(/<title[^>]*>([\s\S]*?)<\/title>/)?.[1]);
     const published = entry.match(/<published>([^<]+)<\/published>/)?.[1] ?? "";
     const summary = plainText(entry.match(/<!\[CDATA\[([\s\S]*?)\]\]>/)?.[1]);
-    const handle = url.startsWith(shop.origin + "/") ? url.slice(shop.origin.length).match(/^\/products\/([\w-]+)$/)?.[1] : null;
-    const garmentKind = classifyGarment({ title });
-    const candidate = { title, handle, url, garmentKind, listedAt: published };
     const searchable = `${title} ${summary}`.toLowerCase().replace(/[.']/g, "");
-    if (!handle || !title || !isFresh(published, window) || !fitsSearch(candidate, preferences)) return null;
-    if ((kindRequested === "shirt" || kindRequested === "pants") && kindRequested !== garmentKind) return null;
-    return terms.every((term) => searchable.includes(term)) ? { ...candidate, handle } : null;
+    return isFresh(published, window) && terms.every((term) => searchable.includes(term)) ? candidateFor(url, title, published) : null;
   }).filter((item) => item !== null);
+  const candidates = new Map(feedCandidates.map((item) => [item.handle, item]));
+  for (const result of suggestions) {
+    if (result.status !== "fulfilled") continue;
+    for (const product of result.value) {
+      if (!product.url || !product.title || product.available !== true) continue;
+      const item = candidateFor(product.url, plainText(product.title), "", product.product_type ?? product.type);
+      if (item && !candidates.has(item.handle)) candidates.set(item.handle, item);
+    }
+  }
 
-  return resolveCandidates(shortlist(candidates, preferences), async ({ handle, url, title, listedAt }) => {
+  const sourceStatus = hasFeed && suggestions.every((result) => result.status === "fulfilled") ? "searched" : "partial";
+  return resolveCandidates(shortlist(Array.from(candidates.values()), preferences), async ({ handle, url, title, listedAt, garmentKind }) => {
     const response = await fetch(`${shop.origin}/products/${handle}.js`, options);
     if (response.status === 404 || response.status === 410) return null;
     if (!response.ok) throw new Error("Shop product details unavailable");
@@ -133,12 +163,19 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
     const imageUrl = httpsImage(product.featured_image, "cdn.shopify.com", new URL(shop.origin).hostname);
     const id = product.id;
     if (!product.available || !imageUrl || !Number.isSafeInteger(id)) return null;
-    if (product.published_at && !isFresh(product.published_at, window)) return null;
+    const published = product.published_at ?? listedAt;
+    if (!isFresh(published, window)) return null;
     const description = plainText(product.description);
+    if (!terms.every((term) => `${title} ${description}`.toLowerCase().replace(/[.']/g, "").includes(term))) return null;
+    const sizeTag = description.match(/\bsize tag:\s*(.+?)(?=\s+(?:pit to pit|length|waist|inseam|collar|flaws)\s*:|$)/i)?.[1];
+    const knownWaist = title.match(/\b(?:tagged(?: size)?|size)\s*W?\s*(\d{2})\b/i)?.[1];
+    const size = garmentKind === "pants"
+      ? pantsSizeTokens(title).filter((value) => value.includes("x")).join(" / ") || (knownWaist ? `W${knownWaist}` : undefined)
+      : shirtSizeTokens(sizeTag ?? title.replace(/\b(?:[a-z]\.){2,}/gi, "")).join(" / ") || undefined;
     const price = product.variants?.find((variant) => variant.available)?.price;
-    return { source: shop.source, externalId: String(id), url, title, description, imageUrl,
-      listedAt: new Date(listedAt).toISOString(), priceCents: typeof price === "number" && Number.isSafeInteger(price) && price >= 0 ? price : null };
-  });
+    return { source: shop.source, externalId: String(id), url, title, description, imageUrl, size,
+      listedAt: new Date(published).toISOString(), priceCents: typeof price === "number" && Number.isSafeInteger(price) && price >= 0 ? price : null };
+  }, sourceStatus);
 }
 
 type EtsyListing = {

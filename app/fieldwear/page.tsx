@@ -61,9 +61,10 @@ const searchDate = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago
 const sourceStatus = { searched: "Checked", partial: "Partially checked", unavailable: "Check failed", "needs-access": "API access needed", "no-feed": "Live feed unavailable" } as const;
 
 function FreshScout({
-  run, preferences, items,
-}: { run: Awaited<ReturnType<typeof readLiveSearch>>; preferences: ScoutPreferences; items: ListingView[] }) {
+  run, preferences, items, source,
+}: { run: Awaited<ReturnType<typeof readLiveSearch>>; preferences: ScoutPreferences; items: ListingView[]; source?: string }) {
   const coverage = run?.coverage;
+  const initialSource = items.some((item) => item.source === source) ? source : undefined;
   const days = run?.days ?? freshListingDays;
   const checked = coverage?.filter((entry) => entry.status === "searched" || entry.status === "partial").length;
   const summary = run ? `Searched ${searchDate.format(new Date(run.searchedAt))} CT` : "";
@@ -110,7 +111,7 @@ function FreshScout({
       {coverage?.some(({ source, status }) => source === "etsy" && (status === "searched" || status === "partial")) ? (
         <p className="mb-5 text-sm text-[var(--muted-ink)]">The term &apos;Etsy&apos; is a trademark of Etsy, Inc. This Application uses Etsy&apos;s API, but is not endorsed or certified by Etsy.</p>
       ) : null}
-      {items.length > 0 ? <FreshCatalog key={run?.searchedAt} items={items} /> : null}
+      {items.length > 0 ? <FreshCatalog key={`${run?.searchedAt}:${initialSource ?? ""}`} items={items} initialSource={initialSource} /> : null}
     </section>
   );
 }
@@ -191,7 +192,7 @@ function LookFinds({ similar, browning, preferences, decisions }: {
   );
 }
 
-export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string; preferences?: string; view?: string }> }) {
+export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string; preferences?: string; view?: string; source?: string }> }) {
   const params = await searchParams;
   if (!(await isScoutOwner())) {
     return <OwnerSignIn token={params.access} status={params.signIn} />;
@@ -267,7 +268,7 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
         ) : (
           <>
             <LookFinds similar={similar} browning={browning} preferences={preferences} decisions={decisions} />
-            <FreshScout run={run} items={live} preferences={preferences} />
+            <FreshScout run={run} items={live} preferences={preferences} source={params.source} />
             {saved.length || savedLinks.length ? (
               <section id="saved" className="mt-8 scroll-mt-24" aria-label="Saved listings">
                 {saved.length ? <ListingShelf id="saved-cards" label="Saved" description="Pieces you marked to revisit." items={saved} /> : null}
