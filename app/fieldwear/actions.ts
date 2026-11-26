@@ -51,14 +51,16 @@ export async function saveScoutPreferences(form: FormData) {
     VALUES ('owner', ${JSON.stringify(preferences)}::jsonb)
     ON CONFLICT (profile) DO UPDATE SET settings = EXCLUDED.settings`;
   const previous = await readLiveSearch();
-  await runAndStoreLiveSearch(preferences, previous?.keywords ?? "");
+  await runAndStoreLiveSearch(preferences, previous?.keywords ?? "", previous?.days);
+  revalidatePath("/fieldwear");
   redirect("/fieldwear#fresh");
 }
 
 export async function searchScoutNow(form: FormData) {
   if (!(await isScoutOwner())) redirect("/fieldwear");
   const keywords = String(form.get("keywords") ?? "").trim().replace(/\s+/g, " ").slice(0, 80);
-  await runAndStoreLiveSearch(await readScoutPreferences(), keywords);
+  await runAndStoreLiveSearch(await readScoutPreferences(), keywords, form.get("days") === "30" ? 30 : 7);
+  revalidatePath("/fieldwear");
   redirect("/fieldwear#fresh");
 }
 

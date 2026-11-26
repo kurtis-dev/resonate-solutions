@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import { Archive, Bookmark, Search, ShieldQuestion } from "lucide-react";
 import { DailyScout } from "@/components/fieldwear/daily-scout";
 import { ListingChecker } from "@/components/fieldwear/listing-checker";
-import { ListingShelf, ListingWorkbench, type ListingView } from "@/components/fieldwear/listing-workbench";
+import { FreshCatalog, ListingShelf, ListingWorkbench, type ListingView } from "@/components/fieldwear/listing-workbench";
 import { ScoutPreferencesForm } from "@/components/fieldwear/scout-preferences";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { curatedListings, type CuratedListing } from "@/lib/fieldwear/curated-listings";
@@ -63,24 +63,29 @@ function FreshScout({
   run, preferences, items,
 }: { run: Awaited<ReturnType<typeof readLiveSearch>>; preferences: ScoutPreferences; items: ListingView[] }) {
   const coverage = run?.coverage;
+  const days = run?.days ?? freshListingDays;
   const checked = coverage?.filter((entry) => entry.status === "searched" || entry.status === "partial").length;
   const summary = run ? `Searched ${searchDate.format(new Date(run.searchedAt))} CT` : "";
   const message = !run ? "Run a search to see what’s new."
     : run.expired ? "Your last search is over six hours old. Run it again for current results."
     : run.status === "unconfigured" || run.status === "unavailable" ? "The connected sources couldn’t complete this search. Try again."
-    : items.length === 0 ? "No matches in the last seven days. Try fewer keywords or a wider fit."
+    : items.length === 0 ? "No matches in this window. Try fewer keywords or a wider date range."
     : `${items.length} matches · ${checked === undefined ? "" : `${checked} sources checked · `}${summary}`;
-  const shirts = items.filter((item) => item.garmentKind === "shirt");
-  const pants = items.filter((item) => item.garmentKind === "pants");
   return (
     <section id="fresh" aria-labelledby="fresh-title" className="scroll-mt-24">
       <div className="mb-5 rounded-[24px] bg-[var(--pine)] px-5 py-6 text-[var(--paper)] sm:px-8">
         <h1 id="fresh-title" className="font-display text-4xl leading-none sm:text-5xl">Fresh finds</h1>
-        <p className="mt-2 text-[var(--sand)]">Listings posted in the last {freshListingDays} days</p>
         <form action={searchScoutNow} className="mt-4 flex max-w-2xl flex-col gap-2 sm:flex-row sm:items-end">
           <label className="flex-1 text-sm font-bold">
             Keywords <span className="font-normal text-[var(--sand)]">(optional)</span>
             <input key={run?.searchedAt} name="keywords" defaultValue={run?.keywords ?? ""} placeholder="Chamois, L.L.Bean, carpenter jeans…" maxLength={80} className="mt-1 block min-h-12 w-full rounded-xl border border-white/25 bg-white px-3 text-base font-normal text-[var(--ink)]" />
+          </label>
+          <label className="text-sm font-bold">
+            Listed in
+            <select name="days" key={run?.searchedAt} defaultValue={String(days)} className="mt-1 block min-h-12 w-full rounded-xl bg-white px-3 text-base font-normal text-[var(--ink)]">
+              <option value="7">Last 7 days</option>
+              <option value="30">Last 30 days</option>
+            </select>
           </label>
           <ScoutSubmit label="Search now" className="min-h-12 shrink-0 rounded-xl bg-[var(--sand)] px-5 font-bold text-[var(--pine)]" />
         </form>
@@ -103,10 +108,7 @@ function FreshScout({
       {coverage?.some(({ source, status }) => source === "etsy" && (status === "searched" || status === "partial")) ? (
         <p className="mb-5 text-sm text-[var(--muted-ink)]">The term &apos;Etsy&apos; is a trademark of Etsy, Inc. This Application uses Etsy&apos;s API, but is not endorsed or certified by Etsy.</p>
       ) : null}
-      <div className="space-y-7">
-        {shirts.length ? <ListingShelf id="live-shirts" label="Shirts" description="Work shirts and heavier layers." items={shirts} /> : null}
-        {pants.length ? <ListingShelf id="live-bottoms" label="Bottoms" description="Work pants, jeans and trousers." items={pants} /> : null}
-      </div>
+      {items.length > 0 ? <FreshCatalog key={run?.searchedAt} items={items} /> : null}
     </section>
   );
 }

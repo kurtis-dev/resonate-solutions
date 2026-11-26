@@ -372,12 +372,92 @@ export function ListingShelf({ id, label, description, items }:{ id:string; labe
   );
 }
 
-function ListingCard({ item }: { item:ListingView }) {
+const freshPageSize = 12;
+const priceForSort = (item: ListingView) => item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
+
+export function FreshCatalog({ items }: { items: ListingView[] }) {
+  const [kind, setKind] = useState<"shirt" | "pants">(() => items.some((item) => item.garmentKind === "shirt") ? "shirt" : "pants");
+  const [order, setOrder] = useState("relevance");
+  const [min, setMin] = useState("");
+  const [max, setMax] = useState("");
+  const [page, setPage] = useState(1);
+  const resultsRef = useRef<HTMLDivElement>(null);
+  const invalidRange = min !== "" && max !== "" && Number(min) > Number(max);
+  const results = useMemo(() => {
+    const filtered = items.filter((item) => {
+      if (item.garmentKind !== kind || invalidRange) return false;
+      if (min === "" && max === "") return true;
+      const cents = priceForSort(item);
+      return cents != null && (min === "" || cents >= Number(min) * 100) && (max === "" || cents <= Number(max) * 100);
+    });
+    if (order === "newest") filtered.sort((a, b) => (b.listedAt ?? "").localeCompare(a.listedAt ?? ""));
+    if (order === "oldest-garment") filtered.sort((a, b) => b.vintage.period - a.vintage.period);
+    if (order === "low" || order === "high") filtered.sort((a, b) => {
+      const left = priceForSort(a);
+      const right = priceForSort(b);
+      if (left == null) return right == null ? 0 : 1;
+      if (right == null) return -1;
+      return order === "high" ? right - left : left - right;
+    });
+    return filtered;
+  }, [items, kind, invalidRange, min, max, order]);
+  const lastPage = Math.max(1, Math.ceil(results.length / freshPageSize));
+  const currentPage = Math.min(page, lastPage);
+  const from = (currentPage - 1) * freshPageSize;
+  const visible = results.slice(from, from + freshPageSize);
+  const control = "mt-1 min-h-11 w-full rounded-xl border border-black/15 bg-white px-3 text-base font-normal text-[var(--ink)]";
+  const go = (nextPage: number) => {
+    setPage(nextPage);
+    resultsRef.current?.focus({ preventScroll: true });
+    resultsRef.current?.scrollIntoView({ block: "start" });
+  };
+
+  return (
+    <div>
+      <div className="flex flex-wrap gap-2" aria-label="Garment type" role="group">
+        {([["shirt", "Shirts"], ["pants", "Bottoms"]] as const).map(([value, label]) => (
+          <button key={value} type="button" aria-pressed={kind === value} onClick={() => { setKind(value); setPage(1); }} className={`min-h-11 rounded-full border px-4 text-sm font-bold ${kind === value ? "border-[var(--pine)] bg-[var(--pine)] text-white" : "border-black/15 bg-white text-[var(--pine)]"}`}>
+            {label} <span className="ml-1 tabular-nums">{items.filter((item) => item.garmentKind === value).length}</span>
+          </button>
+        ))}
+      </div>
+      <div className="my-4 grid grid-cols-2 gap-3 rounded-2xl border border-black/10 bg-[var(--card)] p-3 sm:grid-cols-[minmax(0,2fr)_1fr_1fr_auto] sm:items-end">
+        <label className="col-span-2 text-xs font-bold sm:col-span-1">Sort by
+          <select value={order} onChange={(event) => { setOrder(event.target.value); setPage(1); }} className={control}>
+            <option value="relevance">Best match</option>
+            <option value="newest">Recently listed</option>
+            <option value="oldest-garment">Older garment clues</option>
+            <option value="low">Price low to high</option>
+            <option value="high">Price high to low</option>
+          </select>
+        </label>
+        <label className="text-xs font-bold">Min price ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={min} onChange={(event) => { setMin(event.target.value); setPage(1); }} className={control} /></label>
+        <label className="text-xs font-bold">Max price ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={max} onChange={(event) => { setMax(event.target.value); setPage(1); }} className={control} /></label>
+        <button type="button" onClick={() => { setMin(""); setMax(""); setPage(1); }} disabled={min === "" && max === ""} className="col-span-2 min-h-11 px-3 text-sm font-bold text-[var(--pine)] underline underline-offset-4 disabled:opacity-45 sm:col-span-1">Clear price</button>
+      </div>
+      <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 pb-3 text-sm text-[var(--muted-ink)]" role="status">
+        {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : "No listings match these filters."}
+      </div>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {visible.map((item) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid />)}
+      </div>
+      {lastPage > 1 ? (
+        <nav className="mt-5 flex items-center justify-between gap-4" aria-label="Fresh finds pages">
+          <button type="button" aria-label="Previous page" disabled={currentPage === 1} onClick={() => go(currentPage - 1)} className="min-h-11 rounded-full border border-black/15 bg-white px-4 text-sm font-bold disabled:opacity-40">Previous</button>
+          <span className="text-sm tabular-nums">Page {currentPage} of {lastPage}</span>
+          <button type="button" aria-label="Next page" disabled={currentPage === lastPage} onClick={() => go(currentPage + 1)} className="min-h-11 rounded-full border border-black/15 bg-white px-4 text-sm font-bold disabled:opacity-40">Next</button>
+        </nav>
+      ) : null}
+    </div>
+  );
+}
+
+function ListingCard({ item, grid = false }: { item:ListingView; grid?:boolean }) {
   const total = item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
   const sourceLabel = marketplaceName(item.source);
 
   return (
-    <article className="w-[82vw] min-w-[278px] max-w-[348px] shrink-0 snap-start overflow-hidden rounded-[24px] border border-black/8 bg-white shadow-[0_14px_38px_rgba(44,38,27,.08)] sm:w-[326px]">
+    <article className={`${grid ? "min-w-0" : "w-[82vw] min-w-[278px] max-w-[348px] shrink-0 snap-start sm:w-[326px]"} overflow-hidden rounded-[24px] border border-black/8 bg-white shadow-[0_14px_38px_rgba(44,38,27,.08)]`}>
       <a href={item.url} target="_blank" rel="noreferrer" className="group relative block aspect-[4/5] overflow-hidden bg-[#e5e0d6]" aria-label={`View ${item.title} on ${sourceLabel}`}>
         {item.imageUrl ? (
           // eslint-disable-next-line @next/next/no-img-element -- marketplace hosts are dynamic, so a fixed Image allowlist would reject valid imports.
