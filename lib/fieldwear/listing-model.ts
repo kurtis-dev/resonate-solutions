@@ -1,3 +1,5 @@
+import { departmentMatch, sizeMatch, type ScoutPreferences } from "./preferences";
+
 export const marketplaceHosts = {
   ebay: ["ebay.com", "www.ebay.com"],
   etsy: ["etsy.com", "www.etsy.com"],
@@ -178,7 +180,7 @@ export function classifyGarment(input: Pick<ListingInput, "title" | "description
   return "unknown";
 }
 
-export function scoreListing(input: ListingInput): ListingScore {
+export function scoreListing(input: ListingInput, preferences?: ScoutPreferences): ListingScore {
   const text = `${input.title} ${input.description ?? ""} ${input.size ?? ""} ${input.condition ?? ""}`.toLowerCase();
   const evidence: ListingEvidence = { confirmed: [], sellerClaims: [], visualClues: [] };
   const concerns: string[] = [];
@@ -262,6 +264,7 @@ export function scoreListing(input: ListingInput): ListingScore {
 
   let tasteMatch = 0;
   for (const [pattern, label, points] of tasteSignals) {
+    if (preferences && (label === "Tall XL fit" || label === "Roomy preferred size")) continue;
     if (pattern.test(text)) {
       tasteMatch += points;
       tasteReasons.push(label);
@@ -285,11 +288,14 @@ export function scoreListing(input: ListingInput): ListingScore {
   if (input.shippingCents != null) evidence.confirmed.push(`Shipping listed at $${(input.shippingCents / 100).toFixed(2)}`);
   if (input.size) evidence.confirmed.push(`Seller-entered size: ${input.size}`);
 
-  const matchedSize = preferredSizes.find((size) => text.includes(size));
-  let fit = matchedSize ? 25 : /\b(?:xl|xxl|2xl|38|40)\b/i.test(text) ? 12 : 5;
-  if (/women|womens|ladies|youth|kids/i.test(text)) fit = 0;
-  if (matchedSize) evidence.sellerClaims.push(`Preferred size appears: ${matchedSize.toUpperCase()}`);
-  else missing.push("Preferred size or garment measurements");
+  const fitInput = { ...input, garmentKind: classifyGarment(input) };
+  const matchedSize = preferences ? sizeMatch(fitInput, preferences) : preferredSizes.some((size) => text.includes(size));
+  const sizes = fitInput.garmentKind === "pants" ? preferences?.pantsSizes : preferences?.shirtSizes;
+  const compatibleDepartment = preferences ? departmentMatch(fitInput, preferences.department) > 0 : !/women|womens|ladies|youth|kids/i.test(text);
+  const partialFit = !preferences && /\b(?:xl|xxl|2xl|38|40)\b/i.test(text);
+  const fit = compatibleDepartment ? (sizes?.length === 0 ? 15 : matchedSize ? 25 : partialFit ? 12 : 5) : 0;
+  if (matchedSize && sizes?.length !== 0) evidence.sellerClaims.push("Listing size matches a preferred size");
+  else if (sizes?.length !== 0) missing.push("Preferred size or garment measurements");
 
   let construction = 3;
   for (const [pattern, label, points] of constructionTerms) {

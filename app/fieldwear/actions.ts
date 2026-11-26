@@ -5,6 +5,7 @@ import { revalidatePath } from "next/cache";
 import { sendCustomerEmail } from "@/lib/customer-emails";
 import { exchangeOwnerLink, isScoutOwner, issueOwnerLink, revokeOwnerSession, scoutDatabase } from "@/lib/fieldwear/owner-access";
 import { readScoutEdition } from "@/lib/fieldwear/editions";
+import { parseScoutPreferences } from "@/lib/fieldwear/preferences";
 
 export async function requestOwnerLink(form: FormData) {
   const owner = process.env.FIELDWEAR_OWNER_EMAIL?.trim().toLowerCase();
@@ -38,6 +39,17 @@ export async function redeemOwnerLink(form: FormData) {
 export async function signOutScout() {
   await revokeOwnerSession();
   redirect("/fieldwear");
+}
+
+export async function saveScoutPreferences(form: FormData) {
+  if (!(await isScoutOwner())) redirect("/fieldwear");
+  const preferences = parseScoutPreferences(form);
+  if (!preferences) redirect("/fieldwear?preferences=invalid#preferences");
+  const sql = await scoutDatabase();
+  await sql`INSERT INTO fieldwear_preferences (profile, settings)
+    VALUES ('owner', ${JSON.stringify(preferences)}::jsonb)
+    ON CONFLICT (profile) DO UPDATE SET settings = EXCLUDED.settings`;
+  redirect("/fieldwear?preferences=saved#preferences");
 }
 
 export async function decideListing(form: FormData) {

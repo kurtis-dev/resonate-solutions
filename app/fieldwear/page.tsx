@@ -3,10 +3,12 @@ import { Bell, Bookmark, Ruler, Search, Shirt } from "lucide-react";
 import { DailyScout } from "@/components/fieldwear/daily-scout";
 import { ListingChecker } from "@/components/fieldwear/listing-checker";
 import { ListingWorkbench, type ListingView } from "@/components/fieldwear/listing-workbench";
+import { ScoutPreferencesForm } from "@/components/fieldwear/scout-preferences";
 import { curatedListings, type CuratedListing } from "@/lib/fieldwear/curated-listings";
 import { classifyGarment, scoreListing, type ListingInput } from "@/lib/fieldwear/listing-model";
 import { readScoutEdition } from "@/lib/fieldwear/editions";
-import { isScoutOwner, scoutDatabase } from "@/lib/fieldwear/owner-access";
+import { isScoutOwner, readScoutPreferences, scoutDatabase } from "@/lib/fieldwear/owner-access";
+import { fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { redeemOwnerLink, requestOwnerLink, signOutScout } from "./actions";
 import "./scout.css";
 
@@ -58,16 +60,17 @@ function readLegacyScout() {
   }
 }
 
-export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string }> }) {
+export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string; preferences?: string }> }) {
+  const params = await searchParams;
   if (!(await isScoutOwner())) {
-    const { access, signIn } = await searchParams;
-    return <OwnerSignIn token={access} status={signIn} />;
+    return <OwnerSignIn token={params.access} status={params.signIn} />;
   }
 
   const sql = await scoutDatabase();
-  const [recorded, edition] = await Promise.all([
+  const [recorded, edition, preferences] = await Promise.all([
     sql`SELECT source, external_id, verdict, listing FROM fieldwear_decisions` as Promise<Decision[]>,
     readScoutEdition(),
+    readScoutPreferences(),
   ]);
   const decisions = new Map(readLegacyScout().map((row) => [`${row.source}:${row.external_id}`, row]));
   for (const row of recorded) {
@@ -79,22 +82,24 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
   for (const listing of curatedListings) {
     const updated = listing.provenance.capturedAt;
     const verdict = decisions.get(`${listing.source}:${listing.externalId}`)?.verdict ?? null;
-    entries.set(canonicalListingKey(listing.url), toListingView(listing, updated, updated, verdict, listing));
+    entries.set(canonicalListingKey(listing.url), toListingView(listing, updated, updated, verdict, preferences, listing));
   }
   for (const { listing, verdict } of Array.from(decisions.values())) {
     if (listing && !entries.has(canonicalListingKey(listing.url))) {
       const checkedAt = (listing as ListingInput & { checkedAt?: string }).checkedAt ?? "2026-10-15T00:00:00Z";
-      entries.set(canonicalListingKey(listing.url), toListingView(listing, checkedAt, checkedAt, verdict));
+      entries.set(canonicalListingKey(listing.url), toListingView(listing, checkedAt, checkedAt, verdict, preferences));
     }
   }
   const daily: ListingView[] = [];
   if (edition) {
     for (const item of edition.finds) {
       const verdict = decisions.get(`${item.source}:${item.externalId}`)?.verdict ?? null;
-      const view = toListingView(item, edition.checkedAt, edition.checkedAt, verdict);
+      const key = canonicalListingKey(item.url);
+      const view = toListingView(item, edition.checkedAt, edition.checkedAt, verdict, preferences);
+      view.curatedCategory = entries.get(key)?.curatedCategory;
       view.evidence.sellerClaims.unshift(item.evidence);
-      entries.set(canonicalListingKey(item.url), view);
-      if (verdict !== "pass") daily.push(view);
+      entries.set(key, view);
+      if (verdict !== "pass" && (!preferences.matchingOnly || matchesScoutFit(view, preferences))) daily.push(view);
     }
   }
   const saved = Array.from(decisions.values()).some(({ verdict }) => verdict === "save");
@@ -106,9 +111,10 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
           <p className="text-lg font-bold">Fieldwear Scout</p>
           <form action={signOutScout} noValidate><button className="min-h-11 rounded-full border border-black/15 bg-white px-4 font-semibold">Sign out</button></form>
         </div>
-        <DailyScout edition={edition} items={daily} />
-        <ListingWorkbench listings={Array.from(entries.values())} />
-        <div className="mt-12"><ListingChecker /></div>
+        <ScoutPreferencesForm preferences={preferences} status={params.preferences} />
+        <DailyScout edition={edition} items={daily.sort((a, b) => fitPriority(b, preferences) - fitPriority(a, preferences))} preferences={preferences} />
+        <ListingWorkbench listings={Array.from(entries.values())} preferences={preferences} />
+        <div className="mt-12"><ListingChecker preferences={preferences} /></div>
       </div>
       <nav aria-label="Fieldwear" className="fixed bottom-[calc(.75rem+env(safe-area-inset-bottom))] left-1/2 z-30 flex w-[min(390px,calc(100%-24px))] -translate-x-1/2 rounded-2xl bg-[var(--pine)] px-1 py-2 text-white shadow-lg sm:hidden">
         <a href="#daily" className="grid min-h-12 flex-1 place-items-center text-xs"><Bell size={18}/>Daily</a>
@@ -126,9 +132,10 @@ function toListingView(
   firstSeenAt:string,
   lastSeenAt:string,
   decision:string|null,
+  preferences:ScoutPreferences,
   curated?:CuratedListing,
 ):ListingView {
-  const rescored = scoreListing(input);
+  const rescored = scoreListing(input, preferences);
   const sellerClaims = [...rescored.evidence.sellerClaims];
   const confirmed = [...rescored.evidence.confirmed];
   const visualClues = [...rescored.evidence.visualClues];

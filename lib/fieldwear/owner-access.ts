@@ -1,6 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { getSql } from "@/lib/db";
+import { defaultScoutPreferences, type ScoutPreferences } from "./preferences";
 
 export const sessionCookie = "resonate_fieldwear_session";
 export const sessionSeconds = 30 * 86400;
@@ -33,11 +34,21 @@ export function initializeScoutDatabase() {
       listing jsonb,
       PRIMARY KEY (source, external_id)
     )`;
+    await sql`CREATE TABLE IF NOT EXISTS fieldwear_preferences (
+      profile text PRIMARY KEY,
+      settings jsonb NOT NULL
+    )`;
   })().catch((error) => {
     initialized = undefined;
     throw error;
   });
   return initialized;
+}
+
+export async function readScoutPreferences(): Promise<ScoutPreferences> {
+  const sql = await scoutDatabase();
+  const [row] = await sql`SELECT settings FROM fieldwear_preferences WHERE profile = 'owner'` as { settings: Partial<ScoutPreferences> }[];
+  return { ...defaultScoutPreferences, ...row?.settings };
 }
 
 export async function issueOwnerLink() {

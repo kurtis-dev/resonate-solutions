@@ -77,10 +77,7 @@ export function prepareDailyFind(input: z.infer<typeof findSchema>): DailyFind |
   url.hash = "";
   const listing = { ...input, ...key, url: url.href, description: input.evidence };
   const kind = classifyGarment({ title: listing.title, size: listing.size });
-  const fit = kind === "pants"
-    ? /\b(?:38|39|40)\s*[x×]\s*(?:32|33|34)\b/i.test(listing.size)
-    : /\b(?:XLT|TXL|XL[ -]?(?:TALL|LONG|T|EXTRA LONG)|XXL|2\s?XLT?)\b/i.test(listing.size);
-  if ((kind !== "shirt" && kind !== "pants") || !fit) return null;
+  if (kind !== "shirt" && kind !== "pants") return null;
   const score = scoreListing(listing);
   const reject = /\b(?:graphic tee|reproduction|replica|print.on.demand|dry rot|digital download|sewing pattern)\b/i;
   return reject.test(`${listing.title} ${listing.evidence}`) || score.fiberVerdict === "blend-or-synthetic" ? null : listing;

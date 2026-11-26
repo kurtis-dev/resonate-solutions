@@ -2,6 +2,8 @@
 
 import { useMemo, useState } from "react";
 import { AlertTriangle, CheckCircle2, RotateCcw, SearchCheck } from "lucide-react";
+import { classifyGarment } from "@/lib/fieldwear/listing-model";
+import { matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 
 type Finding = { label: string; points: number };
 
@@ -46,9 +48,7 @@ const concernSignals = [
   ["deadstock", -1, "Deadstock can still have storage damage"],
 ] as const;
 
-const fitSignals = ["xlt", "txl", "xl tall", "xxl", "2xl", "38x32", "38 x 32", "38x34", "38 x 34", "40x32", "40 x 32", "40x34", "40 x 34"];
-
-function inspect(text: string) {
+function inspect(text: string, preferences: ScoutPreferences) {
   const haystack = text.toLowerCase();
   const ageEvidence: Finding[] = [];
   const qualityEvidence: Finding[] = [];
@@ -69,7 +69,8 @@ function inspect(text: string) {
     }
   }
 
-  const fit = fitSignals.find((term) => haystack.includes(term));
+  const garmentKind = classifyGarment({ title: text });
+  const fit = matchesScoutFit({ title: text, garmentKind }, preferences);
   if (/\b(19[5-9]\d|200[0-5]|19[5-9]0'?s|2000'?s)\b/.test(haystack)) ageEvidence.push({ label: "Specific older year or decade claim", points: 1 });
 
   const ageScore = Math.min(4, ageEvidence.reduce((sum, item) => sum + item.points, 0));
@@ -77,13 +78,13 @@ function inspect(text: string) {
   const evidenceScore = ageScore + qualityScore;
   const severeConcern = concerns.some((item) => item.points <= -15);
 
-  return { ageScore, qualityScore, evidenceScore, ageEvidence, qualityEvidence, concerns, fit: Boolean(fit), fitLabel: fit?.toUpperCase(), severeConcern };
+  return { ageScore, qualityScore, evidenceScore, ageEvidence, qualityEvidence, concerns, fit, severeConcern };
 }
 
-export function ListingChecker() {
+export function ListingChecker({ preferences }: { preferences: ScoutPreferences }) {
   const [details, setDetails] = useState("");
   const [checked, setChecked] = useState(false);
-  const result = useMemo(() => inspect(details), [details]);
+  const result = useMemo(() => inspect(details, preferences), [details, preferences]);
   const verdict = result.severeConcern ? "Probably pass" : result.evidenceScore >= 6 && result.fit ? "Worth a closer look" : "Keep it open—ask for evidence";
 
   function reset() {
@@ -120,7 +121,7 @@ export function ListingChecker() {
               <div className="mt-4 grid gap-3 sm:grid-cols-3">
                 <FindingList title={`Age evidence ${result.ageScore}/4`} icon={<CheckCircle2 size={15} />} items={result.ageEvidence.map((item) => item.label)} empty="No age proof yet—ask for every label and the zipper." positive />
                 <FindingList title={`Quality evidence ${result.qualityScore}/4`} icon={<CheckCircle2 size={15} />} items={result.qualityEvidence.map((item) => item.label)} empty="Ask for fiber, seams, cuffs and fabric-weight details." positive />
-                <FindingList title="Purchase gates" icon={<AlertTriangle size={15} />} items={[result.fit ? `Preferred fit detected: ${result.fitLabel}` : "Measurements not confirmed", ...result.concerns.map((item) => item.label)]} empty="Condition and measurements still need proof." />
+                <FindingList title="Purchase gates" icon={<AlertTriangle size={15} />} items={[result.fit ? "Fits your search preferences. Confirm measurements with the seller." : "Check the size and measurements against your preferences.", ...result.concerns.map((item) => item.label)]} empty="Condition and measurements still need proof." />
               </div>
               <p className="mt-3 text-xs leading-5 text-[var(--muted-ink)]">The search stays broad. A low evidence score means “ask for proof,” not automatically “reject.” Buy only when measurements and condition are confirmed.</p>
             </div>

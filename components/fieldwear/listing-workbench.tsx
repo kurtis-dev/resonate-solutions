@@ -18,6 +18,7 @@ import {
 } from "lucide-react";
 import { decideListing } from "@/app/fieldwear/actions";
 import type { GarmentKind } from "@/lib/fieldwear/listing-model";
+import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 
 export type ListingView = {
   source:string; externalId:string; url:string; title:string; imageUrl:string|null;
@@ -53,17 +54,16 @@ function listingText(item:ListingView) {
   return [item.source, item.title, ...item.evidence.confirmed, ...item.evidence.sellerClaims, ...item.evidence.visualClues].join(" ");
 }
 
-function matchesQuickFilter(item:ListingView, filter:QuickFilter) {
+function matchesQuickFilter(item:ListingView, filter:QuickFilter, preferences:ScoutPreferences) {
   const text = listingText(item);
   const total = item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
-  if (filter === "my-sizes") {
-    const fitText = [item.size, text].filter(Boolean).join(" ");
-    if (item.garmentKind === "pants") return /\b(?:38|40)\s*[x×]\s*(?:32|34)\b/i.test(fitText);
-    return /\b(?:XLT|TXL|XL\s*Tall|XXL|2XL)\b/i.test(fitText);
-  }
+  if (filter === "my-sizes") return matchesScoutFit(item, preferences);
   if (filter === "natural-fibers") return /\b(?:100%\s*)?(?:cotton|wool|chamois)\b/i.test(text) && !SYNTHETIC_TERMS.test(text);
   if (filter === "pre-1985") return item.eraConfidence >= 40;
-  if (filter === "under-budget") return total != null && total <= (item.garmentKind === "pants" ? 5_000 : 10_000);
+  if (filter === "under-budget") {
+    const budget = item.garmentKind === "pants" ? preferences.pantsBudget : preferences.shirtBudget;
+    return budget == null || (total != null && total <= Math.round(budget * 100));
+  }
   return true;
 }
 
@@ -136,7 +136,7 @@ const pantsShelves:ShelfDefinition[] = [
   {
     id:"duck-canvas-pants",
     label:"Duck, canvas & work pants",
-    description:"Painter and carpenter shapes in your 38–40 × 32–34 fit range.",
+    description:"Painter and carpenter shapes in durable fabrics.",
     matches:(item) => item.garmentKind === "pants" && item.curatedCategory === "duck-canvas-pants",
     compare:(a,b) => b.tasteMatch-a.tasteMatch || b.constructionScore-a.constructionScore || b.totalScore-a.totalScore,
   },
@@ -163,13 +163,15 @@ const pantsShelves:ShelfDefinition[] = [
   },
 ];
 
-export function ListingWorkbench({ listings }: { listings:ListingView[] }) {
+export function ListingWorkbench({ listings, preferences }: { listings:ListingView[]; preferences:ScoutPreferences }) {
   const [query, setQuery] = useState("");
   const [quickFilter, setQuickFilter] = useState<QuickFilter>("all");
   const [sortMode, setSortMode] = useState<SortMode>("match");
   const [scope, setScope] = useState<CatalogScope>("all");
   const [source, setSource] = useState("all");
-  const activeListings = useMemo(() => listings.filter((item) => item.decision !== "pass"), [listings]);
+  const activeListings = useMemo(() => listings.filter((item) =>
+    item.decision !== "pass" && (!preferences.matchingOnly || matchesScoutFit(item, preferences))
+  ), [listings, preferences]);
   const marketplaceFacets = useMemo(() => {
     const counts = new Map<string,number>();
     activeListings.forEach((item) => counts.set(item.source, (counts.get(item.source) ?? 0) + 1));
@@ -181,22 +183,22 @@ export function ListingWorkbench({ listings }: { listings:ListingView[] }) {
     });
   }, [activeListings]);
   const saved = useMemo(
-    () => activeListings.filter((item) => item.decision === "save").toSorted((a,b) => b.totalScore-a.totalScore),
-    [activeListings],
+    () => listings.filter((item) => item.decision === "save").toSorted((a,b) => b.totalScore-a.totalScore),
+    [listings],
   );
   const shirtShelfResults = useMemo(
     () => shirtShelves.map((shelf) => ({
       ...shelf,
-      items:activeListings.filter(shelf.matches).toSorted(shelf.compare ?? ((a,b) => b.totalScore-a.totalScore)),
+      items:activeListings.filter(shelf.matches).toSorted((a,b) => fitPriority(b, preferences) - fitPriority(a, preferences) || (shelf.compare?.(a,b) ?? b.totalScore-a.totalScore)),
     })),
-    [activeListings],
+    [activeListings, preferences],
   );
   const pantsShelfResults = useMemo(
     () => pantsShelves.map((shelf) => ({
       ...shelf,
-      items:activeListings.filter(shelf.matches).toSorted(shelf.compare ?? ((a,b) => b.totalScore-a.totalScore)),
+      items:activeListings.filter(shelf.matches).toSorted((a,b) => fitPriority(b, preferences) - fitPriority(a, preferences) || (shelf.compare?.(a,b) ?? b.totalScore-a.totalScore)),
     })),
-    [activeListings],
+    [activeListings, preferences],
   );
   const normalizedQuery = query.trim().toLowerCase();
   const filterActive = normalizedQuery.length > 0 || quickFilter !== "all" || sortMode !== "match" || scope !== "all" || source !== "all";
@@ -204,8 +206,8 @@ export function ListingWorkbench({ listings }: { listings:ListingView[] }) {
     const matchesScope = scope === "all" || (scope === "shirts" ? item.garmentKind === "shirt" : item.garmentKind === "pants");
     const matchesSource = source === "all" || item.source === source;
     const matchesQuery = !normalizedQuery || listingText(item).toLowerCase().includes(normalizedQuery);
-    return matchesScope && matchesSource && matchesQuery && matchesQuickFilter(item, quickFilter);
-  }).toSorted(compareListings(sortMode)), [activeListings, normalizedQuery, quickFilter, scope, sortMode, source]);
+    return matchesScope && matchesSource && matchesQuery && matchesQuickFilter(item, quickFilter, preferences);
+  }).toSorted((a,b) => (sortMode === "match" ? fitPriority(b, preferences) - fitPriority(a, preferences) : 0) || compareListings(sortMode)(a,b)), [activeListings, normalizedQuery, quickFilter, scope, sortMode, source, preferences]);
 
   const clearFilters = () => {
     setQuery("");
@@ -222,7 +224,7 @@ export function ListingWorkbench({ listings }: { listings:ListingView[] }) {
           <p className="text-xs font-bold uppercase tracking-[.16em] text-[var(--rust)]">Workwear catalog</p>
           <h2 id="catalog-title" className="mt-1 font-display text-[clamp(2rem,7vw,3.75rem)] leading-[.96] tracking-[-.035em]">Older workwear worth a closer look</h2>
         </div>
-        <p className="max-w-sm text-sm leading-5 text-[var(--muted-ink)]">Shirts in XLT–2XL. Bottoms in 38–40 × 32–34. Natural fibers, older construction, and original listing photos.</p>
+        <p className="max-w-sm text-sm leading-5 text-[var(--muted-ink)]">{departmentLabels[preferences.department]} · {preferences.matchingOnly ? "Matching sizes only" : "Preferred sizes first"}</p>
       </div>
 
       <div className="mt-5 rounded-[22px] border border-black/8 bg-white/75 p-3 shadow-[0_10px_30px_rgba(44,38,27,.05)] sm:p-4">
@@ -299,17 +301,17 @@ export function ListingWorkbench({ listings }: { listings:ListingView[] }) {
           {filterActive ? (
             <>
               {(scope !== "pants") ? <ListingShelf id="matching-shirts" label="Matching shirts" description="Shirt results stay separate so fit and construction remain easy to compare." items={filteredListings.filter((item) => item.garmentKind === "shirt")} /> : null}
-              {(scope !== "shirts") ? <ListingShelf id="matching-bottoms" label="Matching bottoms" description="Jeans, work pants, and trousers are checked against the 38–40 × 32–34 fit range." items={filteredListings.filter((item) => item.garmentKind === "pants")} /> : null}
+              {(scope !== "shirts") ? <ListingShelf id="matching-bottoms" label="Matching bottoms" description="Jeans, work pants, and trousers." items={filteredListings.filter((item) => item.garmentKind === "pants")} /> : null}
             </>
           ) : (
             <>
               {saved.length > 0 ? <ListingShelf id="saved" label="Saved" description="Pieces you marked to revisit." items={saved} /> : null}
               <section id="shirts" className="scroll-mt-24 space-y-10 sm:space-y-12" aria-labelledby="shirts-title">
-                <div className="border-b border-black/10 pb-3"><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[var(--rust)]">Shirts · XLT to 2XL</p><h2 id="shirts-title" className="mt-1 font-display text-3xl tracking-tight sm:text-4xl">Shirts</h2></div>
+                <div className="border-b border-black/10 pb-3"><h2 id="shirts-title" className="font-display text-3xl tracking-tight sm:text-4xl">Shirts</h2><p className="mt-1 text-sm text-[var(--muted-ink)]">{preferences.shirtSizes.join(", ") || "Any size"}</p></div>
                 {shirtShelfResults.map((shelf) => <ListingShelf key={shelf.id} {...shelf} />)}
               </section>
               <section id="bottoms" className="scroll-mt-24 space-y-10 border-t border-black/10 pt-10 sm:space-y-12 sm:pt-12" aria-labelledby="bottoms-title">
-                <div className="border-b border-black/10 pb-3"><p className="text-[10px] font-bold uppercase tracking-[.2em] text-[var(--rust)]">BOTTOMS · 38–40 × 32–34</p><h2 id="bottoms-title" className="mt-1 font-display text-3xl tracking-tight sm:text-4xl">Bottoms</h2><p className="mt-2 max-w-2xl text-sm leading-6 text-[var(--muted-ink)]">Painter and carpenter pants, straight denim, dungarees, and wool trousers—ranked with the same fit, fiber, era, and construction scrutiny as the shirts.</p></div>
+                <div className="border-b border-black/10 pb-3"><h2 id="bottoms-title" className="font-display text-3xl tracking-tight sm:text-4xl">Bottoms</h2><p className="mt-1 text-sm text-[var(--muted-ink)]">{preferences.pantsSizes.join(", ") || "Any size"}</p></div>
                 {pantsShelfResults.map((shelf) => <ListingShelf key={shelf.id} {...shelf} />)}
               </section>
             </>
@@ -329,7 +331,7 @@ export function ListingShelf({ id, label, description, items }:{ id:string; labe
   };
 
   return (
-    <section aria-labelledby={`${id}-title`}>
+    <section id={id} className="scroll-mt-24" aria-labelledby={`${id}-title`}>
       <div className="mb-4 flex items-end justify-between gap-4">
         <div>
           <div className="flex items-baseline gap-2.5">
