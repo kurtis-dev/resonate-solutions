@@ -31,7 +31,7 @@ export function vintageSignals({ title, description }: Pick<ListingInput, "title
 }
 
 export function listingMeasurements(description = "") {
-  return Array.from(description.matchAll(/\b(pit[- ]to[- ]pit|chest(?: width)?|back length|body length|sleeve(?: length)?|shoulder(?: width)?|(?:flat )?waist(?: laid flat)?|inseam|front rise|leg opening)\s*(?::|=|-|is)?\s*(\d{1,3}(?:\.\d+|[ ]+\d\/\d|[½¼¾])?)\s*(inches|inch|in\b|cm\b|["″])(?=$|[\s,.;)])/gi), ([, part, value, unit]) =>
+  return Array.from(description.matchAll(/\b(chest\s*\(pit[- ]to[- ]pit\)|pit[- ]to[- ]pit|chest(?: width| size)?|(?:back |body )?length\s*\(shoulder[- ]to[- ]hem\)|back length|body length|sleeve(?: length)?|shoulder(?: width)?|(?:flat )?waist(?: laid flat| size)?|inseam|front rise|leg opening)\s*(?::|=|-|is)?\s*(\d{1,3}(?:\.\d+|[ ]+\d\/\d|[½¼¾])?)\s*(inches|inch|in\b|cm\b|["″])(?=$|[\s,.;)])/gi), ([, part, value, unit]) =>
     `${part[0].toUpperCase()}${part.slice(1).toLowerCase()} ${value} ${unit.toLowerCase() === "cm" ? "cm" : "in"}`,
   ).filter((value, index, values) => values.indexOf(value) === index).slice(0, 8);
 }
