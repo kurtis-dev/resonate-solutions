@@ -62,7 +62,9 @@ export function sizeMatch(item: FitListing, preferences: ScoutPreferences) {
   const tagged = parse(field);
   if (/^\d{1,2}(?:\.5)?$/.test(field)) tagged.push(field);
   const title = item.title.replace(/\b(?:[a-z]\.){2,}/gi, "");
-  return (tagged.length ? tagged : parse(title)).some((size) => targets.includes(size));
+  const candidates = tagged.length ? tagged : parse(title);
+  if (pants && candidates.length > 1) return candidates.every((size) => targets.includes(size));
+  return candidates.some((size) => targets.includes(size));
 }
 
 export function departmentMatch({ title }: FitListing, selected: Department) {

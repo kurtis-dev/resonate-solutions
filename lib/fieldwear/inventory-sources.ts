@@ -153,6 +153,8 @@ export function shopSize(title: string, notes: string, option: string, garmentKi
   if (fitDimensions.length) return { size: fitDimensions.join(" / "), sizeBasis: "seller-fit" };
   const reported = reportedPantsFit(title);
   if (reported) return { size: reported, sizeBasis: "seller-fit" };
+  const variant = pantsSizeTokens(option).filter((size) => size.includes("x"));
+  if (variant.length) return { size: variant.join(" / "), sizeBasis: "tag" };
   const dimensions = pantsSizeTokens(title).filter((size) => size.includes("x"));
   if (dimensions.length) return { size: dimensions.join(" / "), sizeBasis: "seller-fit" };
   const tagged = pantsSizeTokens(taggedSize ?? "").filter((size) => size.includes("x")).join(" / ");

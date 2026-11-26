@@ -1,7 +1,7 @@
 import { classifyGarment, scoreListing } from "./listing-model";
 import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 import { scoutDatabase } from "./owner-access";
-import { isSturdyShopGarment, searchEtsy, searchVintageShop, type LiveListing, type SourceResult } from "./inventory-sources";
+import { isSturdyShopGarment, searchEtsy, searchVintageShop, shopSize, type LiveListing, type SourceResult } from "./inventory-sources";
 import { isVintageShop, vintageShops } from "./marketplace-directory";
 import { vintageSignals } from "./vintage-signals";
 import { matchLook, type LookHunt, type LookProfile } from "./look-search";
@@ -32,6 +32,7 @@ type EbayItem = {
   image?: { imageUrl?: string };
   price?: EbayMoney;
   currentBidPrice?: EbayMoney;
+  buyingOptions?: string[];
   shippingOptions?: { shippingCost?: EbayMoney }[];
   condition?: string;
   shortDescription?: string;
@@ -108,11 +109,13 @@ function mapItem(item: EbayItem, now: number): LiveListing | null {
   const description = item.shortDescription?.replace(/<[^>]*>/g, " ").slice(0, 1000);
   const garment = classifyGarment({ title: item.title });
   const sizes = (garment === "pants" ? pantsSizeTokens : shirtSizeTokens)(item.title.replace(/\b(?:[a-z]\.){2,}|\b[LS]\/[LS]\b/gi, ""));
+  const fit = garment === "pants" ? shopSize(item.title, description ?? "", "", "pants") : {};
+  const auction = item.buyingOptions?.includes("AUCTION") && !item.buyingOptions.includes("FIXED_PRICE");
   return {
     source: "ebay", externalId: id, title: item.title, imageUrl, listedAt: listedAt && Number.isFinite(Date.parse(listedAt)) ? listedAt : new Date(now).toISOString(), endsAt: item.itemEndDate,
-    url: `https://www.ebay.com/itm/${id}`, description, condition: item.condition, size: sizes.join(" / ") || undefined,
-    priceCents: moneyCents(item.price ?? item.currentBidPrice),
-    priceKind: !item.price && item.currentBidPrice ? "bid" : undefined,
+    url: `https://www.ebay.com/itm/${id}`, description, condition: item.condition, size: fit.size ?? (sizes.join(" / ") || undefined), sizeBasis: fit.sizeBasis,
+    priceCents: moneyCents(auction ? item.currentBidPrice ?? item.price : item.price ?? item.currentBidPrice),
+    priceKind: auction || (!item.price && item.currentBidPrice) ? "bid" : undefined,
     shippingCents: moneyCents(item.shippingOptions?.[0]?.shippingCost),
   };
 }
@@ -208,6 +211,10 @@ async function searchEbay(preferences: ScoutPreferences, keywords: string, { now
     const description = detail.description?.replace(/<\/?(?:p|div|li|tr|br)\b[^>]*>/gi, "\n").replace(/<[^>]*>/g, " ")
       .replace(/&nbsp;/gi, " ").replace(/&quot;|&#34;/gi, '"').trim().slice(0, 4200);
     hit.listing.description = [description || hit.listing.description, ...labeled].filter(Boolean).join("\n");
+    if (classifyGarment(hit.listing) === "pants") {
+      const fit = shopSize(hit.listing.title, description ?? "", "", "pants");
+      if (fit.size && (fit.sizeBasis === "measured" || !hit.listing.size)) Object.assign(hit.listing, fit);
+    }
   }));
   const listings = candidates.filter(({ listing, verifySize }) => !verifySize ||
     matchesScoutFit({ ...listing, garmentKind: classifyGarment(listing) }, preferences)).map(({ listing }) => listing);
