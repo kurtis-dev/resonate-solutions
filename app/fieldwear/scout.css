@@ -87,3 +87,43 @@
 @media (min-width: 640px) {
   .fieldwear-scout .scout-first-dibs { grid-template-columns: 1fr auto; align-items: center; padding: 22px 24px; }
 }
+
+/* Seams Familiar brings the approved 90s study into the private catalog. */
+.fieldwear-scout {
+  --ink: #251a32;
+  --muted-ink: #584a64;
+  --line: #e8dfed;
+  --accent: #68249d;
+  --film-stripe: linear-gradient(90deg, #e94d58 0 20%, #fb9a43 20% 40%, #f3ce4b 40% 60%, #34a96b 60% 80%, #3965df 80%);
+}
+.fieldwear-scout .scout-primary:hover:not(:disabled) { background: #521d81; }
+.fieldwear-scout .scout-brand-hero { position: relative; isolation: isolate; overflow: hidden; padding-block: 10px 14px; }
+.fieldwear-scout .scout-brand-hero h1 { margin-block: 8px 9px; font-size: clamp(42px, 11vw, 62px); font-weight: 900; letter-spacing: -.075em; line-height: .94; }
+.fieldwear-scout .scout-brand-hero p { font-size: .82rem; color: var(--muted-ink); }
+.fieldwear-scout .scout-film-stripe { display: block; width: 64px; height: 6px; background: var(--film-stripe); }
+.fieldwear-scout .scout-90s-graphic { position: absolute; z-index: -1; top: 2px; right: 0; width: clamp(116px, 39vw, 220px); height: 105px; pointer-events: none; }
+.fieldwear-scout .scout-90s-graphic i { position: absolute; display: block; }
+.fieldwear-scout .scout-90s-graphic i:nth-child(1) {
+  z-index: 2; inset: 0 0 12px; background: #7829b1; transform: rotate(-9deg);
+  clip-path: polygon(0 67%,26% 24%,32% 50%,53% 11%,62% 41%,86% 0,100% 11%,66% 72%,55% 52%,38% 84%,29% 58%,11% 99%);
+}
+.fieldwear-scout .scout-90s-graphic i:nth-child(2) {
+  z-index: 1; inset: 22px 4px 24px; background: #43e4c6; transform: rotate(7deg);
+  clip-path: polygon(0 60%,74% 7%,96% 0,90% 21%,100% 19%,86% 45%,95% 49%,71% 75%,4% 100%);
+}
+.fieldwear-scout .scout-90s-graphic i:nth-child(3) {
+  inset: 0 0 3px; opacity: .38; background: radial-gradient(circle,#68249d 1px,transparent 1.7px) 0 0 / 10px 11px;
+  mask-image: linear-gradient(92deg, transparent, #000 76%); transform: rotate(-10deg);
+}
+.fieldwear-scout .scout-departments { display: flex; align-items: center; gap: 5px; border-block: 1px solid var(--line); margin-block: 3px 9px; }
+.fieldwear-scout .scout-departments a { display: inline-flex; align-items: center; min-height: 44px; padding-inline: 10px; font-size: .85rem; font-weight: 650; }
+.fieldwear-scout .scout-departments a[aria-current="page"] { color: var(--accent); box-shadow: inset 0 -3px var(--accent); }
+.fieldwear-scout .scout-departments .scout-dibs-shortcut { margin-inline-start: auto; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.fieldwear-scout .scout-first-dibs { position: relative; isolation: isolate; overflow: hidden; border-style: solid; border-color: #dbc2ea; background: #f8effd; }
+.fieldwear-scout .scout-first-dibs .scout-90s-graphic { top: auto; bottom: 0; opacity: .42; width: 145px; }
+@media (max-width: 354px) { .fieldwear-scout .scout-brand-hero .scout-90s-graphic { width: 105px; opacity: .82; } }
+@media (min-width: 768px) {
+  .fieldwear-scout .scout-brand-hero { padding-block: 9px 20px; }
+  .fieldwear-scout .scout-brand-hero .scout-90s-graphic { top: 5px; height: 132px; right: 24px; }
+  .fieldwear-scout .scout-first-dibs .scout-90s-graphic { right: 220px; }
+}

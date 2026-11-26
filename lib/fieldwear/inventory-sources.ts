@@ -71,14 +71,15 @@ function httpsImage(value: string | undefined, host: string, allowedHost = "") {
 type Candidate = Pick<ListingInput, "title" | "size"> & { garmentKind: string; listedAt: string };
 
 function fitsSearch(item: Candidate, preferences: ScoutPreferences) {
-  return (item.garmentKind === "shirt" || item.garmentKind === "pants")
+  return (item.garmentKind === "shirt" || item.garmentKind === "pants" || (preferences.department === "women" && ["outerwear", "dress", "skirt"].includes(item.garmentKind)))
     && departmentMatch(item, preferences.department) > 0
     && (!preferences.matchingOnly || matchesScoutFit(item, preferences));
 }
 
 function shortlist<T extends Candidate>(candidates: T[], preferences: ScoutPreferences) {
   const compare = (a: T, b: T) => fitPriority(b, preferences) - fitPriority(a, preferences) || b.listedAt.localeCompare(a.listedAt);
-  return ["shirt", "pants"].flatMap((kind) => candidates.filter((item) => item.garmentKind === kind)
+  const kinds = preferences.department === "women" ? ["shirt", "pants", "outerwear", "dress", "skirt"] : ["shirt", "pants"];
+  return kinds.flatMap((kind) => candidates.filter((item) => item.garmentKind === kind)
     .sort(compare).slice(0, parallelLimit));
 }
 
@@ -174,7 +175,8 @@ export function isSturdyShopGarment(title: string, notes: string, kind: "shirt" 
 
 export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, { now }: Window): Promise<SourceResult> {
   const options: RequestInit = { cache: "no-store", signal: AbortSignal.timeout(9_000), redirect: "error" };
-  const pages = await Promise.allSettled(shop.collections.map(async (collection) => {
+  const collections = preferences.department === "women" && "womensCollections" in shop ? shop.womensCollections : shop.collections;
+  const pages = await Promise.allSettled(collections.map(async (collection) => {
     const loadPage = async (page: number) => {
       const response = await fetch(`${shop.origin}/collections/${collection}/products.json?limit=${shopPageSize}&page=${page}`, options);
       if (!response.ok) throw new Error(`Shop collection status ${response.status}`);
@@ -206,8 +208,8 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       const inferred = classifyGarment({ title });
       const garmentKind = inferred !== "unknown" ? inferred
         : /^(?:button ups?|shirts?)$/i.test(rawType) ? "shirt" : "unknown";
-      if (garmentKind !== "shirt" && garmentKind !== "pants") continue;
-      if ((kindRequested === "shirt" || kindRequested === "pants") && kindRequested !== garmentKind) continue;
+      if (garmentKind === "unknown" || (preferences.department !== "women" && garmentKind !== "shirt" && garmentKind !== "pants")) continue;
+      if (kindRequested !== "unknown" && kindRequested !== garmentKind) continue;
 
       const optionPosition = (name: RegExp) => product.options?.find((option) => name.test(option.name ?? ""))?.position ?? 0;
       const waistPosition = optionPosition(/^waist$/i);
@@ -226,15 +228,17 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       const variantSize = waistPosition && inseamPosition
         ? `${optionValue(variant, waistPosition)}x${optionValue(variant, inseamPosition)}`
         : "";
-      const detected = shopSize(title, notes, optionValue(variant, optionPosition(/^size$/i)), garmentKind);
+      const detected = shopSize(title, notes, optionValue(variant, optionPosition(/^size$/i)), garmentKind === "pants" || garmentKind === "skirt" ? "pants" : "shirt");
       const size = detected.sizeBasis === "measured" ? detected.size : variantSize || detected.size;
       const sizeBasis = size === detected.size ? detected.sizeBasis : "tag";
       if (!matchesScoutFit({ title, size, garmentKind }, preferences)) continue;
       const description = [notes, inferred === "unknown" ? "Garment type: shirt." : ""].filter(Boolean).join("\n");
       if (!terms.every((term) => words(`${title} ${description} ${labeledColor ?? ""}`).includes(term))) continue;
-      if (!isSturdyShopGarment(title, description, garmentKind)) continue;
+      if (garmentKind === "shirt" || garmentKind === "pants") {
+        if (!isSturdyShopGarment(title, description, garmentKind)) continue;
+      } else if (vintageSignals({title, description}).build < 0) continue;
       const price = variant.price && /^\d{1,6}(?:\.\d{1,2})?$/.test(variant.price) ? Math.round(Number(variant.price) * 100) : null;
-      const budget = garmentKind === "shirt" ? preferences.shirtBudget : preferences.pantsBudget;
+      const budget = garmentKind === "pants" || garmentKind === "skirt" ? preferences.pantsBudget : preferences.shirtBudget;
       if (price == null || (budget != null && price > Math.round(budget * 100))) continue;
       const [imageUrl, ...imageUrls] = (product.images ?? []).flatMap((image) => httpsImage(image.src, "cdn.shopify.com", host) ?? []).slice(0, 8);
       if (!imageUrl) continue;

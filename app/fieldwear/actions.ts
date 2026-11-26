@@ -6,7 +6,7 @@ import { sendCustomerEmail } from "@/lib/customer-emails";
 import { exchangeOwnerLink, isScoutOwner, issueOwnerLink, readScoutPreferences, revokeOwnerSession, scoutDatabase } from "@/lib/fieldwear/owner-access";
 import { firstDibsConfigured, updateFirstDibs } from "@/lib/fieldwear/first-dibs";
 import { readScoutEdition } from "@/lib/fieldwear/editions";
-import { parseScoutPreferences } from "@/lib/fieldwear/preferences";
+import { catalogHref, catalogProfile, parseScoutPreferences } from "@/lib/fieldwear/preferences";
 import { readLiveSearch, runAndStoreLiveSearch } from "@/lib/fieldwear/live-search";
 import { browningHunt, similarHunt } from "@/lib/fieldwear/look-search";
 import { curatedListings } from "@/lib/fieldwear/curated-listings";
@@ -24,8 +24,8 @@ export async function requestOwnerLink(form: FormData) {
         url.searchParams.set("access", token);
         await sendCustomerEmail({
           to: owner,
-          subject: "Your Fieldwear Scout sign-in link",
-          text: `Open this link and choose Continue to Fieldwear. It works once and expires in 10 minutes.\n\n${url}`,
+          subject: "Your Seams Familiar sign-in link",
+          text: `Open this link and choose Continue to Seams Familiar. It works once and expires in 10 minutes.\n\n${url}`,
         });
       }
     } catch {
@@ -43,14 +43,15 @@ export async function redeemOwnerLink(form: FormData) {
 
 export async function setFirstDibs(form: FormData) {
   if (!(await isScoutOwner())) redirect("/fieldwear");
+  const profile = catalogProfile(form.get("profile"));
   const enabled = form.get("enabled") === "on";
-  if (enabled && !firstDibsConfigured()) redirect("/fieldwear?alerts=unavailable#first-dibs");
+  if (enabled && !firstDibsConfigured()) redirect(catalogHref(profile, { alerts: "unavailable" }, "first-dibs"));
   try {
     await updateFirstDibs(enabled);
   } catch {
-    redirect("/fieldwear?alerts=unavailable#first-dibs");
+    redirect(catalogHref(profile, { alerts: "unavailable" }, "first-dibs"));
   }
-  redirect(enabled ? "/fieldwear?alerts=enabled#first-dibs" : "/fieldwear?alerts=disabled#first-dibs");
+  redirect(catalogHref(profile, { alerts: enabled ? "enabled" : "disabled" }, "first-dibs"));
 }
 
 export async function signOutScout() {
@@ -60,24 +61,27 @@ export async function signOutScout() {
 
 export async function saveScoutPreferences(form: FormData) {
   if (!(await isScoutOwner())) redirect("/fieldwear");
-  const preferences = parseScoutPreferences(form);
-  if (!preferences) redirect("/fieldwear?preferences=invalid#preferences");
+  const profile = catalogProfile(form.get("profile"));
+  const parsed = parseScoutPreferences(form);
+  if (!parsed) redirect(catalogHref(profile, { preferences: "invalid" }, "preferences"));
+  const preferences = profile === "women" ? { ...parsed, department: "women" as const } : parsed;
   const sql = await scoutDatabase();
   await sql`INSERT INTO fieldwear_preferences (profile, settings)
-    VALUES ('owner', ${JSON.stringify(preferences)}::jsonb)
+    VALUES (${profile}, ${JSON.stringify(preferences)}::jsonb)
     ON CONFLICT (profile) DO UPDATE SET settings = EXCLUDED.settings`;
-  const previous = await readLiveSearch();
-  await runAndStoreLiveSearch(preferences, previous?.keywords ?? "");
+  const previous = await readLiveSearch(undefined, "owner", profile);
+  await runAndStoreLiveSearch(preferences, previous?.keywords ?? "", undefined, profile);
   revalidatePath("/fieldwear");
-  redirect("/fieldwear?catalog=1#fresh");
+  redirect(catalogHref(profile, { catalog: "1" }));
 }
 
 export async function searchScoutNow(form: FormData) {
   if (!(await isScoutOwner())) redirect("/fieldwear");
+  const profile = catalogProfile(form.get("profile"));
   const keywords = String(form.get("keywords") ?? "").replace(/\bvintage\b/gi, "").trim().replace(/\s+/g, " ").slice(0, 80);
-  await runAndStoreLiveSearch(await readScoutPreferences(), keywords);
+  await runAndStoreLiveSearch(await readScoutPreferences(profile), keywords, undefined, profile);
   revalidatePath("/fieldwear");
-  redirect("/fieldwear?catalog=1#fresh");
+  redirect(catalogHref(profile, { catalog: "1" }));
 }
 
 export async function searchScoutLook(form: FormData) {
@@ -113,7 +117,7 @@ export async function decideListing(form: FormData) {
   const externalId = String(form.get("externalId") ?? "");
   const verdict = String(form.get("verdict") ?? "");
   if (!/^[a-z]{1,30}$/.test(source) || !/^[a-z\d-]{1,120}$/i.test(externalId) || !["save", "proof", "pass"].includes(verdict)) return;
-  const runs = await Promise.all([readLiveSearch(), readLiveSearch(undefined, "similar"), readLiveSearch(undefined, "browning")]);
+  const runs = await Promise.all([readLiveSearch(), readLiveSearch(undefined, "owner", "women"), readLiveSearch(undefined, "daily"), readLiveSearch(undefined, "daily", "women"), readLiveSearch(undefined, "similar"), readLiveSearch(undefined, "browning")]);
   const matches = (listing: { source: string; externalId: string }) => listing.source === source && listing.externalId === externalId;
   const liveItem = runs.flatMap((run) => run?.listings ?? []).find(matches);
   const item = liveItem?.source === "etsy"

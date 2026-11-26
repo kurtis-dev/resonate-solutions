@@ -1,7 +1,7 @@
 import { createHash, randomBytes } from "node:crypto";
 import { cookies } from "next/headers";
 import { getSql } from "@/lib/db";
-import { defaultScoutPreferences, type ScoutPreferences } from "./preferences";
+import { defaultScoutPreferences, type CatalogProfile, type ScoutPreferences } from "./preferences";
 
 export const sessionCookie = "resonate_fieldwear_session";
 export const sessionSeconds = 30 * 86400;
@@ -61,9 +61,10 @@ export function initializeScoutDatabase() {
   return initialized;
 }
 
-export async function readScoutPreferences(): Promise<ScoutPreferences> {
+export async function readScoutPreferences(profile: CatalogProfile = "owner"): Promise<ScoutPreferences> {
   const sql = await scoutDatabase();
-  const [row] = await sql`SELECT settings FROM fieldwear_preferences WHERE profile = 'owner'` as { settings: Partial<ScoutPreferences> }[];
+  const [row] = await sql`SELECT settings FROM fieldwear_preferences WHERE profile = ${profile}` as { settings: Partial<ScoutPreferences> }[];
+  if (profile === "women") return { ...defaultScoutPreferences, shirtSizes: [], pantsSizes: [], ...row?.settings, department: "women" };
   return { ...defaultScoutPreferences, ...row?.settings };
 }
 

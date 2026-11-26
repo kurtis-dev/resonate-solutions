@@ -75,7 +75,7 @@ export async function deliverFirstDibs() {
 
   const mail = await sendCustomerEmail({
     to: recipient,
-    subject: "Fieldwear Scout · First dibs",
+    subject: "Seams Familiar · First dibs",
     text: digest.body,
     idempotencyKey: `fieldwear-first-dibs/${day}`,
   });

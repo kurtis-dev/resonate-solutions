@@ -13,7 +13,7 @@ export const marketplaceHosts = {
 } as const;
 
 export type MarketplaceSource = keyof typeof marketplaceHosts | "other";
-export type GarmentKind = "shirt" | "pants" | "outerwear" | "unknown";
+export type GarmentKind = "shirt" | "pants" | "outerwear" | "dress" | "skirt" | "unknown";
 
 export type ListingInput = {
   source: MarketplaceSource | VintageShopSource | "shopifycatalog";
@@ -179,9 +179,11 @@ export function stableListingId(source: MarketplaceSource, url: string) {
 
 export function classifyGarment(input: Pick<ListingInput, "title" | "description" | "size">): GarmentKind {
   const text = `${input.title} ${input.description ?? ""} ${input.size ?? ""}`;
+  if (/\b(?:skirt|kilt)\b/i.test(input.title)) return "skirt";
+  if (/\bdress(?:es)?\b/i.test(input.title) && !/\bdress[- ](?:shirts?|pants?|trousers?|slacks?|blouses?)\b/i.test(input.title)) return "dress";
   if (/\b(?:pants?|jeans?|dungarees?|trousers?|carpenters?|painters?|overalls?)\b|\b(?:38|40)\s?[x×]\s?(?:32|34)\b/i.test(text)) return "pants";
   if (/\b(?:coat|parka|blazer|outerwear)\b|\bjacket\b(?![- ]?shirt)/i.test(text) && !/shirt[- ]?(?:jacket|jac)|shacket/i.test(text)) return "outerwear";
-  if (/\b(?:shirts?|flannel|chamois|overshirt|shirt[- ]?(?:jacket|jac)|shacket)\b/i.test(text)) return "shirt";
+  if (/\b(?:shirts?|blouses?|cardigans?|sweaters?|flannel|chamois|overshirt|shirt[- ]?(?:jacket|jac)|shacket)\b/i.test(text)) return "shirt";
   if (/\bbutton[- ](?:up|down|front)\b/i.test(input.title) && /\b(?:workwear|long[- ]sleeve)\b/i.test(input.title) && !/\b(?:cardigan|dress|sweater|blouse|skirt)\b/i.test(input.title)) return "shirt";
   return "unknown";
 }
@@ -296,7 +298,7 @@ export function scoreListing(input: ListingInput, preferences?: ScoutPreferences
 
   const fitInput = { ...input, garmentKind: classifyGarment(input) };
   const matchedSize = preferences ? sizeMatch(fitInput, preferences) : preferredSizes.some((size) => text.includes(size));
-  const sizes = fitInput.garmentKind === "pants" ? preferences?.pantsSizes : preferences?.shirtSizes;
+  const sizes = (fitInput.garmentKind === "pants" || fitInput.garmentKind === "skirt") ? preferences?.pantsSizes : preferences?.shirtSizes;
   const compatibleDepartment = preferences ? departmentMatch(fitInput, preferences.department) > 0 : !/women|womens|ladies|youth|kids/i.test(text);
   const partialFit = !preferences && /\b(?:xl|xxl|2xl|38|40)\b/i.test(text);
   const fit = compatibleDepartment ? (sizes?.length === 0 ? 15 : matchedSize ? 25 : partialFit ? 12 : 5) : 0;

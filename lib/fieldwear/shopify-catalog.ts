@@ -1,6 +1,6 @@
 import { isSturdyShopGarment, shopSellerNotes, shopSize } from "./inventory-sources";
 import { classifyGarment, type ListingInput } from "./listing-model";
-import { matchesScoutFit, type ScoutPreferences } from "./preferences";
+import { departmentMatch, matchesScoutFit, type ScoutPreferences } from "./preferences";
 import { vintageSignals } from "./vintage-signals";
 
 const endpoint = "https://catalog.shopify.com/api/ucp/mcp";
@@ -45,13 +45,20 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
   for (const product of products) {
     const title = product.title?.trim();
     const description = shopSellerNotes(product.description?.plain);
-    if (!title || classifyGarment({ title, description }) !== "pants" || !isSturdyShopGarment(title, description, "pants")) continue;
+    if (!title) continue;
+    const garmentKind = classifyGarment({ title, description });
+    const womenswear = preferences.department === "women";
+    if (garmentKind === "unknown" || (!womenswear && garmentKind !== "pants")) continue;
+    if (womenswear && departmentMatch({ title, garmentKind }, "women") < 2 && departmentMatch({ title, garmentKind }, "unisex") < 2) continue;
+    const quality = vintageSignals({ title, description });
+    if (garmentKind === "pants" ? !isSturdyShopGarment(title, description, "pants") : (quality.build < 0 || (quality.build <= 0 && quality.period <= 0))) continue;
+    const budget = garmentKind === "pants" || garmentKind === "skirt" ? preferences.pantsBudget : preferences.shirtBudget;
     if (/\b(?:select pair|assorted|mystery|bundle|lot of|nwt|deadstock|new with tags)\b/i.test(title)) continue;
     for (const variant of product.variants ?? []) {
       if (!variant.condition?.includes("secondhand") || variant.availability?.available !== true) continue;
       const price = variant.price?.amount;
       if (typeof price !== "number" || !Number.isSafeInteger(price) || price <= 0 || variant.price?.currency !== "USD"
-        || (preferences.pantsBudget != null && price > preferences.pantsBudget * 100)) continue;
+        || (budget != null && price > budget * 100)) continue;
       const url = safeUrl(variant.url);
       const id = variant.id?.match(/^gid:\/\/shopify\/ProductVariant\/(\d+)$/)?.[1];
       if (!url || !id || !/\/products\/[^/]+\/?$/.test(url.pathname)) continue;
@@ -65,8 +72,8 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
       }).slice(0, 8);
       if (!imageUrl) continue;
       const option = (name: RegExp) => variant.options?.find((value) => name.test(value.name))?.label ?? "";
-      const fit = shopSize(normalizeSize(title), description, normalizeSize(option(/^size$/i)), "pants");
-      if (!fit.size?.includes("x") || !matchesScoutFit({ title, size: fit.size, sizeBasis: fit.sizeBasis, garmentKind: "pants" }, preferences)) continue;
+      const fit = shopSize(normalizeSize(title), description, normalizeSize(option(/^size$/i)), garmentKind === "pants" ? "pants" : "shirt");
+      if ((!womenswear && !fit.size?.includes("x")) || !matchesScoutFit({ title, size: fit.size, sizeBasis: fit.sizeBasis, garmentKind }, preferences)) continue;
       const seller = variant.seller?.name?.trim() || url.hostname.replace(/^www\./, "");
       const condition = description.match(/^(?:condition|flaws)\s*:\s*(.+)$/im)?.[1] || option(/^condition$/i) || "Secondhand";
       unique.set(url.hostname + url.pathname, {
@@ -86,8 +93,12 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
 export async function searchShopifyCatalog(preferences: ScoutPreferences, keywords: string, profile = profileUrl) {
   const sizes = preferences.pantsSizes.slice(0, 6);
   const department = { any: "", men: "men's", women: "women's", unisex: "unisex" }[preferences.department];
+  const womenswear = preferences.department === "women";
   const terms = keywords.replace(/\bvintage\b/gi, "").trim();
-  const lanes = terms ? [terms + " work pants"] : [
+  const lanes = terms ? [womenswear ? terms : terms + " work pants"] : womenswear ? [
+    "cotton denim chore jacket", "wool Pendleton plaid skirt", "cotton denim shirt dress",
+    "cotton chambray blouse", "wool cardigan 1990s", "high rise straight denim jeans", "duck canvas carpenter pants",
+  ] : [
     "duck canvas carpenter work pants",
     "double knee heavy cotton work pants",
     "straight heavyweight denim work jeans",
@@ -103,7 +114,7 @@ export async function searchShopifyCatalog(preferences: ScoutPreferences, keywor
   ];
   const checkedAt = Date.now();
   const results = await Promise.allSettled(lanes.map(async (lane, index) => {
-    const sizeWords = index < 3 ? sizes.join(" ") : sizes[index % sizes.length] ?? "";
+    const sizeWords = womenswear ? "" : index < 3 ? sizes.join(" ") : sizes[index % sizes.length] ?? "";
     const fetchPage = async (cursor?: string) => {
       const request: RequestInit = {
         method: "POST",
@@ -118,7 +129,7 @@ export async function searchShopifyCatalog(preferences: ScoutPreferences, keywor
               pagination: { limit: index < 3 ? 40 : 22, ...(cursor ? { cursor } : {}) }, context: { address_country: "US" },
               filters: {
                 ships_to: { country: "US" }, condition: ["secondhand"], available: true,
-                ...(preferences.pantsBudget == null ? {} : { price: { max: Math.round(preferences.pantsBudget * 100) } }),
+                ...(womenswear || preferences.pantsBudget == null ? {} : { price: { max: Math.round(preferences.pantsBudget * 100) } }),
               },
             },
           } },

@@ -5,7 +5,7 @@ export const vintageShops = [
   { source: "wyliewelling", name: "Wylie Welling", origin: "https://wyliewelling.com", collections: ["shirts", "all-live-pants", "shop-all"] },
   { source: "firstclass", name: "1STCLASS Vintage", origin: "https://1stclass-vintage.com", collections: ["carpenter", "pants", "denim", "wrangler-pants"] },
   { source: "secondtrail", name: "Second Trail Co.", origin: "https://secondtrailco.com", collections: ["mens-pants"] },
-  { source: "fredgoodwill", name: "Rappahannock Goodwill", origin: "https://shop.fredgoodwill.org", collections: ["mens-bottoms", "carhartt-workwear", "workwear"] },
+  { source: "fredgoodwill", name: "Rappahannock Goodwill", origin: "https://shop.fredgoodwill.org", collections: ["mens-bottoms", "carhartt-workwear", "workwear"], womensCollections: ["women", "womens-bottoms", "dresses"] },
   { source: "cobblestore", name: "Cobblestore", origin: "https://cobblestore.com", collections: ["jeans", "vintage-pants", "sale"] },
   { source: "thriftmanguy", name: "Thrift Man Guy", origin: "https://thriftmanguy.com", collections: ["carhartt-pants", "carhartt-jeans", "levis-jeans", "jeans-pants", "workwear"] },
 ] as const;

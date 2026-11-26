@@ -1,5 +1,15 @@
 export const departmentLabels = { any: "Any department", men: "Men’s", women: "Women’s", unisex: "Unisex" } as const;
 export type Department = keyof typeof departmentLabels;
+export type CatalogProfile = "owner" | "women";
+
+export function catalogProfile(value: unknown): CatalogProfile {
+  return value === "women" ? "women" : "owner";
+}
+
+export function catalogHref(profile: CatalogProfile, params: Record<string, string> = {}, anchor = "fresh") {
+  const query = new URLSearchParams(profile === "women" ? { ...params, department: "women" } : params).toString();
+  return `/fieldwear${query ? `?${query}` : ""}#${anchor}`;
+}
 
 export type ScoutPreferences = {
   department: Department;
@@ -36,7 +46,7 @@ function normalizeAlpha(value: string) {
 export function shirtSizeTokens(input: string) {
   const spelled = input.replace(/\b(extra small|extra large|large tall|medium tall|xl extra long)\b/gi, (match) =>
     ({ "extra small": "XS", "extra large": "XL", "large tall": "LT", "medium tall": "MT", "xl extra long": "XLT" })[match.toLowerCase()] ?? match);
-  const numeric = Array.from(spelled.matchAll(/\b(?:tagged(?: size)?|size|us)\s*(\d{1,2}(?:\.5)?)\b/gi), ([, value]) => value);
+  const numeric = Array.from(spelled.matchAll(/\b(?:tagged(?: size)?|size|sz|us)\s*[:.=]?\s*(\d{1,2}(?:\.5)?)\b/gi), ([, value]) => value);
   return Array.from(new Set([...(spelled.match(alphaSize) ?? []).map(normalizeAlpha), ...numeric]));
 }
 
@@ -53,7 +63,7 @@ export function reportedPantsFit(title: string) {
 export type FitListing = { title: string; size?: string | null; sizeBasis?: "tag" | "seller-fit" | "measured"; garmentKind: string };
 
 export function sizeMatch(item: FitListing, preferences: ScoutPreferences) {
-  const pants = item.garmentKind === "pants";
+  const pants = item.garmentKind === "pants" || item.garmentKind === "skirt";
   const targets = pants ? preferences.pantsSizes : preferences.shirtSizes;
   if (!targets.length) return true;
   const parse = pants ? pantsSizeTokens : shirtSizeTokens;

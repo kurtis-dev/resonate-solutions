@@ -14,7 +14,7 @@ import { listingMeasurements, vintageSignals } from "@/lib/fieldwear/vintage-sig
 import { beanReferenceId, matchLook } from "@/lib/fieldwear/look-search";
 import { readScoutEdition } from "@/lib/fieldwear/editions";
 import { isScoutOwner, readScoutPreferences, scoutDatabase } from "@/lib/fieldwear/owner-access";
-import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
+import { catalogHref, catalogProfile, departmentLabels, fitPriority, matchesScoutFit, type CatalogProfile, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { readLiveSearch } from "@/lib/fieldwear/live-search";
 import { searchShopifyCatalog } from "@/lib/fieldwear/shopify-catalog";
 import { marketplaceBrowse, marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
@@ -24,7 +24,7 @@ import "./scout.css";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
-  title: "Fieldwear Scout | Resonate Solutions",
+  title: "Seams Familiar | Resonate Solutions",
   robots: { index: false, follow: false },
   referrer: "no-referrer",
 };
@@ -42,12 +42,12 @@ function OwnerSignIn({ token, status }: { token?: string; status?: string }) {
     <main className="fieldwear-scout px-4 py-14 sm:px-7">
       <section className="mx-auto max-w-md rounded border border-[var(--line)] p-6 sm:p-8">
         <ResonateLogo />
-        <h1 className="mt-4 text-2xl font-semibold">Fieldwear Scout</h1>
+        <h1 className="mt-4 text-2xl font-semibold">Seams Familiar</h1>
         {validToken ? (
           <form action={redeemOwnerLink} noValidate>
             <p className="mt-3">Use your one-time link to sign in on this device.</p>
             <input type="hidden" name="access" value={token} />
-            <button className={buttonClass}>Continue to Fieldwear</button>
+            <button className={buttonClass}>Continue to Seams Familiar</button>
           </form>
         ) : (
           <form action={requestOwnerLink} noValidate>
@@ -70,41 +70,49 @@ type Decision = { source: string; external_id: string; verdict: string; listing:
 const sourceStatus = { searched: "Checked", partial: "Partially checked", unavailable: "Check failed", "needs-access": "API access needed", "no-feed": "Live feed unavailable" } as const;
 
 function FreshScout({
-  run, preferences, items, source, catalog,
-}: { run: Awaited<ReturnType<typeof readLiveSearch>>; preferences: ScoutPreferences; items: ListingView[]; source?: string; catalog?: Awaited<ReturnType<typeof searchShopifyCatalog>> }) {
+  run, preferences, profile, items, source, catalog, daily,
+}: { run: Awaited<ReturnType<typeof readLiveSearch>>; preferences: ScoutPreferences; profile: CatalogProfile; daily: boolean; items: ListingView[]; source?: string; catalog?: Awaited<ReturnType<typeof searchShopifyCatalog>> }) {
   const coverage = run?.coverage;
   const sources: { source: string; status: keyof typeof sourceStatus }[] = [...(coverage ?? []), ...(catalog ? [{ source: "shopifycatalog", status: catalog.status }] : [])];
   const initialSource = source && items.some((item) => matchesMarketplace(item.source, source)) ? source : undefined;
   const sourceCount = sources.filter((entry) => entry.status === "searched" || entry.status === "partial").length;
-  const message = items.length ? `${items.length} matches · ${sourceCount} sources checked`
-    : !run || run.expired ? "Search connected shops and marketplaces for available workwear."
+  const message = items.length ? `${daily ? "Daily catalog · " : ""}${items.length} matches · ${sourceCount} sources checked`
+    : !run || run.expired ? "Search connected shops and marketplaces for available clothing."
     : run.status === "unconfigured" || run.status === "unavailable" ? "The connected marketplaces couldn’t complete this search. Try again."
     : "No available listings matched. Try fewer keywords.";
   return (
     <section id="fresh" aria-labelledby="fresh-title" className="scroll-mt-4">
       <div className="pt-5 md:pt-7">
-        <div className="flex flex-wrap items-center justify-between gap-x-2">
-          <h1 id="fresh-title" className="text-2xl font-semibold tracking-tight md:text-[28px]">Workwear catalog</h1>
-          <a href="#first-dibs" className="inline-flex min-h-11 items-center text-xs font-semibold text-[var(--accent)] underline underline-offset-4 sm:hidden">First dibs</a>
+        <div className="scout-brand-hero">
+          <span className="scout-film-stripe" aria-hidden="true" />
+          <span className="scout-90s-graphic" aria-hidden="true"><i /><i /><i /></span>
+          <h1 id="fresh-title">Seams<br className="sm:hidden" /> Familiar</h1>
+          <p>Vintage clothing · Good clothes come around again.</p>
         </div>
+        <nav className="scout-departments" aria-label="Catalog departments">
+          <Link href={catalogHref("owner")} aria-current={profile === "owner" ? "page" : undefined}>Men’s</Link>
+          <Link href={catalogHref("women")} aria-current={profile === "women" ? "page" : undefined}>Women’s</Link>
+          <a href="#first-dibs" className="scout-dibs-shortcut">First dibs</a>
+        </nav>
         <p className="mt-1 text-xs leading-5 text-[var(--muted-ink)]" aria-label="Saved search sizes">
-          {departmentLabels[preferences.department]} · Shirts {preferences.shirtSizes.join(", ") || "any size"} · Bottoms {preferences.pantsSizes.join(", ") || "any size"}{preferences.pantsBudget != null ? ` · Up to $${preferences.pantsBudget}` : ""}
+          {departmentLabels[preferences.department]} · {profile === "women" ? "Tops & dresses" : "Shirts"} {preferences.shirtSizes.join(", ") || "any size"} · Bottoms {preferences.pantsSizes.join(", ") || "any size"}{preferences.pantsBudget != null ? ` · Up to $${preferences.pantsBudget}` : ""}
         </p>
         <form action={searchScoutNow} className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:max-w-2xl">
+          <input type="hidden" name="profile" value={profile} />
           <label className="relative min-w-0">
             <span className="sr-only">Keywords (optional)</span>
             <Search aria-hidden="true" size={16} strokeWidth={1.6} className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-[var(--muted-ink)]" />
-            <input key={run?.searchedAt} name="keywords" type="search" defaultValue={run?.keywords ?? ""} placeholder="Chamois, L.L.Bean, carpenter jeans…" maxLength={80} className="scout-control scout-keywords w-full text-base sm:text-sm" />
+            <input key={run?.searchedAt} name="keywords" type="search" defaultValue={run?.keywords ?? ""} placeholder={profile === "women" ? "Wool skirts, denim, cotton blouses…" : "Chamois, L.L.Bean, carpenter jeans…"} maxLength={80} className="scout-control scout-keywords w-full text-base sm:text-sm" />
           </label>
           <ScoutSubmit label="Search now" className="scout-primary whitespace-nowrap px-4 text-sm" />
         </form>
       </div>
       <p className="pb-3 pt-2 text-xs leading-5 text-[var(--muted-ink)]" role="status">{message}</p>
-      {items.length > 0 ? <FreshCatalog key={`${run?.searchedAt}:${initialSource ?? ""}`} items={items} initialSource={initialSource} catalogExpiresAt={catalog?.expiresAt} /> : null}
+      {items.length > 0 ? <FreshCatalog key={`${run?.searchedAt}:${initialSource ?? ""}`} items={items} initialSource={initialSource} womenswear={profile === "women"} catalogExpiresAt={catalog?.expiresAt} /> : null}
       {catalog && !catalog.listings.length ? (
         <p role="status" className="mt-3 text-xs text-[var(--muted-ink)]">{catalog.status === "unavailable"
           ? "Shopify Global Catalog couldn’t finish this search. The other sources are still shown."
-          : "Shopify Global Catalog found no used pants that passed your size and workwear filters."}</p>
+          : "Shopify Global Catalog found no available items that matched this search."}</p>
       ) : null}
       {coverage && run && !run.expired ? (
         <details className="mt-5 border-y border-[var(--line)]">
@@ -212,8 +220,9 @@ function LookFinds({ similar, browning, preferences, decisions }: {
   );
 }
 
-export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string; preferences?: string; view?: string; source?: string; catalog?: string; alerts?: string }> }) {
+export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string; preferences?: string; view?: string; source?: string; catalog?: string; alerts?: string; department?: string }> }) {
   const params = await searchParams;
+  const profile = catalogProfile(params.department);
   if (!(await isScoutOwner())) {
     return <OwnerSignIn token={params.access} status={params.signIn} />;
   }
@@ -222,13 +231,18 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
   const [recorded, edition, preferences, alertsEnabled] = await Promise.all([
     sql`SELECT source, external_id, verdict, listing FROM fieldwear_decisions` as Promise<Decision[]>,
     params.view === "archive" ? readScoutEdition() : Promise.resolve(null),
-    readScoutPreferences(),
+    readScoutPreferences(profile),
     firstDibsEnabled(),
   ]);
-  const [run, similar, browning] = await Promise.all([
-    readLiveSearch(preferences), readLiveSearch(preferences, "similar"), readLiveSearch(preferences, "browning"),
+  const [manual, dailyRun, similar, browning] = await Promise.all([
+    readLiveSearch(preferences, "owner", profile), readLiveSearch(preferences, "daily", profile),
+    profile === "owner" ? readLiveSearch(preferences, "similar") : null,
+    profile === "owner" ? readLiveSearch(preferences, "browning") : null,
   ]);
-  const catalog = params.catalog === "1" && params.view !== "archive"
+  const availableManual = manual && !manual.expired && manual.status !== "unavailable" ? manual : null;
+  const availableDaily = dailyRun && !dailyRun.expired ? dailyRun : null;
+  const run = params.catalog === "1" ? availableManual ?? availableDaily ?? manual : availableDaily ?? availableManual ?? manual;
+  const catalog = (params.catalog === "1" || (!run && profile === "women")) && params.view !== "archive"
     ? await searchShopifyCatalog(preferences, run?.keywords ?? "")
     : undefined;
   const decisions = new Map(readLegacyScout().map((row) => [`${row.source}:${row.external_id}`, row]));
@@ -284,10 +298,10 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
         <div className="scout-container flex min-h-16 items-center justify-between gap-2">
           <div className="scout-brand-lockup">
             <ResonateLogo />
-            <a href="/fieldwear" className="scout-app-name">Fieldwear Scout</a>
+            <a href="/fieldwear" className="scout-app-name">Seams Familiar</a>
           </div>
           <nav className="flex items-center text-sm" aria-label="Fieldwear">
-            <a href={archived ? "/fieldwear#find-similar" : "#find-similar"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]" aria-label="Find similar listings">Similar</a>
+            {profile === "owner" ? <a href={archived ? "/fieldwear#find-similar" : "#find-similar"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]" aria-label="Find similar listings">Similar</a> : null}
             <a href="#first-dibs" className="hidden min-h-11 items-center rounded px-2 hover:bg-[var(--matte)] sm:inline-flex">First dibs</a>
             <a href="#preferences" className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]" aria-label="Size and search preferences">Sizes</a>
             <a href={archived ? "/fieldwear#saved" : "#saved"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]">Saved</a>
@@ -300,7 +314,7 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
             <div id="archive" className="mb-5 scroll-mt-6 border-b border-[var(--line)] pb-3 pt-5">
               <h1 className="text-2xl font-semibold tracking-tight">Catalog archive</h1>
               <p className="mt-1 text-sm text-[var(--muted-ink)]">Earlier marketplace checks and references. Open the original listing to confirm availability.</p>
-              <a href="/fieldwear#fresh" className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--accent)] underline underline-offset-4">Back to workwear catalog</a>
+              <a href={catalogHref(profile)} className="inline-flex min-h-11 items-center text-sm font-medium text-[var(--accent)] underline underline-offset-4">Back to catalog</a>
             </div>
             <DailyScout edition={edition} items={daily.sort((a, b) => fitPriority(b, preferences) - fitPriority(a, preferences))} preferences={preferences} />
             <ListingWorkbench listings={Array.from(entries.values())} preferences={preferences} />
@@ -311,8 +325,8 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
           </>
         ) : (
           <>
-            <FreshScout run={run} items={freshItems} preferences={preferences} source={params.source} catalog={catalog} />
-            <LookFinds similar={similar} browning={browning} preferences={preferences} decisions={decisions} />
+            <FreshScout run={run} items={freshItems} preferences={preferences} profile={profile} daily={run != null && run === availableDaily} source={params.source} catalog={catalog} />
+            {profile === "owner" ? <LookFinds similar={similar} browning={browning} preferences={preferences} decisions={decisions} /> : null}
             <section id="saved" className="mt-8 scroll-mt-6 border-t border-[var(--line)] pt-5" aria-label="Saved listings">
               {saved.length ? <ListingShelf id="saved-cards" label="Saved" description="" items={saved} /> : <h2 className="text-xl font-semibold">Saved</h2>}
               {savedLinks.length ? <ul className="grid gap-2">{savedLinks.map((item, index) => (
@@ -320,15 +334,17 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
               ))}</ul> : null}
               {!saved.length && !savedLinks.length ? <p className="mt-1 text-sm text-[var(--muted-ink)]">Nothing saved yet.</p> : null}
             </section>
-            <a href="/fieldwear?view=archive#archive" className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[var(--accent)] underline underline-offset-4"><Archive aria-hidden="true" size={16} />Browse catalog archive</a>
+            <a href={catalogHref(profile, {view: "archive"}, "archive")} className="mt-6 inline-flex min-h-11 items-center gap-2 text-sm font-medium text-[var(--accent)] underline underline-offset-4"><Archive aria-hidden="true" size={16} />Browse catalog archive</a>
           </>
         )}
         <section id="first-dibs" aria-labelledby="first-dibs-title" className="scout-first-dibs">
+          <span className="scout-90s-graphic" aria-hidden="true"><i /><i /><i /></span>
           <div>
             <h2 id="first-dibs-title" className="text-xl font-semibold tracking-tight">Get first dibs</h2>
             <p id="first-dibs-description" className="mt-1 text-sm">Get a daily email when Scout finds more workwear in your saved sizes and budget.</p>
           </div>
           <form action={setFirstDibs} aria-describedby="first-dibs-description" className="scout-first-dibs-form">
+            <input type="hidden" name="profile" value={profile} />
             <input type="hidden" name="enabled" value={alertsEnabled ? "off" : "on"} />
             <ScoutSubmit className={alertsEnabled ? "scout-control" : "scout-primary"} label={alertsEnabled ? "Turn off emails" : "Sign me up"} pendingLabel="Saving…" />
             <p className="text-xs" role="status">{params.alerts === "enabled" ? "You’re signed up. Scout uses your sign-in email."
@@ -337,7 +353,7 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
               : alertsEnabled ? "Emails are on." : "Sent to your Scout sign-in email."}</p>
           </form>
         </section>
-        <ScoutPreferencesForm preferences={preferences} status={params.preferences} />
+        <ScoutPreferencesForm preferences={preferences} profile={profile} status={params.preferences} />
         <form action={signOutScout} noValidate><button className="min-h-11 rounded text-sm font-medium text-[var(--accent)] hover:underline">Sign out</button></form>
       </div>
     </main>

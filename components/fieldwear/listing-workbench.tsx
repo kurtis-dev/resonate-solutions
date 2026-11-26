@@ -416,8 +416,8 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt }: {
-  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number;
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false }: {
+  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean;
 }) {
   const [expired, setExpired] = useState(false);
   useEffect(() => {
@@ -431,7 +431,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
     };
   }, [catalogExpiresAt]);
   const items = useMemo(() => expired ? allItems.filter((item) => item.source !== "shopifycatalog") : allItems, [allItems, expired]);
-  const [kind, setKind] = useState<"all" | "shirt" | "pants">("all");
+  const [kind, setKind] = useState<"all" | "shirt" | "pants" | "outerwear" | "dress" | "skirt">("all");
   const filterDialog = useRef<HTMLDialogElement>(null);
   const [marketplace, setMarketplace] = useState(initialSource);
   const [order, setOrder] = useState("relevance");
@@ -510,7 +510,9 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   };
   const visibleColors = colorFamilies.filter(({ label }) => colorCounts.get(label) || colors.includes(label));
   const shopsSelected = marketplace === "shops";
-  const tabs = [["all", "All"], ["shirt", "Shirts"], ["pants", "Bottoms"]] as const;
+  const tabs = womenswear
+    ? [["all", "All"], ["shirt", "Tops"], ["pants", "Pants"], ["skirt", "Skirts"], ["dress", "Dresses"], ["outerwear", "Jackets"]] as const
+    : [["all", "All"], ["shirt", "Shirts"], ["pants", "Bottoms"]] as const;
 
   return (
     <div>
@@ -522,7 +524,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         ))}
       </div>
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-2 border-y border-[var(--line)]">
-        <div className="flex items-center gap-1 sm:gap-3" role="group" aria-label="Garment category">
+        <div className="flex flex-wrap items-center gap-1 sm:gap-3" role="group" aria-label="Garment category">
           {tabs.map(([value, label]) => (
             <button key={value} type="button" aria-pressed={kind === value}
               onClick={() => { if (kind !== value) { setKind(value); setGarmentType(""); setTagSize(""); } setPage(1); }}
@@ -554,7 +556,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         <label className="min-w-0 text-xs font-medium">Garment type
           <select value={garmentType} onChange={(event) => { setGarmentType(event.target.value); setPage(1); }} className={control}>
             <option value="">Any type</option>
-            {(kind === "all" ? [...garmentOptions.shirt, ...garmentOptions.pants] : garmentOptions[kind]).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            {(kind === "all" ? [...garmentOptions.shirt, ...garmentOptions.pants] : kind === "shirt" || kind === "pants" ? garmentOptions[kind] : []).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label>
         <label className="min-w-0 text-xs font-medium">Marketplace
@@ -636,10 +638,10 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         </div>
       ) : null}
       <div className="scout-photo-grid">
-        {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid priority={index < 4} />)}
+        {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid showSimilar={!womenswear} priority={index < 4} />)}
       </div>
       {lastPage > 1 ? (
-        <nav className="mt-5 flex items-center justify-between gap-4" aria-label="Workwear catalog pages">
+        <nav className="mt-5 flex items-center justify-between gap-4" aria-label="Catalog pages">
           <button type="button" aria-label="Previous page" disabled={currentPage === 1} onClick={() => go(currentPage - 1)} className="min-h-11 rounded-full border border-black/15 bg-white px-4 text-sm font-bold disabled:opacity-40">Previous</button>
           <span className="text-sm tabular-nums">Page {currentPage} of {lastPage}</span>
           <button type="button" aria-label="Next page" disabled={currentPage === lastPage} onClick={() => go(currentPage + 1)} className="min-h-11 rounded-full border border-black/15 bg-white px-4 text-sm font-bold disabled:opacity-40">Next</button>
@@ -659,7 +661,7 @@ function ListingPhoto({ imageUrl, title, priority = false }: Pick<ListingView, "
   );
 }
 
-function ListingCard({ item, grid = false, priority = false }: { item: ListingView; grid?: boolean; priority?: boolean }) {
+function ListingCard({ item, grid = false, priority = false, showSimilar = true }: { item: ListingView; grid?: boolean; priority?: boolean; showSimilar?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const displayPrice = item.priceCents == null ? "Price unlisted" : `${money(item.priceCents)}${item.priceKind === "bid" ? " bid" : ""}`;
@@ -723,7 +725,7 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
               </dl>
               {item.lookNote ? <p className="mt-2 text-sm text-[var(--muted-ink)]">{item.lookNote}</p> : null}
               <a href={item.url} target="_blank" rel="noreferrer" className="scout-primary mt-4 inline-flex items-center gap-2">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
-              {!catalogItem && (item.garmentKind === "shirt" || item.garmentKind === "pants") && item.decision !== "pass" ? (
+              {!catalogItem && showSimilar && (item.garmentKind === "shirt" || item.garmentKind === "pants") && item.decision !== "pass" ? (
                 <form action={searchScoutLook} className="mt-2">
                   <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
                   <ScoutSubmit label="Find me more like this" className="scout-toolbar-button" />
