@@ -1,0 +1,14 @@
+.fieldwear-scout {
+  --paper: #f4efe3;
+  --card: #fffdf7;
+  --ink: #20231f;
+  --muted-ink: #68675e;
+  --pine: #1f3024;
+  --rust: #b34f2e;
+  --sand: #e4d8ba;
+  --font-display: Georgia, "Times New Roman", serif;
+}
+.fieldwear-scout :focus-visible {
+  outline: 3px solid var(--rust);
+  outline-offset: 3px;
+}
