@@ -77,7 +77,7 @@ function FreshScout({
       <div className="pt-5 md:pt-7">
         <h1 id="fresh-title" className="text-2xl font-semibold tracking-tight md:text-[28px]">Workwear catalog</h1>
         <p className="mt-1 text-xs leading-5 text-[var(--muted-ink)]" aria-label="Saved search sizes">
-          {departmentLabels[preferences.department]} · Shirts {preferences.shirtSizes.join(", ") || "any size"} · Bottoms {preferences.pantsSizes.join(", ") || "any size"}{preferences.pantsBudget != null ? ` · Up to ${preferences.pantsBudget}` : ""}
+          {departmentLabels[preferences.department]} · Shirts {preferences.shirtSizes.join(", ") || "any size"} · Bottoms {preferences.pantsSizes.join(", ") || "any size"}{preferences.pantsBudget != null ? ` · Up to $${preferences.pantsBudget}` : ""}
         </p>
         <form action={searchScoutNow} className="mt-3 grid grid-cols-[minmax(0,1fr)_auto] gap-2 sm:max-w-2xl">
           <label className="relative min-w-0">
@@ -110,7 +110,7 @@ function FreshScout({
                       Browse on site
                     </a>
                   ) : (
-                    <span className="text-right text-[var(--muted-ink)]">{sourceStatus[status]}{status === "searched" || status === "partial" ? ` · ${count} matches` : ""}</span>
+                    <span className="text-right text-[var(--muted-ink)]">{sourceStatus[status]}{status === "searched" || status === "partial" ? ` · ${count} ${count === 1 ? "match" : "matches"}` : ""}</span>
                   )}
                 </li>
               );
