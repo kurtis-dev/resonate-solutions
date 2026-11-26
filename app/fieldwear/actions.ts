@@ -64,7 +64,7 @@ export async function searchScoutNow(form: FormData) {
   const keywords = String(form.get("keywords") ?? "").trim().replace(/\s+/g, " ").slice(0, 80);
   await runAndStoreLiveSearch(await readScoutPreferences(), keywords, form.get("days") === "30" ? 30 : 7);
   revalidatePath("/fieldwear");
-  redirect("/fieldwear#fresh");
+  redirect("/fieldwear?catalog=1#fresh");
 }
 
 export async function searchScoutLook(form: FormData) {

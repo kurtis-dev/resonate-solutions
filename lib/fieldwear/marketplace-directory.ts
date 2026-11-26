@@ -13,6 +13,7 @@ export const vintageShops = [
 export type VintageShopSource = (typeof vintageShops)[number]["source"];
 
 export function marketplaceName(source: string) {
+  if (source === "shopifycatalog") return "Shopify Global Catalog";
   if (source === "ebay") return "eBay";
   if (source === "shopgoodwill") return "ShopGoodwill";
   return vintageShops.find((shop) => shop.source === source)?.name

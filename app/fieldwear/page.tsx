@@ -14,6 +14,7 @@ import { readScoutEdition } from "@/lib/fieldwear/editions";
 import { isScoutOwner, readScoutPreferences, scoutDatabase } from "@/lib/fieldwear/owner-access";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { freshListingDays, readLiveSearch } from "@/lib/fieldwear/live-search";
+import { searchShopifyCatalog } from "@/lib/fieldwear/shopify-catalog";
 import { marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
 import { redeemOwnerLink, requestOwnerLink, searchScoutLook, searchScoutNow, signOutScout } from "./actions";
 import "./scout.css";
@@ -62,18 +63,19 @@ const searchDate = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago
 const sourceStatus = { searched: "Checked", partial: "Partially checked", unavailable: "Check failed", "needs-access": "API access needed", "no-feed": "Live feed unavailable" } as const;
 
 function FreshScout({
-  run, preferences, items, source,
-}: { run: Awaited<ReturnType<typeof readLiveSearch>>; preferences: ScoutPreferences; items: ListingView[]; source?: string }) {
+  run, preferences, items, source, catalog,
+}: { run: Awaited<ReturnType<typeof readLiveSearch>>; preferences: ScoutPreferences; items: ListingView[]; source?: string; catalog?: Awaited<ReturnType<typeof searchShopifyCatalog>> }) {
   const coverage = run?.coverage;
   const initialSource = source && items.some((item) => matchesMarketplace(item.source, source)) ? source : undefined;
   const days = run?.days ?? freshListingDays;
   const checked = coverage?.filter((entry) => entry.status === "searched" || entry.status === "partial").length;
+  const liveCount = items.filter((item) => item.source !== "shopifycatalog").length;
   const summary = run ? `Searched ${searchDate.format(new Date(run.searchedAt))} CT` : "";
   const message = !run ? "Run a search to see what’s new."
     : run.expired ? "Your last search is over six hours old. Run it again for current results."
     : run.status === "unconfigured" || run.status === "unavailable" ? "The connected sources couldn’t complete this search. Try again."
     : items.length === 0 ? "No matches in this window. Try fewer keywords or a wider date range."
-    : `${items.length} matches · ${checked === undefined ? "" : `${checked} sources checked · `}${summary}`;
+    : `${liveCount} matches · ${checked === undefined ? "" : `${checked} sources checked · `}${summary}`;
   return (
     <section id="fresh" aria-labelledby="fresh-title" className="scroll-mt-4">
       <div className="pt-5 md:pt-7">
@@ -98,7 +100,12 @@ function FreshScout({
         </form>
       </div>
       <p className="pb-3 pt-2 text-xs leading-5 text-[var(--muted-ink)]" role="status">{message}</p>
-      {items.length > 0 ? <FreshCatalog key={`${run?.searchedAt}:${initialSource ?? ""}`} items={items} initialSource={initialSource} /> : null}
+      {items.length > 0 ? <FreshCatalog key={`${run?.searchedAt}:${initialSource ?? ""}`} items={items} initialSource={initialSource} catalogExpiresAt={catalog?.expiresAt} /> : null}
+      {catalog && !catalog.listings.length ? (
+        <p role="status" className="mt-3 text-xs text-[var(--muted-ink)]">{catalog.status === "unavailable"
+          ? "Shopify Global Catalog couldn’t finish this search. The other sources are still shown."
+          : "Shopify Global Catalog found no used pants that passed your size and workwear filters."}</p>
+      ) : null}
       {coverage && run && !run.expired ? (
         <details className="mt-5 border-y border-[var(--line)]">
           <summary className="min-h-11 cursor-pointer py-3 text-sm font-medium text-[var(--accent)]">Source coverage{run.status === "partial" ? " · Some checks failed" : ""}</summary>
@@ -205,7 +212,7 @@ function LookFinds({ similar, browning, preferences, decisions }: {
   );
 }
 
-export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string; preferences?: string; view?: string; source?: string }> }) {
+export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string; preferences?: string; view?: string; source?: string; catalog?: string }> }) {
   const params = await searchParams;
   if (!(await isScoutOwner())) {
     return <OwnerSignIn token={params.access} status={params.signIn} />;
@@ -220,6 +227,9 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
   const [run, similar, browning] = await Promise.all([
     readLiveSearch(preferences), readLiveSearch(preferences, "similar"), readLiveSearch(preferences, "browning"),
   ]);
+  const catalog = params.catalog === "1" && params.view !== "archive"
+    ? await searchShopifyCatalog(preferences, run?.keywords ?? "")
+    : undefined;
   const decisions = new Map(readLegacyScout().map((row) => [`${row.source}:${row.external_id}`, row]));
   for (const row of recorded) {
     const key = `${row.source}:${row.external_id}`;
@@ -254,6 +264,13 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
     const verdict = decisions.get(`${item.source}:${item.externalId}`)?.verdict ?? null;
     return verdict === "pass" ? [] : [{ ...toListingView(item, item.listedAt, run.searchedAt, verdict, preferences), listedAt: item.listedAt }];
   }) : [];
+  const passedUrls = new Set(Array.from(decisions.values()).flatMap(({ verdict, listing }) => verdict === "pass" && listing ? [canonicalListingKey(listing.url)] : []));
+  const catalogItems = catalog?.listings.flatMap((item) => {
+    if (passedUrls.has(canonicalListingKey(item.url))) return [];
+    const checkedAt = new Date(catalog.checkedAt).toISOString();
+    return toListingView(item, checkedAt, checkedAt, null, preferences);
+  }) ?? [];
+  const freshItems = [...catalogItems, ...live];
   const saved = Array.from(entries.values()).filter((item) => item.decision === "save");
   const savedLinks = Array.from(decisions.values()).flatMap(({ verdict, listing }) =>
     verdict === "save" && listing?.linkOnly && !entries.has(canonicalListingKey(listing.url)) ? [listing] : [],
@@ -289,7 +306,7 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
           </>
         ) : (
           <>
-            <FreshScout run={run} items={live} preferences={preferences} source={params.source} />
+            <FreshScout run={run} items={freshItems} preferences={preferences} source={params.source} catalog={catalog} />
             <LookFinds similar={similar} browning={browning} preferences={preferences} decisions={decisions} />
             <section id="saved" className="mt-8 scroll-mt-6 border-t border-[var(--line)] pt-5" aria-label="Saved listings">
               {saved.length ? <ListingShelf id="saved-cards" label="Saved" description="" items={saved} /> : <h2 className="text-xl font-semibold">Saved</h2>}
@@ -335,6 +352,7 @@ function toListingView(
 
   return {
     source:input.source,
+    sellerName: input.source === "shopifycatalog" ? input.seller ?? null : null,
     externalId:input.externalId,
     url:input.url,
     title:input.title,

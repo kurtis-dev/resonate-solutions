@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ExternalLink,
   Bookmark,
@@ -28,6 +28,7 @@ export type ListingView = {
   source:string; externalId:string; url:string; title:string; imageUrl:string|null;
   priceCents:number|null; shippingCents:number|null; size:string|null; condition:string|null;
   sizeBasis?:"tag" | "seller-fit" | "measured";
+  sellerName?:string | null;
   colors:ColorFamily[];
   measurements:string[]; vintage:ReturnType<typeof vintageSignals>;
   lookNote?: string | null;
@@ -410,7 +411,21 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items, initialSource = "" }: { items: ListingView[]; initialSource?: string }) {
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt }: {
+  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number;
+}) {
+  const [expired, setExpired] = useState(false);
+  useEffect(() => {
+    if (!catalogExpiresAt) return;
+    const checkExpiry = () => { if (Date.now() >= catalogExpiresAt) setExpired(true); };
+    const timeout = window.setTimeout(checkExpiry, Math.max(0, catalogExpiresAt - Date.now()));
+    document.addEventListener("visibilitychange", checkExpiry);
+    return () => {
+      window.clearTimeout(timeout);
+      document.removeEventListener("visibilitychange", checkExpiry);
+    };
+  }, [catalogExpiresAt]);
+  const items = useMemo(() => expired ? allItems.filter((item) => item.source !== "shopifycatalog") : allItems, [allItems, expired]);
   const [kind, setKind] = useState<"all" | "shirt" | "pants">("all");
   const filterDialog = useRef<HTMLDialogElement>(null);
   const [marketplace, setMarketplace] = useState(initialSource);
@@ -429,11 +444,16 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
   const tagSizes = Array.from(new Set(items.flatMap(({ size }) => size ? [size] : []))).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
   const hasVintageShops = marketplaces.some(isVintageShop);
   const { results, colorCounts } = useMemo(() => {
+    const shownUrls = new Set<string>();
     const base = items.filter((item) => {
       if ((kind !== "all" && item.garmentKind !== kind) || !matchesMarketplace(item.source, marketplace) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
-      if (min === "" && max === "") return true;
       const cents = priceForSort(item);
-      return cents != null && (min === "" || cents >= Number(min) * 100) && (max === "" || cents <= Number(max) * 100);
+      if ((min !== "" || max !== "") && (cents == null || (min !== "" && cents < Number(min) * 100) || (max !== "" && cents > Number(max) * 100))) return false;
+      const url = URL.canParse(item.url) ? new URL(item.url) : null;
+      const key = url ? url.hostname.replace(/^www\./, "") + url.pathname.replace(/\/$/, "") : item.url;
+      if (shownUrls.has(key)) return false;
+      shownUrls.add(key);
+      return true;
     });
     const counts = new Map<ColorFamily, number>();
     for (const { colors: itemColors } of base) {
@@ -578,9 +598,14 @@ export function FreshCatalog({ items, initialSource = "" }: { items: ListingView
         <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 py-2 text-sm text-[var(--muted-ink)]" role="status">
           {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : "No listings match these filters."}
         </div>
+        <div className="flex flex-wrap gap-1">
+        {marketplaces.includes("shopifycatalog") ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" aria-pressed={marketplace === "shopifycatalog"}
+          onClick={() => { setMarketplace(marketplace === "shopifycatalog" ? "" : "shopifycatalog"); setPage(1); }}>Shopify Catalog</button> : null}
         {hasVintageShops ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" aria-pressed={shopsSelected}
           onClick={() => { setMarketplace(shopsSelected ? "" : "shops"); setPage(1); }}>Vintage shops</button> : null}
+        </div>
       </div>
+      {expired ? <p role="status" className="mb-3 text-xs text-[var(--muted-ink)]">Shopify prices and stock expired. Use Search now to check again.</p> : null}
       {colors.length > 0 ? (
         <div className="mb-3 flex flex-wrap gap-2" aria-label="Selected colors">
           {colorFamilies.filter(({ label }) => colors.includes(label)).map(({ label, swatch }) => (
@@ -620,7 +645,8 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
   const [detailsOpen, setDetailsOpen] = useState(false);
   const displayPrice = item.priceCents == null ? "Price unlisted" : money(item.priceCents);
   const total = item.priceCents != null && item.shippingCents != null ? money(item.priceCents + item.shippingCents) : null;
-  const sourceLabel = marketplaceName(item.source);
+  const sourceLabel = item.sellerName ?? marketplaceName(item.source);
+  const catalogItem = item.source === "shopifycatalog";
   const openDetails = () => {
     setDetailsOpen(true);
     dialog.current?.showModal();
@@ -647,12 +673,12 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
           <h3 className="min-w-0 flex-1 text-sm font-semibold leading-[1.35]">
             <button type="button" className="line-clamp-2 min-h-10 text-left hover:underline" onClick={openDetails} aria-haspopup="dialog">{item.title}</button>
           </h3>
-          <form action={decideListing}>
+          {!catalogItem ? <form action={decideListing}>
             <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
             <button name="verdict" value="save" className="scout-icon -mr-1" aria-label={`Save ${item.title}`} aria-pressed={item.decision === "save"} title={item.decision === "save" ? "Saved" : "Save"}>
               <Bookmark size={17} fill={item.decision === "save" ? "currentColor" : "none"} aria-hidden="true" />
             </button>
-          </form>
+          </form> : null}
         </div>
         <p className="text-sm tabular-nums"><span className="font-semibold">{displayPrice}</span>{item.size ? <span className="text-[var(--muted-ink)]"> · {item.size}</span> : null}</p>
         <p className="mt-1 text-xs text-[var(--muted-ink)]">{sourceLabel}</p>
@@ -680,7 +706,7 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
               </dl>
               {item.lookNote ? <p className="mt-2 text-sm text-[var(--muted-ink)]">{item.lookNote}</p> : null}
               <a href={item.url} target="_blank" rel="noreferrer" className="scout-primary mt-4 inline-flex items-center gap-2">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
-              {(item.garmentKind === "shirt" || item.garmentKind === "pants") && item.decision !== "pass" ? (
+              {!catalogItem && (item.garmentKind === "shirt" || item.garmentKind === "pants") && item.decision !== "pass" ? (
                 <form action={searchScoutLook} className="mt-2">
                   <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
                   <ScoutSubmit label="Find me more like this" className="scout-toolbar-button" />
@@ -693,12 +719,12 @@ function ListingCard({ item, grid = false, priority = false }: { item: ListingVi
                   {item.evidence.visualClues.length ? <Evidence title="Corroborating clues" items={item.evidence.visualClues} /> : null}
                 </details>
               ) : null}
-              <form action={decideListing} className="mt-3 grid grid-cols-3 gap-2">
+              {!catalogItem ? <form action={decideListing} className="mt-3 grid grid-cols-3 gap-2">
                 <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
                 <Decision active={item.decision === "save"} value="save" icon={<Bookmark size={15} />} label="Save" />
                 <Decision active={item.decision === "proof"} value="proof" icon={<ShieldQuestion size={15} />} label="Proof" />
                 <Decision active={item.decision === "pass"} value="pass" icon={<ThumbsDown size={15} />} label="Pass" />
-              </form>
+              </form> : null}
             </div>
           </div>
         ) : null}

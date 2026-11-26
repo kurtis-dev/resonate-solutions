@@ -16,7 +16,7 @@ export type MarketplaceSource = keyof typeof marketplaceHosts | "other";
 export type GarmentKind = "shirt" | "pants" | "outerwear" | "unknown";
 
 export type ListingInput = {
-  source: MarketplaceSource | VintageShopSource;
+  source: MarketplaceSource | VintageShopSource | "shopifycatalog";
   externalId: string;
   url: string;
   title: string;

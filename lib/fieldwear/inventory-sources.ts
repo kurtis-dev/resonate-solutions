@@ -116,13 +116,13 @@ type ShopProduct = {
   options?: { name?: string; position?: number }[];
 };
 
-function shopSellerNotes(html = "") {
+export function shopSellerNotes(html = "") {
   return decodeText(html.replace(/<\/?(?:p|div|li|br)\b[^>]*>/gi, "\n").replace(/<[^>]*>/g, " "))
     .split(/\b(?:please note|all flaws mentioned)\b|\n\s*(?:shipping|local pick ?up)\s*(?=\n|:)/i, 1)[0]
     .split(/\n+/).map((line) => line.replace(/\s+/g, " ").trim()).filter(Boolean).join("\n").slice(0, 1800);
 }
 
-function shopSize(title: string, notes: string, option: string, garmentKind: "shirt" | "pants"): {
+export function shopSize(title: string, notes: string, option: string, garmentKind: "shirt" | "pants"): {
   size?: string;
   sizeBasis?: "tag" | "seller-fit" | "measured";
 } {
@@ -157,6 +157,15 @@ function shopSize(title: string, notes: string, option: string, garmentKind: "sh
   if (tagged) return { size: tagged, sizeBasis: "tag" };
   const optionSize = shirtSizeTokens(option).join(" / ");
   return optionSize ? { size: optionSize, sizeBasis: "seller-fit" } : {};
+}
+
+export function isSturdyShopGarment(title: string, notes: string, kind: "shirt" | "pants") {
+  if (shopExcluded.test(title) || newerThanPreferred.test(title) || newerThanPreferred.test(notes)) return false;
+  if (structuralDamage.test(notes.replace(damageDenial, ""))) return false;
+  if (kind === "pants" && lightweightPants.test(`${title} ${notes}`)) return false;
+  const quality = vintageSignals({ title, description: notes });
+  const workwear = (kind === "shirt" ? workShirtClues : workPantsClues).test(`${title} ${notes}`);
+  return quality.build > 0 || (quality.build === 0 && workwear);
 }
 
 export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, { now }: Window): Promise<SourceResult> {
@@ -219,10 +228,7 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       if (!matchesScoutFit({ title, size, garmentKind }, preferences)) continue;
       const description = [notes, inferred === "unknown" ? "Garment type: shirt." : ""].filter(Boolean).join("\n");
       if (!terms.every((term) => words(`${title} ${description} ${labeledColor ?? ""}`).includes(term))) continue;
-      const quality = vintageSignals({ title, description });
-      const explicitWorkwear = (garmentKind === "shirt" ? workShirtClues : workPantsClues).test(`${title} ${description}`);
-      if (quality.build < 0 || (!quality.build && !explicitWorkwear) || newerThanPreferred.test(notes) || structuralDamage.test(notes.replace(damageDenial, ""))) continue;
-      if (garmentKind === "pants" && lightweightPants.test(`${title} ${notes}`)) continue;
+      if (!isSturdyShopGarment(title, description, garmentKind)) continue;
       const price = variant.price && /^\d{1,6}(?:\.\d{1,2})?$/.test(variant.price) ? Math.round(Number(variant.price) * 100) : null;
       const budget = garmentKind === "shirt" ? preferences.shirtBudget : preferences.pantsBudget;
       if (price == null || (budget != null && price > Math.round(budget * 100))) continue;
