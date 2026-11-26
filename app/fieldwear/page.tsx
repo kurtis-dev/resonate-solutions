@@ -106,7 +106,18 @@ function FreshScout({
           <ul className="grid gap-x-5 py-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
             {coverage.map(({ source, status }) => {
               const count = items.filter((item) => item.source === source).length;
-              return <li key={source} className="flex items-baseline justify-between gap-2 py-2"><strong>{marketplaceName(source)}</strong><span className="text-right text-[var(--muted-ink)]">{sourceStatus[status]}{status === "searched" || status === "partial" ? ` · ${count} matches` : ""}</span></li>;
+              return (
+                <li key={source} className="flex items-baseline justify-between gap-2 py-2">
+                  <strong>{marketplaceName(source)}</strong>
+                  {source === "vinted" && status === "no-feed" ? (
+                    <a href="https://www.vinted.com/catalog/583-pants/brand/362-carhartt" target="_blank" rel="noreferrer" className="text-[var(--accent)] underline underline-offset-4">
+                      Browse Carhartt pants on Vinted
+                    </a>
+                  ) : (
+                    <span className="text-right text-[var(--muted-ink)]">{sourceStatus[status]}{status === "searched" || status === "partial" ? ` · ${count} matches` : ""}</span>
+                  )}
+                </li>
+              );
             })}
           </ul>
         </details>

@@ -1,8 +1,8 @@
 import { classifyGarment, scoreListing } from "./listing-model";
 import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 import { scoutDatabase } from "./owner-access";
-import { searchEtsy, searchVintageShop, shopStockDays, type LiveListing, type SourceResult } from "./inventory-sources";
-import { vintageShops } from "./marketplace-directory";
+import { searchEtsy, searchVintageShop, type LiveListing, type SourceResult } from "./inventory-sources";
+import { isVintageShop, vintageShops } from "./marketplace-directory";
 import { vintageSignals } from "./vintage-signals";
 import { lookDays, matchLook, type LookHunt, type LookProfile } from "./look-search";
 
@@ -264,9 +264,10 @@ export async function searchNewListings(preferences: ScoutPreferences, keywords:
   }).sort((a, b) => b.look - a.look || compareQuality(a, b));
   const listings = hunt ? ranked.slice(0, 24).map(({ listing }) => listing) : garmentTypes.flatMap((kind) => {
     const candidates = ranked.filter((item) => item.garmentKind === kind);
-    const represented = results.flatMap(({ source }) => candidates.filter(({ listing }) => listing.source === source)
-      .slice(0, vintageShops.some((shop) => shop.source === source) ? 12 : 2));
-    const included = new Set([...represented, ...candidates].slice(0, 120));
+    const marketplace = candidates.filter(({ listing }) => !isVintageShop(listing.source));
+    const represented = results.flatMap(({ source }) => marketplace.filter(({ listing }) => listing.source === source).slice(0, 2));
+    const shopListings = vintageShops.flatMap(({ source }) => candidates.filter(({ listing }) => listing.source === source).slice(0, 24));
+    const included = new Set([...Array.from(new Set([...represented, ...marketplace])).slice(0, 120), ...shopListings]);
     return candidates.filter((item) => included.has(item)).map(({ listing }) => listing);
   });
   const succeeded = results.some(({ status }) => status === "searched" || status === "partial");
@@ -299,8 +300,7 @@ export async function readLiveSearch(preferences?: ScoutPreferences, profile: Lo
     ...row.result, expired,
     listings: expired ? [] : row.result.listings.filter((item) => {
       const days = row.result.hunt ? lookDays : row.result.days ?? freshListingDays;
-      const stockDays = vintageShops.some((shop) => shop.source === item.source) ? Math.max(days, shopStockDays) : days;
-      return Date.parse(item.listedAt) >= now - stockDays * day;
+      return isVintageShop(item.source) || Date.parse(item.listedAt) >= now - days * day;
     }),
   };
 }

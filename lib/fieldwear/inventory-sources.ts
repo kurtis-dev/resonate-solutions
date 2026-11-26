@@ -95,14 +95,14 @@ async function resolveCandidates<T>(candidates: T[], load: (candidate: T) => Pro
   return { status: failed && failed === candidates.length ? "unavailable" : failed ? "partial" : status, listings };
 }
 
-// Recheck available shop stock on every run. Preserve the seller's original publication date.
-export const shopStockDays = 365;
 const shopPageSize = 100;
 const shopExcluded = /\b(?:reworked|reproduction|replica|reissue|cropped|cut.off|tie[- ]dye|short[- ]sleeve|shorts?|track pants|joggers?|sweatpants|hoodies?|tees?|t[- ]?shirts?|sportswear)\b/i;
 const workShirtClues = /\b(?:work(?:wear)?|field|utility|chore|flannel|two[- ]pocket|double[- ]pocket|pearl[- ]snap|western|chambray|pendleton|woolrich|filson|browning|big mac|big yank|five brother|saddle king|dee cee|oshkosh)\b/i;
-const workPantsClues = /\b(?:carpenter|work(?:wear)?|double[- ]knee|painter|fatigue|cargo|riveted|straight[- ]leg|chinos?)\b/i;
+const workPantsClues = /\b(?:carpenter|work(?:wear)?|double[- ]knee|painter|fatigue|cargo|riveted|straight[- ]leg|dungarees?|chinos?|(?:carhartt|dickies)\b[^\n.]{0,80}\bjeans)\b/i;
 const newerThanPreferred = /\b(?:2010s|2020s|(?:produced|manufactured|made|dated) in 20[12]\d)\b/i;
-const structuralDamage = /\b(?:dry rot|broken zip(?:per)?|heavy staining|large holes?|major tears?|rips)\b/i;
+const structuralDamage = /\b(?:dry rot|broken zip(?:per)?|heavy staining|large holes?|(?:major|unrepaired) tears?|rips?|(?:missing|ripped|torn) belt loops?|belt loops? (?:missing|ripped|torn)|tear on (?:the )?back pocket|torn open)\b/i;
+const damageDenial = /\b(?:no|without)\s+(?:visible\s+)?(?:(?:(?:major|large|heavy)\s+)?(?:rips?|holes?|tears?|stains?)|flaws|damage)(?:(?:\s*,\s*(?:(?:and|or)\s+)?|\s+(?:and|or)\s+)(?:(?:(?:major|large|heavy)\s+)?(?:rips?|holes?|tears?|stains?)|flaws|damage))*/gi;
+const lightweightPants = /\b(?:city flex|tactical lightweight|four[- ]way stretch|moisture[- ]wicking)\b/i;
 
 type ShopProduct = {
   id?: number;
@@ -112,13 +112,13 @@ type ShopProduct = {
   published_at?: string;
   product_type?: string;
   images?: { src?: string }[];
-  variants?: { available?: boolean; price?: string; option1?: string; option2?: string; option3?: string }[];
+  variants?: { id?: number; available?: boolean; price?: string; option1?: string; option2?: string; option3?: string }[];
   options?: { name?: string; position?: number }[];
 };
 
 function shopSellerNotes(html = "") {
   return decodeText(html.replace(/<\/?(?:p|div|li|br)\b[^>]*>/gi, "\n").replace(/<[^>]*>/g, " "))
-    .split(/\b(?:please note|all flaws mentioned)\b/i, 1)[0]
+    .split(/\b(?:please note|all flaws mentioned)\b|\n\s*(?:shipping|local pick ?up)\s*(?=\n|:)/i, 1)[0]
     .split(/\n+/).map((line) => line.replace(/\s+/g, " ").trim()).filter(Boolean).join("\n").slice(0, 1800);
 }
 
@@ -141,11 +141,16 @@ function shopSize(title: string, notes: string, option: string, garmentKind: "sh
     }
     return {};
   }
+  const waist = notes.match(/\bwaist(\s+flat|\s+laid flat)?\s*:\s*(\d{2}(?:\.\d+)?)\s*(?:["″]|in\b|inches\b|$)(\s+flat)?(?:\s*\(\s*(\d{2}(?:\.\d+)?)\s*(?:["″]|in\b|inches\b)?\s*doubled\s*\))?/im);
+  const inseam = notes.match(/\binseam\s*:\s*(\d{2}(?:\.\d+)?)\s*(?:["″]|in\b|inches\b|$)/im);
+  if (waist && inseam) {
+    const fullWaist = waist[4] ?? String(Number(waist[2]) * (waist[1] || waist[3] ? 2 : 1));
+    return { size: `${fullWaist}x${Number(inseam[1])}`, sizeBasis: "measured" };
+  }
+  const inlineDimensions = notes.match(/\b(\d{2}(?:\.\d+)?)\s*(?:["″]|in\b|inches\b)\s*waist\s*[-,;]\s*(\d{2}(?:\.\d+)?)\s*(?:["″]|in\b|inches\b)\s*inseam\b/i);
+  if (inlineDimensions) return { size: `${Number(inlineDimensions[1])}x${Number(inlineDimensions[2])}`, sizeBasis: "measured" };
   const fitDimensions = pantsSizeTokens(fitSize ?? "").filter((size) => size.includes("x"));
   if (fitDimensions.length) return { size: fitDimensions.join(" / "), sizeBasis: "seller-fit" };
-  const waist = notes.match(/\bwaist(\s+flat|\s+laid flat)?\s*:\s*(\d{2}(?:\.\d+)?)\s*(?:["″]|in\b|inches\b|$)/im);
-  const inseam = notes.match(/\binseam\s*:\s*(\d{2}(?:\.\d+)?)\s*(?:["″]|in\b|inches\b|$)/im);
-  if (waist && inseam) return { size: `${Number(waist[2]) * (waist[1] ? 2 : 1)}x${Number(inseam[1])}`, sizeBasis: "measured" };
   const dimensions = pantsSizeTokens(title).filter((size) => size.includes("x"));
   if (dimensions.length) return { size: dimensions.join(" / "), sizeBasis: "seller-fit" };
   const tagged = pantsSizeTokens(taggedSize ?? "").filter((size) => size.includes("x")).join(" / ");
@@ -154,25 +159,20 @@ function shopSize(title: string, notes: string, option: string, garmentKind: "sh
   return optionSize ? { size: optionSize, sizeBasis: "seller-fit" } : {};
 }
 
-export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, window: Window): Promise<SourceResult> {
+export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, { now }: Window): Promise<SourceResult> {
   const options: RequestInit = { cache: "no-store", signal: AbortSignal.timeout(9_000), redirect: "error" };
-  const stockWindow = { ...window, start: Math.min(window.start, window.now - shopStockDays * 86_400_000) };
-  const [cart, pages] = await Promise.all([
-    fetch(`${shop.origin}/cart.js`, options),
-    Promise.allSettled(shop.collections.map(async (collection) => {
-      const loadPage = async (page: number) => {
-        const response = await fetch(`${shop.origin}/collections/${collection}/products.json?limit=${shopPageSize}&page=${page}`, options);
-        if (!response.ok) throw new Error(`Shop collection status ${response.status}`);
-        const { products } = await response.json() as { products?: ShopProduct[] };
-        if (!Array.isArray(products)) throw new Error("Invalid shop collection response");
-        return products;
-      };
-      const first = await loadPage(1);
-      const second = first.length === shopPageSize ? await loadPage(2).catch(() => null) : [];
-      return { products: [...first, ...(second ?? [])], complete: second !== null };
-    })),
-  ]);
-  if (!cart.ok || (await cart.json() as { currency?: string }).currency !== "USD") return { status: "unavailable", listings: [] };
+  const pages = await Promise.allSettled(shop.collections.map(async (collection) => {
+    const loadPage = async (page: number) => {
+      const response = await fetch(`${shop.origin}/collections/${collection}/products.json?limit=${shopPageSize}&page=${page}`, options);
+      if (!response.ok) throw new Error(`Shop collection status ${response.status}`);
+      const { products } = await response.json() as { products?: ShopProduct[] };
+      if (!Array.isArray(products)) throw new Error("Invalid shop collection response");
+      return products;
+    };
+    const first = await loadPage(1);
+    const second = first.length === shopPageSize ? await loadPage(2).catch(() => null) : [];
+    return { products: [...first, ...(second ?? [])], complete: second !== null };
+  }));
   const catalogs = pages.flatMap((result) => result.status === "fulfilled" ? [result.value] : []);
   if (!catalogs.length) return { status: "unavailable", listings: [] };
 
@@ -186,10 +186,9 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
     for (const product of products) {
       if (!Number.isSafeInteger(product.id) || !product.handle || !/^[\w-]+$/.test(product.handle)) continue;
       const externalId = String(product.id);
-      if (listings.has(externalId) || !product.published_at || !isFresh(product.published_at, stockWindow)) continue;
-      const variant = product.variants?.find((value) => value.available === true);
+      if (listings.has(externalId) || !product.published_at || !isFresh(product.published_at, { start: 0, now })) continue;
       const title = plainText(product.title);
-      if (!variant || !title || shopExcluded.test(title) || newerThanPreferred.test(title)) continue;
+      if (!title || shopExcluded.test(title) || newerThanPreferred.test(title)) continue;
       const rawType = product.product_type?.trim() ?? "";
       const inferred = classifyGarment({ title });
       const garmentKind = inferred !== "unknown" ? inferred
@@ -197,29 +196,44 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       if (garmentKind !== "shirt" && garmentKind !== "pants") continue;
       if ((kindRequested === "shirt" || kindRequested === "pants") && kindRequested !== garmentKind) continue;
 
-      const optionValue = (name: RegExp) => {
-        const position = product.options?.find((option) => name.test(option.name ?? ""))?.position ?? 0;
-        return [variant.option1, variant.option2, variant.option3][position - 1]?.trim() ?? "";
-      };
+      const optionPosition = (name: RegExp) => product.options?.find((option) => name.test(option.name ?? ""))?.position ?? 0;
+      const waistPosition = optionPosition(/^waist$/i);
+      const inseamPosition = optionPosition(/^(?:inseam|length)$/i);
+      const optionValue = (variant: NonNullable<ShopProduct["variants"]>[number], position: number) =>
+        [variant.option1, variant.option2, variant.option3][position - 1]?.trim() ?? "";
       const notes = shopSellerNotes(product.body_html);
-      const labeledColor = optionValue(/^colou?r$/i) || notes.match(/^colou?r\s*:\s*([^\n.]{2,35})$/im)?.[1];
-      const { size, sizeBasis } = shopSize(title, notes, optionValue(/^size$/i), garmentKind);
+      const variant = product.variants?.find((value) => {
+        if (!value.available) return false;
+        if (garmentKind !== "pants" || !waistPosition || !inseamPosition) return true;
+        const size = `${optionValue(value, waistPosition)}x${optionValue(value, inseamPosition)}`;
+        return matchesScoutFit({ title: size, size, garmentKind }, preferences);
+      });
+      if (!variant) continue;
+      const labeledColor = notes.match(/^colou?r\s*:\s*([^\n.]{2,35})$/im)?.[1] || optionValue(variant, optionPosition(/^colou?r$/i));
+      const variantSize = waistPosition && inseamPosition
+        ? `${optionValue(variant, waistPosition)}x${optionValue(variant, inseamPosition)}`
+        : "";
+      const detected = shopSize(title, notes, optionValue(variant, optionPosition(/^size$/i)), garmentKind);
+      const size = detected.sizeBasis === "measured" ? detected.size : variantSize || detected.size;
+      const sizeBasis = size === detected.size ? detected.sizeBasis : "tag";
       if (!matchesScoutFit({ title, size, garmentKind }, preferences)) continue;
       const description = [notes, inferred === "unknown" ? "Garment type: shirt." : ""].filter(Boolean).join("\n");
       if (!terms.every((term) => words(`${title} ${description} ${labeledColor ?? ""}`).includes(term))) continue;
       const quality = vintageSignals({ title, description });
       const explicitWorkwear = (garmentKind === "shirt" ? workShirtClues : workPantsClues).test(`${title} ${description}`);
-      if (quality.build < 0 || (!quality.build && !explicitWorkwear) || newerThanPreferred.test(notes) || structuralDamage.test(notes)) continue;
+      if (quality.build < 0 || (!quality.build && !explicitWorkwear) || newerThanPreferred.test(notes) || structuralDamage.test(notes.replace(damageDenial, ""))) continue;
+      if (garmentKind === "pants" && lightweightPants.test(`${title} ${notes}`)) continue;
       const price = variant.price && /^\d{1,6}(?:\.\d{1,2})?$/.test(variant.price) ? Math.round(Number(variant.price) * 100) : null;
       const budget = garmentKind === "shirt" ? preferences.shirtBudget : preferences.pantsBudget;
       if (price == null || (budget != null && price > Math.round(budget * 100))) continue;
       const imageUrl = product.images?.map((image) => httpsImage(image.src, "cdn.shopify.com", host)).find(Boolean);
       if (!imageUrl) continue;
-      const condition = notes.match(/^(?:condition|flaws)\s*:\s*(.+)$/im)?.[1];
+      const condition = notes.match(/^(?:condition|flaws)\s*:\s*(.+)$/im)?.[1]
+        ?? notes.match(/^pre[- ]owned\s*[-–:]\s*(.+)$/im)?.[1];
       listings.set(externalId, {
         source: shop.source, externalId, title, description, imageUrl, size, sizeBasis, condition, color: labeledColor || undefined,
         listedAt: new Date(product.published_at).toISOString(), priceCents: price,
-        url: `${shop.origin}/products/${product.handle}`,
+        url: `${shop.origin}/products/${product.handle}${variantSize && Number.isSafeInteger(variant.id) ? `?variant=${variant.id}` : ""}`,
       });
     }
   }
