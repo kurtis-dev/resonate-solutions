@@ -11,6 +11,7 @@ import { readScoutEdition } from "@/lib/fieldwear/editions";
 import { isScoutOwner, readScoutPreferences, scoutDatabase } from "@/lib/fieldwear/owner-access";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { freshListingDays, readLiveSearch } from "@/lib/fieldwear/live-search";
+import { marketplaceName } from "@/lib/fieldwear/marketplace-directory";
 import { redeemOwnerLink, requestOwnerLink, searchScoutNow, signOutScout } from "./actions";
 import "./scout.css";
 
@@ -52,26 +53,29 @@ function OwnerSignIn({ token, status }: { token?: string; status?: string }) {
   );
 }
 
-type Decision = { source: string; external_id: string; verdict: string; listing: (ListingInput & { listedAt?: string; checkedAt?: string }) | null };
+type Decision = { source: string; external_id: string; verdict: string; listing: (ListingInput & { listedAt?: string; checkedAt?: string; linkOnly?: boolean }) | null };
 
 const searchDate = new Intl.DateTimeFormat("en-US", { timeZone: "America/Chicago", dateStyle: "medium", timeStyle: "short" });
+const sourceStatus = { searched: "Checked", partial: "Partially checked", unavailable: "Check failed", "needs-access": "API access needed", "no-feed": "Live feed unavailable" } as const;
 
 function FreshScout({
   run, preferences, items,
 }: { run: Awaited<ReturnType<typeof readLiveSearch>>; preferences: ScoutPreferences; items: ListingView[] }) {
+  const coverage = run?.coverage;
+  const checked = coverage?.filter((entry) => entry.status === "searched" || entry.status === "partial").length;
+  const summary = run ? `Searched ${searchDate.format(new Date(run.searchedAt))} CT` : "";
   const message = !run ? "Run a search to see what’s new."
     : run.expired ? "Your last search is over six hours old. Run it again for current results."
-    : run.status === "unconfigured" || run.status === "unavailable" ? "eBay couldn’t complete this search. Try again."
-    : run.status === "partial" ? "eBay returned some results. Part of the search couldn’t finish."
+    : run.status === "unconfigured" || run.status === "unavailable" ? "The connected sources couldn’t complete this search. Try again."
     : items.length === 0 ? "No matches in the last seven days. Try fewer keywords or a wider fit."
-    : `${items.length} matches · Searched ${searchDate.format(new Date(run.searchedAt))} CT`;
+    : `${items.length} matches · ${checked === undefined ? "" : `${checked} sources checked · `}${summary}`;
   const shirts = items.filter((item) => item.garmentKind === "shirt");
   const pants = items.filter((item) => item.garmentKind === "pants");
   return (
     <section id="fresh" aria-labelledby="fresh-title" className="scroll-mt-24">
       <div className="mb-5 rounded-[24px] bg-[var(--pine)] px-5 py-6 text-[var(--paper)] sm:px-8">
         <h1 id="fresh-title" className="font-display text-4xl leading-none sm:text-5xl">Fresh finds</h1>
-        <p className="mt-2 text-[var(--sand)]">eBay listings posted in the last {freshListingDays} days</p>
+        <p className="mt-2 text-[var(--sand)]">Listings posted in the last {freshListingDays} days</p>
         <form action={searchScoutNow} className="mt-4 flex max-w-2xl flex-col gap-2 sm:flex-row sm:items-end">
           <label className="flex-1 text-sm font-bold">
             Keywords <span className="font-normal text-[var(--sand)]">(optional)</span>
@@ -84,6 +88,20 @@ function FreshScout({
         </p>
       </div>
       <p className="mb-5 text-sm text-[var(--muted-ink)]" role="status">{message}</p>
+      {coverage && run && !run.expired ? (
+        <details className="mb-5 rounded-2xl border border-black/10 bg-[var(--card)] px-4">
+          <summary className="min-h-11 cursor-pointer py-3 text-sm font-bold text-[var(--pine)]">Source coverage{run.status === "partial" ? " · Some checks failed" : ""}</summary>
+          <ul className="grid gap-x-5 border-t border-black/10 py-2 text-sm sm:grid-cols-2 lg:grid-cols-3">
+            {coverage.map(({ source, status }) => {
+              const count = items.filter((item) => item.source === source).length;
+              return <li key={source} className="flex items-baseline justify-between gap-2 py-2"><strong>{marketplaceName(source)}</strong><span className="text-right text-[var(--muted-ink)]">{sourceStatus[status]}{status === "searched" || status === "partial" ? ` · ${count} matches` : ""}</span></li>;
+            })}
+          </ul>
+        </details>
+      ) : null}
+      {coverage?.some(({ source, status }) => source === "etsy" && (status === "searched" || status === "partial")) ? (
+        <p className="mb-5 text-sm text-[var(--muted-ink)]">The term &apos;Etsy&apos; is a trademark of Etsy, Inc. This Application uses Etsy&apos;s API, but is not endorsed or certified by Etsy.</p>
+      ) : null}
       <div className="space-y-7">
         {shirts.length ? <ListingShelf id="live-shirts" label="Shirts" description="Work shirts and heavier layers." items={shirts} /> : null}
         {pants.length ? <ListingShelf id="live-bottoms" label="Bottoms" description="Work pants, jeans and trousers." items={pants} /> : null}
@@ -126,7 +144,7 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
     entries.set(canonicalListingKey(listing.url), toListingView(listing, updated, updated, verdict, preferences, listing));
   }
   for (const { listing, verdict } of Array.from(decisions.values())) {
-    if (listing && !entries.has(canonicalListingKey(listing.url))) {
+    if (listing && !listing.linkOnly && !entries.has(canonicalListingKey(listing.url))) {
       const checkedAt = listing.checkedAt ?? listing.listedAt ?? "2026-10-15T00:00:00Z";
       entries.set(canonicalListingKey(listing.url), { ...toListingView(listing, checkedAt, checkedAt, verdict, preferences), listedAt: listing.listedAt });
     }
@@ -148,6 +166,9 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
     return verdict === "pass" ? [] : [{ ...toListingView(item, item.listedAt, run.searchedAt, verdict, preferences), listedAt: item.listedAt }];
   }) : [];
   const saved = Array.from(entries.values()).filter((item) => item.decision === "save");
+  const savedLinks = Array.from(decisions.values()).flatMap(({ verdict, listing }) =>
+    verdict === "save" && listing?.linkOnly && !entries.has(canonicalListingKey(listing.url)) ? [listing] : [],
+  );
   const archived = params.view === "archive";
 
   return (
@@ -171,7 +192,14 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
         ) : (
           <>
             <FreshScout run={run} items={live} preferences={preferences} />
-            {saved.length ? <div className="mt-8"><ListingShelf id="saved" label="Saved" description="Pieces you marked to revisit." items={saved} /></div> : null}
+            {saved.length || savedLinks.length ? (
+              <section id="saved" className="mt-8 scroll-mt-24" aria-label="Saved listings">
+                {saved.length ? <ListingShelf id="saved-cards" label="Saved" description="Pieces you marked to revisit." items={saved} /> : null}
+                {savedLinks.length ? <ul className="grid gap-2">{savedLinks.map((item, index) => (
+                  <li key={item.externalId}><a href={item.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center font-bold text-[var(--pine)] underline underline-offset-4">Open saved Etsy listing {index + 1}</a></li>
+                ))}</ul> : null}
+              </section>
+            ) : null}
             <a href="/fieldwear?view=archive#archive" className="mt-4 inline-flex min-h-11 items-center gap-2 font-bold text-[var(--pine)] underline underline-offset-4"><Archive size={17} />Browse catalog archive</a>
           </>
         )}
@@ -179,7 +207,7 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
       </div>
       <nav aria-label="Fieldwear" className="fixed bottom-[calc(.75rem+env(safe-area-inset-bottom))] left-1/2 z-30 flex w-[min(390px,calc(100%-24px))] -translate-x-1/2 rounded-2xl bg-[var(--pine)] px-1 py-2 text-white shadow-lg sm:hidden">
         <a href="/fieldwear#fresh" className="grid min-h-12 flex-1 place-items-center text-xs"><Search size={18}/>Fresh</a>
-        {saved.length ? <a href="/fieldwear#saved" className="grid min-h-12 flex-1 place-items-center text-xs"><Bookmark size={18}/>Saved</a> : null}
+        {saved.length || savedLinks.length ? <a href="/fieldwear#saved" className="grid min-h-12 flex-1 place-items-center text-xs"><Bookmark size={18}/>Saved</a> : null}
         <a href="/fieldwear?view=archive#archive" className="grid min-h-12 flex-1 place-items-center text-xs"><Archive size={18}/>Archive</a>
         <a href="#check" className="grid min-h-12 flex-1 place-items-center text-xs"><ShieldQuestion size={18}/>Check</a>
       </nav>

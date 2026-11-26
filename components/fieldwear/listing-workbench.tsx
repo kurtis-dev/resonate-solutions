@@ -19,6 +19,7 @@ import {
 import { decideListing } from "@/app/fieldwear/actions";
 import type { GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
+import { marketplaceName } from "@/lib/fieldwear/marketplace-directory";
 
 export type ListingView = {
   source:string; externalId:string; url:string; title:string; imageUrl:string|null;
@@ -437,10 +438,5 @@ function Decision({ active, value, icon, label }:{ active:boolean; value:string;
 }
 function Score({ label, value, max }:{ label:string; value:number; max:number }) { return <div className="rounded-lg bg-white px-1 py-2"><strong className="block text-sm">{value}<span className="font-normal text-black/40">/{max}</span></strong><span className="text-[var(--muted-ink)]">{label}</span></div>; }
 function Evidence({ title, items, warning=false }:{ title:string; items:string[]; warning?:boolean }) { return <div className="border-t border-black/8 py-2"><p className={`flex items-center gap-1 text-[10px] font-bold uppercase tracking-[.1em] ${warning ? "text-[var(--rust)]" : "text-[var(--pine)]"}`}>{warning ? <AlertCircle size={12} /> : null}{title}</p><ul className="mt-1 space-y-1 text-[11px] leading-4 text-[var(--muted-ink)]">{items.slice(0,4).map((item) => <li key={item}>• {item}</li>)}</ul></div>; }
-function marketplaceName(source:string) {
-  if (source === "ebay") return "eBay";
-  if (source === "shopgoodwill") return "ShopGoodwill";
-  return source.length > 0 ? source.charAt(0).toUpperCase() + source.slice(1) : "Marketplace";
-}
 function money(cents:number) { return new Intl.NumberFormat("en-US", { style:"currency", currency:"USD" }).format(cents / 100); }
 function relativeTime(value:string) { const hours = Math.max(0, Math.round((Date.now() - new Date(value).getTime()) / 3600000)); return hours < 1 ? "now" : hours < 24 ? `${hours}h ago` : `${Math.round(hours/24)}d ago`; }

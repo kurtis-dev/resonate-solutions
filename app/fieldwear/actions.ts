@@ -68,9 +68,12 @@ export async function decideListing(form: FormData) {
   const externalId = String(form.get("externalId") ?? "");
   const verdict = String(form.get("verdict") ?? "");
   if (!/^[a-z]{1,30}$/.test(source) || !/^[a-z\d-]{1,120}$/i.test(externalId) || !["save", "proof", "pass"].includes(verdict)) return;
-  const live = source === "ebay" ? await readLiveSearch() : null;
+  const live = await readLiveSearch();
   const matches = (listing: { source: string; externalId: string }) => listing.source === source && listing.externalId === externalId;
-  const item = live?.listings.find(matches) ?? (await readScoutEdition())?.finds.find(matches);
+  const liveItem = live?.listings.find(matches);
+  const item = liveItem?.source === "etsy"
+    ? { source, externalId, title: "Saved Etsy listing", url: liveItem.url, linkOnly: true }
+    : liveItem ?? (await readScoutEdition())?.finds.find(matches);
   const sql = await scoutDatabase();
   await sql`INSERT INTO fieldwear_decisions (source, external_id, verdict, listing)
     VALUES (${source}, ${externalId}, ${verdict}, ${item ? JSON.stringify(item) : null}::jsonb)

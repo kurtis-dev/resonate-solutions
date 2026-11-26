@@ -1,4 +1,5 @@
 import { departmentMatch, sizeMatch, type ScoutPreferences } from "./preferences";
+import type { VintageShopSource } from "./marketplace-directory";
 
 export const marketplaceHosts = {
   ebay: ["ebay.com", "www.ebay.com"],
@@ -15,7 +16,7 @@ export type MarketplaceSource = keyof typeof marketplaceHosts | "other";
 export type GarmentKind = "shirt" | "pants" | "outerwear" | "unknown";
 
 export type ListingInput = {
-  source: MarketplaceSource;
+  source: MarketplaceSource | VintageShopSource;
   externalId: string;
   url: string;
   title: string;
@@ -174,7 +175,7 @@ export function stableListingId(source: MarketplaceSource, url: string) {
 
 export function classifyGarment(input: Pick<ListingInput, "title" | "description" | "size">): GarmentKind {
   const text = `${input.title} ${input.description ?? ""} ${input.size ?? ""}`;
-  if (/\b(?:pants|jeans?|dungarees?|trousers?|carpenters?|painters?|overalls?)\b|\b(?:38|40)\s?[x×]\s?(?:32|34)\b/i.test(text)) return "pants";
+  if (/\b(?:pants?|jeans?|dungarees?|trousers?|carpenters?|painters?|overalls?)\b|\b(?:38|40)\s?[x×]\s?(?:32|34)\b/i.test(text)) return "pants";
   if (/\b(?:coat|parka|blazer|outerwear)\b|\bjacket\b(?![- ]?shirt)/i.test(text) && !/shirt[- ]?(?:jacket|jac)|shacket/i.test(text)) return "outerwear";
   if (/\b(?:shirts?|flannel|chamois|overshirt|shirt[- ]?(?:jacket|jac)|shacket)\b/i.test(text)) return "shirt";
   return "unknown";

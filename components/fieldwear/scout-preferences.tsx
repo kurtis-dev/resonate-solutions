@@ -12,7 +12,7 @@ export function ScoutPreferencesForm({ preferences, status }: { preferences: Sco
         <SlidersHorizontal aria-hidden="true" size={17} className="mr-2 inline-block" />Scout preferences
       </summary>
       <form action={saveScoutPreferences} className="border-t border-black/10 pb-4 pt-3">
-        <p className="mb-4 text-sm text-[var(--muted-ink)]">Saving runs a new eBay search with these settings.</p>
+        <p className="mb-4 text-sm text-[var(--muted-ink)]">Saving checks connected sources with these settings.</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label className="text-sm font-bold">Department
             <select className={control} name="department" defaultValue={preferences.department}>

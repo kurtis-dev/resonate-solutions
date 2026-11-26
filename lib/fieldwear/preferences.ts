@@ -20,7 +20,7 @@ export const defaultScoutPreferences: ScoutPreferences = {
 };
 
 const alphaSize = /\b(?:\d\s*-?\s*X(?:XL|LT|L|T)?|XXXXL|XXXL|XXL|XXS|XLT|TXL|LT|MT|XS|XL|SMALL|MEDIUM|LARGE|S|M|L)(?:[ -]?(?:TALL|LONG|EXTRA LONG))?\b/gi;
-const waistInseam = /\bW?\s*(\d{2})\s*[x×]\s*L?\s*(\d{2})\b/gi;
+const waistInseam = /\bW?\s*(\d{2}(?:\.\d{1,2})?)\s*[x×]\s*L?\s*(\d{2}(?:\.\d{1,2})?)\b/gi;
 
 function normalizeAlpha(value: string) {
   const compact = value.toUpperCase().replace(/[ -]/g, "").replace(/(?:EXTRA)?LONG$/, "TALL");
