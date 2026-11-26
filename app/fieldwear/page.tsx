@@ -8,12 +8,13 @@ import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { curatedListings, type CuratedListing } from "@/lib/fieldwear/curated-listings";
 import { classifyGarment, scoreListing, type ListingInput } from "@/lib/fieldwear/listing-model";
 import { listingMeasurements, vintageSignals } from "@/lib/fieldwear/vintage-signals";
+import { beanReferenceId, matchLook } from "@/lib/fieldwear/look-search";
 import { readScoutEdition } from "@/lib/fieldwear/editions";
 import { isScoutOwner, readScoutPreferences, scoutDatabase } from "@/lib/fieldwear/owner-access";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { freshListingDays, readLiveSearch } from "@/lib/fieldwear/live-search";
 import { marketplaceName } from "@/lib/fieldwear/marketplace-directory";
-import { redeemOwnerLink, requestOwnerLink, searchScoutNow, signOutScout } from "./actions";
+import { redeemOwnerLink, requestOwnerLink, searchScoutLook, searchScoutNow, signOutScout } from "./actions";
 import "./scout.css";
 
 export const dynamic = "force-dynamic";
@@ -92,6 +93,7 @@ function FreshScout({
         <p className="mt-3 text-sm text-[var(--sand)]">
           {departmentLabels[preferences.department]} · Shirts {preferences.shirtSizes.join(", ") || "any size"} · Bottoms {preferences.pantsSizes.join(", ") || "any size"}
         </p>
+        <a href="#find-similar" className="mt-1 inline-flex min-h-11 items-center text-sm font-bold text-[var(--sand)] underline underline-offset-4">Find me more like this</a>
       </div>
       <p className="mb-5 text-sm text-[var(--muted-ink)]" role="status">{message}</p>
       {coverage && run && !run.expired ? (
@@ -121,6 +123,74 @@ function readLegacyScout() {
   }
 }
 
+type LiveRun = Awaited<ReturnType<typeof readLiveSearch>>;
+
+function LookFinds({ similar, browning, preferences, decisions }: {
+  similar: LiveRun; browning: LiveRun; preferences: ScoutPreferences; decisions: Map<string, Decision>;
+}) {
+  const reference = curatedListings.find((item) => item.source === "grailed" && item.externalId === beanReferenceId);
+  const button = "min-h-11 rounded-full bg-[var(--pine)] px-4 text-sm font-bold text-white hover:opacity-90";
+  const listings = (run: LiveRun) => run?.listings.flatMap((item) => {
+    const decision = decisions.get(`${item.source}:${item.externalId}`)?.verdict ?? null;
+    const match = run.hunt && matchLook(item, run.hunt);
+    if (decision === "pass" || !match) return [];
+    return [{ ...toListingView(item, item.listedAt, run.searchedAt, decision, preferences),
+      garmentKind: run.hunt?.kind ?? classifyGarment(item), listedAt: item.listedAt, lookNote: match.note, group: match.group }];
+  }) ?? [];
+  const related = listings(similar);
+  const field = listings(browning);
+  const patched = field.filter((item) => item.group === "browning-patched");
+  const substitutes = field.filter((item) => item.group === "other-patched");
+  const otherBrowning = field.filter((item) => item.group === "browning-field");
+  const error = (run: LiveRun) => run?.status === "unavailable" ? "The listing sources couldn’t finish. Try running this search again."
+    : run?.expired ? "Run this search again for current listings." : null;
+  return (
+    <section id="find-similar" aria-labelledby="find-similar-title" className="mb-8 scroll-mt-24">
+      <h2 id="find-similar-title" className="font-display text-2xl sm:text-3xl">Find me more like this</h2>
+      <div className="mt-3 grid gap-3 md:grid-cols-2">
+        {reference ? (
+          <div className="flex min-w-0 gap-4 rounded-2xl border border-black/10 bg-[var(--card)] p-4">
+            <a href={reference.url} target="_blank" rel="noreferrer" className="shrink-0" aria-label="Open the L.L.Bean reference on Grailed">
+              {/* eslint-disable-next-line @next/next/no-img-element -- marketplace reference photo */}
+              <img src={reference.imageUrl ?? ""} alt="L.L.Bean lined denim reference" className="h-28 w-24 rounded-lg bg-[var(--paper)] object-contain" />
+            </a>
+            <div className="min-w-0">
+              <h3 className="font-bold">L.L.Bean lined denim shirt</h3>
+              <p className="mb-3 text-sm text-[var(--muted-ink)]">Your Grailed reference</p>
+              <form action={searchScoutLook}>
+                <input type="hidden" name="source" value={reference.source} /><input type="hidden" name="externalId" value={reference.externalId} />
+                <ScoutSubmit label="Find lined denim shirts" className={button} />
+              </form>
+            </div>
+          </div>
+        ) : null}
+        <div className="rounded-2xl border border-black/10 bg-[var(--card)] p-4">
+          <h3 className="font-bold">Browning with leather elbows</h3>
+          <p className="mb-3 mt-1 text-sm text-[var(--muted-ink)]">Field shirts with leather or suede elbow patches.</p>
+          <form action={searchScoutLook}>
+            <input type="hidden" name="hunt" value="browning" />
+            <ScoutSubmit label="Find Browning shirts" className={button} />
+          </form>
+        </div>
+      </div>
+      {similar ? (
+        <div id="similar-results" className="mt-6 scroll-mt-24">
+          {related.length ? <ListingShelf id="similar-listings" label="Similar finds" description={similar.hunt?.title ?? ""} items={related} comparePrices />
+            : <p role="status" className="text-sm text-[var(--muted-ink)]">{error(similar) ?? "No similar listings in your saved sizes and budget this time."}</p>}
+        </div>
+      ) : null}
+      {browning ? (
+        <div id="browning-results" className="mt-6 space-y-5 scroll-mt-24">
+          {patched.length ? <ListingShelf id="browning-patched" label="Browning with leather or suede elbows" description="Elbow patches described in the listing." items={patched} comparePrices />
+            : <p role="status" className="text-sm text-[var(--muted-ink)]">{error(browning) ?? "No Browning with described leather or suede elbow patches in your sizes and budget on this search."}</p>}
+          {substitutes.length ? <ListingShelf id="patched-alternatives" label="Leather elbow patches from other makers" description="Similar shirts in your sizes." items={substitutes} comparePrices /> : null}
+          {otherBrowning.length ? <ListingShelf id="browning-field" label="Browning field shirts" description="Leather elbow patches unconfirmed." items={otherBrowning} comparePrices /> : null}
+        </div>
+      ) : null}
+    </section>
+  );
+}
+
 export default async function FieldwearPage({ searchParams }: { searchParams: Promise<{ access?: string; signIn?: string; preferences?: string; view?: string }> }) {
   const params = await searchParams;
   if (!(await isScoutOwner())) {
@@ -133,7 +203,9 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
     params.view === "archive" ? readScoutEdition() : Promise.resolve(null),
     readScoutPreferences(),
   ]);
-  const run = await readLiveSearch(preferences);
+  const [run, similar, browning] = await Promise.all([
+    readLiveSearch(preferences), readLiveSearch(preferences, "similar"), readLiveSearch(preferences, "browning"),
+  ]);
   const decisions = new Map(readLegacyScout().map((row) => [`${row.source}:${row.external_id}`, row]));
   for (const row of recorded) {
     const key = `${row.source}:${row.external_id}`;
@@ -194,6 +266,7 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
           </>
         ) : (
           <>
+            <LookFinds similar={similar} browning={browning} preferences={preferences} decisions={decisions} />
             <FreshScout run={run} items={live} preferences={preferences} />
             {saved.length || savedLinks.length ? (
               <section id="saved" className="mt-8 scroll-mt-24" aria-label="Saved listings">

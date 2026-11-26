@@ -7,6 +7,9 @@ import { exchangeOwnerLink, isScoutOwner, issueOwnerLink, readScoutPreferences, 
 import { readScoutEdition } from "@/lib/fieldwear/editions";
 import { parseScoutPreferences } from "@/lib/fieldwear/preferences";
 import { readLiveSearch, runAndStoreLiveSearch } from "@/lib/fieldwear/live-search";
+import { browningHunt, similarHunt } from "@/lib/fieldwear/look-search";
+import { curatedListings } from "@/lib/fieldwear/curated-listings";
+import type { ListingInput } from "@/lib/fieldwear/listing-model";
 
 export async function requestOwnerLink(form: FormData) {
   const owner = process.env.FIELDWEAR_OWNER_EMAIL?.trim().toLowerCase();
@@ -64,15 +67,42 @@ export async function searchScoutNow(form: FormData) {
   redirect("/fieldwear#fresh");
 }
 
+export async function searchScoutLook(form: FormData) {
+  if (!(await isScoutOwner())) redirect("/fieldwear");
+  const preferences = await readScoutPreferences();
+  if (form.get("hunt") === "browning") {
+    await runAndStoreLiveSearch(preferences, "", undefined, browningHunt);
+    revalidatePath("/fieldwear");
+    redirect("/fieldwear#browning-results");
+  }
+  const source = String(form.get("source") ?? "");
+  const externalId = String(form.get("externalId") ?? "");
+  if (!/^[a-z]{1,30}$/.test(source) || !/^[a-z\d-]{1,120}$/i.test(externalId)) return;
+  const matches = (listing: Pick<ListingInput, "source" | "externalId">) => listing.source === source && listing.externalId === externalId;
+  const sql = await scoutDatabase();
+  const [liveRuns, saved, edition] = await Promise.all([
+    Promise.all([readLiveSearch(preferences), readLiveSearch(preferences, "similar"), readLiveSearch(preferences, "browning")]),
+    sql`SELECT listing FROM fieldwear_decisions WHERE source = ${source} AND external_id = ${externalId}` as Promise<{ listing: ListingInput | null }[]>,
+    readScoutEdition(),
+  ]);
+  const reference = curatedListings.find(matches) ?? liveRuns.flatMap((run) => run?.listings ?? []).find(matches)
+    ?? saved[0]?.listing ?? edition?.finds.find(matches);
+  const hunt = reference && similarHunt(reference);
+  if (!hunt) redirect("/fieldwear#find-similar");
+  await runAndStoreLiveSearch(preferences, "", undefined, hunt);
+  revalidatePath("/fieldwear");
+  redirect("/fieldwear#similar-results");
+}
+
 export async function decideListing(form: FormData) {
   if (!(await isScoutOwner())) redirect("/fieldwear");
   const source = String(form.get("source") ?? "");
   const externalId = String(form.get("externalId") ?? "");
   const verdict = String(form.get("verdict") ?? "");
   if (!/^[a-z]{1,30}$/.test(source) || !/^[a-z\d-]{1,120}$/i.test(externalId) || !["save", "proof", "pass"].includes(verdict)) return;
-  const live = await readLiveSearch();
+  const runs = await Promise.all([readLiveSearch(), readLiveSearch(undefined, "similar"), readLiveSearch(undefined, "browning")]);
   const matches = (listing: { source: string; externalId: string }) => listing.source === source && listing.externalId === externalId;
-  const liveItem = live?.listings.find(matches);
+  const liveItem = runs.flatMap((run) => run?.listings ?? []).find(matches);
   const item = liveItem?.source === "etsy"
     ? { source, externalId, title: "Saved Etsy listing", url: liveItem.url, linkOnly: true }
     : liveItem ?? (await readScoutEdition())?.finds.find(matches);

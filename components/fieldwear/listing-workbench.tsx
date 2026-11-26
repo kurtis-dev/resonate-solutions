@@ -16,7 +16,8 @@ import {
   ThumbsDown,
   X,
 } from "lucide-react";
-import { decideListing } from "@/app/fieldwear/actions";
+import { decideListing, searchScoutLook } from "@/app/fieldwear/actions";
+import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import type { GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { marketplaceName } from "@/lib/fieldwear/marketplace-directory";
@@ -26,6 +27,7 @@ export type ListingView = {
   source:string; externalId:string; url:string; title:string; imageUrl:string|null;
   priceCents:number|null; shippingCents:number|null; size:string|null; condition:string|null;
   measurements:string[]; vintage:ReturnType<typeof vintageSignals>;
+  lookNote?: string | null;
   firstSeenAt:string; lastSeenAt:string; totalScore:number; fitScore:number; constructionScore:number;
   listedAt?:string;
   ageScore:number; conditionScore:number; valueScore:number; documentationScore:number;
@@ -324,8 +326,12 @@ export function ListingWorkbench({ listings, preferences }: { listings:ListingVi
   );
 }
 
-export function ListingShelf({ id, label, description, items }:{ id:string; label:string; description:string; items:ListingView[] }) {
+export function ListingShelf({ id, label, description, items, comparePrices = false }:{
+  id:string; label:string; description:string; items:ListingView[]; comparePrices?:boolean;
+}) {
   const trackRef = useRef<HTMLDivElement>(null);
+  const [cheapest, setCheapest] = useState(false);
+  const displayed = cheapest ? items.toSorted((a, b) => (priceForSort(a) ?? Infinity) - (priceForSort(b) ?? Infinity)) : items;
   const scroll = (direction:-1|1) => {
     const track = trackRef.current;
     if (!track) return;
@@ -343,9 +349,11 @@ export function ListingShelf({ id, label, description, items }:{ id:string; labe
           <p className="mt-1 text-xs leading-5 text-[var(--muted-ink)] sm:text-sm">{description}</p>
         </div>
         {items.length > 1 ? (
-          <div className="hidden shrink-0 gap-2 sm:flex" aria-label={`${label} carousel controls`}>
-            <button type="button" onClick={() => scroll(-1)} className="grid h-11 w-11 cursor-pointer place-items-center rounded-full border border-black/10 bg-white text-[var(--pine)] transition hover:border-[var(--pine)] hover:bg-[var(--sand)] active:scale-95" aria-label={`Scroll ${label} left`}><ChevronLeft size={18} /></button>
-            <button type="button" onClick={() => scroll(1)} className="grid h-11 w-11 cursor-pointer place-items-center rounded-full border border-black/10 bg-white text-[var(--pine)] transition hover:border-[var(--pine)] hover:bg-[var(--sand)] active:scale-95" aria-label={`Scroll ${label} right`}><ChevronRight size={18} /></button>
+          <div className="flex shrink-0 gap-2" aria-label={`${label} carousel controls`}>
+            {comparePrices ? <button type="button" aria-pressed={cheapest} onClick={() => { setCheapest(!cheapest); trackRef.current?.scrollTo(0, 0); }}
+              className="min-h-11 rounded-full border border-black/10 bg-white px-3 text-xs font-bold text-[var(--pine)] aria-pressed:border-[var(--pine)] aria-pressed:bg-[var(--sand)]">Lowest price</button> : null}
+            <button type="button" onClick={() => scroll(-1)} className="hidden h-11 w-11 cursor-pointer place-items-center rounded-full border border-black/10 bg-white text-[var(--pine)] transition hover:border-[var(--pine)] hover:bg-[var(--sand)] active:scale-95 sm:grid" aria-label={`Scroll ${label} left`}><ChevronLeft size={18} /></button>
+            <button type="button" onClick={() => scroll(1)} className="hidden h-11 w-11 cursor-pointer place-items-center rounded-full border border-black/10 bg-white text-[var(--pine)] transition hover:border-[var(--pine)] hover:bg-[var(--sand)] active:scale-95 sm:grid" aria-label={`Scroll ${label} right`}><ChevronRight size={18} /></button>
           </div>
         ) : null}
       </div>
@@ -364,7 +372,7 @@ export function ListingShelf({ id, label, description, items }:{ id:string; labe
           style={{ scrollbarGutter:"stable" }}
         >
           <p className="sr-only">Scroll horizontally to browse. Each image and View link opens the original marketplace page.</p>
-          {items.map((item) => <ListingCard key={`${id}:${item.source}:${item.externalId}`} item={item} />)}
+          {displayed.map((item) => <ListingCard key={`${id}:${item.source}:${item.externalId}`} item={item} />)}
           <span aria-hidden="true" className="w-px shrink-0" />
         </div>
       )}
@@ -546,6 +554,7 @@ function ListingCard({ item, grid = false }: { item:ListingView; grid?:boolean }
           <a href={item.url} target="_blank" rel="noreferrer" className="inline-flex min-h-11 shrink-0 cursor-pointer items-center gap-1.5 rounded-full bg-[var(--pine)] px-3.5 text-xs font-bold text-white transition hover:bg-[#2b4432] active:scale-[.98]" aria-label={`View ${item.title} on ${sourceLabel}`}>View <ArrowRight size={14} /></a>
         </div>
 
+        {item.lookNote ? <p className="mt-3 text-xs font-medium text-[var(--muted-ink)]">{item.lookNote}</p> : null}
         <details className="mt-4 rounded-xl bg-[var(--paper)] px-3 py-2">
           <summary className="min-h-10 cursor-pointer py-2 text-xs font-bold">Listing details</summary>
           {item.measurements.length > 0 ? <Evidence title="Seller measurements" items={item.measurements} /> : null}
@@ -555,6 +564,12 @@ function ListingCard({ item, grid = false }: { item:ListingView; grid?:boolean }
           {item.condition ? <Evidence title="Listed condition" items={[item.condition]} /> : null}
         </details>
 
+        {(item.garmentKind === "shirt" || item.garmentKind === "pants") && item.decision !== "pass" ? (
+          <form action={searchScoutLook} className="mt-3">
+            <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
+            <ScoutSubmit label="Find me more like this" className="min-h-11 w-full rounded-xl border border-[var(--pine)]/25 px-3 text-sm font-bold text-[var(--pine)] hover:bg-[var(--paper)]" />
+          </form>
+        ) : null}
         <form action={decideListing} className="mt-3 grid grid-cols-3 gap-2">
           <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
           <Decision active={item.decision === "save"} value="save" icon={<Bookmark size={15} />} label="Save" />
