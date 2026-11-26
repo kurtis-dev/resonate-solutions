@@ -38,6 +38,12 @@ export function initializeScoutDatabase() {
       profile text PRIMARY KEY,
       settings jsonb NOT NULL
     )`;
+    await sql`CREATE TABLE IF NOT EXISTS fieldwear_live_search (
+      profile text PRIMARY KEY,
+      settings jsonb NOT NULL,
+      searched_at timestamptz NOT NULL,
+      result jsonb NOT NULL
+    )`;
   })().catch((error) => {
     initialized = undefined;
     throw error;

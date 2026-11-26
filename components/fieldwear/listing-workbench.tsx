@@ -24,6 +24,7 @@ export type ListingView = {
   source:string; externalId:string; url:string; title:string; imageUrl:string|null;
   priceCents:number|null; shippingCents:number|null; size:string|null; condition:string|null;
   firstSeenAt:string; lastSeenAt:string; totalScore:number; fitScore:number; constructionScore:number;
+  listedAt?:string;
   ageScore:number; conditionScore:number; valueScore:number; documentationScore:number;
   evidence:{ confirmed:string[]; sellerClaims:string[]; visualClues:string[]; hiddenBargain?:boolean };
   concerns:string[]; missing:string[]; decision:string|null; tasteMatch:number; tasteReasons:string[];
@@ -394,7 +395,7 @@ function ListingCard({ item }: { item:ListingView }) {
       <div className="p-4">
         <div className="flex items-center justify-between gap-3 text-[10px] font-bold uppercase tracking-[.11em] text-[var(--rust)]">
           <span className="max-w-[58%] truncate" title={item.size ?? "Size unconfirmed"}>{item.size ?? "Size unconfirmed"}</span>
-          <span className="flex shrink-0 items-center gap-1 text-[var(--muted-ink)]" aria-label={`Marketplace details checked ${relativeTime(item.lastSeenAt)}`}><Clock3 size={12} />Checked {relativeTime(item.lastSeenAt)}</span>
+          <span className="flex shrink-0 items-center gap-1 text-[var(--muted-ink)]"><Clock3 size={12} />{item.listedAt ? "Listed" : "Checked"} {relativeTime(item.listedAt ?? item.lastSeenAt)}</span>
         </div>
         <a href={item.url} target="_blank" rel="noreferrer" className="mt-2 block rounded-sm hover:text-[var(--rust)]">
           <h3 className="line-clamp-2 min-h-12 text-base font-bold leading-6">{item.title}</h3>

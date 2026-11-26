@@ -1,6 +1,7 @@
 import { SlidersHorizontal } from "lucide-react";
 import { saveScoutPreferences } from "@/app/fieldwear/actions";
 import { departmentLabels, type ScoutPreferences } from "@/lib/fieldwear/preferences";
+import { ScoutSubmit } from "./scout-submit";
 
 const control = "mt-1 block min-h-12 w-full rounded-xl border border-black/20 bg-white px-3 text-base";
 
@@ -11,7 +12,7 @@ export function ScoutPreferencesForm({ preferences, status }: { preferences: Sco
         <SlidersHorizontal aria-hidden="true" size={17} className="mr-2 inline-block" />Scout preferences
       </summary>
       <form action={saveScoutPreferences} className="border-t border-black/10 pb-4 pt-3">
-        <p className="mb-4 text-sm text-[var(--muted-ink)]">Choose what Scout puts first in Daily finds and the catalog.</p>
+        <p className="mb-4 text-sm text-[var(--muted-ink)]">Saving runs a new eBay search with these settings.</p>
         <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
           <label className="text-sm font-bold">Department
             <select className={control} name="department" defaultValue={preferences.department}>
@@ -32,14 +33,13 @@ export function ScoutPreferencesForm({ preferences, status }: { preferences: Sco
             <input className={control} name="pantsBudget" type="number" inputMode="decimal" min="0.01" max="9999.99" step="0.01" defaultValue={preferences.pantsBudget ?? ""} placeholder="Any price" />
           </label>
         </div>
-        <p className="mt-2 text-sm text-[var(--muted-ink)]">Budgets apply to the Under budget filter and include shipping when listed.</p>
+        <p className="mt-2 text-sm text-[var(--muted-ink)]">Budgets apply to fresh searches and the catalog’s Under budget filter. Known shipping is included.</p>
         <label className="mt-3 flex min-h-11 items-center gap-2 text-sm font-bold">
           <input type="checkbox" name="matchingOnly" defaultChecked={preferences.matchingOnly} className="h-5 w-5 accent-[var(--pine)]" />
           Only show matching sizes and compatible departments
         </label>
         <p className="text-sm text-[var(--muted-ink)]">Listings without a department label can still appear. Saved finds stay available.</p>
-        <button className="mt-4 min-h-11 rounded-xl bg-[var(--pine)] px-4 font-bold text-white">Save preferences</button>
-        {status === "saved" ? <p className="mt-2 text-sm font-semibold text-[var(--pine)]" role="status">Preferences saved.</p> : null}
+        <ScoutSubmit label="Save & search" className="mt-4 min-h-11 rounded-xl bg-[var(--pine)] px-4 font-bold text-white" />
         {status === "invalid" ? <p className="mt-2 text-sm font-semibold text-[var(--rust)]" role="alert">Check the size format and budgets. Enter up to 12 comma-separated sizes per group.</p> : null}
       </form>
     </details>
