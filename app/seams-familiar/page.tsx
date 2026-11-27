@@ -1,0 +1,172 @@
+import type { Metadata } from "next";
+import Image from "next/image";
+import Link from "next/link";
+import { FreshCatalog } from "@/components/fieldwear/listing-workbench";
+import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
+import { toListingView } from "@/lib/fieldwear/listing-view";
+import { interestLabels, matchSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
+import { firstDibsReady } from "@/lib/seams/digest";
+import { defaultMemberSettings, readMember, seamsPath, type Member, type MemberSettings } from "@/lib/seams/members";
+import { continueSeams, requestMemberLink, saveMemberDibs, saveMemberFit, searchMemberCatalog, signOutSeams, stopFirstDibs } from "./actions";
+import "../fieldwear/scout.css";
+
+export const dynamic = "force-dynamic";
+export const metadata: Metadata = {
+  title: "Seams Familiar | Vintage clothing by Resonate Solutions",
+  description: "Find vintage clothing in your sizes and budget. Save your fit and get a daily First Dibs email.",
+  robots: { index: false, follow: false },
+  referrer: "no-referrer",
+};
+
+const field = "scout-control mt-1 block w-full text-base";
+const button = "scout-primary px-4 text-sm";
+const notice = "mt-3 text-sm text-[var(--muted-ink)]";
+
+function Welcome({ access, status }: { access?: string; status?: string }) {
+  const valid = access && /^[a-f0-9]{64}$/.test(access);
+  return (
+    <section className="my-6 max-w-xl rounded border border-[var(--line)] p-5 sm:p-7" aria-labelledby="welcome-title">
+      <h2 id="welcome-title" className="text-2xl font-bold tracking-tight">{valid ? "Finish signing in" : "Join Seams Familiar"}</h2>
+      {valid ? (
+        <form action={continueSeams}>
+          <input type="hidden" name="access" value={access} />
+          <p className={notice}>Continue on this device to open your catalog.</p>
+          <ScoutSubmit label="Continue to Seams Familiar" pendingLabel="Signing in…" className={`mt-4 ${button}`} />
+        </form>
+      ) : (
+        <>
+          <p className={notice}>Save your sizes, budget, and favorite styles. Use one email link to create an account or sign in.</p>
+          <form action={requestMemberLink} className="mt-4" noValidate>
+            <label htmlFor="seams-email" className="text-sm font-semibold">Email</label>
+            <input id="seams-email" name="email" type="email" autoComplete="email" inputMode="email" maxLength={254} required className={field}
+              aria-invalid={status === "invalid" || undefined} aria-describedby={status ? "email-status" : undefined} />
+            <ScoutSubmit label="Email me a sign-in link" pendingLabel="Sending…" className={`mt-3 w-full sm:w-auto ${button}`} />
+            {status ? <p id="email-status" role="status" className={notice}>
+              {status === "sent" ? "Check your inbox. If you recently requested a link, use the one already sent."
+                : status === "invalid" ? "Enter a complete email address."
+                : status === "expired" ? "This link has expired or was used. Request a new one."
+                : status === "unsubscribed" ? "You’re unsubscribed from First Dibs."
+                : "We couldn’t send a sign-in link. Try again in a few minutes."}
+            </p> : null}
+          </form>
+        </>
+      )}
+    </section>
+  );
+}
+
+function FitForm({ settings, status }: { settings: MemberSettings; status?: string }) {
+  return (
+    <section id="fit" className="my-5 scroll-mt-6 border-b border-[var(--line)] pb-6" aria-labelledby="fit-title">
+      <h2 id="fit-title" className="text-xl font-bold tracking-tight">Your fit</h2>
+      <form action={saveMemberFit} className="mt-3 space-y-3" noValidate>
+        <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+          <label className="text-sm font-semibold">Shop
+            <select name="department" defaultValue={settings.department} className={field}>
+              <option value="any">Men’s and women’s</option><option value="men">Men’s</option><option value="women">Women’s</option>
+            </select>
+          </label>
+          <label className="text-sm font-semibold">Tops, dresses & jackets
+            <input name="topSizes" defaultValue={settings.topSizes.join(", ")} placeholder="M, 12, XL Tall" maxLength={120} className={field} aria-describedby="size-format" />
+          </label>
+          <label className="text-sm font-semibold">Pants & skirts
+            <input name="bottomSizes" defaultValue={settings.bottomSizes.join(", ")} placeholder="8, 16W, 32x30" maxLength={120} className={field} aria-describedby="size-format" />
+          </label>
+          <label className="text-sm font-semibold">Max price per item ($)
+            <input name="budget" type="number" inputMode="decimal" min="0.01" max="9999.99" step="0.01" defaultValue={settings.budget ?? ""} placeholder="Any price" className={field} />
+          </label>
+        </div>
+        <p id="size-format" className="text-sm text-[var(--muted-ink)]">Separate sizes with commas. Leave a field blank for any size. Budget includes shipping when listed.</p>
+        <fieldset>
+          <legend className="text-sm font-semibold">Styles you like</legend>
+          <div className="mt-1 flex flex-wrap gap-x-4 gap-y-0">
+            {Object.entries(interestLabels).map(([id, label]) => (
+              <label key={id} className="inline-flex min-h-11 items-center gap-2 text-sm"><input name="interests" type="checkbox" value={id} defaultChecked={settings.interests.includes(id)} className="h-4 w-4 accent-[var(--accent)]" />{label}</label>
+            ))}
+          </div>
+        </fieldset>
+        <ScoutSubmit label="Save my fit" pendingLabel="Saving…" className={button} />
+        {status === "saved" || status === "bad-fit" ? <p role="status" className={notice}>{status === "saved" ? "Your fit is saved." : "Check the size format and enter a budget above $0, or leave it blank."}</p> : null}
+      </form>
+    </section>
+  );
+}
+
+function FirstDibs({ member, status }: { member: Member; status?: string }) {
+  const available = firstDibsReady();
+  return (
+    <section id="first-dibs" className="scout-first-dibs" aria-labelledby="first-dibs-title">
+      <span className="scout-90s-graphic" aria-hidden="true"><i /><i /><i /></span>
+      <div>
+        <h2 id="first-dibs-title" className="text-xl font-bold tracking-tight">Get first dibs</h2>
+        <p className="mt-1 text-sm">One morning email when there are new matches for your fit, budget, and favorite styles.</p>
+        <p className="mt-2 text-xs">{available ? member.first_dibs ? "First Dibs is on." : "First Dibs is off." : "Email delivery is being set up."}</p>
+      </div>
+      {available || member.first_dibs ? <form action={saveMemberDibs} className="scout-first-dibs-form">
+        <input type="hidden" name="enabled" value={member.first_dibs ? "off" : "on"} />
+        <ScoutSubmit label={member.first_dibs ? "Turn off emails" : "Turn on First Dibs"} pendingLabel="Saving…" className={button} />
+        {status === "email-saved" ? <p role="status" className="text-sm">Email preference saved.</p> : null}
+        {status === "email-unavailable" ? <p role="status" className="text-sm">First Dibs isn’t ready yet.</p> : null}
+      </form> : null}
+    </section>
+  );
+}
+
+export default async function SeamsFamiliar({ searchParams }: { searchParams: Promise<{ access?: string; status?: string; q?: string; unsubscribe?: string }> }) {
+  const params = await searchParams;
+  const unsubscribe = typeof params.unsubscribe === "string" && /^[a-f0-9]{64}$/.test(params.unsubscribe) ? params.unsubscribe : null;
+  const member = unsubscribe ? null : await readMember();
+  const settings = member?.settings ?? defaultMemberSettings;
+  const keywords = typeof params.q === "string" ? params.q.slice(0, 80) : "";
+  const catalog = member ? await readSeamsCatalog() : [];
+  const items = matchSeamsCatalog(catalog, settings, keywords);
+  const preferences = { department: settings.department, shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes, shirtBudget: settings.budget, pantsBudget: settings.budget, matchingOnly: true };
+  const stamp = catalog.reduce((latest, row) => latest > (row.checked_at ?? "") ? latest : row.checked_at ?? "", "");
+  const cards = items.map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
+  return (
+    <main className="fieldwear-scout pb-12">
+      <header className="border-b border-[var(--line)]">
+        <div className="scout-container flex min-h-16 items-center justify-between">
+          <Link href="/" aria-label="Resonate Solutions"><Image src="/assets/resonate-logo-transparent.png" alt="Resonate Solutions" width={122} height={34} /></Link>
+          {member ? <nav aria-label="Your account" className="flex items-center gap-3 text-sm font-semibold text-[var(--accent)]"><a href="#catalog">Catalog</a><a href="#fit">Your fit</a><form action={signOutSeams}><button className="min-h-11">Sign out</button></form></nav> : null}
+        </div>
+      </header>
+      <div className="scout-container">
+        <div className="scout-brand-hero pt-5">
+          <span className="scout-film-stripe" aria-hidden="true" />
+          <span className="scout-90s-graphic" aria-hidden="true"><i /><i /><i /></span>
+          <h1>Seams<br className="sm:hidden" /> Familiar</h1>
+          <p>Vintage clothing · Good clothes come around again.</p>
+        </div>
+        {unsubscribe ? (
+          <section className="my-6 max-w-xl" aria-labelledby="unsubscribe-title">
+            <h2 id="unsubscribe-title" className="text-2xl font-bold">Unsubscribe from First Dibs</h2>
+            <form action={stopFirstDibs} className="mt-4">
+              <input type="hidden" name="token" value={unsubscribe} />
+              <ScoutSubmit label="Unsubscribe" pendingLabel="Updating…" className={button} />
+            </form>
+          </section>
+        ) : member ? (
+          <>
+            {!member.settings ? <FitForm settings={settings} status={params.status} /> : null}
+            <section id="catalog" aria-labelledby="catalog-title" className="my-5 scroll-mt-6">
+              <h2 id="catalog-title" className="text-xl font-bold tracking-tight">Your vintage catalog</h2>
+              <form action={searchMemberCatalog} className="my-3 flex gap-2">
+                <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input name="keywords" type="search" defaultValue={keywords} placeholder="Denim, wool, L.L.Bean…" maxLength={80} className="scout-control w-full text-base" /></label>
+                <ScoutSubmit label="Search now" pendingLabel="Checking shops…" className={button} />
+              </form>
+              <p className="mb-2 text-sm text-[var(--muted-ink)]" role="status">{cards.length ? `${cards.length} matches from secondhand shops` : catalog.length ? "No matches in your saved fit. Try a different search or adjust your sizes or budget." : "The shop catalog is loading. Use Search now to check the shops."}</p>
+              {cards.length ? <FreshCatalog key={`${stamp}:${keywords}:${JSON.stringify(settings)}`} items={cards} womenswear={settings.department !== "men"} personalActions={false} /> : null}
+            </section>
+            {member.settings ? <FitForm settings={settings} status={params.status} /> : null}
+            <FirstDibs member={member} status={params.status} />
+          </>
+        ) : <Welcome access={params.access} status={params.status} />}
+        <footer className="mt-8 border-t border-[var(--line)] py-4 text-xs text-[var(--muted-ink)]">
+          <p>Resonate Solutions uses your email to sign you in and your preferences to match listings. First Dibs is optional and has an unsubscribe link.</p>
+          <Link href="/privacy" className="mt-2 inline-block underline underline-offset-4">Privacy policy</Link>
+        </footer>
+      </div>
+    </main>
+  );
+}

@@ -7,10 +7,9 @@ import { ListingChecker } from "@/components/fieldwear/listing-checker";
 import { FreshCatalog, ListingShelf, ListingWorkbench, type ListingView } from "@/components/fieldwear/listing-workbench";
 import { ScoutPreferencesForm } from "@/components/fieldwear/scout-preferences";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
-import { curatedListings, type CuratedListing } from "@/lib/fieldwear/curated-listings";
-import { classifyGarment, scoreListing, type ListingInput } from "@/lib/fieldwear/listing-model";
-import { listingColors } from "@/lib/fieldwear/listing-colors";
-import { listingMeasurements, vintageSignals } from "@/lib/fieldwear/vintage-signals";
+import { curatedListings } from "@/lib/fieldwear/curated-listings";
+import { classifyGarment, type ListingInput } from "@/lib/fieldwear/listing-model";
+import { toListingView } from "@/lib/fieldwear/listing-view";
 import { beanReferenceId, matchLook } from "@/lib/fieldwear/look-search";
 import { readScoutEdition } from "@/lib/fieldwear/editions";
 import { isScoutOwner, readScoutPreferences, scoutDatabase } from "@/lib/fieldwear/owner-access";
@@ -55,6 +54,7 @@ function OwnerSignIn({ token, status }: { token?: string; status?: string }) {
             <label htmlFor="fieldwear-email" className="mt-5 block font-bold">Email</label>
             <input id="fieldwear-email" name="email" type="email" autoComplete="email" maxLength={254} className={inputClass} />
             <button className={buttonClass}>Send sign-in link</button>
+            <p className="mt-4 text-sm"><Link href="/seams-familiar" className="font-semibold text-[var(--accent)] underline underline-offset-4">Create a Seams Familiar account</Link></p>
             {status === "requested" ? <p className="mt-4" role="status">If this is the owner email, check your inbox for the link.</p> : null}
             {status === "expired" || (token && !validToken) ? <p className="mt-4" role="status">This link is invalid, expired, or already used. Request a new one.</p> : null}
             {status === "unavailable" ? <p className="mt-4" role="status">Sign-in is unavailable right now.</p> : null}
@@ -358,71 +358,6 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
       </div>
     </main>
   );
-}
-
-function toListingView(
-  input:ListingInput,
-  firstSeenAt:string,
-  lastSeenAt:string,
-  decision:string|null,
-  preferences:ScoutPreferences,
-  curated?:CuratedListing,
-):ListingView {
-  const rescored = scoreListing(input, preferences);
-  const sellerClaims = [...rescored.evidence.sellerClaims];
-  const confirmed = [...rescored.evidence.confirmed];
-  const visualClues = [...rescored.evidence.visualClues];
-  const missing = [...rescored.missing];
-
-  if (curated) {
-    sellerClaims.push(
-      curated.curatedEvidence.fiberClaim,
-      curated.curatedEvidence.eraClaim,
-      curated.curatedEvidence.originClaim,
-    );
-    confirmed.push(`Marketplace snapshot captured ${new Date(curated.provenance.capturedAt).toLocaleDateString("en-US", { month:"short", day:"numeric", year:"numeric", timeZone:"UTC" })}`);
-    visualClues.push(...(curated.curatedEvidence.corroboratingClues ?? []));
-    missing.push("Recheck current availability and seller details on the original listing");
-  }
-
-  return {
-    source:input.source,
-    sellerName: input.source === "shopifycatalog" ? input.seller ?? null : null,
-    externalId:input.externalId,
-    url:input.url,
-    title:input.title,
-    imageUrl:input.imageUrl ?? null,
-    imageUrls:input.imageUrls,
-    priceCents:input.priceCents ?? null,
-    priceKind:input.priceKind,
-    shippingCents:input.shippingCents ?? null,
-    size:input.size ?? null,
-    sizeBasis:input.sizeBasis,
-    colors:listingColors(input.title, input.color),
-    measurements:listingMeasurements(input.description),
-    vintage:vintageSignals(input),
-    condition:input.condition ?? null,
-    firstSeenAt,
-    lastSeenAt,
-    totalScore:rescored.total,
-    fitScore:rescored.fit,
-    constructionScore:rescored.construction,
-    ageScore:rescored.age,
-    conditionScore:rescored.condition,
-    valueScore:rescored.value,
-    documentationScore:rescored.documentation,
-    tasteMatch:rescored.tasteMatch,
-    tasteReasons:curated ? [curated.curatedEvidence.curationNote, ...rescored.tasteReasons] : rescored.tasteReasons,
-    eraConfidence:rescored.eraConfidence,
-    eraReasons:rescored.eraReasons,
-    qualityException:rescored.qualityException,
-    garmentKind:classifyGarment(input),
-    evidence:{ ...rescored.evidence, confirmed, sellerClaims:Array.from(new Set(sellerClaims)), visualClues:Array.from(new Set(visualClues)), hiddenBargain:rescored.hiddenBargain },
-    concerns:rescored.concerns,
-    missing:Array.from(new Set(missing)),
-    decision,
-    curatedCategory:curated?.category ?? null,
-  };
 }
 
 function canonicalListingKey(rawUrl:string) {

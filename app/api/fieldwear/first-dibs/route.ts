@@ -1,8 +1,9 @@
 import { timingSafeEqual } from "node:crypto";
+import { deliverSeamsDibs } from "@/lib/seams/digest";
 import { deliverFirstDibs } from "@/lib/fieldwear/first-dibs";
 
 export const dynamic = "force-dynamic";
-export const maxDuration = 60;
+export const maxDuration = 120;
 
 export async function GET(request: Request) {
   const secret = process.env.CRON_SECRET;
@@ -13,8 +14,10 @@ export async function GET(request: Request) {
     return new Response(null, { status: 401 });
   }
   try {
-    const status = await deliverFirstDibs();
-    return Response.json({ status }, { status: ["unavailable", "sources-unavailable", "email-failed"].includes(status) ? 503 : 200 });
+    const status = await deliverFirstDibs().catch(() => "digest-failed");
+    const members = await deliverSeamsDibs();
+    const ok = !["unavailable", "sources-unavailable", "email-failed", "digest-failed"].includes(status) && !members.failed;
+    return Response.json({ status, members }, { status: ok ? 200 : 503 });
   } catch {
     return Response.json({ status: "digest-failed" }, { status: 500 });
   }

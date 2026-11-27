@@ -22,6 +22,8 @@ export default function PrivacyPage() {
         <p>We may use trusted service providers for payments, hosting, analytics, email, storage, and content support. These providers only receive information needed to support the service.</p>
         <h2 className="text-2xl font-black text-ink">Data Retention</h2>
         <p>We keep business and account information for as long as needed to provide the service, maintain records, resolve issues, and meet legal or operational requirements. Please do not submit sensitive personal information unless it is required for your page or account.</p>
+        <h2 className="text-2xl font-black text-ink">Seams Familiar</h2>
+        <p>Seams Familiar uses your email to verify and manage your account. We use the sizes, budget, and style preferences you save to match listings. When you opt in to First Dibs, our email provider uses your email address to deliver matches. Turn off First Dibs in your account or use the unsubscribe link in an email. Contact us below to request deletion of your account and preferences.</p>
         <h2 className="text-2xl font-black text-ink">Contact</h2>
         <p>For privacy questions, contact questions@resonate.solutions.</p>
       </div>

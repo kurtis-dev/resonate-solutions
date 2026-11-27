@@ -12,6 +12,7 @@ type CustomerEmailInput = {
   text: string;
   replyTo?: string;
   idempotencyKey?: string;
+  headers?: Record<string, string>;
   attachments?: Array<{
     filename: string;
     content: string;
@@ -40,6 +41,7 @@ export async function sendCustomerEmail(input: CustomerEmailInput): Promise<Emai
   try {
     const response = await fetch("https://api.resend.com/emails", {
       method: "POST",
+      signal: AbortSignal.timeout(8000),
       headers: {
         Authorization: `Bearer ${apiKey}`,
         "Content-Type": "application/json",
@@ -51,6 +53,7 @@ export async function sendCustomerEmail(input: CustomerEmailInput): Promise<Emai
         reply_to: replyTo || undefined,
         subject: clean(input.subject, 180),
         text: clean(input.text, 5000),
+        headers: input.headers,
         attachments: input.attachments?.map((attachment) => ({
           filename: clean(attachment.filename, 180),
           content: attachment.content,

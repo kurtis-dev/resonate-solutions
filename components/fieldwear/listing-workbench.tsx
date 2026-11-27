@@ -388,7 +388,7 @@ export function ListingShelf({ id, label, description, items, comparePrices = fa
 }
 
 const freshPageSize = 12;
-const collections = [["all", "All workwear"], ["90s", "90s"], ["y2k", "Y2K"], ["canvas", "Canvas & duck"], ["lined", "Lined layers"]] as const;
+const collections = [["all", "All finds"], ["90s", "90s"], ["y2k", "Y2K"], ["canvas", "Canvas & duck"], ["lined", "Lined layers"]] as const;
 type Collection = (typeof collections)[number][0];
 const priceForSort = (item: ListingView) => item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
 const garmentOptions = {
@@ -416,8 +416,8 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false }: {
-  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean;
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true }: {
+  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean;
 }) {
   const [expired, setExpired] = useState(false);
   useEffect(() => {
@@ -638,7 +638,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         </div>
       ) : null}
       <div className="scout-photo-grid">
-        {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid showSimilar={!womenswear} priority={index < 4} />)}
+        {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid showSimilar={!womenswear} personalActions={personalActions} priority={index < 4} />)}
       </div>
       {lastPage > 1 ? (
         <nav className="mt-5 flex items-center justify-between gap-4" aria-label="Catalog pages">
@@ -661,13 +661,13 @@ function ListingPhoto({ imageUrl, title, priority = false }: Pick<ListingView, "
   );
 }
 
-function ListingCard({ item, grid = false, priority = false, showSimilar = true }: { item: ListingView; grid?: boolean; priority?: boolean; showSimilar?: boolean }) {
+function ListingCard({ item, grid = false, priority = false, showSimilar = true, personalActions = true }: { item: ListingView; grid?: boolean; priority?: boolean; showSimilar?: boolean; personalActions?: boolean }) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const displayPrice = item.priceCents == null ? "Price unlisted" : `${money(item.priceCents)}${item.priceKind === "bid" ? " bid" : ""}`;
   const total = item.priceCents != null && item.shippingCents != null ? money(item.priceCents + item.shippingCents) : null;
   const sourceLabel = item.sellerName ?? marketplaceName(item.source);
-  const catalogItem = item.source === "shopifycatalog";
+  const catalogItem = item.source === "shopifycatalog" || !personalActions;
   const openDetails = () => {
     setDetailsOpen(true);
     dialog.current?.showModal();
