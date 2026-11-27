@@ -21,7 +21,7 @@ async function refreshDepartment(department: Department, force: boolean) {
     ON CONFLICT (department) DO UPDATE SET lease_until = EXCLUDED.lease_until
     WHERE (seams_catalog.lease_until IS NULL OR seams_catalog.lease_until < now())
     AND (${force} OR seams_catalog.checked_at IS NULL OR seams_catalog.checked_at < now() - interval '15 minutes')
-    RETURNING lease_until` as { lease_until: string }[];
+    RETURNING lease_until::text AS lease_until` as { lease_until: string }[];
   if (!lease) return null;
 
   const now = Date.now();
@@ -57,7 +57,7 @@ export async function refreshSeamsCatalog(force = false) {
 export async function readSeamsCatalog() {
   await initializeSeams();
   const sql = await seamsSql();
-  return await sql`SELECT department, listings, checked_at FROM seams_catalog
+  return await sql`SELECT department, listings, checked_at::text AS checked_at FROM seams_catalog
     WHERE checked_at > now() - interval '36 hours'` as CatalogRow[];
 }
 
