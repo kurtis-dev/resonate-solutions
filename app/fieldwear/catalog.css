@@ -408,6 +408,23 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
   text-decoration: underline;
   text-underline-offset: 3px;
 }
+.scout-listing-cost {
+  display: flex;
+  gap: 4px 20px;
+  flex-wrap: wrap;
+  margin-top: 12px;
+  padding-block: 8px;
+  border-block: 1px solid var(--line);
+  font-size: .8125rem;
+  line-height: 1.45;
+}
+.scout-listing-cost > div {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+.scout-listing-cost dt { color: var(--muted-ink); }
+.scout-listing-cost dd { font-weight: 750; font-variant-numeric: tabular-nums; }
 .scout-measurements {
   scroll-margin-top: 62px;
   margin-bottom: 16px;

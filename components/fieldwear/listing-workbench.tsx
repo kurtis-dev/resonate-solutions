@@ -792,6 +792,10 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
   const [detailsOpen, setDetailsOpen] = useState(false);
   const displayPrice = item.priceCents == null ? "Price unlisted" : `${money(item.priceCents)}${item.priceKind === "bid" ? " bid" : ""}`;
   const total = item.priceCents != null && item.shippingCents != null ? money(item.priceCents + item.shippingCents) : null;
+  const totalLabel = item.priceKind === "bid" ? "Bid + shipping" : "Item + shipping";
+  const shipping = item.shippingCents === 0 ? "Free" : item.shippingCents != null ? money(item.shippingCents)
+    : "Check with seller";
+  const showShippingTotal = total != null && item.shippingCents != null && item.shippingCents > 0;
   const sourceLabel = item.sellerName ?? marketplaceName(item.source);
   const catalogItem = item.source === "shopifycatalog" || !personalActions;
   const trackOriginal = personalActions ? undefined : () => recordSeamsActivity("seller-click", item.garmentKind, item.source);
@@ -812,9 +816,9 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
     { label: "Color", value: item.colors.join(", ") },
     { label: "Era", value: item.vintage.eraNote },
     { label: "Pickup", value: item.pickupAvailable ? (item.source === "fredgoodwill" ? "Check pickup eligibility and scheduling at Goodwill checkout." : "Check pickup availability and details with the seller.") : null },
-    { label: "Shipping", value: item.pickupAvailable ? null : item.shippingCents != null ? money(item.shippingCents)
+    { label: "Shipping", value: frame || item.pickupAvailable ? null : item.shippingCents != null ? money(item.shippingCents)
       : item.source === "fredgoodwill" ? "Check availability and cost at checkout" : "Unknown" },
-    { label: item.priceKind === "bid" ? "Bid + shipping" : "Item + shipping", value: total },
+    { label: totalLabel, value: frame ? null : total },
   ];
 
   return (
@@ -861,6 +865,12 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
                   onAuxClick={(event) => { if (event.button === 1) trackOriginal?.(); }}
                   className="scout-primary inline-flex items-center gap-2 text-sm">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
               </div>
+              {frame ? (
+                <dl className="scout-listing-cost" aria-label="Shipping and price">
+                  <div><dt>{item.pickupAvailable && item.shippingCents == null ? "Pickup" : "Shipping"}</dt><dd>{shipping}</dd></div>
+                  {showShippingTotal ? <div><dt>{totalLabel}</dt><dd>{total}</dd></div> : null}
+                </dl>
+              ) : null}
               {frame && item.measurements.length > 0 ? (
                 <button type="button" className="scout-measurement-link" onClick={() => {
                   measurementSection.current?.focus({ preventScroll: true });
