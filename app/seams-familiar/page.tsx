@@ -8,14 +8,14 @@ import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { pageMetadata } from "@/lib/seo";
 import { toListingView } from "@/lib/fieldwear/listing-view";
-import { interestLabels, isGoodwillWorkPants, matchSeamsCatalog, previewSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
+import { goodwillShelf, interestLabels, matchSeamsCatalog, previewSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
 import { firstDibsReady } from "@/lib/seams/digest";
 import { defaultMemberSettings, readMember, seamsPath, type Member, type MemberSettings } from "@/lib/seams/members";
 import { continueSeams, requestMemberLink, saveMemberDibs, saveMemberFit, searchMemberCatalog, signOutSeams, stopFirstDibs } from "./actions";
 import "../fieldwear/scout.css";
 
 export const dynamic = "force-dynamic";
-type CatalogShelf = "" | "tour-shirts" | "goodwill-pants";
+type CatalogShelf = "" | "tour-shirts" | "goodwill" | "goodwill-pants";
 type CatalogQuery = { access?: string; status?: string; q?: string; unsubscribe?: string; department?: string; collection?: string; decade?: string };
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<CatalogQuery> }): Promise<Metadata> {
@@ -132,16 +132,17 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
   const member = unsubscribe ? null : await readMember();
   const guestDepartment = params.department === "men" || params.department === "women" ? params.department : "any";
   const settings = member?.settings ?? (member ? defaultMemberSettings : { ...defaultMemberSettings, department: guestDepartment });
-  const collection: CatalogShelf = params.collection === "tour-shirts" || params.collection === "goodwill-pants" ? params.collection : "";
+  const collection: CatalogShelf = params.collection === "tour-shirts" || params.collection === "goodwill" || params.collection === "goodwill-pants" ? params.collection : "";
   const tour = collection === "tour-shirts";
   const goodwillPants = collection === "goodwill-pants";
+  const goodwill = goodwillPants || collection === "goodwill";
   const decade = params.decade === "80s" || params.decade === "90s" ? params.decade : "";
   const decadeChoices = [["", "All decades"], ["80s", "80s"], ["90s", "90s"]] as const;
   const keywords = typeof params.q === "string" ? params.q.slice(0, 80) : "";
   const showCatalog = !unsubscribe && !params.access;
   const catalog = showCatalog ? await readSeamsCatalog().catch(() => []) : [];
   const matches = matchSeamsCatalog(catalog, settings, keywords, false, tour);
-  const shelfItems = goodwillPants ? matches.filter(isGoodwillWorkPants) : matches;
+  const shelfItems = goodwill ? goodwillShelf(matches, goodwillPants) : matches;
   const items = decade ? shelfItems.filter((item) => vintageSignals(item).decade === decade) : shelfItems;
   const preferences = { department: settings.department, shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes, shirtBudget: settings.budget, pantsBudget: settings.budget, matchingOnly: true };
   const stamp = catalog.reduce((latest, row) => latest > (row.checked_at ?? "") ? latest : row.checked_at ?? "", "");
@@ -181,16 +182,18 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
         ) : showCatalog ? (
           <>
             <section id="fresh" aria-labelledby="catalog-title" className="my-5 scroll-mt-6">
-              <h2 id="catalog-title" className="text-xl font-bold tracking-tight">{tour ? "’80s & ’90s tour shirts" : goodwillPants ? "Goodwill work pants" : member?.settings ? "Your fresh finds" : "Fresh finds"}</h2>
+              <h2 id="catalog-title" className="text-xl font-bold tracking-tight">{tour ? "’80s & ’90s tour shirts" : goodwill ? (goodwillPants ? "Goodwill work pants" : "Goodwill clothing") : member?.settings ? "Your fresh finds" : "Fresh finds"}</h2>
               <div className="scout-departments" aria-label="Catalog shelves">
                 <Link href={catalogHref({ decade, collection: "", department: guestDepartment })} aria-current={!collection ? "page" : undefined}>Daily catalog</Link>
                 <Link href={catalogHref({ decade, collection: "tour-shirts", department: guestDepartment })} aria-current={tour ? "page" : undefined}>Tour shirts</Link>
-                <Link href={catalogHref({ decade, collection: "goodwill-pants", department: guestDepartment })} aria-current={goodwillPants ? "page" : undefined}>Goodwill pants</Link>
+                <Link href={catalogHref({ decade, collection: "goodwill-pants", department: guestDepartment })} aria-current={goodwill ? "page" : undefined}>Goodwill pants</Link>
               </div>
               {tour ? <p className="my-2 text-xs text-[var(--muted-ink)]">Tour and era are seller-described. Check the print and tag photos.</p> : null}
-              {goodwillPants ? <p className="my-2 text-sm text-[var(--muted-ink)]">
-                Shippable listings from Goodwill storefronts. <a href="https://shopgoodwill.com/search/advancedsearch" target="_blank" rel="noreferrer" className="text-[var(--accent)] underline underline-offset-4">Search on ShopGoodwill.com</a>
-              </p> : null}
+              {goodwill ? <div className="my-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--muted-ink)]">
+                <span>Items that ship</span>
+                <Link href={catalogHref({ decade, collection: goodwillPants ? "goodwill" : "goodwill-pants", department: guestDepartment })} className="inline-flex min-h-11 items-center text-[var(--accent)] underline underline-offset-4">{goodwillPants ? "All Goodwill clothing" : "Work pants only"}</Link>
+                <a href="https://shopgoodwill.com/search/advancedsearch" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-[var(--accent)] underline underline-offset-4">Search on ShopGoodwill.com</a>
+              </div> : null}
               {!member && !tour ? <nav className="scout-departments" aria-label="Shop departments">
                 {([["any", "All"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([department, label]) => {
                   return <Link key={department} href={catalogHref({ decade, collection, department })} aria-current={guestDepartment === department ? "page" : undefined} scroll={false}>{label}</Link>;

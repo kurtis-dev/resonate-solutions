@@ -107,12 +107,20 @@ export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSetting
   }).sort((a, b) => b.rank - a.rank || b.item.listedAt.localeCompare(a.item.listedAt)).map(({ item }) => item);
 }
 
-export function isGoodwillWorkPants(item: LiveListing) {
-  const goodwill = item.source === "fredgoodwill" || (item.source === "ebay" && item.seller === "Goodwill on eBay");
-  if (!goodwill || classifyGarment(item) !== "pants") return false;
-  const notes = item.description ?? "";
-  if (!isSturdyShopGarment(item.title, notes, "pants")) return false;
-  return /\b(?:carpenter|work(?:wear)?|double[- ]knee|duck canvas|canvas|dungarees?|fatigue|sateen|painter|riveted)\b/i.test(`${item.title} ${notes}`);
+export function goodwillShelf(items: LiveListing[], workPantsOnly: boolean) {
+  const seen = new Set<string>();
+  return items.filter((item) => {
+    if (item.source !== "fredgoodwill" && (item.source !== "ebay" || item.seller !== "Goodwill on eBay")) return false;
+    const { title, description = "" } = item;
+    if (workPantsOnly && (classifyGarment({ title }) !== "pants"
+      || /\b(?:shortalls|shorts|leggings|joggers|sweatpants|ponte|lot of \d)\b/i.test(title)
+      || !isSturdyShopGarment(title, description, "pants")
+      || !/\b(?:carpenter|workwear|work (?:pants|trousers|jeans)|double[- ]knee|canvas|dungarees?|fatigue|sateen|painter|ripstop|utility|riveted)\b/i.test(`${title} ${description}`))) return false;
+    const key = title.toLowerCase().replace(/[^a-z0-9]/g, "");
+    const unique = !seen.has(key);
+    seen.add(key);
+    return unique;
+  });
 }
 
 export function previewSeamsCatalog(items: LiveListing[], includeHighlights: boolean) {

@@ -137,7 +137,10 @@ function mapItem(item: EbayItem, now: number): LiveListing | null {
   };
 }
 
-const goodwillSellers = ["goodwillscwi", "goodwillgoodskills", "seattlegoodwill", "goodwill_north_central_texas", "rappahannockgoodwill"];
+const goodwillSellers = [
+  "goodwillscwi", "goodwillgoodskills", "seattlegoodwill", "goodwill_north_central_texas",
+  "rappahannockgoodwill", "goodwillsocalshop", "goodwill_colorado_collectables",
+];
 
 export async function searchGoodwillEbay(department: "any" | "men" | "women", zip?: string): Promise<SourceResult> {
   const client = process.env.EBAY_CLIENT_ID;
