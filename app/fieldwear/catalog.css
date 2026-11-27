@@ -134,7 +134,14 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
 }
 @media (min-width: 640px) {
   .fieldwear-scout .scout-photo-grid { column-gap: 20px; }
-  .fieldwear-scout .scout-item-layout { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 24px; padding: 24px; }
+  .fieldwear-scout .scout-item-layout {
+    grid-template: "gallery summary" auto "gallery facts" 1fr / repeat(2, minmax(0, 1fr));
+    gap: 16px 24px;
+    padding: 24px;
+  }
+  .scout-item-summary { grid-area: summary; }
+  .scout-item-gallery { grid-area: gallery; }
+  .scout-item-facts { grid-area: facts; }
 }
 @media (min-width: 768px) {
   .fieldwear-scout .scout-photo-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }

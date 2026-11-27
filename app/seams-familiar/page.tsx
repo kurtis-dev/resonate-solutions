@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import localFont from "next/font/local";
 import Image from "next/image";
 import Link from "next/link";
 import { FreshCatalog } from "@/components/fieldwear/listing-workbench";
@@ -13,6 +14,13 @@ import { firstDibsPickLimit, firstDibsReady } from "@/lib/seams/digest";
 import { defaultMemberSettings, readMember, seamsPath, type Member, type MemberSettings } from "@/lib/seams/members";
 import { continueSeams, requestMemberLink, saveMemberDibs, saveMemberFit, searchMemberCatalog, signOutSeams, stopFirstDibs } from "./actions";
 import "../fieldwear/scout.css";
+
+const fraunces = localFont({
+  src: "./fonts/fraunces-semibold.woff2",
+  weight: "600",
+  display: "swap",
+  variable: "--seams-wordmark-font",
+});
 
 export const dynamic = "force-dynamic";
 type CatalogShelf = "" | "tour-shirts" | "goodwill" | "goodwill-pants";
@@ -170,21 +178,23 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
     return seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh";
   };
   return (
-    <main className="fieldwear-scout seams-public pb-12" data-decade={showCatalog && decade || undefined}>
+    <main className={`fieldwear-scout seams-public pb-12 ${fraunces.variable}`} data-decade={showCatalog && decade || undefined}>
       {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${collection}:${keywords}`} /> : null}
       <header className="border-b border-[var(--line)]">
         <div className="scout-container flex min-h-16 items-center justify-between">
           <Link href="/" aria-label="Resonate Solutions"><Image src="/assets/resonate-logo-transparent.png" alt="Resonate Solutions" width={122} height={34} /></Link>
           {member ? <nav aria-label="Your account" className="flex items-center gap-3 text-sm font-semibold text-[var(--accent)]"><a href="#fresh">Catalog</a><a href="#fit">Your fit</a><form action={signOutSeams}><button className="min-h-11">Sign out</button></form></nav> : (showCatalog ? <a href="#join" className="inline-flex min-h-11 items-center text-sm font-semibold text-[var(--accent)] underline underline-offset-4">Save my fit</a> : null)}
         </div>
+        <div className="scout-container">
+          <div className="scout-brand-hero">
+            <span className="scout-film-stripe" aria-hidden="true" />
+            <span className="scout-90s-graphic" aria-hidden="true"><i /><i /><i /></span>
+            <h1>Seams<br className="seams-wordmark-break" /> Familiar</h1>
+            <p>Vintage clothing · Good clothes come around again.</p>
+          </div>
+        </div>
       </header>
       <div className="scout-container">
-        <div className="scout-brand-hero pt-5">
-          <span className="scout-film-stripe" aria-hidden="true" />
-          <span className="scout-90s-graphic" aria-hidden="true"><i /><i /><i /></span>
-          <h1>Seams<br className="sm:hidden" /> Familiar</h1>
-          <p>Vintage clothing · Good clothes come around again.</p>
-        </div>
         {unsubscribe ? (
           <section className="my-6 max-w-xl" aria-labelledby="unsubscribe-title">
             <h2 id="unsubscribe-title" className="text-2xl font-bold">Unsubscribe from First Dibs</h2>

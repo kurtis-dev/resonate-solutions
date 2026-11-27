@@ -696,8 +696,8 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
     setDetailsOpen(true);
     dialog.current?.showModal();
   };
+  const sizeLabel = item.sizeBasis === "measured" ? "Measured size" : item.sizeBasis === "seller-fit" ? "Seller fit" : "Size";
   const details = [
-    { label: item.sizeBasis === "measured" ? "Measured size" : item.sizeBasis === "seller-fit" ? "Seller fit" : "Size", value: item.size },
     { label: "Measurements", value: item.measurements.join(" · ") },
     { label: "Condition", value: item.condition },
     { label: "Fabric", value: item.vintage.fabricNote },
@@ -738,11 +738,22 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
         </div>
         {detailsOpen ? (
           <div className="scout-item-layout">
-            <ListingGallery item={item} />
-            <div className="min-w-0">
+            <div className="scout-item-summary min-w-0">
               <h2 className="text-xl font-semibold leading-tight">{item.title}</h2>
-              <p className="mt-2 text-xl font-semibold tabular-nums">{displayPrice}</p>
-              <dl className="mt-4">
+              <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
+                <div>
+                  <p className="text-xl font-semibold tabular-nums">{displayPrice}</p>
+                  {item.size ? <p className="text-sm text-[var(--muted-ink)]">{sizeLabel} {item.size}</p> : null}
+                </div>
+                <a href={item.url} target="_blank" rel="noreferrer"
+                  onClick={personalActions ? undefined : () => recordSeamsActivity("seller-click", item.garmentKind, item.source)}
+                  onAuxClick={personalActions ? undefined : (event) => { if (event.button === 1) recordSeamsActivity("seller-click", item.garmentKind, item.source); }}
+                  className="scout-primary inline-flex items-center gap-2 text-sm">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
+              </div>
+            </div>
+            <ListingGallery item={item} />
+            <div className="scout-item-facts min-w-0">
+              <dl>
                 {details.filter(({ value }) => value).map(({ label, value }) => (
                   <div key={label} className="grid grid-cols-[6.5rem_1fr] gap-2 border-t border-[var(--line)] py-2 text-sm">
                     <dt className="text-[var(--muted-ink)]">{label}</dt><dd>{value}</dd>
@@ -750,10 +761,6 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
                 ))}
               </dl>
               {item.lookNote ? <p className="mt-2 text-sm text-[var(--muted-ink)]">{item.lookNote}</p> : null}
-              <a href={item.url} target="_blank" rel="noreferrer"
-                onClick={personalActions ? undefined : () => recordSeamsActivity("seller-click", item.garmentKind, item.source)}
-                onAuxClick={personalActions ? undefined : (event) => { if (event.button === 1) recordSeamsActivity("seller-click", item.garmentKind, item.source); }}
-                className="scout-primary mt-4 inline-flex items-center gap-2">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
               {!catalogItem && showSimilar && (item.garmentKind === "shirt" || item.garmentKind === "pants") && item.decision !== "pass" ? (
                 <form action={searchScoutLook} className="mt-2">
                   <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
@@ -792,7 +799,7 @@ function ListingGallery({ item }: { item: ListingView }) {
     if (zoomed && area) area.scrollTo((area.scrollWidth - area.clientWidth) / 2, (area.scrollHeight - area.clientHeight) / 2);
   }, [zoomed]);
   return (
-    <div className="min-w-0">
+    <div className="scout-item-gallery min-w-0">
       <div ref={scrollArea} className="scout-gallery-scroll" data-zoomed={zoomed}>
         {current ? (
           <button type="button" className="scout-photo-well scout-gallery-photo" onClick={() => setZoomed(!zoomed)} aria-label={zoomed ? "Zoom out" : "Zoom in"}>

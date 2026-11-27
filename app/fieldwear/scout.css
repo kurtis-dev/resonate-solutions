@@ -128,6 +128,21 @@
   .fieldwear-scout .scout-first-dibs .scout-90s-graphic { right: 220px; }
 }
 
+.fieldwear-scout.seams-public { background: #ebe8e1; }
+.seams-public > header { background: #fffefa; }
+.seams-public .scout-brand-hero { padding-block: 12px 20px; }
+.seams-public .scout-brand-hero h1 {
+  font-family: var(--seams-wordmark-font), Georgia, serif;
+  font-size: clamp(32px, 10.55vw, 62px);
+  font-weight: 600;
+  letter-spacing: -.035em;
+  line-height: 1.04;
+}
+.seams-wordmark-break { display: none; }
+@media (max-width: 639px) {
+  .seams-public[data-decade="90s"] .seams-wordmark-break { display: initial; }
+}
+
 .seams-public[data-decade] {
   --decade-rail-width: 12px;
   position: relative;
