@@ -434,9 +434,9 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true, compactFilters = false, filterNavigation, mobileNavigation, pickupPanel, emptyMessage }: {
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true, compactFilters = false, filterNavigation, toolbarNavigation, pickupPanel, emptyMessage }: {
   items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean; fixedKind?: "pants"; showNinetiesCollection?: boolean;
-  compactFilters?: boolean; filterNavigation?: ReactNode; mobileNavigation?: ReactNode; pickupPanel?: ReactNode; emptyMessage?: string;
+  compactFilters?: boolean; filterNavigation?: ReactNode; toolbarNavigation?: ReactNode; pickupPanel?: ReactNode; emptyMessage?: string;
 }) {
   const [expired, setExpired] = useState(false);
   useEffect(() => {
@@ -558,8 +558,8 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   );
   return (
     <div>
-      {pickupPanel ? <div ref={pickupPanelRef} className="scout-pickup-panel">{pickupPanel}</div> : null}
-      {!tourShelf ? <div className={`scout-collections ${compactFilters ? "scout-desktop-control" : ""}`} role="group" aria-label="Workwear collections">
+      {pickupPanel ? <div ref={pickupPanelRef} className={`scout-pickup-panel ${toolbarNavigation ? "scout-pickup-on-demand" : ""}`}>{pickupPanel}</div> : null}
+      {!tourShelf && !toolbarNavigation ? <div className={`scout-collections ${compactFilters ? "scout-desktop-control" : ""}`} role="group" aria-label="Workwear collections">
         <span className="scout-collections-label" aria-hidden="true">Collections</span>
         {collectionOptions.map(([id, label]) => (
           <button key={id} type="button" className="scout-collection" aria-pressed={collection === id}
@@ -567,8 +567,8 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         ))}
       </div> : null}
       <div className="scout-catalog-toolbar flex min-h-12 flex-wrap items-center justify-between gap-x-2 border-y border-[var(--line)]">
-        {mobileNavigation ? <div className="sm:hidden">{mobileNavigation}</div> : null}
-        {!tourShelf && !fixedKind ? <div className={`flex flex-wrap items-center gap-1 sm:gap-3 ${compactFilters ? "scout-desktop-control" : ""}`} role="group" aria-label="Garment category">
+        {toolbarNavigation}
+        {!tourShelf && !fixedKind && !toolbarNavigation ? <div className={`flex flex-wrap items-center gap-1 sm:gap-3 ${compactFilters ? "scout-desktop-control" : ""}`} role="group" aria-label="Garment category">
           {tabs.map(([value, label]) => (
             <button key={value} type="button" aria-pressed={kind === value}
               onClick={() => { if (kind !== value) { setKind(value); setGarmentType(""); setTagSize(""); } setPage(1); }}
@@ -594,7 +594,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
           <form method="dialog"><button className="scout-icon" aria-label="Close filters"><X size={19} /></button></form>
         </div>
         {compactFilters && (filterNavigation || pickupPanel) ? (
-          <div className="border-b border-[var(--line)] px-4 pb-2 pt-3 sm:hidden">
+          <div className={`border-b border-[var(--line)] px-4 pb-2 pt-3 ${toolbarNavigation ? "" : "sm:hidden"}`}>
             {filterNavigation}
             {pickupPanel ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" onClick={openPickup}>Local pickup</button> : null}
           </div>
@@ -604,12 +604,12 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
           <label className="col-span-full min-w-0 text-xs font-medium sm:hidden">Sort
             <select value={order} onChange={(event) => { setOrder(event.target.value); setPage(1); }} className={control}>{sortOptions}</select>
           </label>
-          {!tourShelf ? <label className="min-w-0 text-xs font-medium sm:hidden">Collection
+          {!tourShelf ? <label className={`min-w-0 text-xs font-medium ${toolbarNavigation ? "" : "sm:hidden"}`}>Collection
             <select value={collection} onChange={(event) => { setCollection(event.target.value as Collection); setPage(1); }} className={control}>
               {collectionOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
           </label> : null}
-          {!tourShelf && !fixedKind ? <label className="min-w-0 text-xs font-medium sm:hidden">Garment category
+          {!tourShelf && !fixedKind ? <label className={`min-w-0 text-xs font-medium ${toolbarNavigation ? "" : "sm:hidden"}`}>Garment category
             <select value={kind} onChange={(event) => { setKind(event.target.value as typeof kind); setGarmentType(""); setTagSize(""); setPage(1); }} className={control}>
               {tabs.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
@@ -681,12 +681,12 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 py-2 text-sm text-[var(--muted-ink)]" role="status">
           {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : allItems.length ? "No listings match these filters." : emptyMessage ?? "No listings match these filters."}
         </div>
-        <div className={`flex flex-wrap gap-1 ${compactFilters ? "scout-desktop-control" : ""}`}>
+        {!toolbarNavigation ? <div className={`flex flex-wrap gap-1 ${compactFilters ? "scout-desktop-control" : ""}`}>
         {marketplaces.includes("shopifycatalog") ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" aria-pressed={marketplace === "shopifycatalog"}
           onClick={() => { setMarketplace(marketplace === "shopifycatalog" ? "" : "shopifycatalog"); setPage(1); }}>Shopify Catalog</button> : null}
         {hasVintageShops ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" aria-pressed={shopsSelected}
           onClick={() => { setMarketplace(shopsSelected ? "" : "shops"); setPage(1); }}>Vintage shops</button> : null}
-        </div>
+        </div> : null}
       </div>
       {expired ? <p role="status" className="mb-3 text-xs text-[var(--muted-ink)]">Use Search now to check Shopify stock again.</p> : null}
       {colors.length > 0 ? (

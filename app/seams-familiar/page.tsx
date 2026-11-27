@@ -172,31 +172,20 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
     return seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh";
   };
   const decadeNavigation = (
-    <nav className="scout-collections scout-decades" aria-label="Shop by decade">
+    <nav className="seams-decades" aria-label="Shop by decade">
       {decadeChoices.map(([value, label]) => (
-        <Link key={value} className="scout-collection" href={catalogHref({ decade: value, collection, department: guestDepartment })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
+        <Link key={value} href={catalogHref({ decade: value, collection, department: guestDepartment })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
       ))}
     </nav>
   );
-  const catalogNavigation = (
-    <>
-      <nav className="scout-departments" aria-label="Catalog shelves">
-        <Link href={catalogHref({ decade, collection: "", department: guestDepartment })} aria-current={!collection ? "page" : undefined}>Daily catalog</Link>
-        <Link href={catalogHref({ decade, collection: "tour-shirts", department: guestDepartment })} aria-current={tour ? "page" : undefined}>Tour shirts</Link>
-        <Link href={catalogHref({ decade, collection: "goodwill-pants", department: guestDepartment })} aria-current={goodwill ? "page" : undefined}>Goodwill pants</Link>
-      </nav>
-      {goodwill ? <div className="my-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--muted-ink)]">
-        <span>Items that ship</span>
-        <Link href={catalogHref({ decade, collection: goodwillPants ? "goodwill" : "goodwill-pants", department: guestDepartment })} className="inline-flex min-h-11 items-center text-[var(--accent)] underline underline-offset-4">{goodwillPants ? "All Goodwill clothing" : "Work pants only"}</Link>
-        <a href="https://shopgoodwill.com/search/advancedsearch" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-[var(--accent)] underline underline-offset-4">Search on ShopGoodwill.com</a>
-      </div> : null}
-      {!member && !tour ? <nav className="scout-departments" aria-label="Shop departments">
-        {([["any", "All"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([department, label]) => {
-          return <Link key={department} href={catalogHref({ decade, collection, department })} aria-current={guestDepartment === department ? "page" : undefined} scroll={false}>{label}</Link>;
-        })}
-      </nav> : null}
-    </>
-  );
+  const departmentNavigation = !member && !tour ? (
+    <nav className="seams-decades" aria-label="Shop departments">
+      {([["any", "All departments"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([department, label]) => (
+        <Link key={department} href={catalogHref({ decade, collection, department })} aria-current={guestDepartment === department ? "page" : undefined} scroll={false}>{label}</Link>
+      ))}
+    </nav>
+  ) : undefined;
+  const placeholder = tour ? "Band, tour, or artist…" : goodwillPants ? "Canvas, carpenter, double knee…" : "Denim, wool, L.L.Bean…";
   return (
     <main className="fieldwear-scout seams-public pb-12" data-decade={showCatalog && decade || undefined}>
       {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${collection}:${keywords}`} /> : null}
@@ -223,15 +212,23 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
           </section>
         ) : showCatalog ? (
           <>
-            <section id="fresh" aria-labelledby="catalog-title" className="my-5 scroll-mt-6">
-              <h2 id="catalog-title" className="text-xl font-bold tracking-tight">{tour ? "’80s & ’90s tour shirts" : goodwill ? (goodwillPants ? "Goodwill work pants" : "Goodwill clothing") : member?.settings ? "Your fresh finds" : "Fresh finds"}</h2>
-              <div className="hidden sm:block">{catalogNavigation}</div>
+            <section id="fresh" aria-labelledby="catalog-title" className="seams-catalog my-5 scroll-mt-6">
+              <nav className="seams-shelves" aria-label="Catalog shelves">
+                <Link href={catalogHref({ decade, collection: "", department: guestDepartment })} aria-current={!collection ? "page" : undefined} scroll={false}>Catalog</Link>
+                <Link href={catalogHref({ decade, collection: "tour-shirts", department: guestDepartment })} aria-current={tour ? "page" : undefined} scroll={false}>Tour shirts</Link>
+                <Link href={catalogHref({ decade, collection: "goodwill-pants", department: guestDepartment })} aria-current={goodwill ? "page" : undefined} scroll={false}>Goodwill pants</Link>
+              </nav>
+              <h2 id="catalog-title" className="seams-catalog-title">{tour ? "’80s & ’90s tour shirts" : goodwill ? (goodwillPants ? "Goodwill work pants" : "Goodwill clothing") : member?.settings ? "Your fresh finds" : "Vintage clothing"}</h2>
+              {goodwill ? <div className="seams-goodwill-links">
+                <Link href={catalogHref({ decade, collection: goodwillPants ? "goodwill" : "goodwill-pants", department: guestDepartment })}>{goodwillPants ? "All Goodwill clothing" : "Work pants only"}</Link>
+                <a href="https://shopgoodwill.com/search/advancedsearch" target="_blank" rel="noreferrer">Search on ShopGoodwill.com</a>
+              </div> : null}
               {tour ? <p className="my-2 text-xs text-[var(--muted-ink)]">Tour and era are seller-described. Check the print and tag photos.</p> : null}
               {member ? (
                 <form action={searchMemberCatalog} className="my-3 flex gap-2">
                   {collection ? <input type="hidden" name="collection" value={collection} /> : null}
                   {decade ? <input type="hidden" name="decade" value={decade} /> : null}
-                  <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="keywords" type="search" defaultValue={keywords} placeholder={goodwillPants ? "Canvas, carpenter, double knee…" : "Denim, wool, L.L.Bean…"} maxLength={80} className="scout-control w-full text-base" /></label>
+                  <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="keywords" type="search" defaultValue={keywords} placeholder={placeholder} maxLength={80} className="scout-control w-full text-base" /></label>
                   <ScoutSubmit label="Search now" pendingLabel="Checking shops…" className={button} />
                 </form>
               ) : (
@@ -239,15 +236,14 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
                   {collection ? <input type="hidden" name="collection" value={collection} /> : null}
                   {decade ? <input type="hidden" name="decade" value={decade} /> : null}
                   {guestDepartment !== "any" ? <input type="hidden" name="department" value={guestDepartment} /> : null}
-                  <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="q" type="search" defaultValue={keywords} placeholder={goodwillPants ? "Canvas, carpenter, double knee…" : "Denim, wool, L.L.Bean…"} maxLength={80} className="scout-control w-full text-base" /></label>
+                  <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="q" type="search" defaultValue={keywords} placeholder={placeholder} maxLength={80} className="scout-control w-full text-base" /></label>
                   <button type="submit" className={button}>Search</button>
                 </form>
               )}
-              <div className="hidden sm:block">{decadeNavigation}</div>
               <FreshCatalog key={stamp + ":" + keywords + ":" + collection + ":" + decade + ":" + JSON.stringify(settings)}
                 items={cards} womenswear={!tour && settings.department !== "men"} tourShelf={tour}
                 fixedKind={goodwillPants ? "pants" : undefined} personalActions={false} showNinetiesCollection={false}
-                compactFilters filterNavigation={catalogNavigation} mobileNavigation={decadeNavigation}
+                compactFilters filterNavigation={departmentNavigation} toolbarNavigation={decadeNavigation}
                 pickupPanel={!tour ? <LocalPickup department={settings.department} /> : undefined}
                 emptyMessage={catalog.length ? "No listings match. Try another search or adjust your filters." : "The shop catalog is being refreshed."} />
             </section>

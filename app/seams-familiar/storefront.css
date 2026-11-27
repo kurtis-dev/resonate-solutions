@@ -5,7 +5,9 @@
 }
 
 .fieldwear-scout.seams-public {
+  --font-display: inherit;
   background: #f0ebe2;
+  font-family: var(--font-display), system-ui, sans-serif;
 }
 .seams-public:not([data-decade]) {
   --accent: #4c3051;
@@ -66,27 +68,83 @@
 .seams-broadcast-letter[data-motif="grid"] { background-image: linear-gradient(var(--pattern) 1px, transparent 1px), linear-gradient(90deg, var(--pattern) 1px, transparent 1px); background-size: .24em .24em; }
 .seams-broadcast-letter[data-motif="lightning"] { background-image: linear-gradient(-39deg, var(--face) 0 37%, var(--accent-mark) 38% 42%, #241729 43% 48%, var(--pattern) 49% 65%, var(--face) 66%); }
 
-@media (max-width: 639px) {
-  .seams-public #fresh { margin-top: 14px; }
-  .seams-public #fresh > form { margin-block: 9px; }
-  .seams-public #fresh .scout-catalog-toolbar .scout-decades {
-    margin: 0;
-    padding: 0;
-    border: 0;
-    gap: 2px;
-  }
-  .seams-public #fresh .scout-decades a {
-    padding-inline: 8px;
-    border: 0;
-    border-radius: 0;
-  }
-  .seams-public #fresh .scout-decades a[aria-current="page"] {
-    box-shadow: inset 0 -2px var(--accent);
-    background: transparent;
-    color: var(--accent);
-    font-weight: 700;
-  }
-  .seams-public #fresh .scout-catalog-count { min-height: 36px; }
+.seams-public .seams-catalog {
+  margin-top: 0;
+}
+.seams-shelves,
+.seams-decades {
+  display: flex;
+  align-items: center;
+}
+.seams-shelves {
+  gap: clamp(12px, 4vw, 28px);
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 15px;
+}
+.seams-shelves a,
+.seams-decades a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  color: var(--muted-ink);
+  white-space: nowrap;
+}
+.seams-shelves a {
+  min-height: 48px;
+  padding-inline: 2px;
+  font-size: .875rem;
+  font-weight: 750;
+}
+.seams-decades a {
+  padding-inline: 9px;
+  font-size: .8125rem;
+  font-weight: 650;
+}
+.seams-shelves a:hover,
+.seams-decades a:hover {
+  color: var(--ink);
+}
+.seams-shelves a[aria-current="page"] {
+  box-shadow: inset 0 -3px var(--accent);
+  color: var(--ink);
+}
+.seams-decades a[aria-current="page"] {
+  box-shadow: inset 0 -2px var(--accent);
+  color: var(--accent);
+  font-weight: 750;
+}
+.seams-public .seams-catalog-title {
+  font-size: clamp(1.25rem, 3vw, 1.625rem);
+  font-weight: 750;
+  line-height: 1.25;
+}
+.seams-catalog > form { margin-block: 10px; }
+.seams-catalog .scout-catalog-count { min-height: 38px; }
+.seams-catalog .scout-pickup-on-demand:not(:has(> details[open])) { display: none; }
+.seams-goodwill-links {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 16px;
+  color: var(--accent);
+  font-size: .8125rem;
+}
+.seams-goodwill-links a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+}
+.seams-catalog .scout-card-copy h3 {
+  font-weight: 700;
+  line-height: 1.4;
+}
+.seams-catalog .scout-card-copy > p {
+  font-size: .8125rem;
+}
+.seams-public .seams-catalog .scout-price-tag {
+  font-size: .8125rem;
+  font-weight: 800;
 }
 @media (max-width: 350px) {
   .seams-broadcast { font-size: 8vw; }
