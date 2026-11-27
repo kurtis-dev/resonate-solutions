@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { FreshCatalog } from "@/components/fieldwear/listing-workbench";
 import { LocalPickup } from "@/components/seams/local-pickup";
+import { WordmarkPreview } from "@/components/seams/wordmark-preview";
 import { SeamsActivity } from "@/components/seams/activity";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
@@ -14,6 +15,7 @@ import { firstDibsPickLimit, firstDibsReady } from "@/lib/seams/digest";
 import { defaultMemberSettings, readMember, seamsPath, type Member, type MemberSettings } from "@/lib/seams/members";
 import { continueSeams, requestMemberLink, saveMemberDibs, saveMemberFit, searchMemberCatalog, signOutSeams, stopFirstDibs } from "./actions";
 import "../fieldwear/scout.css";
+import "./wordmark-preview.css";
 
 const fraunces = localFont({
   src: "./fonts/fraunces-semibold.woff2",
@@ -208,8 +210,12 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
           <div className="scout-brand-hero">
             <span className="scout-film-stripe" aria-hidden="true" />
             <span className="scout-90s-graphic" aria-hidden="true"><i /><i /><i /></span>
-            <h1>Seams<br className="seams-wordmark-break" /> Familiar</h1>
-            <p>Vintage clothing · Good clothes come around again.</p>
+            {process.env.VERCEL_ENV !== "production" ? <WordmarkPreview /> : (
+              <>
+                <h1>Seams<br className="seams-wordmark-break" /> Familiar</h1>
+                <p>Vintage clothing · Good clothes come around again.</p>
+              </>
+            )}
           </div>
         </div>
       </header>

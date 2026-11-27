@@ -1,0 +1,65 @@
+@font-face {
+  font-family: "Seams Broadcast";
+  src: url("/assets/seams/preview/archivo-black.woff2") format("woff2");
+  font-display: swap;
+}
+
+.seams-public .scout-brand-hero .seams-preview-title {
+  max-width: 570px;
+  margin-block: 10px 8px;
+}
+.seams-shop-sign { display: block; width: min(100%, 465px); height: auto; }
+.scout-brand-hero:has([data-wordmark]) .scout-90s-graphic { display: none; }
+.seams-broadcast {
+  display: flex;
+  align-items: baseline;
+  gap: .22em;
+  width: fit-content;
+  padding: .08em .13em .16em .03em;
+  font: 400 clamp(20px, 6.15vw, 53px)/1.12 "Seams Broadcast", Impact, sans-serif;
+  letter-spacing: -.055em;
+}
+.seams-broadcast-word { white-space: nowrap; }
+.seams-broadcast-letter {
+  display: inline-block;
+  background-color: var(--face);
+  background-clip: text;
+  color: transparent;
+  -webkit-text-stroke: .045em #241729;
+  filter: drop-shadow(.045em .06em 0 #241729);
+  padding-inline: .018em;
+  transform: rotate(var(--letter-angle, -2deg));
+}
+.seams-broadcast-letter:nth-child(even) { --letter-angle: 2deg; }
+.seams-broadcast-letter[data-motif="blocks"] { background-image: linear-gradient(137deg, var(--face) 45%, var(--pattern) 46% 74%, var(--accent-mark) 75%); }
+.seams-broadcast-letter[data-motif="checks"] { background-image: repeating-conic-gradient(var(--pattern) 0 25%, transparent 0 50%); background-size: .38em .38em; }
+.seams-broadcast-letter[data-motif="sunburst"] { background-image: repeating-conic-gradient(from 10deg at 48% 78%, var(--accent-mark) 0 16deg, transparent 16deg 39deg); }
+.seams-broadcast-letter[data-motif="waves"] { background-image: repeating-radial-gradient(ellipse at 0 110%, var(--pattern) 0 12%, transparent 13% 29%); }
+.seams-broadcast-letter[data-motif="confetti"] { background-image: radial-gradient(circle at 20% 23%, var(--pattern) 0 7%, transparent 8%), radial-gradient(circle at 80% 72%, var(--accent-mark) 0 9%, transparent 10%); background-size: .44em .4em; }
+.seams-broadcast-letter[data-motif="static"] { background-image: repeating-linear-gradient(0deg, #201629 0 3%, transparent 4% 11%); }
+.seams-broadcast-letter[data-motif="steps"] { background-image: linear-gradient(28deg, var(--pattern) 0 29%, transparent 30% 69%, var(--accent-mark) 70%); }
+.seams-broadcast-letter[data-motif="zebra"] { background-image: repeating-linear-gradient(130deg, #241729 0 12%, transparent 13% 28%); }
+.seams-broadcast-letter[data-motif="rings"] { background-image: radial-gradient(ellipse at 66% 45%, var(--accent-mark) 0 14%, var(--pattern) 15% 32%, transparent 33% 47%, var(--accent-mark) 48% 55%, transparent 56%); }
+.seams-broadcast-letter[data-motif="halftone"] { background-image: radial-gradient(var(--pattern) 1px, transparent 1.3px); background-size: .19em .2em; }
+.seams-broadcast-letter[data-motif="split"] { background-image: linear-gradient(90deg, var(--accent-mark) 0 18%, transparent 19% 55%, var(--pattern) 56%); }
+.seams-broadcast-letter[data-motif="grid"] { background-image: linear-gradient(var(--pattern) 1px, transparent 1px), linear-gradient(90deg, var(--pattern) 1px, transparent 1px); background-size: .24em .24em; }
+.seams-broadcast-letter[data-motif="lightning"] { background-image: linear-gradient(-39deg, var(--face) 0 37%, var(--accent-mark) 38% 42%, #241729 43% 48%, var(--pattern) 49% 65%, var(--face) 66%); }
+
+.seams-preview-controls, .seams-preview-options, .seams-preview-controls label {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+.seams-preview-controls { margin-top: 10px; font-size: .78rem; }
+.seams-preview-options button, .seams-preview-controls select {
+  min-height: 44px;
+  padding-inline: 10px;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+}
+.seams-preview-options button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
+@media (max-width: 350px) {
+  .seams-broadcast { font-size: 5.75vw; }
+}
