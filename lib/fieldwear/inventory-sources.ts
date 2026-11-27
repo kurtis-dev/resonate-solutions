@@ -175,7 +175,7 @@ export function isSturdyShopGarment(title: string, notes: string, kind: "shirt" 
   return quality.build > 0 || (quality.build === 0 && workwear);
 }
 
-export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, { now }: Window, tour = false): Promise<SourceResult> {
+export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, { now }: Window, { tour = false, includePickupOnly = false } = {}): Promise<SourceResult> {
   const options: RequestInit = { cache: "no-store", signal: AbortSignal.timeout(9_000), redirect: "error" };
   const collections = preferences.department === "women" && "womensCollections" in shop ? shop.womensCollections : shop.collections;
   const pages = await Promise.allSettled(collections.map(async (collection) => {
@@ -219,7 +219,8 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       const optionValue = (variant: NonNullable<ShopProduct["variants"]>[number], position: number) =>
         [variant.option1, variant.option2, variant.option3][position - 1]?.trim() ?? "";
       const notes = shopSellerNotes(product.body_html);
-      if (isGoodwillPickupOnly(shop.source, [title, product.tags, plainText(product.body_html)].flat().join(" "))) continue;
+      const pickupOnly = isGoodwillPickupOnly(shop.source, [title, product.tags, plainText(product.body_html)].flat().join(" "));
+      if (pickupOnly && !includePickupOnly) continue;
       if (tour && !isPeriodTourShirt(title, notes)) continue;
       const variant = product.variants?.find((value) => {
         if (!value.available) return false;
@@ -252,7 +253,7 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
         ?? notes.match(/^pre[- ]owned\s*[-–:]\s*(.+)$/im)?.[1];
       listings.set(externalId, {
         source: shop.source, externalId, title, description: tour ? ["Garment type: shirt. Tour or era is seller-described. Check tag and print photographs.", description].join("\n") : description, imageUrl, imageUrls, size, sizeBasis, condition, color: labeledColor || undefined,
-        listedAt: new Date(product.published_at).toISOString(), priceCents: price,
+        listedAt: new Date(product.published_at).toISOString(), priceCents: price, pickupOnly: pickupOnly || undefined,
         url: `${shop.origin}/products/${product.handle}${variantSize && Number.isSafeInteger(variant.id) ? `?variant=${variant.id}` : ""}`,
       });
     }

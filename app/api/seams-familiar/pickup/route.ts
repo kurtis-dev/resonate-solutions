@@ -1,7 +1,9 @@
 import { createHash } from "node:crypto";
 import { searchGoodwillEbay } from "@/lib/fieldwear/live-search";
 import { toListingView } from "@/lib/fieldwear/listing-view";
-import { matchSeamsCatalog } from "@/lib/seams/catalog";
+import { isGoodwillPickupOnly } from "@/lib/fieldwear/marketplace-directory";
+import { isNearGoodwillPickup } from "@/lib/seams/goodwill-pickup-area";
+import { matchSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
 import { defaultMemberSettings, initializeSeams, readMember, seamsSql } from "@/lib/seams/members";
 
 const reply = (body: object, status = 200) => Response.json(body, {
@@ -32,20 +34,35 @@ export async function POST(request: Request) {
     const member = await readMember();
     const department = body?.department === "men" || body?.department === "women" ? body.department : "any";
     const settings = member?.settings ?? { ...defaultMemberSettings, department };
-    const result = await searchGoodwillEbay(settings.department, zip);
-    if (result.status === "unavailable" || result.status === "needs-access") {
+    const nearby = isNearGoodwillPickup(zip);
+    const [remote, direct] = await Promise.allSettled([
+      searchGoodwillEbay(settings.department, zip),
+      nearby ? readSeamsCatalog() : Promise.resolve([]),
+    ]);
+    const ebay = remote.status === "fulfilled" ? remote.value : null;
+    const ebayUnavailable = !ebay || ebay.status === "unavailable" || ebay.status === "needs-access";
+    const directUnavailable = direct.status === "rejected" || (nearby && direct.value.length === 0);
+    const directRows = direct.status === "fulfilled" ? direct.value.map((row) => ({
+      ...row,
+      listings: row.listings.filter((item) => item.source === "fredgoodwill" && (item.pickupOnly
+        || isGoodwillPickupOnly(item.source, [item.title, item.description].join(" "))
+        || /\bcustomer pick[- ]?ups?\s*:\s*by appointment\b/i.test(item.description ?? "")))
+        .map((item) => ({ ...item, pickupAvailable: true })),
+    })) : [];
+    if (ebayUnavailable && (!nearby || directUnavailable)) {
       return reply({ error: "Pickup search is temporarily unavailable. Try again later." }, 503);
     }
 
-    const rows = settings.department === "any" ? "men" : settings.department;
+    const departmentForEbay = settings.department === "any" ? "men" : settings.department;
     const now = new Date().toISOString();
-    const items = matchSeamsCatalog([{ department: rows, listings: result.listings, checked_at: now }], settings).map((item) =>
+    const rows = [...directRows, { department: departmentForEbay, listings: ebay?.listings ?? [], checked_at: now }];
+    const items = matchSeamsCatalog(rows, settings, "", false, false, true).slice(0, 96).map((item) =>
       toListingView(item, item.listedAt, now, null, {
         department: settings.department, shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes,
         shirtBudget: settings.budget, pantsBudget: settings.budget, matchingOnly: true,
       }),
     );
-    return reply({ items, partial: result.status === "partial" });
+    return reply({ items, partial: ebayUnavailable || ebay?.status === "partial" || directUnavailable });
   } catch {
     return reply({ error: "Pickup search is temporarily unavailable. Try again later." }, 503);
   }

@@ -26,6 +26,7 @@ export type ListingInput = {
   priceCents?: number | null;
   shippingCents?: number | null;
   pickupAvailable?: boolean;
+  pickupOnly?: boolean;
   priceKind?: "bid";
   size?: string | null;
   sizeBasis?: "tag" | "seller-fit" | "measured";

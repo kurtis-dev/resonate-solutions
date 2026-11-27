@@ -30,7 +30,7 @@ async function refreshDepartment(department: Department, force: boolean) {
   try {
     const shops = department === "tour" ? tourShops : vintageShops;
     const results = await Promise.allSettled([
-      ...shops.map((shop) => searchVintageShop(shop, preferences, "", { start: 0, now }, department === "tour")),
+      ...shops.map((shop) => searchVintageShop(shop, preferences, "", { start: 0, now }, { tour: department === "tour", includePickupOnly: true })),
       ...(department === "tour" ? [] : [searchGoodwillEbay(department)]),
     ]);
     const listings = new Map<string, LiveListing>();
@@ -80,14 +80,14 @@ function matchesInterest(item: LiveListing, kind: GarmentKind, interest: string)
   }
 }
 
-export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSettings, keywords = "", email = false, tour = false) {
+export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSettings, keywords = "", email = false, tour = false, includePickupOnly = false) {
   const terms = keywords.toLowerCase().match(/[a-z0-9]+/g) ?? [];
   const fitPreferences = { shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes } as ScoutPreferences;
   const unique = new Map<string, LiveListing>();
   for (const row of catalog) {
     if (tour ? row.department !== "tour" : row.department === "tour" || (settings.department !== "any" && settings.department !== row.department)) continue;
     for (const item of row.listings) {
-      if (isGoodwillPickupOnly(item.source, [item.title, item.description].join(" "))) continue;
+      if (!includePickupOnly && (item.pickupOnly || isGoodwillPickupOnly(item.source, [item.title, item.description].join(" ")))) continue;
       const signals = vintageSignals(item);
       if (signals.decade === "y2k" && !signals.sturdy2000s) continue;
       const kind = classifyGarment(item);

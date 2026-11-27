@@ -681,7 +681,7 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
     { label: "Fabric", value: item.vintage.fabricNote },
     { label: "Color", value: item.colors.join(", ") },
     { label: "Era", value: item.vintage.eraNote },
-    { label: "Pickup", value: item.pickupAvailable ? "Available within your search radius. Check pickup details on eBay." : null },
+    { label: "Pickup", value: item.pickupAvailable ? (item.source === "fredgoodwill" ? "Check pickup eligibility and scheduling at Goodwill checkout." : "Check pickup details on the eBay listing.") : null },
     { label: "Shipping", value: item.pickupAvailable ? null : item.shippingCents != null ? money(item.shippingCents)
       : item.source === "fredgoodwill" ? "Check availability and cost at checkout" : "Unknown" },
     { label: item.priceKind === "bid" ? "Bid + shipping" : "Item + shipping", value: total },
