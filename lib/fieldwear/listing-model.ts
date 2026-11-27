@@ -25,6 +25,7 @@ export type ListingInput = {
   imageUrls?: string[];
   priceCents?: number | null;
   shippingCents?: number | null;
+  pickupAvailable?: boolean;
   priceKind?: "bid";
   size?: string | null;
   sizeBasis?: "tag" | "seller-fit" | "measured";

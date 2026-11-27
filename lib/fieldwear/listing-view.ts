@@ -32,7 +32,7 @@ export function toListingView(
 
   return {
     source:input.source,
-    sellerName: input.source === "shopifycatalog" ? input.seller ?? null : null,
+    sellerName: input.source === "shopifycatalog" || input.source === "ebay" ? input.seller ?? null : null,
     externalId:input.externalId,
     url:input.url,
     title:input.title,
@@ -41,6 +41,7 @@ export function toListingView(
     priceCents:input.priceCents ?? null,
     priceKind:input.priceKind,
     shippingCents:input.shippingCents ?? null,
+    pickupAvailable:input.pickupAvailable,
     size:input.size ?? null,
     sizeBasis:input.sizeBasis,
     colors:listingColors(input.title, input.color),

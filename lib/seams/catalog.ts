@@ -2,6 +2,7 @@ import { searchVintageShop, type LiveListing } from "@/lib/fieldwear/inventory-s
 import { isGoodwillPickupOnly, vintageShops, tourShops } from "@/lib/fieldwear/marketplace-directory";
 import { classifyGarment, type GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentMatch, sizeMatch, type ScoutPreferences } from "@/lib/fieldwear/preferences";
+import { searchGoodwillEbay } from "@/lib/fieldwear/live-search";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { initializeSeams, seamsSql, type MemberSettings } from "./members";
 
@@ -28,7 +29,10 @@ async function refreshDepartment(department: Department, force: boolean) {
   const preferences: ScoutPreferences = { department: department === "tour" ? "any" : department, shirtSizes: [], pantsSizes: [], shirtBudget: null, pantsBudget: null, matchingOnly: false };
   try {
     const shops = department === "tour" ? tourShops : vintageShops;
-    const results = await Promise.allSettled(shops.map((shop) => searchVintageShop(shop, preferences, "", { start: 0, now }, department === "tour")));
+    const results = await Promise.allSettled([
+      ...shops.map((shop) => searchVintageShop(shop, preferences, "", { start: 0, now }, department === "tour")),
+      ...(department === "tour" ? [] : [searchGoodwillEbay(department)]),
+    ]);
     const listings = new Map<string, LiveListing>();
     for (const result of results) {
       if (result.status !== "fulfilled") continue;
@@ -103,22 +107,29 @@ export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSetting
   }).sort((a, b) => b.rank - a.rank || b.item.listedAt.localeCompare(a.item.listedAt)).map(({ item }) => item);
 }
 
-export function previewSeamsCatalog(items: LiveListing[], include2000s: boolean) {
-  const previewSize = 72;
+export function previewSeamsCatalog(items: LiveListing[], includeHighlights: boolean) {
+  const previewSize = 288;
   const preview = items.slice(0, previewSize);
-  if (!include2000s || items.length <= previewSize) return preview;
+  if (!includeHighlights || items.length <= previewSize) return preview;
 
-  const desired2000s = 4;
-  const featured = preview.filter((item) => vintageSignals(item).sturdy2000s).length;
-  if (featured >= desired2000s) return preview;
-  const additional = items.slice(previewSize).filter((item) => vintageSignals(item).sturdy2000s).slice(0, desired2000s - featured);
-  if (!additional.length) return preview;
-
-  // Reserve room without displacing 2000s pieces that already ranked in the preview.
-  let slots = additional.length;
+  const remainder = items.slice(previewSize);
+  const isGoodwillEbay = (item: LiveListing) => item.source === "ebay" && item.seller === "Goodwill on eBay";
+  const isSturdy2000s = (item: LiveListing) => vintageSignals(item).sturdy2000s;
+  const reserve = [
+    { matches: isGoodwillEbay, minimum: 24 },
+    { matches: isSturdy2000s, minimum: 4 },
+  ];
+  const additional = new Set<LiveListing>();
+  for (const { matches, minimum } of reserve) {
+    const featured = preview.filter(matches).length + Array.from(additional).filter(matches).length;
+    remainder.filter((item) => !additional.has(item) && matches(item)).slice(0, Math.max(0, minimum - featured))
+      .forEach((item) => additional.add(item));
+  }
+  if (!additional.size) return preview;
+  let slots = additional.size;
   return preview.reduceRight<LiveListing[]>((kept, item) => {
-    if (slots > 0 && !vintageSignals(item).sturdy2000s) slots--;
+    if (slots > 0 && !reserve.some(({ matches }) => matches(item))) slots--;
     else kept.push(item);
     return kept;
-  }, []).reverse().concat(additional);
+  }, []).reverse().concat(Array.from(additional).slice(0, additional.size - slots));
 }

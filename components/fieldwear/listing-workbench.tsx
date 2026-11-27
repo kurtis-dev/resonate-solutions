@@ -30,7 +30,7 @@ import "@/app/fieldwear/catalog.css";
 
 export type ListingView = {
   source:string; externalId:string; url:string; title:string; imageUrl:string|null; imageUrls?:string[];
-  priceCents:number|null; priceKind?:"bid"; shippingCents:number|null; size:string|null; condition:string|null;
+  priceCents:number|null; priceKind?:"bid"; shippingCents:number|null; pickupAvailable?:boolean; size:string|null; condition:string|null;
   sizeBasis?:"tag" | "seller-fit" | "measured";
   sellerName?:string | null;
   colors:ColorFamily[];
@@ -681,7 +681,8 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
     { label: "Fabric", value: item.vintage.fabricNote },
     { label: "Color", value: item.colors.join(", ") },
     { label: "Era", value: item.vintage.eraNote },
-    { label: "Shipping", value: item.shippingCents != null ? money(item.shippingCents)
+    { label: "Pickup", value: item.pickupAvailable ? "Available within your search radius. Check pickup details on eBay." : null },
+    { label: "Shipping", value: item.pickupAvailable ? null : item.shippingCents != null ? money(item.shippingCents)
       : item.source === "fredgoodwill" ? "Check availability and cost at checkout" : "Unknown" },
     { label: item.priceKind === "bid" ? "Bid + shipping" : "Item + shipping", value: total },
   ];

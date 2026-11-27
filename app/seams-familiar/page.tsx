@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { FreshCatalog } from "@/components/fieldwear/listing-workbench";
+import { LocalPickup } from "@/components/seams/local-pickup";
 import { SeamsActivity } from "@/components/seams/activity";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
@@ -208,6 +209,7 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
                   <Link key={value} className="scout-collection" href={catalogHref({ decade: value, tour, department: guestDepartment })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
                 ))}
               </nav>
+              {!tour ? <LocalPickup key={settings.department} department={settings.department} /> : null}
               {!cards.length ? <p className="mb-2 text-sm text-[var(--muted-ink)]" role="status">{catalog.length ? "No matches. Try a different search or an open size or budget." : "The shop catalog is being refreshed."}</p> : null}
               {cards.length ? <FreshCatalog key={stamp + ":" + keywords + ":" + tour + ":" + decade + ":" + JSON.stringify(settings)} items={cards} womenswear={!tour && settings.department !== "men"} tourShelf={tour} personalActions={false} showNinetiesCollection={false} /> : null}
             </section>
