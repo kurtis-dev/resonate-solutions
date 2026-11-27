@@ -793,9 +793,8 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
   const displayPrice = item.priceCents == null ? "Price unlisted" : `${money(item.priceCents)}${item.priceKind === "bid" ? " bid" : ""}`;
   const total = item.priceCents != null && item.shippingCents != null ? money(item.priceCents + item.shippingCents) : null;
   const totalLabel = item.priceKind === "bid" ? "Bid + shipping" : "Item + shipping";
-  const shipping = item.shippingCents === 0 ? "Free" : item.shippingCents != null ? money(item.shippingCents)
-    : "Check with seller";
-  const showShippingTotal = total != null && item.shippingCents != null && item.shippingCents > 0;
+  const shipping = item.shippingCents == null ? (item.pickupAvailable ? "Check pickup with seller" : "Check shipping with seller")
+    : item.shippingCents === 0 ? "Free shipping" : `+ ${money(item.shippingCents)} shipping`;
   const sourceLabel = item.sellerName ?? marketplaceName(item.source);
   const catalogItem = item.source === "shopifycatalog" || !personalActions;
   const trackOriginal = personalActions ? undefined : () => recordSeamsActivity("seller-click", item.garmentKind, item.source);
@@ -858,6 +857,7 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
               <div className="mt-3 flex flex-wrap items-center justify-between gap-x-3 gap-y-2">
                 <div>
                   <p className="text-xl font-semibold tabular-nums">{displayPrice}</p>
+                  {frame ? <p className="scout-listing-shipping">{shipping}</p> : null}
                   {item.size ? <p className="text-sm text-[var(--muted-ink)]">{sizeLabel} {item.size}</p> : null}
                 </div>
                 <a href={item.url} target="_blank" rel="noreferrer"
@@ -865,12 +865,6 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
                   onAuxClick={(event) => { if (event.button === 1) trackOriginal?.(); }}
                   className="scout-primary inline-flex items-center gap-2 text-sm">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
               </div>
-              {frame ? (
-                <dl className="scout-listing-cost" aria-label="Shipping and price">
-                  <div><dt>{item.pickupAvailable && item.shippingCents == null ? "Pickup" : "Shipping"}</dt><dd>{shipping}</dd></div>
-                  {showShippingTotal ? <div><dt>{totalLabel}</dt><dd>{total}</dd></div> : null}
-                </dl>
-              ) : null}
               {frame && item.measurements.length > 0 ? (
                 <button type="button" className="scout-measurement-link" onClick={() => {
                   measurementSection.current?.focus({ preventScroll: true });
