@@ -184,7 +184,7 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
                 </form>
               )}
               {!cards.length ? <p className="mb-2 text-sm text-[var(--muted-ink)]" role="status">{catalog.length ? "No matches. Try a different search or an open size or budget." : "The shop catalog is being refreshed."}</p> : null}
-              {cards.length ? <FreshCatalog key={stamp + ":" + keywords + ":" + JSON.stringify(settings)} items={cards} womenswear={!tour && settings.department !== "men"} personalActions={false} /> : null}
+              {cards.length ? <FreshCatalog key={stamp + ":" + keywords + ":" + tour + ":" + JSON.stringify(settings)} items={cards} womenswear={!tour && settings.department !== "men"} tourShelf={tour} personalActions={false} /> : null}
             </section>
             {member ? <><FitForm settings={settings} status={params.status} /><FirstDibs member={member} status={params.status} /></>
               : <Welcome status={params.status} />}

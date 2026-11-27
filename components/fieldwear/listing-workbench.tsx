@@ -417,8 +417,8 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true }: {
-  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean;
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false }: {
+  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean;
 }) {
   const [expired, setExpired] = useState(false);
   useEffect(() => {
@@ -517,21 +517,21 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
 
   return (
     <div>
-      <div className="scout-collections" role="group" aria-label="Workwear collections">
+      {!tourShelf ? <div className="scout-collections" role="group" aria-label="Workwear collections">
         <span className="scout-collections-label" aria-hidden="true">Collections</span>
         {collections.map(([id, label]) => (
           <button key={id} type="button" className="scout-collection" aria-pressed={collection === id}
             onClick={() => { setCollection(id); setPage(1); }}>{label}</button>
         ))}
-      </div>
+      </div> : null}
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-2 border-y border-[var(--line)]">
-        <div className="flex flex-wrap items-center gap-1 sm:gap-3" role="group" aria-label="Garment category">
+        {!tourShelf ? <div className="flex flex-wrap items-center gap-1 sm:gap-3" role="group" aria-label="Garment category">
           {tabs.map(([value, label]) => (
             <button key={value} type="button" aria-pressed={kind === value}
               onClick={() => { if (kind !== value) { setKind(value); setGarmentType(""); setTagSize(""); } setPage(1); }}
               className="scout-tab">{label}</button>
           ))}
-        </div>
+        </div> : null}
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
           <button type="button" className="scout-toolbar-button" aria-haspopup="dialog" onClick={() => filterDialog.current?.showModal()}>
             <SlidersHorizontal size={16} aria-hidden="true" />Filters{hasFilters ? " •" : ""}
@@ -554,12 +554,12 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
           <form method="dialog"><button className="scout-icon" aria-label="Close filters"><X size={19} /></button></form>
         </div>
         <div className="grid grid-cols-2 gap-x-3 gap-y-4 px-4 py-4 sm:px-6">
-        <label className="min-w-0 text-xs font-medium">Garment type
+        {!tourShelf ? <label className="min-w-0 text-xs font-medium">Garment type
           <select value={garmentType} onChange={(event) => { setGarmentType(event.target.value); setPage(1); }} className={control}>
             <option value="">Any type</option>
             {(kind === "all" ? [...garmentOptions.shirt, ...garmentOptions.pants] : kind === "shirt" || kind === "pants" ? garmentOptions[kind] : []).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
-        </label>
+        </label> : null}
         <label className="min-w-0 text-xs font-medium">Marketplace
           <select value={marketplace} onChange={(event) => { setMarketplace(event.target.value); setPage(1); }} className={control}>
             <option value="">All marketplaces</option>
