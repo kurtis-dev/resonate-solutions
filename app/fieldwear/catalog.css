@@ -137,7 +137,7 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
 @media (min-width: 640px) {
   .fieldwear-scout .scout-photo-grid { column-gap: 20px; }
   .fieldwear-scout .scout-item-layout {
-    grid-template: "gallery summary" auto "gallery facts" 1fr / repeat(2, minmax(0, 1fr));
+    grid-template: "gallery summary" auto "gallery facts" 1fr / minmax(0, 1fr) minmax(0, 1fr);
     gap: 16px 24px;
     padding: 24px;
   }
@@ -352,25 +352,6 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
 .scout-gallery-original:focus-visible {
   outline-offset: -3px;
 }
-.scout-gallery-original-label {
-  position: absolute;
-  right: 9px;
-  bottom: 9px;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 6px 9px;
-  border-radius: 3px;
-  background: #fffdfa;
-  color: var(--ink);
-  font-size: .75rem;
-  font-weight: 750;
-  box-shadow: 0 1px 5px rgb(0 0 0 / .2);
-}
-.scout-gallery-original:hover .scout-gallery-original-label {
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
 .seams-public .scout-gallery-polished .scout-gallery-toolbar {
   min-height: 48px;
   margin-block: 3px;
@@ -415,6 +396,16 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
   font-weight: 700;
   font-variant-numeric: tabular-nums;
   line-height: 1.45;
+}
+.fieldwear-scout .scout-primary.scout-seller-action {
+  display: flex;
+  width: 100%;
+  min-height: 48px;
+  margin-top: 12px;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: .9375rem;
 }
 .scout-measurements {
   scroll-margin-top: 62px;
