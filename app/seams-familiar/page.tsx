@@ -172,14 +172,14 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
     return seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh";
   };
   const decadeNavigation = (
-    <nav className="seams-decades" aria-label="Shop by decade">
+    <nav key="catalog-decades" className="seams-decades" aria-label="Shop by decade">
       {decadeChoices.map(([value, label]) => (
         <Link key={value} href={catalogHref({ decade: value, collection, department: guestDepartment })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
       ))}
     </nav>
   );
   const departmentNavigation = !member && !tour ? (
-    <nav className="seams-decades" aria-label="Shop departments">
+    <nav key="catalog-departments" className="seams-decades" aria-label="Shop departments">
       {([["any", "All departments"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([department, label]) => (
         <Link key={department} href={catalogHref({ decade, collection, department })} aria-current={guestDepartment === department ? "page" : undefined} scroll={false}>{label}</Link>
       ))}
