@@ -434,9 +434,9 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true, compactFilters = false, filterNavigation, pickupPanel, emptyMessage }: {
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true, compactFilters = false, filterNavigation, mobileNavigation, pickupPanel, emptyMessage }: {
   items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean; fixedKind?: "pants"; showNinetiesCollection?: boolean;
-  compactFilters?: boolean; filterNavigation?: ReactNode; pickupPanel?: ReactNode; emptyMessage?: string;
+  compactFilters?: boolean; filterNavigation?: ReactNode; mobileNavigation?: ReactNode; pickupPanel?: ReactNode; emptyMessage?: string;
 }) {
   const [expired, setExpired] = useState(false);
   useEffect(() => {
@@ -566,7 +566,8 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
             onClick={() => { setCollection(id); setPage(1); }}>{label}</button>
         ))}
       </div> : null}
-      <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-2 border-y border-[var(--line)]">
+      <div className="scout-catalog-toolbar flex min-h-12 flex-wrap items-center justify-between gap-x-2 border-y border-[var(--line)]">
+        {mobileNavigation ? <div className="sm:hidden">{mobileNavigation}</div> : null}
         {!tourShelf && !fixedKind ? <div className={`flex flex-wrap items-center gap-1 sm:gap-3 ${compactFilters ? "scout-desktop-control" : ""}`} role="group" aria-label="Garment category">
           {tabs.map(([value, label]) => (
             <button key={value} type="button" aria-pressed={kind === value}
@@ -676,7 +677,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
           <form method="dialog"><button className="scout-primary">Show {results.length} {results.length === 1 ? "piece" : "pieces"}</button></form>
         </div>
       </dialog>
-      <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-2">
+      <div className="scout-catalog-count flex min-h-12 flex-wrap items-center justify-between gap-x-2">
         <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 py-2 text-sm text-[var(--muted-ink)]" role="status">
           {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : allItems.length ? "No listings match these filters." : emptyMessage ?? "No listings match these filters."}
         </div>

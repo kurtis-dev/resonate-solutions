@@ -21,7 +21,7 @@ export function WordmarkPreview() {
       <h1 className="seams-preview-title">
         <span className="sr-only">Seams Familiar</span>
         {wordmark === "shop" ? (
-          <Image src="/assets/seams/preview/shop-sign-lettering.svg" className="seams-shop-sign" alt="" width={724} height={99} priority />
+          <Image src="/assets/seams/preview/storefront-print.svg" className="seams-shop-sign" alt="" width={789} height={101} priority />
         ) : (
           <span className="seams-broadcast" aria-hidden="true">
             {["SEAMS", "FAMILIAR"].map((word, wordIndex) => (
@@ -41,17 +41,22 @@ export function WordmarkPreview() {
           </span>
         )}
       </h1>
-      <p>Vintage clothing · Good clothes come around again.</p>
-      <div className="seams-preview-controls">
-        <div className="seams-preview-options" role="group" aria-label="Wordmark preview">
-          <button type="button" aria-pressed={wordmark === "shop"} onClick={() => setWordmark("shop")}>Shop sign</button>
-          <button type="button" aria-pressed={wordmark === "broadcast"} onClick={() => setWordmark("broadcast")}>Music TV</button>
-        </div>
-        {wordmark === "broadcast" ? (
-          <label>Palette <select value={paletteName} onChange={(event) => setPaletteName(event.target.value as PaletteName)}>
-            {Object.keys(palettes).map((name) => <option key={name}>{name}</option>)}
-          </select></label>
-        ) : null}
+      <div className="seams-preview-caption">
+        <p>Vintage worth wearing again.</p>
+        <details className="seams-preview-disclosure">
+          <summary>Design preview</summary>
+          <div className="seams-preview-controls">
+            <div className="seams-preview-options" role="group" aria-label="Wordmark preview">
+              <button type="button" aria-pressed={wordmark === "shop"} onClick={() => setWordmark("shop")}>Storefront</button>
+              <button type="button" aria-pressed={wordmark === "broadcast"} onClick={() => setWordmark("broadcast")}>Music TV</button>
+            </div>
+            {wordmark === "broadcast" ? (
+              <label>Palette <select value={paletteName} onChange={(event) => setPaletteName(event.target.value as PaletteName)}>
+                {Object.keys(palettes).map((name) => <option key={name}>{name}</option>)}
+              </select></label>
+            ) : null}
+          </div>
+        </details>
       </div>
     </div>
   );

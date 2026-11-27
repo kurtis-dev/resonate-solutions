@@ -164,6 +164,7 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
   const decadeChoices = [["", "All decades"], ["80s", "80s"], ["90s", "90s"]] as const;
   const keywords = typeof params.q === "string" ? params.q.slice(0, 80) : "";
   const showCatalog = !unsubscribe && !params.access;
+  const designPreview = process.env.VERCEL_ENV !== "production";
   const catalog = showCatalog ? await readSeamsCatalog().catch(() => []) : [];
   const matches = matchSeamsCatalog(catalog, settings, keywords, false, tour);
   const shelfItems = goodwill ? goodwillShelf(matches, goodwillPants) : matches;
@@ -179,6 +180,13 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
     if (filters.collection !== "tour-shirts" && !member && filters.department !== "any") query.set("department", filters.department);
     return seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh";
   };
+  const decadeNavigation = (
+    <nav className="scout-collections scout-decades" aria-label="Shop by decade">
+      {decadeChoices.map(([value, label]) => (
+        <Link key={value} className="scout-collection" href={catalogHref({ decade: value, collection, department: guestDepartment })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
+      ))}
+    </nav>
+  );
   const catalogNavigation = (
     <>
       <nav className="scout-departments" aria-label="Catalog shelves">
@@ -199,8 +207,8 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
     </>
   );
   return (
-    <main className={`fieldwear-scout seams-public pb-12 ${fraunces.variable}`} data-decade={showCatalog && decade || undefined}>
       {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${collection}:${keywords}`} /> : null}
+    <main className={`fieldwear-scout seams-public pb-12 ${fraunces.variable}`} data-decade={showCatalog && decade || undefined} data-design-preview={designPreview || undefined}>
       <header className="border-b border-[var(--line)]">
         <div className="scout-container flex min-h-16 items-center justify-between">
           <Link href="/" aria-label="Resonate Solutions"><Image src="/assets/resonate-logo-transparent.png" alt="Resonate Solutions" width={122} height={34} /></Link>
@@ -210,7 +218,7 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
           <div className="scout-brand-hero">
             <span className="scout-film-stripe" aria-hidden="true" />
             <span className="scout-90s-graphic" aria-hidden="true"><i /><i /><i /></span>
-            {process.env.VERCEL_ENV !== "production" ? <WordmarkPreview /> : (
+            {designPreview ? <WordmarkPreview /> : (
               <>
                 <h1>Seams<br className="seams-wordmark-break" /> Familiar</h1>
                 <p>Vintage clothing · Good clothes come around again.</p>
@@ -250,15 +258,11 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
                   <button type="submit" className={button}>Search</button>
                 </form>
               )}
-              <nav className="scout-collections scout-decades" aria-label="Shop by decade">
-                {decadeChoices.map(([value, label]) => (
-                  <Link key={value} className="scout-collection" href={catalogHref({ decade: value, collection, department: guestDepartment })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
-                ))}
-              </nav>
+              {designPreview ? <div className="hidden sm:block">{decadeNavigation}</div> : decadeNavigation}
               <FreshCatalog key={stamp + ":" + keywords + ":" + collection + ":" + decade + ":" + JSON.stringify(settings)}
                 items={cards} womenswear={!tour && settings.department !== "men"} tourShelf={tour}
                 fixedKind={goodwillPants ? "pants" : undefined} personalActions={false} showNinetiesCollection={false}
-                compactFilters filterNavigation={catalogNavigation}
+                compactFilters filterNavigation={catalogNavigation} mobileNavigation={designPreview ? decadeNavigation : undefined}
                 pickupPanel={!tour ? <LocalPickup department={settings.department} /> : undefined}
                 emptyMessage={catalog.length ? "No listings match. Try another search or adjust your filters." : "The shop catalog is being refreshed."} />
             </section>
