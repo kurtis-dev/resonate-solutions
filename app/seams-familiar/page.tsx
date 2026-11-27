@@ -177,6 +177,25 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
     if (filters.collection !== "tour-shirts" && !member && filters.department !== "any") query.set("department", filters.department);
     return seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh";
   };
+  const catalogNavigation = (
+    <>
+      <nav className="scout-departments" aria-label="Catalog shelves">
+        <Link href={catalogHref({ decade, collection: "", department: guestDepartment })} aria-current={!collection ? "page" : undefined}>Daily catalog</Link>
+        <Link href={catalogHref({ decade, collection: "tour-shirts", department: guestDepartment })} aria-current={tour ? "page" : undefined}>Tour shirts</Link>
+        <Link href={catalogHref({ decade, collection: "goodwill-pants", department: guestDepartment })} aria-current={goodwill ? "page" : undefined}>Goodwill pants</Link>
+      </nav>
+      {goodwill ? <div className="my-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--muted-ink)]">
+        <span>Items that ship</span>
+        <Link href={catalogHref({ decade, collection: goodwillPants ? "goodwill" : "goodwill-pants", department: guestDepartment })} className="inline-flex min-h-11 items-center text-[var(--accent)] underline underline-offset-4">{goodwillPants ? "All Goodwill clothing" : "Work pants only"}</Link>
+        <a href="https://shopgoodwill.com/search/advancedsearch" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-[var(--accent)] underline underline-offset-4">Search on ShopGoodwill.com</a>
+      </div> : null}
+      {!member && !tour ? <nav className="scout-departments" aria-label="Shop departments">
+        {([["any", "All"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([department, label]) => {
+          return <Link key={department} href={catalogHref({ decade, collection, department })} aria-current={guestDepartment === department ? "page" : undefined} scroll={false}>{label}</Link>;
+        })}
+      </nav> : null}
+    </>
+  );
   return (
     <main className={`fieldwear-scout seams-public pb-12 ${fraunces.variable}`} data-decade={showCatalog && decade || undefined}>
       {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${collection}:${keywords}`} /> : null}
@@ -207,22 +226,8 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
           <>
             <section id="fresh" aria-labelledby="catalog-title" className="my-5 scroll-mt-6">
               <h2 id="catalog-title" className="text-xl font-bold tracking-tight">{tour ? "’80s & ’90s tour shirts" : goodwill ? (goodwillPants ? "Goodwill work pants" : "Goodwill clothing") : member?.settings ? "Your fresh finds" : "Fresh finds"}</h2>
-              <div className="scout-departments" aria-label="Catalog shelves">
-                <Link href={catalogHref({ decade, collection: "", department: guestDepartment })} aria-current={!collection ? "page" : undefined}>Daily catalog</Link>
-                <Link href={catalogHref({ decade, collection: "tour-shirts", department: guestDepartment })} aria-current={tour ? "page" : undefined}>Tour shirts</Link>
-                <Link href={catalogHref({ decade, collection: "goodwill-pants", department: guestDepartment })} aria-current={goodwill ? "page" : undefined}>Goodwill pants</Link>
-              </div>
+              <div className="hidden sm:block">{catalogNavigation}</div>
               {tour ? <p className="my-2 text-xs text-[var(--muted-ink)]">Tour and era are seller-described. Check the print and tag photos.</p> : null}
-              {goodwill ? <div className="my-2 flex flex-wrap items-center gap-x-4 gap-y-1 text-sm text-[var(--muted-ink)]">
-                <span>Items that ship</span>
-                <Link href={catalogHref({ decade, collection: goodwillPants ? "goodwill" : "goodwill-pants", department: guestDepartment })} className="inline-flex min-h-11 items-center text-[var(--accent)] underline underline-offset-4">{goodwillPants ? "All Goodwill clothing" : "Work pants only"}</Link>
-                <a href="https://shopgoodwill.com/search/advancedsearch" target="_blank" rel="noreferrer" className="inline-flex min-h-11 items-center text-[var(--accent)] underline underline-offset-4">Search on ShopGoodwill.com</a>
-              </div> : null}
-              {!member && !tour ? <nav className="scout-departments" aria-label="Shop departments">
-                {([["any", "All"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([department, label]) => {
-                  return <Link key={department} href={catalogHref({ decade, collection, department })} aria-current={guestDepartment === department ? "page" : undefined} scroll={false}>{label}</Link>;
-                })}
-              </nav> : null}
               {member ? (
                 <form action={searchMemberCatalog} className="my-3 flex gap-2">
                   {collection ? <input type="hidden" name="collection" value={collection} /> : null}
@@ -244,9 +249,12 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
                   <Link key={value} className="scout-collection" href={catalogHref({ decade: value, collection, department: guestDepartment })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
                 ))}
               </nav>
-              {!tour ? <LocalPickup key={settings.department} department={settings.department} /> : null}
-              {!cards.length ? <p className="mb-2 text-sm text-[var(--muted-ink)]" role="status">{catalog.length ? "No matches. Try a different search or an open size or budget." : "The shop catalog is being refreshed."}</p> : null}
-              {cards.length ? <FreshCatalog key={stamp + ":" + keywords + ":" + collection + ":" + decade + ":" + JSON.stringify(settings)} items={cards} womenswear={!tour && settings.department !== "men"} tourShelf={tour} fixedKind={goodwillPants ? "pants" : undefined} personalActions={false} showNinetiesCollection={false} /> : null}
+              <FreshCatalog key={stamp + ":" + keywords + ":" + collection + ":" + decade + ":" + JSON.stringify(settings)}
+                items={cards} womenswear={!tour && settings.department !== "men"} tourShelf={tour}
+                fixedKind={goodwillPants ? "pants" : undefined} personalActions={false} showNinetiesCollection={false}
+                compactFilters filterNavigation={catalogNavigation}
+                pickupPanel={!tour ? <LocalPickup department={settings.department} /> : undefined}
+                emptyMessage={catalog.length ? "No listings match. Try another search or adjust your filters." : "The shop catalog is being refreshed."} />
             </section>
             {member ? <><FitForm settings={settings} status={params.status} /><FirstDibs member={member} status={params.status} /></>
               : <Welcome status={params.status} />}

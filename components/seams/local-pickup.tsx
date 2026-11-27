@@ -59,7 +59,7 @@ export function LocalPickup({ department }: { department: "any" | "men" | "women
         {searched ? <p role="status" className="mb-3 text-sm">{items.length
           ? `${items.length} pickup ${items.length === 1 ? "match" : "matches"} within about 50 miles.${partial ? " Some searches were unavailable." : ""}`
           : partial ? "No matches from the searches that finished. Try again later." : "No matching Goodwill clothing with pickup within 50 miles."}</p> : null}
-        {searched && items.length ? <FreshCatalog key={searchId} items={items} womenswear={department !== "men"} personalActions={false} showNinetiesCollection={false} /> : null}
+        {searched && items.length ? <FreshCatalog key={searchId} items={items} womenswear={department !== "men"} compactFilters personalActions={false} showNinetiesCollection={false} /> : null}
         <a href="https://www.goodwill.org/locator/" target="_blank" rel="noreferrer" className="mt-1 inline-block text-sm underline underline-offset-4">Find a Goodwill store</a>
       </div>
     </details>

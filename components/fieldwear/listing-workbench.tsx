@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useId, useMemo, useRef, useState, type ReactNode } from "react";
 import {
   ExternalLink,
   Bookmark,
@@ -434,8 +434,9 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true }: {
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true, compactFilters = false, filterNavigation, pickupPanel, emptyMessage }: {
   items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean; fixedKind?: "pants"; showNinetiesCollection?: boolean;
+  compactFilters?: boolean; filterNavigation?: ReactNode; pickupPanel?: ReactNode; emptyMessage?: string;
 }) {
   const [expired, setExpired] = useState(false);
   useEffect(() => {
@@ -451,6 +452,15 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const items = useMemo(() => expired ? allItems.filter((item) => item.source !== "shopifycatalog") : allItems, [allItems, expired]);
   const [kind, setKind] = useState<"all" | "shirt" | "pants" | "outerwear" | "dress" | "skirt">(fixedKind ?? "all");
   const filterDialog = useRef<HTMLDialogElement>(null);
+  const filterTitleId = useId();
+  const pickupPanelRef = useRef<HTMLDivElement>(null);
+  const openPickup = () => {
+    const panel = pickupPanelRef.current?.querySelector("details");
+    if (!panel) return;
+    filterDialog.current?.close();
+    panel.open = true;
+    panel.querySelector("summary")?.focus();
+  };
   const [marketplace, setMarketplace] = useState(initialSource);
   const [order, setOrder] = useState("relevance");
   const [collection, setCollection] = useState<Collection>("all");
@@ -504,8 +514,12 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const visible = results.slice(from, from + freshPageSize);
   const frames = personalActions ? null : shuffleCatalogFrames(visible);
   const control = "mt-1 min-h-11 w-full rounded-[4px] border border-[var(--line)] bg-white px-3 text-base font-normal text-[var(--ink)]";
-  const hasFilters = Boolean(collection !== "all" || marketplace || garmentType || era || fabric || tagSize || colors.length || min || max);
+  const hasFilters = Boolean((compactFilters && (kind !== (fixedKind ?? "all") || order !== "relevance")) || collection !== "all" || marketplace || garmentType || era || fabric || tagSize || colors.length || min || max);
   const clearFilters = () => {
+    if (compactFilters) {
+      setKind(fixedKind ?? "all");
+      setOrder("relevance");
+    }
     setCollection("all");
     setGarmentType("");
     setMarketplace("");
@@ -533,17 +547,27 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
     ? [["all", "All"], ["shirt", "Tops"], ["pants", "Pants"], ["skirt", "Skirts"], ["dress", "Dresses"], ["outerwear", "Jackets"]] as const
     : [["all", "All"], ["shirt", "Shirts"], ["pants", "Bottoms"]] as const;
 
+  const collectionOptions = collections.filter(([id]) => (showNinetiesCollection || id !== "90s") && (!fixedKind || id !== "lined"));
+  const sortOptions = (
+    <>
+      <option value="relevance">Best match</option>
+      <option value="oldest-garment">Older garment clues</option>
+      <option value="low">Price + shipping, low to high</option>
+      <option value="high">Price + shipping, high to low</option>
+    </>
+  );
   return (
     <div>
-      {!tourShelf ? <div className="scout-collections" role="group" aria-label="Workwear collections">
+      {pickupPanel ? <div ref={pickupPanelRef} className="scout-pickup-panel">{pickupPanel}</div> : null}
+      {!tourShelf ? <div className={`scout-collections ${compactFilters ? "scout-desktop-control" : ""}`} role="group" aria-label="Workwear collections">
         <span className="scout-collections-label" aria-hidden="true">Collections</span>
-        {collections.filter(([id]) => showNinetiesCollection || id !== "90s").map(([id, label]) => (
+        {collectionOptions.map(([id, label]) => (
           <button key={id} type="button" className="scout-collection" aria-pressed={collection === id}
             onClick={() => { setCollection(id); setPage(1); }}>{label}</button>
         ))}
       </div> : null}
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-2 border-y border-[var(--line)]">
-        {!tourShelf && !fixedKind ? <div className="flex flex-wrap items-center gap-1 sm:gap-3" role="group" aria-label="Garment category">
+        {!tourShelf && !fixedKind ? <div className={`flex flex-wrap items-center gap-1 sm:gap-3 ${compactFilters ? "scout-desktop-control" : ""}`} role="group" aria-label="Garment category">
           {tabs.map(([value, label]) => (
             <button key={value} type="button" aria-pressed={kind === value}
               onClick={() => { if (kind !== value) { setKind(value); setGarmentType(""); setTagSize(""); } setPage(1); }}
@@ -554,24 +578,42 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
           <button type="button" className="scout-toolbar-button" aria-haspopup="dialog" onClick={() => filterDialog.current?.showModal()}>
             <SlidersHorizontal size={16} aria-hidden="true" />Filters{hasFilters ? " •" : ""}
           </button>
-          <label className="scout-sort">
+          <label className={`scout-sort ${compactFilters ? "scout-desktop-control" : ""}`}>
             <span>Sort</span>
             <select aria-label="Sort listings" value={order} onChange={(event) => { setOrder(event.target.value); setPage(1); }}>
-              <option value="relevance">Best match</option>
-              <option value="oldest-garment">Older garment clues</option>
-              <option value="low">Price + shipping, low to high</option>
-              <option value="high">Price + shipping, high to low</option>
+              {sortOptions}
             </select>
             <ChevronRight size={13} className="rotate-90" aria-hidden="true" />
           </label>
         </div>
       </div>
-      <dialog ref={filterDialog} className="scout-dialog scout-filter-dialog" aria-labelledby="scout-filter-title">
+      <dialog ref={filterDialog} className="scout-dialog scout-filter-dialog" aria-labelledby={filterTitleId}>
         <div className="scout-dialog-header">
-          <h2 id="scout-filter-title" className="text-base font-semibold">Filters</h2>
+          <h2 id={filterTitleId} className="text-base font-semibold">Filters</h2>
           <form method="dialog"><button className="scout-icon" aria-label="Close filters"><X size={19} /></button></form>
         </div>
+        {compactFilters && (filterNavigation || pickupPanel) ? (
+          <div className="border-b border-[var(--line)] px-4 pb-2 pt-3 sm:hidden">
+            {filterNavigation}
+            {pickupPanel ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" onClick={openPickup}>Local pickup</button> : null}
+          </div>
+        ) : null}
         <div className="grid grid-cols-2 gap-x-3 gap-y-4 px-4 py-4 sm:px-6">
+        {compactFilters ? <>
+          <label className="col-span-full min-w-0 text-xs font-medium sm:hidden">Sort
+            <select value={order} onChange={(event) => { setOrder(event.target.value); setPage(1); }} className={control}>{sortOptions}</select>
+          </label>
+          {!tourShelf ? <label className="min-w-0 text-xs font-medium sm:hidden">Collection
+            <select value={collection} onChange={(event) => { setCollection(event.target.value as Collection); setPage(1); }} className={control}>
+              {collectionOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </label> : null}
+          {!tourShelf && !fixedKind ? <label className="min-w-0 text-xs font-medium sm:hidden">Garment category
+            <select value={kind} onChange={(event) => { setKind(event.target.value as typeof kind); setGarmentType(""); setTagSize(""); setPage(1); }} className={control}>
+              {tabs.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            </select>
+          </label> : null}
+        </> : null}
         {!tourShelf ? <label className="min-w-0 text-xs font-medium">Garment type
           <select value={garmentType} onChange={(event) => { setGarmentType(event.target.value); setPage(1); }} className={control}>
             <option value="">Any type</option>
@@ -636,9 +678,9 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
       </dialog>
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-2">
         <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 py-2 text-sm text-[var(--muted-ink)]" role="status">
-          {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : "No listings match these filters."}
+          {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : allItems.length ? "No listings match these filters." : emptyMessage ?? "No listings match these filters."}
         </div>
-        <div className="flex flex-wrap gap-1">
+        <div className={`flex flex-wrap gap-1 ${compactFilters ? "scout-desktop-control" : ""}`}>
         {marketplaces.includes("shopifycatalog") ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" aria-pressed={marketplace === "shopifycatalog"}
           onClick={() => { setMarketplace(marketplace === "shopifycatalog" ? "" : "shopifycatalog"); setPage(1); }}>Shopify Catalog</button> : null}
         {hasVintageShops ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" aria-pressed={shopsSelected}
