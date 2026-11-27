@@ -782,6 +782,7 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
   const total = item.priceCents != null && item.shippingCents != null ? money(item.priceCents + item.shippingCents) : null;
   const sourceLabel = item.sellerName ?? marketplaceName(item.source);
   const catalogItem = item.source === "shopifycatalog" || !personalActions;
+  const trackOriginal = personalActions ? undefined : () => recordSeamsActivity("seller-click", item.garmentKind, item.source);
   const openDetails = () => {
     if (!personalActions) recordSeamsActivity("listing-open", item.garmentKind, item.source);
     setDetailsOpen(true);
@@ -844,8 +845,8 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
                   {item.size ? <p className="text-sm text-[var(--muted-ink)]">{sizeLabel} {item.size}</p> : null}
                 </div>
                 <a href={item.url} target="_blank" rel="noreferrer"
-                  onClick={personalActions ? undefined : () => recordSeamsActivity("seller-click", item.garmentKind, item.source)}
-                  onAuxClick={personalActions ? undefined : (event) => { if (event.button === 1) recordSeamsActivity("seller-click", item.garmentKind, item.source); }}
+                  onClick={trackOriginal}
+                  onAuxClick={(event) => { if (event.button === 1) trackOriginal?.(); }}
                   className="scout-primary inline-flex items-center gap-2 text-sm">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
               </div>
               {frame && item.measurements.length > 0 ? (
@@ -855,7 +856,7 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
                 }}>See measurements</button>
               ) : null}
             </div>
-            <ListingGallery item={item} polished={Boolean(frame)} />
+            <ListingGallery item={item} polished={Boolean(frame)} onOpenOriginal={trackOriginal} />
             <div className="scout-item-facts min-w-0">
               {frame ? (
                 <section ref={measurementSection} tabIndex={-1} className="scout-measurements" aria-label="Measurements">
@@ -908,7 +909,7 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
   );
 }
 
-function ListingGallery({ item, polished }: { item: ListingView; polished: boolean }) {
+function ListingGallery({ item, polished, onOpenOriginal }: { item: ListingView; polished: boolean; onOpenOriginal?: () => void }) {
   const photos = Array.from(new Set([item.imageUrl, ...(item.imageUrls ?? [])].filter((url): url is string => Boolean(url))));
   const [selected, setSelected] = useState(0);
   const [zoomed, setZoomed] = useState(false);
@@ -935,7 +936,14 @@ function ListingGallery({ item, polished }: { item: ListingView; polished: boole
   return (
     <div className={`scout-item-gallery min-w-0 ${polished ? "scout-gallery-polished" : ""}`}>
       <div ref={scrollArea} className="scout-gallery-scroll" data-zoomed={zoomed}>
-        {current && polished ? (
+        {current && polished && !zoomed ? (
+          <a href={item.url} target="_blank" rel="noreferrer" className="scout-photo-well scout-gallery-photo scout-gallery-original"
+            aria-label="Open original listing from photo" onClick={onOpenOriginal}
+            onAuxClick={(event) => { if (event.button === 1) onOpenOriginal?.(); }}>
+            <ListingPhoto key={current} imageUrl={current} title={`${item.title}, seller photo ${selected + 1}`} priority />
+            <span className="scout-gallery-original-label">Open original <ExternalLink size={14} aria-hidden="true" /></span>
+          </a>
+        ) : current && polished ? (
           <div className="scout-photo-well scout-gallery-photo">
             <ListingPhoto key={current} imageUrl={current} title={`${item.title}, seller photo ${selected + 1}`} priority />
           </div>

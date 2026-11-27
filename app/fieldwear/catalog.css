@@ -346,6 +346,31 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
 .seams-public .scout-gallery-polished .scout-gallery-scroll .scout-gallery-photo {
   cursor: default;
 }
+.seams-public .scout-gallery-polished .scout-gallery-scroll .scout-gallery-original {
+  cursor: pointer;
+}
+.scout-gallery-original:focus-visible {
+  outline-offset: -3px;
+}
+.scout-gallery-original-label {
+  position: absolute;
+  right: 9px;
+  bottom: 9px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 9px;
+  border-radius: 3px;
+  background: #fffdfa;
+  color: var(--ink);
+  font-size: .75rem;
+  font-weight: 750;
+  box-shadow: 0 1px 5px rgb(0 0 0 / .2);
+}
+.scout-gallery-original:hover .scout-gallery-original-label {
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
 .seams-public .scout-gallery-polished .scout-gallery-toolbar {
   min-height: 48px;
   margin-block: 3px;
