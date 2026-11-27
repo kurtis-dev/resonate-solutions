@@ -2,8 +2,8 @@ import { createHash, randomBytes, randomUUID } from "node:crypto";
 import { cookies, headers } from "next/headers";
 import { getSql } from "@/lib/db";
 
-export const seamsPath = "/seams-familiar";
-export const seamsUrl = "https://www.resonate.solutions" + seamsPath;
+import { seamsPath } from "./paths";
+export { seamsPath, seamsUrl } from "./paths";
 const sessionCookie = "resonate_seams_session";
 const sessionSeconds = 30 * 86_400;
 const tokenPattern = /^[a-f0-9]{64}$/;
@@ -45,6 +45,10 @@ export function initializeSeams() {
     )`;
     await sql`CREATE TABLE IF NOT EXISTS seams_catalog (
       department text PRIMARY KEY, listings jsonb NOT NULL DEFAULT '[]', checked_at timestamptz, lease_until timestamptz
+    )`;
+    await sql`CREATE TABLE IF NOT EXISTS seams_activity (
+      day date NOT NULL, event text NOT NULL, kind text NOT NULL, source text NOT NULL,
+      total bigint NOT NULL, PRIMARY KEY (day, event, kind, source)
     )`;
     await sql`CREATE TABLE IF NOT EXISTS seams_digests (
       member_id uuid NOT NULL REFERENCES seams_members(id) ON DELETE CASCADE, day date NOT NULL,

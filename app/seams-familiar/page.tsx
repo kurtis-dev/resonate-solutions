@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { FreshCatalog } from "@/components/fieldwear/listing-workbench";
+import { SeamsActivity } from "@/components/seams/activity";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { toListingView } from "@/lib/fieldwear/listing-view";
 import { interestLabels, matchSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
@@ -25,7 +26,7 @@ const notice = "mt-3 text-sm text-[var(--muted-ink)]";
 function Welcome({ access, status }: { access?: string; status?: string }) {
   const valid = access && /^[a-f0-9]{64}$/.test(access);
   return (
-    <section className="my-6 max-w-xl rounded border border-[var(--line)] p-5 sm:p-7" aria-labelledby="welcome-title">
+    <section id="join" className="my-6 max-w-xl scroll-mt-5 rounded border border-[var(--line)] p-5 sm:p-7" aria-labelledby="welcome-title">
       <h2 id="welcome-title" className="text-2xl font-bold tracking-tight">{valid ? "Finish signing in" : "Join Seams Familiar"}</h2>
       {valid ? (
         <form action={continueSeams}>
@@ -112,23 +113,26 @@ function FirstDibs({ member, status }: { member: Member; status?: string }) {
   );
 }
 
-export default async function SeamsFamiliar({ searchParams }: { searchParams: Promise<{ access?: string; status?: string; q?: string; unsubscribe?: string }> }) {
+export default async function SeamsFamiliar({ searchParams }: { searchParams: Promise<{ access?: string; status?: string; q?: string; unsubscribe?: string; department?: string }> }) {
   const params = await searchParams;
   const unsubscribe = typeof params.unsubscribe === "string" && /^[a-f0-9]{64}$/.test(params.unsubscribe) ? params.unsubscribe : null;
   const member = unsubscribe ? null : await readMember();
-  const settings = member?.settings ?? defaultMemberSettings;
+  const guestDepartment = params.department === "men" || params.department === "women" ? params.department : "any";
+  const settings = member?.settings ?? (member ? defaultMemberSettings : { ...defaultMemberSettings, department: guestDepartment });
   const keywords = typeof params.q === "string" ? params.q.slice(0, 80) : "";
-  const catalog = member ? await readSeamsCatalog() : [];
+  const showCatalog = !unsubscribe && !params.access;
+  const catalog = showCatalog ? await readSeamsCatalog().catch(() => []) : [];
   const items = matchSeamsCatalog(catalog, settings, keywords);
   const preferences = { department: settings.department, shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes, shirtBudget: settings.budget, pantsBudget: settings.budget, matchingOnly: true };
   const stamp = catalog.reduce((latest, row) => latest > (row.checked_at ?? "") ? latest : row.checked_at ?? "", "");
-  const cards = items.map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
+  const cards = (member ? items : items.slice(0, 72)).map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
   return (
     <main className="fieldwear-scout pb-12">
+      {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${keywords}`} /> : null}
       <header className="border-b border-[var(--line)]">
         <div className="scout-container flex min-h-16 items-center justify-between">
           <Link href="/" aria-label="Resonate Solutions"><Image src="/assets/resonate-logo-transparent.png" alt="Resonate Solutions" width={122} height={34} /></Link>
-          {member ? <nav aria-label="Your account" className="flex items-center gap-3 text-sm font-semibold text-[var(--accent)]"><a href="#catalog">Catalog</a><a href="#fit">Your fit</a><form action={signOutSeams}><button className="min-h-11">Sign out</button></form></nav> : null}
+          {member ? <nav aria-label="Your account" className="flex items-center gap-3 text-sm font-semibold text-[var(--accent)]"><a href="#fresh">Catalog</a><a href="#fit">Your fit</a><form action={signOutSeams}><button className="min-h-11">Sign out</button></form></nav> : (showCatalog ? <a href="#join" className="inline-flex min-h-11 items-center text-sm font-semibold text-[var(--accent)] underline underline-offset-4">Save my fit</a> : null)}
         </div>
       </header>
       <div className="scout-container">
@@ -146,20 +150,36 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
               <ScoutSubmit label="Unsubscribe" pendingLabel="Updating…" className={button} />
             </form>
           </section>
-        ) : member ? (
+        ) : showCatalog ? (
           <>
-            {!member.settings ? <FitForm settings={settings} status={params.status} /> : null}
-            <section id="catalog" aria-labelledby="catalog-title" className="my-5 scroll-mt-6">
-              <h2 id="catalog-title" className="text-xl font-bold tracking-tight">Your vintage catalog</h2>
-              <form action={searchMemberCatalog} className="my-3 flex gap-2">
-                <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input name="keywords" type="search" defaultValue={keywords} placeholder="Denim, wool, L.L.Bean…" maxLength={80} className="scout-control w-full text-base" /></label>
-                <ScoutSubmit label="Search now" pendingLabel="Checking shops…" className={button} />
-              </form>
-              <p className="mb-2 text-sm text-[var(--muted-ink)]" role="status">{cards.length ? `${cards.length} matches from secondhand shops` : catalog.length ? "No matches in your saved fit. Try a different search or adjust your sizes or budget." : "The shop catalog is loading. Use Search now to check the shops."}</p>
-              {cards.length ? <FreshCatalog key={`${stamp}:${keywords}:${JSON.stringify(settings)}`} items={cards} womenswear={settings.department !== "men"} personalActions={false} /> : null}
+            <section id="fresh" aria-labelledby="catalog-title" className="my-5 scroll-mt-6">
+              <h2 id="catalog-title" className="text-xl font-bold tracking-tight">{member?.settings ? "Your fresh finds" : "Fresh finds"}</h2>
+              {!member ? <nav className="scout-departments" aria-label="Shop departments">
+                {([["any", "All"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([department, label]) => {
+                  const query = new URLSearchParams();
+                  if (department !== "any") query.set("department", department);
+                  if (keywords) query.set("q", keywords);
+                  const qs = query.toString();
+                  return <Link key={department} href={seamsPath + (qs ? "?" + qs : "") + "#fresh"} aria-current={guestDepartment === department ? "page" : undefined} scroll={false}>{label}</Link>;
+                })}
+              </nav> : null}
+              {member ? (
+                <form action={searchMemberCatalog} className="my-3 flex gap-2">
+                  <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="keywords" type="search" defaultValue={keywords} placeholder="Denim, wool, L.L.Bean…" maxLength={80} className="scout-control w-full text-base" /></label>
+                  <ScoutSubmit label="Search now" pendingLabel="Checking shops…" className={button} />
+                </form>
+              ) : (
+                <form method="get" action={seamsPath + "#fresh"} className="my-3 flex gap-2">
+                  {guestDepartment !== "any" ? <input type="hidden" name="department" value={guestDepartment} /> : null}
+                  <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="q" type="search" defaultValue={keywords} placeholder="Denim, wool, L.L.Bean…" maxLength={80} className="scout-control w-full text-base" /></label>
+                  <button type="submit" className={button}>Search</button>
+                </form>
+              )}
+              {!cards.length ? <p className="mb-2 text-sm text-[var(--muted-ink)]" role="status">{catalog.length ? "No matches. Try a different search or an open size or budget." : "The shop catalog is being refreshed."}</p> : null}
+              {cards.length ? <FreshCatalog key={stamp + ":" + keywords + ":" + JSON.stringify(settings)} items={cards} womenswear={settings.department !== "men"} personalActions={false} /> : null}
             </section>
-            {member.settings ? <FitForm settings={settings} status={params.status} /> : null}
-            <FirstDibs member={member} status={params.status} />
+            {member ? <><FitForm settings={settings} status={params.status} /><FirstDibs member={member} status={params.status} /></>
+              : <Welcome status={params.status} />}
           </>
         ) : <Welcome access={params.access} status={params.status} />}
         <footer className="mt-8 border-t border-[var(--line)] py-4 text-xs text-[var(--muted-ink)]">

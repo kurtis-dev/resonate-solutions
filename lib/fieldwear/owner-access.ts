@@ -3,7 +3,7 @@ import { cookies } from "next/headers";
 import { getSql } from "@/lib/db";
 import { defaultScoutPreferences, type CatalogProfile, type ScoutPreferences } from "./preferences";
 
-export const sessionCookie = "resonate_fieldwear_session";
+import { ownerCatalogPath, ownerSessionCookie as sessionCookie } from "./owner-routes";
 export const sessionSeconds = 30 * 86400;
 const tokenPattern = /^[a-f0-9]{64}$/;
 
@@ -97,7 +97,7 @@ export async function exchangeOwnerLink(token: string) {
   if (!created) return false;
   (await cookies()).set(sessionCookie, session, {
     httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax",
-    maxAge: sessionSeconds, path: "/fieldwear",
+    maxAge: sessionSeconds, path: ownerCatalogPath,
   });
   return true;
 }
@@ -119,5 +119,5 @@ export async function revokeOwnerSession() {
     const sql = await scoutDatabase();
     await sql`DELETE FROM fieldwear_owner_access WHERE token_hash = ${digest(token)} AND kind = 'session'`;
   }
-  jar.set(sessionCookie, "", { path: "/fieldwear", maxAge: 0 });
+  jar.set(sessionCookie, "", { path: ownerCatalogPath, maxAge: 0 });
 }

@@ -6,6 +6,7 @@ import { DailyScout } from "@/components/fieldwear/daily-scout";
 import { ListingChecker } from "@/components/fieldwear/listing-checker";
 import { FreshCatalog, ListingShelf, ListingWorkbench, type ListingView } from "@/components/fieldwear/listing-workbench";
 import { ScoutPreferencesForm } from "@/components/fieldwear/scout-preferences";
+import { SeamsActivitySummary } from "@/components/seams/activity-summary";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { curatedListings } from "@/lib/fieldwear/curated-listings";
 import { classifyGarment, type ListingInput } from "@/lib/fieldwear/listing-model";
@@ -18,8 +19,9 @@ import { readLiveSearch } from "@/lib/fieldwear/live-search";
 import { searchShopifyCatalog } from "@/lib/fieldwear/shopify-catalog";
 import { marketplaceBrowse, marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
 import { firstDibsEnabled } from "@/lib/fieldwear/first-dibs";
-import { setFirstDibs, redeemOwnerLink, requestOwnerLink, searchScoutLook, searchScoutNow, signOutScout } from "./actions";
-import "./scout.css";
+import { setFirstDibs, redeemOwnerLink, requestOwnerLink, searchScoutLook, searchScoutNow, signOutScout } from "@/app/fieldwear/actions";
+import "@/app/fieldwear/scout.css";
+import { ownerCatalogPath } from "@/lib/fieldwear/owner-routes";
 
 export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
@@ -298,13 +300,13 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
         <div className="scout-container flex min-h-16 items-center justify-between gap-2">
           <div className="scout-brand-lockup">
             <ResonateLogo />
-            <a href="/fieldwear" className="scout-app-name">Seams Familiar</a>
+            <a href={ownerCatalogPath} className="scout-app-name">Seams Familiar</a>
           </div>
           <nav className="flex items-center text-sm" aria-label="Fieldwear">
-            {profile === "owner" ? <a href={archived ? "/fieldwear#find-similar" : "#find-similar"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]" aria-label="Find similar listings">Similar</a> : null}
+            {profile === "owner" ? <a href={archived ? catalogHref(profile, {}, "find-similar") : "#find-similar"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]" aria-label="Find similar listings">Similar</a> : null}
             <a href="#first-dibs" className="hidden min-h-11 items-center rounded px-2 hover:bg-[var(--matte)] sm:inline-flex">First dibs</a>
             <a href="#preferences" className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]" aria-label="Size and search preferences">Sizes</a>
-            <a href={archived ? "/fieldwear#saved" : "#saved"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]">Saved</a>
+            <a href={archived ? catalogHref(profile, {}, "saved") : "#saved"} className="inline-flex min-h-11 items-center rounded px-2 hover:bg-[var(--matte)]">Saved</a>
           </nav>
         </div>
       </header>
@@ -353,6 +355,7 @@ export default async function FieldwearPage({ searchParams }: { searchParams: Pr
               : alertsEnabled ? "Emails are on." : "Sent to your Scout sign-in email."}</p>
           </form>
         </section>
+        <SeamsActivitySummary />
         <ScoutPreferencesForm preferences={preferences} profile={profile} status={params.preferences} />
         <form action={signOutScout} noValidate><button className="min-h-11 rounded text-sm font-medium text-[var(--accent)] hover:underline">Sign out</button></form>
       </div>

@@ -1,5 +1,6 @@
 "use server";
 
+import { ownerCatalogPath } from "@/lib/fieldwear/owner-routes";
 import { redirect } from "next/navigation";
 import { revalidatePath } from "next/cache";
 import { sendCustomerEmail } from "@/lib/customer-emails";
@@ -15,12 +16,12 @@ import type { ListingInput } from "@/lib/fieldwear/listing-model";
 export async function requestOwnerLink(form: FormData) {
   const owner = process.env.FIELDWEAR_OWNER_EMAIL?.trim().toLowerCase();
   const email = String(form.get("email") ?? "").trim().toLowerCase();
-  if (!owner) redirect("/fieldwear?signIn=unavailable");
+  if (!owner) redirect(`${ownerCatalogPath}?signIn=unavailable`);
   if (email === owner) {
     try {
       const token = await issueOwnerLink();
       if (token) {
-        const url = new URL("https://www.resonate.solutions/fieldwear");
+        const url = new URL(ownerCatalogPath, "https://www.resonate.solutions");
         url.searchParams.set("access", token);
         await sendCustomerEmail({
           to: owner,
@@ -32,17 +33,17 @@ export async function requestOwnerLink(form: FormData) {
       console.error("Fieldwear owner link could not be issued.");
     }
   }
-  redirect("/fieldwear?signIn=requested");
+  redirect(`${ownerCatalogPath}?signIn=requested`);
 }
 
 export async function redeemOwnerLink(form: FormData) {
   const token = String(form.get("access") ?? "");
   const hasSession = await exchangeOwnerLink(token);
-  redirect(hasSession ? "/fieldwear#fresh" : "/fieldwear?signIn=expired");
+  redirect(hasSession ? `${ownerCatalogPath}#fresh` : `${ownerCatalogPath}?signIn=expired`);
 }
 
 export async function setFirstDibs(form: FormData) {
-  if (!(await isScoutOwner())) redirect("/fieldwear");
+  if (!(await isScoutOwner())) redirect(ownerCatalogPath);
   const profile = catalogProfile(form.get("profile"));
   const enabled = form.get("enabled") === "on";
   if (enabled && !firstDibsConfigured()) redirect(catalogHref(profile, { alerts: "unavailable" }, "first-dibs"));
@@ -56,11 +57,11 @@ export async function setFirstDibs(form: FormData) {
 
 export async function signOutScout() {
   await revokeOwnerSession();
-  redirect("/fieldwear");
+  redirect(ownerCatalogPath);
 }
 
 export async function saveScoutPreferences(form: FormData) {
-  if (!(await isScoutOwner())) redirect("/fieldwear");
+  if (!(await isScoutOwner())) redirect(ownerCatalogPath);
   const profile = catalogProfile(form.get("profile"));
   const parsed = parseScoutPreferences(form);
   if (!parsed) redirect(catalogHref(profile, { preferences: "invalid" }, "preferences"));
@@ -71,26 +72,26 @@ export async function saveScoutPreferences(form: FormData) {
     ON CONFLICT (profile) DO UPDATE SET settings = EXCLUDED.settings`;
   const previous = await readLiveSearch(undefined, "owner", profile);
   await runAndStoreLiveSearch(preferences, previous?.keywords ?? "", undefined, profile);
-  revalidatePath("/fieldwear");
+  revalidatePath(ownerCatalogPath);
   redirect(catalogHref(profile, { catalog: "1" }));
 }
 
 export async function searchScoutNow(form: FormData) {
-  if (!(await isScoutOwner())) redirect("/fieldwear");
+  if (!(await isScoutOwner())) redirect(ownerCatalogPath);
   const profile = catalogProfile(form.get("profile"));
   const keywords = String(form.get("keywords") ?? "").replace(/\bvintage\b/gi, "").trim().replace(/\s+/g, " ").slice(0, 80);
   await runAndStoreLiveSearch(await readScoutPreferences(profile), keywords, undefined, profile);
-  revalidatePath("/fieldwear");
+  revalidatePath(ownerCatalogPath);
   redirect(catalogHref(profile, { catalog: "1" }));
 }
 
 export async function searchScoutLook(form: FormData) {
-  if (!(await isScoutOwner())) redirect("/fieldwear");
+  if (!(await isScoutOwner())) redirect(ownerCatalogPath);
   const preferences = await readScoutPreferences();
   if (form.get("hunt") === "browning") {
     await runAndStoreLiveSearch(preferences, "", browningHunt);
-    revalidatePath("/fieldwear");
-    redirect("/fieldwear#browning-results");
+    revalidatePath(ownerCatalogPath);
+    redirect(`${ownerCatalogPath}#browning-results`);
   }
   const source = String(form.get("source") ?? "");
   const externalId = String(form.get("externalId") ?? "");
@@ -105,14 +106,14 @@ export async function searchScoutLook(form: FormData) {
   const reference = curatedListings.find(matches) ?? liveRuns.flatMap((run) => run?.listings ?? []).find(matches)
     ?? saved[0]?.listing ?? edition?.finds.find(matches);
   const hunt = reference && similarHunt(reference);
-  if (!hunt) redirect("/fieldwear#find-similar");
+  if (!hunt) redirect(`${ownerCatalogPath}#find-similar`);
   await runAndStoreLiveSearch(preferences, "", hunt);
-  revalidatePath("/fieldwear");
-  redirect("/fieldwear#similar-results");
+  revalidatePath(ownerCatalogPath);
+  redirect(`${ownerCatalogPath}#similar-results`);
 }
 
 export async function decideListing(form: FormData) {
-  if (!(await isScoutOwner())) redirect("/fieldwear");
+  if (!(await isScoutOwner())) redirect(ownerCatalogPath);
   const source = String(form.get("source") ?? "");
   const externalId = String(form.get("externalId") ?? "");
   const verdict = String(form.get("verdict") ?? "");
@@ -128,5 +129,5 @@ export async function decideListing(form: FormData) {
     VALUES (${source}, ${externalId}, ${verdict}, ${item ? JSON.stringify(item) : null}::jsonb)
     ON CONFLICT (source, external_id) DO UPDATE SET
       verdict = EXCLUDED.verdict, listing = COALESCE(EXCLUDED.listing, fieldwear_decisions.listing)`;
-  revalidatePath("/fieldwear");
+  revalidatePath(ownerCatalogPath);
 }

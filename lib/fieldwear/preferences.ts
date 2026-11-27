@@ -1,3 +1,5 @@
+import { ownerCatalogPath } from "./owner-routes";
+
 export const departmentLabels = { any: "Any department", men: "Men’s", women: "Women’s", unisex: "Unisex" } as const;
 export type Department = keyof typeof departmentLabels;
 export type CatalogProfile = "owner" | "women";
@@ -8,7 +10,7 @@ export function catalogProfile(value: unknown): CatalogProfile {
 
 export function catalogHref(profile: CatalogProfile, params: Record<string, string> = {}, anchor = "fresh") {
   const query = new URLSearchParams(profile === "women" ? { ...params, department: "women" } : params).toString();
-  return `/fieldwear${query ? `?${query}` : ""}#${anchor}`;
+  return `${ownerCatalogPath}${query ? `?${query}` : ""}#${anchor}`;
 }
 
 export type ScoutPreferences = {

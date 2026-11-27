@@ -32,6 +32,7 @@ export async function GET(request: Request) {
     sql`DELETE FROM seams_sessions WHERE expires_at <= now()`,
     sql`DELETE FROM seams_rate_limits WHERE expires_at <= now()`,
     sql`DELETE FROM seams_digests WHERE day < current_date - 90`,
+    sql`DELETE FROM seams_activity WHERE day < current_date - 90`,
   ]);
   const ok = results.every(({ count }) => count > 0) && publicCatalog.every(({ count }) => count !== 0);
   return Response.json({ results, publicCatalog }, { status: ok ? 200 : 503 });

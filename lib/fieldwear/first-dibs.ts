@@ -5,7 +5,8 @@ import { classifyGarment } from "./listing-model";
 import { initializeScoutDatabase, readScoutPreferences, scoutDatabase } from "./owner-access";
 
 type Digest = { body: string; sent_at: string | null };
-const catalogUrl = "https://www.resonate.solutions/fieldwear";
+import { ownerCatalogPath } from "./owner-routes";
+const catalogUrl = "https://www.resonate.solutions" + ownerCatalogPath;
 
 export function firstDibsConfigured() {
   return Boolean(process.env.CRON_SECRET && process.env.FIELDWEAR_OWNER_EMAIL?.trim() && customerEmailConfigured());

@@ -19,6 +19,7 @@ import {
   X,
 } from "lucide-react";
 import { decideListing, searchScoutLook } from "@/app/fieldwear/actions";
+import { recordSeamsActivity } from "@/components/seams/activity";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import type { GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
@@ -669,6 +670,7 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
   const sourceLabel = item.sellerName ?? marketplaceName(item.source);
   const catalogItem = item.source === "shopifycatalog" || !personalActions;
   const openDetails = () => {
+    if (!personalActions) recordSeamsActivity("listing-open", item.garmentKind, item.source);
     setDetailsOpen(true);
     dialog.current?.showModal();
   };
@@ -724,7 +726,10 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
                 ))}
               </dl>
               {item.lookNote ? <p className="mt-2 text-sm text-[var(--muted-ink)]">{item.lookNote}</p> : null}
-              <a href={item.url} target="_blank" rel="noreferrer" className="scout-primary mt-4 inline-flex items-center gap-2">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
+              <a href={item.url} target="_blank" rel="noreferrer"
+                onClick={personalActions ? undefined : () => recordSeamsActivity("seller-click", item.garmentKind, item.source)}
+                onAuxClick={personalActions ? undefined : (event) => { if (event.button === 1) recordSeamsActivity("seller-click", item.garmentKind, item.source); }}
+                className="scout-primary mt-4 inline-flex items-center gap-2">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
               {!catalogItem && showSimilar && (item.garmentKind === "shirt" || item.garmentKind === "pants") && item.decision !== "pass" ? (
                 <form action={searchScoutLook} className="mt-2">
                   <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />

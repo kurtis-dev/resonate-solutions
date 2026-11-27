@@ -9,8 +9,8 @@ import { firstDibsReady } from "@/lib/seams/digest";
 
 export async function requestMemberLink(form: FormData) {
   const email = normalizeEmail(form.get("email"));
-  if (!email) redirect(seamsPath + "?status=invalid");
-  if (!customerEmailConfigured()) redirect(seamsPath + "?status=unavailable");
+  if (!email) redirect(seamsPath + "?status=invalid#join");
+  if (!customerEmailConfigured()) redirect(seamsPath + "?status=unavailable#join");
   try {
     const token = await issueSeamsLink(email);
     if (token) {
@@ -22,14 +22,14 @@ export async function requestMemberLink(form: FormData) {
       if (!mail.sent) throw new Error("Sign-in email failed");
     }
   } catch {
-    redirect(seamsPath + "?status=unavailable");
+    redirect(seamsPath + "?status=unavailable#join");
   }
-  redirect(seamsPath + "?status=sent");
+  redirect(seamsPath + "?status=sent#join");
 }
 
 export async function continueSeams(form: FormData) {
   const signedIn = await redeemSeamsLink(String(form.get("access") ?? ""));
-  redirect(signedIn ? seamsPath : seamsPath + "?status=expired");
+  redirect(signedIn ? seamsPath : seamsPath + "?status=expired#join");
 }
 
 export async function signOutSeams() {
@@ -70,10 +70,10 @@ export async function searchMemberCatalog(form: FormData) {
   if (!(await readMember())) redirect(seamsPath);
   const keywords = String(form.get("keywords") ?? "").trim().slice(0, 80);
   await refreshSeamsCatalog();
-  redirect(seamsPath + (keywords ? "?q=" + encodeURIComponent(keywords) : "") + "#catalog");
+  redirect(seamsPath + (keywords ? "?q=" + encodeURIComponent(keywords) : "") + "#fresh");
 }
 
 export async function stopFirstDibs(form: FormData) {
   await unsubscribeSeams(String(form.get("token") ?? ""));
-  redirect(seamsPath + "?status=unsubscribed");
+  redirect(seamsPath + "?status=unsubscribed#join");
 }
