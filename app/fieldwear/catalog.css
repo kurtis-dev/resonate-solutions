@@ -421,6 +421,19 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
   width: calc(100% - var(--instant-left) - var(--instant-right));
   height: calc(100% - var(--instant-top) - var(--instant-foot));
 }
+.seams-public article > .scout-photo-well[data-frame]::before {
+  background: #e8e2d8;
+}
+.seams-public article:has(> .scout-photo-well[data-frame]) .scout-card-copy {
+  padding: 8px 2px 0;
+}
+.seams-public article:has(> .scout-photo-well[data-frame]) .scout-card-copy h3 {
+  min-height: 2.8em;
+}
+.seams-public .scout-card-fit {
+  line-height: 1.35;
+  margin-top: 3px;
+}
 .seams-public article > .scout-photo-well[data-frame] .scout-photo-fallback {
   position: absolute;
   align-content: center;

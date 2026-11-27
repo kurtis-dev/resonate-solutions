@@ -725,6 +725,16 @@ function ListingPhoto({ imageUrl, title, priority = false }: Pick<ListingView, "
   );
 }
 
+function catalogCardTitle(title: string, size: string | null) {
+  const dimensions = size?.trim().match(/^(\d{2}(?:\.\d+)?)\s*[x×]\s*(\d{2}(?:\.\d+)?)$/i);
+  if (!dimensions) return title;
+
+  const [, waist, inseam] = dimensions;
+  const sizeInTitle = new RegExp(`(?:\\b(?:size|sz)\\s+)?(?<![\\d.])\\b${waist.replace(".", "\\.")}\\s*[x×]\\s*${inseam.replace(".", "\\.")}\\b(?!\\.\\d)`, "i");
+  const shorterTitle = title.replace(sizeInTitle, "").replace(/\s{2,}/g, " ").replace(/\s*[-–,:]\s*$/, "").trim();
+  return shorterTitle || title;
+}
+
 function ListingCard({ item, grid = false, priority = false, showSimilar = true, personalActions = true, frame }: {
   item: ListingView; grid?: boolean; priority?: boolean; showSimilar?: boolean; personalActions?: boolean; frame?: CatalogFrame;
 }) {
@@ -740,6 +750,9 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
     dialog.current?.showModal();
   };
   const sizeLabel = item.sizeBasis === "measured" ? "Measured size" : item.sizeBasis === "seller-fit" ? "Seller fit" : "Size";
+  const cardTitle = frame ? catalogCardTitle(item.title, item.size) : item.title;
+  const cardSize = frame ? item.size?.replace(/^(\d+(?:\.\d+)?)\s*[x×]\s*(\d+(?:\.\d+)?)$/i, "$1 × $2") : item.size;
+  const cardSizeLabel = item.sizeBasis === "measured" ? "Measured" : sizeLabel;
   const details = [
     { label: "Measurements", value: item.measurements.join(" · ") },
     { label: "Condition", value: item.condition },
@@ -761,7 +774,7 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
       <div className="scout-card-copy">
         <div className="flex items-start justify-between gap-1">
           <h3 className="min-w-0 flex-1 text-sm font-semibold leading-[1.35]">
-            <button type="button" className="line-clamp-2 min-h-10 text-left hover:underline" onClick={openDetails} aria-haspopup="dialog">{item.title}</button>
+            <button type="button" className={`line-clamp-2 text-left hover:underline ${frame ? "" : "min-h-10"}`} onClick={openDetails} aria-haspopup="dialog">{cardTitle}</button>
           </h3>
           {!catalogItem ? <form action={decideListing}>
             <input type="hidden" name="source" value={item.source} /><input type="hidden" name="externalId" value={item.externalId} />
@@ -770,7 +783,10 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
             </button>
           </form> : null}
         </div>
-        <p className="text-sm tabular-nums">{item.priceCents == null ? <span className="font-semibold">{displayPrice}{item.size ? " · " : ""}</span> : null}{item.size ? <span className="text-[var(--muted-ink)]">{item.size}</span> : null}</p>
+        <p className={`text-sm tabular-nums ${frame ? "scout-card-fit" : ""}`}>
+          {item.priceCents == null ? <span className="font-semibold">{displayPrice}{cardSize ? " · " : ""}</span> : null}
+          {cardSize ? <span className="text-[var(--muted-ink)]">{frame ? `${cardSizeLabel} ` : null}{cardSize}</span> : null}
+        </p>
         {personalActions ? <p className="scout-source"><Store size={13} aria-hidden="true" /><span>{sourceLabel}</span></p> : null}
       </div>
 
