@@ -15,7 +15,8 @@ export function GET(request: NextRequest) {
   if (oldSession && /^[a-f0-9]{64}$/.test(oldSession) && !query.has("access")) {
     const options = { httpOnly: true, secure: process.env.NODE_ENV === "production", sameSite: "lax" as const };
     response.cookies.set(ownerSessionCookie, oldSession, { ...options, path: ownerCatalogPath, maxAge: 30 * 86_400 });
-    response.cookies.set(ownerSessionCookie, "", { ...options, path: legacyOwnerPath, maxAge: 0 });
+    const secure = options.secure ? "; Secure" : "";
+    response.headers.append("Set-Cookie", `${ownerSessionCookie}=; Path=${legacyOwnerPath}; Max-Age=0; HttpOnly; SameSite=Lax${secure}`);
   }
   response.headers.set("Cache-Control", "private, no-store");
   return response;
