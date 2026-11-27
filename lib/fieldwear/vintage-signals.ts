@@ -19,6 +19,9 @@ const canvas = /\b(?:canvas|duck(?!\s+head\b|\s+camo\b))\b/i;
 
 export function vintageSignals({ title, description }: Pick<ListingInput, "title" | "description">) {
   const text = [title, description].filter(Boolean).join("\n").replace(/[’‘]/g, "'");
+  const withoutStyleDates = (value: string) => value.replace(/\b(?:(?:19|20)?[4-9]0'?s|(?:20)?00'?s|(?:19|20)\d{2})[- ]+(?:style|inspired|look|aesthetic|revival)\b/gi, "");
+  const eraText = withoutStyleDates(text);
+  const eraTitle = withoutStyleDates(title);
   const shell = text.replace(lining, "").replace(liningMaterial, "").replace(/\b(?:lining|liner|fill|padding|insulation)\s+(?:\d{1,3}\s*%\s*)?(?:cotton|wool|polyester|nylon|acrylic|synthetic)\b/gi, "");
   const substantial = durableFabric.test(shell) || durableBuild.test(text);
   const blend = synthetic.test(shell);
@@ -27,9 +30,9 @@ export function vintageSignals({ title, description }: Pick<ListingInput, "title
   const natural = /\b(?:100\s*%\s*(?:cotton|wool)|pure wool|all wool)\b/i.test(shell) && !mixedFibers;
   const cotton = !mixedFibers && /\bcotton\b/i.test(shell);
   const wool = !mixedFibers && /\bwool\b/i.test(shell);
-  const fromEighties = eighties.test(text) || titledEighties.test(title);
-  const fromNineties = sometime90s.test(text) || /\b(?:from|made in|dated|circa|year manufactured:)\s*199\d\b/i.test(text) || /^(?:vintage\s+)?199\d\b|\b199\d\s+(?:world\s+)?(?:tour|concert)\b/i.test(title);
-  const before1999 = old.test(text) || fromEighties || /^(?:vintage\s+)?199[0-8]\b|\b199[0-8]\s+(?:world\s+)?(?:tour|concert)\b/i.test(title);
+  const fromEighties = eighties.test(eraText) || titledEighties.test(eraTitle);
+  const fromNineties = sometime90s.test(eraText) || /\b(?:from|made in|dated|circa|year manufactured:)\s*199\d\b/i.test(eraText) || /^(?:vintage\s+)?199\d\b|\b199\d\s+(?:world\s+)?(?:tour|concert)\b/i.test(eraTitle);
+  const before1999 = old.test(eraText) || fromEighties || /^(?:vintage\s+)?199[0-8]\b|\b199[0-8]\s+(?:world\s+)?(?:tour|concert)\b/i.test(eraTitle);
   const isModern = modern.test(text);
   const dated2000s = from2000s.test(text);
   const afterNineties = dated2000s || postNineties.test(text);

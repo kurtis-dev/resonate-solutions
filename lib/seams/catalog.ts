@@ -120,6 +120,7 @@ function matchesInterest(item: LiveListing, kind: GarmentKind, interest: string)
 
 export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSettings, keywords = "", email = false, tour: boolean | "include" = false, includePickupOnly = false) {
   const terms = keywords.toLowerCase().match(/[a-z0-9]+/g) ?? [];
+  const searchTerms = terms.map((term) => new RegExp(`\\b${term}`, "i"));
   const fitPreferences = { shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes } as ScoutPreferences;
   const unique = new Map<string, LiveListing>();
   const now = Date.now();
@@ -136,7 +137,7 @@ export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSetting
       if (tourRow && tour === "include" && !departmentMatch({ title: item.title, garmentKind: kind }, settings.department)) continue;
       if (!sizeMatch({ ...item, garmentKind: kind }, fitPreferences)) continue;
       if (item.priceCents == null || (settings.budget != null && item.priceCents + (item.shippingCents ?? 0) > Math.round(settings.budget * 100))) continue;
-      if (!terms.every((term) => `${item.title} ${item.description ?? ""}`.toLowerCase().includes(term))) continue;
+      if (!searchTerms.every((term) => term.test(`${item.title} ${item.description ?? ""}`))) continue;
       if (email && settings.interests.length && !settings.interests.some((interest) => matchesInterest(item, kind, interest))) continue;
       unique.set(sourceKey(item), item);
     }
@@ -177,7 +178,7 @@ export function previewSeamsCatalog(items: LiveListing[], includeHighlights: boo
   const isSturdy2000s = (item: LiveListing) => vintageSignals(item).sturdy2000s;
   const reserve = includeHighlights ? [
     { matches: isGoodwillEbay, minimum: 24 },
-    { matches: (item: LiveListing) => isVintageShop(item.source), minimum: 48 },
+    { matches: (item: LiveListing) => isVintageShop(item.source) && item.source !== "fredgoodwill", minimum: 48 },
     { matches: isSturdy2000s, minimum: 4 },
   ] : [];
   if (tourKeys?.size) reserve.push({ matches: (item) => tourKeys.has(sourceKey(item)), minimum: 12 });
