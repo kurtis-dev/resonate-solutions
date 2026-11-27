@@ -6,6 +6,8 @@ import { initializeSeams, seamsSql, seamsUrl, type MemberSettings } from "./memb
 type Recipient = { id: string; email: string; settings: MemberSettings; unsubscribe_token: string; seen: string[] };
 type PendingDigest = { body: string; sent_at: string | null };
 
+export const firstDibsPickLimit = 6;
+
 export function firstDibsReady() {
   return Boolean(process.env.SEAMS_MAILING_ADDRESS?.trim() && customerEmailConfigured());
 }
@@ -31,16 +33,19 @@ export async function deliverSeamsDibs() {
   const replyTo = process.env.SEAMS_REPLY_TO?.trim() || "questions@resonate.solutions";
   for (const member of recipients) {
     const seen = new Set(member.seen);
-    const items = matchSeamsCatalog(catalog, member.settings, "", true).filter((item) => !seen.has(seamsListingKey(item))).slice(0, 6);
+    const items = matchSeamsCatalog(catalog, member.settings, "", true).filter((item) => !seen.has(seamsListingKey(item))).slice(0, firstDibsPickLimit);
     const [existing] = await sql`SELECT body, sent_at FROM seams_digests WHERE member_id = ${member.id}::uuid AND day = ${day}` as PendingDigest[];
     if (existing?.sent_at || (!existing && !items.length)) continue;
     const unsubscribeUrl = `${seamsUrl}?unsubscribe=${member.unsubscribe_token}`;
     const listUnsubscribe = `${seamsUrl}/unsubscribe?token=${member.unsubscribe_token}`;
     const body = [
       "Vintage finds matched to your Seams Familiar settings.",
-      ...items.map((item) => [
-        item.title, [item.size, dollars.format(item.priceCents! / 100)].filter(Boolean).join(" · "), item.url,
-      ].join("\n")),
+      ...items.map((item) => {
+        const price = dollars.format(item.priceCents! / 100);
+        const amount = item.priceKind === "bid" ? `Current bid ${price}` : price;
+        const shipping = item.shippingCents == null ? null : `${dollars.format(item.shippingCents / 100)} shipping`;
+        return [item.title, [item.size, amount, shipping].filter(Boolean).join(" · "), item.url].join("\n");
+      }),
       `Edit your sizes, budget, or styles: ${seamsUrl}#fit`,
       `Unsubscribe from First Dibs: ${unsubscribeUrl}`,
       `Resonate Solutions · ${address}`,

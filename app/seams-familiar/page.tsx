@@ -9,7 +9,7 @@ import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { pageMetadata } from "@/lib/seo";
 import { toListingView } from "@/lib/fieldwear/listing-view";
 import { goodwillShelf, interestLabels, matchSeamsCatalog, previewSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
-import { firstDibsReady } from "@/lib/seams/digest";
+import { firstDibsPickLimit, firstDibsReady } from "@/lib/seams/digest";
 import { defaultMemberSettings, readMember, seamsPath, type Member, type MemberSettings } from "@/lib/seams/members";
 import { continueSeams, requestMemberLink, saveMemberDibs, saveMemberFit, searchMemberCatalog, signOutSeams, stopFirstDibs } from "./actions";
 import "../fieldwear/scout.css";
@@ -35,6 +35,15 @@ export async function generateMetadata({ searchParams }: { searchParams: Promise
 const field = "scout-control mt-1 block w-full text-base";
 const button = "scout-primary px-4 text-sm";
 const notice = "mt-3 text-sm text-[var(--muted-ink)]";
+
+function FirstDibsDetails() {
+  return (
+    <>
+      <p className="mt-1 text-sm">An optional morning email with up to {firstDibsPickLimit} finds that match your saved sizes, budget, and styles.</p>
+      <p className="mt-2 text-sm text-[var(--muted-ink)]">Each pick includes the listed size when available, the price or current bid, and a link to the seller, where anyone can still buy the item. You get an email only when there’s a match we haven’t sent you in the last 60 days.</p>
+    </>
+  );
+}
 
 function Welcome({ access, status }: { access?: string; status?: string }) {
   const valid = access && /^[a-f0-9]{64}$/.test(access);
@@ -63,6 +72,11 @@ function Welcome({ access, status }: { access?: string; status?: string }) {
                 : "We couldn’t send a sign-in link. Try again in a few minutes."}
             </p> : null}
           </form>
+          <section id="first-dibs" aria-labelledby="first-dibs-title" className="mt-5 scroll-mt-6 border-t border-[var(--line)] pt-4">
+            <h3 id="first-dibs-title" className="font-bold">What you get with First Dibs</h3>
+            <FirstDibsDetails />
+            {!firstDibsReady() ? <p className="mt-2 text-xs text-[var(--muted-ink)]">First Dibs delivery is being set up.</p> : null}
+          </section>
         </>
       )}
     </section>
@@ -113,8 +127,8 @@ function FirstDibs({ member, status }: { member: Member; status?: string }) {
       <span className="scout-90s-graphic" aria-hidden="true"><i /><i /><i /></span>
       <div>
         <h2 id="first-dibs-title" className="text-xl font-bold tracking-tight">Get first dibs</h2>
-        <p className="mt-1 text-sm">One morning email when there are new matches for your fit, budget, and favorite styles.</p>
-        <p className="mt-2 text-xs">{available ? member.first_dibs ? "First Dibs is on." : "First Dibs is off." : "Email delivery is being set up."}</p>
+        <FirstDibsDetails />
+        <p className="mt-2 text-xs">{available ? member.first_dibs ? "First Dibs is on." : "First Dibs is off." : "First Dibs delivery is being set up."}</p>
       </div>
       {available || member.first_dibs ? <form action={saveMemberDibs} className="scout-first-dibs-form">
         <input type="hidden" name="enabled" value={member.first_dibs ? "off" : "on"} />
