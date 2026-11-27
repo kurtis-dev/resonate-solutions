@@ -7,7 +7,7 @@ import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { pageMetadata } from "@/lib/seo";
 import { toListingView } from "@/lib/fieldwear/listing-view";
-import { interestLabels, matchSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
+import { interestLabels, matchSeamsCatalog, previewSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
 import { firstDibsReady } from "@/lib/seams/digest";
 import { defaultMemberSettings, readMember, seamsPath, type Member, type MemberSettings } from "@/lib/seams/members";
 import { continueSeams, requestMemberLink, saveMemberDibs, saveMemberFit, searchMemberCatalog, signOutSeams, stopFirstDibs } from "./actions";
@@ -140,7 +140,7 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
   const items = decade ? matches.filter((item) => vintageSignals(item).decade === decade) : matches;
   const preferences = { department: settings.department, shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes, shirtBudget: settings.budget, pantsBudget: settings.budget, matchingOnly: true };
   const stamp = catalog.reduce((latest, row) => latest > (row.checked_at ?? "") ? latest : row.checked_at ?? "", "");
-  const cards = (member ? items : items.slice(0, 72)).map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
+  const cards = (member ? items : previewSeamsCatalog(items, !decade && !tour)).map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
   const catalogHref = (filters: { decade: string; tour: boolean; department: string }) => {
     const query = new URLSearchParams();
     if (keywords) query.set("q", keywords);

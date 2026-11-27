@@ -389,7 +389,7 @@ export function ListingShelf({ id, label, description, items, comparePrices = fa
 }
 
 const freshPageSize = 12;
-const collections = [["all", "All finds"], ["90s", "90s"], ["y2k", "Y2K"], ["canvas", "Canvas & duck"], ["lined", "Lined layers"]] as const;
+const collections = [["all", "All finds"], ["90s", "90s"], ["canvas", "Canvas & duck"], ["lined", "Lined layers"]] as const;
 type Collection = (typeof collections)[number][0];
 const priceForSort = (item: ListingView) => item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
 const garmentOptions = {
@@ -456,7 +456,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
     const base = items.filter((item) => {
       if (collection === "canvas" && !item.vintage.canvas) return false;
       if (collection === "lined" && !matchesFreshType(item, "lined")) return false;
-      if ((collection === "90s" || collection === "y2k") && item.vintage.decade !== collection) return false;
+      if (collection === "90s" && item.vintage.decade !== collection) return false;
       if ((kind !== "all" && item.garmentKind !== kind) || (marketplace.startsWith("shopifycatalog:") ? item.source !== "shopifycatalog" || item.sellerName !== marketplace.slice(15) : !matchesMarketplace(item.source, marketplace)) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
       const cents = priceForSort(item);
       if ((min !== "" || max !== "") && (cents == null || (min !== "" && cents < Number(min) * 100) || (max !== "" && cents > Number(max) * 100))) return false;
@@ -681,7 +681,8 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
     { label: "Fabric", value: item.vintage.fabricNote },
     { label: "Color", value: item.colors.join(", ") },
     { label: "Era", value: item.vintage.eraNote },
-    { label: "Shipping", value: item.shippingCents == null ? "Unknown" : money(item.shippingCents) },
+    { label: "Shipping", value: item.shippingCents != null ? money(item.shippingCents)
+      : item.source === "fredgoodwill" ? "Check availability and cost at checkout" : "Unknown" },
     { label: item.priceKind === "bid" ? "Bid + shipping" : "Item + shipping", value: total },
   ];
 

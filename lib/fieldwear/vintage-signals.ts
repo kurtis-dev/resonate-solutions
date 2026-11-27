@@ -6,6 +6,7 @@ const eighties = /\b(?:19)?80'?s\b|(?:^|\b(?:from|made in|dated|circa|year manuf
 const titledEighties = /^(?:vintage\s+)?198\d\b|\b198\d\s+(?:world\s+)?(?:tour|concert)\b/i;
 const sometime90s = /\b(?:19)?90'?s\b/i;
 const postNineties = /\b(?:(?:year manufactured:|from|dated|made in|circa)\s*20[0-2]\d|(?:20)?00s|2010s|2020s|y2k)\b/i;
+const from2000s = /\b(?:2000[’']?s|early 2000s|(?:from|made in|manufactured in|dated|circa|year manufactured:)\s*200\d)\b|^(?:vintage\s+)?200\d\b/i;
 const lateNineties = /\b(?:year manufactured:|from|dated|made in|circa)\s*1999\b/i;
 const historicLabels = /\b(?:actwu|acwa|amalgamated clothing (?:and textile )?workers|gimbels|(?:made in|country of origin:)\s*(?:west germany|czechoslovakia|u\.?s\.?s\.?r\.?))\b/i;
 const durableFabric = /\b(?:duck(?: canvas)?|canvas|denim|chamois|sateen|moleskin|melton|twill|herringbone|wool whipcord|heavy[- ]?weight|heavy cotton|heavy flannel)\b/i;
@@ -30,11 +31,13 @@ export function vintageSignals({ title, description }: Pick<ListingInput, "title
   const fromNineties = sometime90s.test(text) || /\b(?:from|made in|dated|circa|year manufactured:)\s*199\d\b/i.test(text) || /^(?:vintage\s+)?199\d\b|\b199\d\s+(?:world\s+)?(?:tour|concert)\b/i.test(title);
   const before1999 = old.test(text) || fromEighties || /^(?:vintage\s+)?199[0-8]\b|\b199[0-8]\s+(?:world\s+)?(?:tour|concert)\b/i.test(title);
   const isModern = modern.test(text);
-  const afterNineties = postNineties.test(text);
+  const dated2000s = from2000s.test(text);
+  const afterNineties = dated2000s || postNineties.test(text);
   const period = isModern || afterNineties || lateNineties.test(text) ? -2
     : before1999 || historicLabels.test(text) ? 2 : fromNineties ? 1 : 0;
   const build = pureSynthetic || (blend && (light.test(shell) || !substantial)) ? -2 : substantial && (natural || durableBuild.test(shell)) ? 2 : substantial || natural ? 1 : 0;
-  const eraNote = period < 0 ? "Listing wording points to a newer garment or reissue."
+  const eraNote = dated2000s && !isModern ? "Seller date language points to the 2000s. Check the label photos."
+    : period < 0 ? "Listing wording points to a newer garment or reissue."
     : period === 2 ? (before1999 ? "Seller date language points to before 1999. Check the label photos." : "A period label or origin is mentioned. Check the actual tag and garment.")
     : period === 1 ? "Seller mentions the 1990s. The exact year is open."
     : "Garment date is open.";
@@ -44,9 +47,10 @@ export function vintageSignals({ title, description }: Pick<ListingInput, "title
     : substantial ? "Listing mentions a substantial fabric or reinforced construction."
     : null;
   const eraDecade = fromEighties === fromNineties ? null : fromEighties ? "80s" : "90s";
-  const decade = !isModern && /\b(?:(?:20)?00[’']?s|early 2000s|y2k|(?:made in|dated|circa|year manufactured:)\s*200\d)\b/i.test(text) ? "y2k"
+  const decade = !isModern && (dated2000s || /\b(?:00[’']?s|y2k)\b/i.test(text)) ? "y2k"
     : !isModern && !afterNineties ? eraDecade : null;
-  return { decade, period, build, natural, eraNote, fabricNote, cotton, wool, sturdyBlend: mixedFibers && substantial && !pureSynthetic && !light.test(shell), canvas: canvas.test(shell) };
+  const sturdy2000s = decade === "y2k" && build > 0 && substantial && !light.test(shell);
+  return { decade, period, build, sturdy2000s, natural, eraNote, fabricNote, cotton, wool, sturdyBlend: mixedFibers && substantial && !pureSynthetic && !light.test(shell), canvas: canvas.test(shell) };
 }
 
 export function listingMeasurements(description = "") {

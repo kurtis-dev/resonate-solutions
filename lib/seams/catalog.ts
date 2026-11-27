@@ -1,5 +1,5 @@
 import { searchVintageShop, type LiveListing } from "@/lib/fieldwear/inventory-sources";
-import { vintageShops, tourShops } from "@/lib/fieldwear/marketplace-directory";
+import { isGoodwillPickupOnly, vintageShops, tourShops } from "@/lib/fieldwear/marketplace-directory";
 import { classifyGarment, type GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentMatch, sizeMatch, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
@@ -9,7 +9,7 @@ const departments = ["men", "women", "tour"] as const;
 type Department = (typeof departments)[number];
 type CatalogRow = { department: Department; listings: LiveListing[]; checked_at: string | null };
 export const interestLabels = {
-  denim: "Denim", workwear: "Workwear", knitwear: "Knitwear", dresses: "Dresses & skirts", jackets: "Jackets", vintage90s: "90s", y2k: "Y2K",
+  denim: "Denim", workwear: "Workwear", knitwear: "Knitwear", dresses: "Dresses & skirts", jackets: "Jackets", vintage90s: "90s",
 } as const;
 
 const sourceKey = (listing: LiveListing) => `${listing.source}:${listing.externalId}`;
@@ -83,6 +83,9 @@ export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSetting
   for (const row of catalog) {
     if (tour ? row.department !== "tour" : row.department === "tour" || (settings.department !== "any" && settings.department !== row.department)) continue;
     for (const item of row.listings) {
+      if (isGoodwillPickupOnly(item.source, [item.title, item.description].join(" "))) continue;
+      const signals = vintageSignals(item);
+      if (signals.decade === "y2k" && !signals.sturdy2000s) continue;
       const kind = classifyGarment(item);
       if (kind === "unknown" || (item.endsAt && Date.parse(item.endsAt) <= Date.now())) continue;
       if (!sizeMatch({ ...item, garmentKind: kind }, fitPreferences)) continue;
@@ -98,4 +101,24 @@ export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSetting
     const taste = settings.interests.filter((interest) => matchesInterest(item, kind, interest)).length;
     return { item, rank: taste * 100 + signals.period * 10 + signals.build * 5 };
   }).sort((a, b) => b.rank - a.rank || b.item.listedAt.localeCompare(a.item.listedAt)).map(({ item }) => item);
+}
+
+export function previewSeamsCatalog(items: LiveListing[], include2000s: boolean) {
+  const previewSize = 72;
+  const preview = items.slice(0, previewSize);
+  if (!include2000s || items.length <= previewSize) return preview;
+
+  const desired2000s = 4;
+  const featured = preview.filter((item) => vintageSignals(item).sturdy2000s).length;
+  if (featured >= desired2000s) return preview;
+  const additional = items.slice(previewSize).filter((item) => vintageSignals(item).sturdy2000s).slice(0, desired2000s - featured);
+  if (!additional.length) return preview;
+
+  // Reserve room without displacing 2000s pieces that already ranked in the preview.
+  let slots = additional.length;
+  return preview.reduceRight<LiveListing[]>((kept, item) => {
+    if (slots > 0 && !vintageSignals(item).sturdy2000s) slots--;
+    else kept.push(item);
+    return kept;
+  }, []).reverse().concat(additional);
 }

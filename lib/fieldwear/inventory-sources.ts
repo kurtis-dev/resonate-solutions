@@ -1,7 +1,7 @@
 import { classifyGarment, type ListingInput } from "./listing-model";
 import { setTimeout as delay } from "node:timers/promises";
 import { isPeriodTourShirt } from "@/lib/seams/tour-shirts";
-import { vintageShops, tourShops } from "./marketplace-directory";
+import { isGoodwillPickupOnly, vintageShops, tourShops } from "./marketplace-directory";
 import { vintageSignals } from "./vintage-signals";
 import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, reportedPantsFit, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 
@@ -113,6 +113,7 @@ type ShopProduct = {
   body_html?: string;
   published_at?: string;
   product_type?: string;
+  tags?: string | string[];
   images?: { src?: string }[];
   variants?: { id?: number; available?: boolean; price?: string; option1?: string; option2?: string; option3?: string }[];
   options?: { name?: string; position?: number }[];
@@ -218,6 +219,7 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       const optionValue = (variant: NonNullable<ShopProduct["variants"]>[number], position: number) =>
         [variant.option1, variant.option2, variant.option3][position - 1]?.trim() ?? "";
       const notes = shopSellerNotes(product.body_html);
+      if (isGoodwillPickupOnly(shop.source, [title, product.tags, plainText(product.body_html)].flat().join(" "))) continue;
       if (tour && !isPeriodTourShirt(title, notes)) continue;
       const variant = product.variants?.find((value) => {
         if (!value.available) return false;
