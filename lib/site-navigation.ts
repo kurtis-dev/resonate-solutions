@@ -62,7 +62,7 @@ export const globalNavigationExcludedPrefixes = [
 ] as const;
 
 export function isGlobalNavigationExcluded(pathname: string) {
-  return pathname === "/fieldwear" || globalNavigationExcludedPrefixes.some((prefix) => pathname.startsWith(prefix));
+  return pathname === "/fieldwear" || pathname === "/seams-familiar" || pathname.startsWith("/seams-familiar/") || globalNavigationExcludedPrefixes.some((prefix) => pathname.startsWith(prefix));
 }
 
 export function isNavigationLinkActive(pathname: string, href: string) {
