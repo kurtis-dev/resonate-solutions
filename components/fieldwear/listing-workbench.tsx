@@ -770,7 +770,7 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
           </form> : null}
         </div>
         <p className="text-sm tabular-nums">{item.priceCents == null ? <span className="font-semibold">{displayPrice}{item.size ? " · " : ""}</span> : null}{item.size ? <span className="text-[var(--muted-ink)]">{item.size}</span> : null}</p>
-        <p className="scout-source"><Store size={13} aria-hidden="true" /><span>{sourceLabel}</span></p>
+        {personalActions ? <p className="scout-source"><Store size={13} aria-hidden="true" /><span>{sourceLabel}</span></p> : null}
       </div>
 
       <dialog ref={dialog} onClose={() => setDetailsOpen(false)} className="scout-dialog scout-item-dialog" aria-label={item.title}>

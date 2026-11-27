@@ -16,7 +16,7 @@
   gap: .22em;
   width: fit-content;
   padding: .08em .13em .16em .03em;
-  font: 400 clamp(20px, 6.15vw, 53px)/1.12 "Seams Broadcast", Impact, sans-serif;
+  font: 400 clamp(20px, 8.4vw, 53px)/1.12 "Seams Broadcast", Impact, sans-serif;
   letter-spacing: -.055em;
 }
 .seams-broadcast-word { white-space: nowrap; }
@@ -61,5 +61,5 @@
 }
 .seams-preview-options button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
 @media (max-width: 350px) {
-  .seams-broadcast { font-size: 5.75vw; }
+  .seams-broadcast { font-size: 8vw; }
 }
