@@ -113,22 +113,23 @@ function FirstDibs({ member, status }: { member: Member; status?: string }) {
   );
 }
 
-export default async function SeamsFamiliar({ searchParams }: { searchParams: Promise<{ access?: string; status?: string; q?: string; unsubscribe?: string; department?: string }> }) {
+export default async function SeamsFamiliar({ searchParams }: { searchParams: Promise<{ access?: string; status?: string; q?: string; unsubscribe?: string; department?: string; collection?: string }> }) {
   const params = await searchParams;
   const unsubscribe = typeof params.unsubscribe === "string" && /^[a-f0-9]{64}$/.test(params.unsubscribe) ? params.unsubscribe : null;
   const member = unsubscribe ? null : await readMember();
   const guestDepartment = params.department === "men" || params.department === "women" ? params.department : "any";
   const settings = member?.settings ?? (member ? defaultMemberSettings : { ...defaultMemberSettings, department: guestDepartment });
+  const tour = params.collection === "tour-shirts";
   const keywords = typeof params.q === "string" ? params.q.slice(0, 80) : "";
   const showCatalog = !unsubscribe && !params.access;
   const catalog = showCatalog ? await readSeamsCatalog().catch(() => []) : [];
-  const items = matchSeamsCatalog(catalog, settings, keywords);
+  const items = matchSeamsCatalog(catalog, settings, keywords, false, tour);
   const preferences = { department: settings.department, shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes, shirtBudget: settings.budget, pantsBudget: settings.budget, matchingOnly: true };
   const stamp = catalog.reduce((latest, row) => latest > (row.checked_at ?? "") ? latest : row.checked_at ?? "", "");
   const cards = (member ? items : items.slice(0, 72)).map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
   return (
     <main className="fieldwear-scout pb-12">
-      {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${keywords}`} /> : null}
+      {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${tour}:${keywords}`} /> : null}
       <header className="border-b border-[var(--line)]">
         <div className="scout-container flex min-h-16 items-center justify-between">
           <Link href="/" aria-label="Resonate Solutions"><Image src="/assets/resonate-logo-transparent.png" alt="Resonate Solutions" width={122} height={34} /></Link>
@@ -153,8 +154,13 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
         ) : showCatalog ? (
           <>
             <section id="fresh" aria-labelledby="catalog-title" className="my-5 scroll-mt-6">
-              <h2 id="catalog-title" className="text-xl font-bold tracking-tight">{member?.settings ? "Your fresh finds" : "Fresh finds"}</h2>
-              {!member ? <nav className="scout-departments" aria-label="Shop departments">
+              <h2 id="catalog-title" className="text-xl font-bold tracking-tight">{tour ? "’80s & ’90s tour shirts" : member?.settings ? "Your fresh finds" : "Fresh finds"}</h2>
+              <div className="scout-departments" aria-label="Catalog shelves">
+                <Link href={seamsPath + "#fresh"} aria-current={!tour ? "page" : undefined}>Daily catalog</Link>
+                <Link href={seamsPath + "?collection=tour-shirts#fresh"} aria-current={tour ? "page" : undefined}>Tour shirts</Link>
+              </div>
+              {tour ? <p className="my-2 text-xs text-[var(--muted-ink)]">Tour and era are seller-described. Check the print and tag photos.</p> : null}
+              {!member && !tour ? <nav className="scout-departments" aria-label="Shop departments">
                 {([["any", "All"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([department, label]) => {
                   const query = new URLSearchParams();
                   if (department !== "any") query.set("department", department);
@@ -165,18 +171,20 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
               </nav> : null}
               {member ? (
                 <form action={searchMemberCatalog} className="my-3 flex gap-2">
+                  {tour ? <input type="hidden" name="collection" value="tour-shirts" /> : null}
                   <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="keywords" type="search" defaultValue={keywords} placeholder="Denim, wool, L.L.Bean…" maxLength={80} className="scout-control w-full text-base" /></label>
                   <ScoutSubmit label="Search now" pendingLabel="Checking shops…" className={button} />
                 </form>
               ) : (
                 <form method="get" action={seamsPath + "#fresh"} className="my-3 flex gap-2">
+                  {tour ? <input type="hidden" name="collection" value="tour-shirts" /> : null}
                   {guestDepartment !== "any" ? <input type="hidden" name="department" value={guestDepartment} /> : null}
                   <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="q" type="search" defaultValue={keywords} placeholder="Denim, wool, L.L.Bean…" maxLength={80} className="scout-control w-full text-base" /></label>
                   <button type="submit" className={button}>Search</button>
                 </form>
               )}
               {!cards.length ? <p className="mb-2 text-sm text-[var(--muted-ink)]" role="status">{catalog.length ? "No matches. Try a different search or an open size or budget." : "The shop catalog is being refreshed."}</p> : null}
-              {cards.length ? <FreshCatalog key={stamp + ":" + keywords + ":" + JSON.stringify(settings)} items={cards} womenswear={settings.department !== "men"} personalActions={false} /> : null}
+              {cards.length ? <FreshCatalog key={stamp + ":" + keywords + ":" + JSON.stringify(settings)} items={cards} womenswear={!tour && settings.department !== "men"} personalActions={false} /> : null}
             </section>
             {member ? <><FitForm settings={settings} status={params.status} /><FirstDibs member={member} status={params.status} /></>
               : <Welcome status={params.status} />}

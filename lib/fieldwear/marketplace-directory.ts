@@ -10,7 +10,12 @@ export const vintageShops = [
   { source: "thriftmanguy", name: "Thrift Man Guy", origin: "https://thriftmanguy.com", collections: ["carhartt-pants", "carhartt-jeans", "levis-jeans", "jeans-pants", "workwear"] },
 ] as const;
 
-export type VintageShopSource = (typeof vintageShops)[number]["source"];
+export const tourShops = [
+  { source: "rebalance", name: "Rebalance Vintage", origin: "https://rebalancevintage.com", collections: ["music-lovers", "tees"] },
+  { source: "secondlife", name: "Second Life Vintage", origin: "https://secondlifevtg.com", collections: ["bandtees"] },
+] as const;
+
+export type VintageShopSource = (typeof vintageShops | typeof tourShops)[number]["source"];
 
 export const marketplaceBrowse: Readonly<Record<string, { name: string; url: string }>> = {
   etsy: { name: "Etsy", url: "https://www.etsy.com/market/carhartt_work_pants" },
@@ -30,12 +35,12 @@ export function marketplaceName(source: string) {
   if (source === "shopifycatalog") return "Shopify Global Catalog";
   if (source === "ebay") return "eBay";
   if (marketplaceBrowse[source]) return marketplaceBrowse[source].name;
-  return vintageShops.find((shop) => shop.source === source)?.name
+  return [...vintageShops, ...tourShops].find((shop) => shop.source === source)?.name
     ?? (source ? source[0].toUpperCase() + source.slice(1) : "Marketplace");
 }
 
 export function isVintageShop(source: string): source is VintageShopSource {
-  return vintageShops.some((shop) => shop.source === source);
+  return [...vintageShops, ...tourShops].some((shop) => shop.source === source);
 }
 
 export function matchesMarketplace(source: string, filter: string) {

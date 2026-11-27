@@ -70,7 +70,10 @@ export async function searchMemberCatalog(form: FormData) {
   if (!(await readMember())) redirect(seamsPath);
   const keywords = String(form.get("keywords") ?? "").trim().slice(0, 80);
   await refreshSeamsCatalog();
-  redirect(seamsPath + (keywords ? "?q=" + encodeURIComponent(keywords) : "") + "#fresh");
+  const query = new URLSearchParams();
+  if (keywords) query.set("q", keywords);
+  if (form.get("collection") === "tour-shirts") query.set("collection", "tour-shirts");
+  redirect(seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh");
 }
 
 export async function stopFirstDibs(form: FormData) {

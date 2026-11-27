@@ -1,11 +1,11 @@
 import { searchVintageShop, type LiveListing } from "@/lib/fieldwear/inventory-sources";
-import { vintageShops } from "@/lib/fieldwear/marketplace-directory";
+import { vintageShops, tourShops } from "@/lib/fieldwear/marketplace-directory";
 import { classifyGarment, type GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentMatch, sizeMatch, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { initializeSeams, seamsSql, type MemberSettings } from "./members";
 
-const departments = ["men", "women"] as const;
+const departments = ["men", "women", "tour"] as const;
 type Department = (typeof departments)[number];
 type CatalogRow = { department: Department; listings: LiveListing[]; checked_at: string | null };
 export const interestLabels = {
@@ -25,9 +25,10 @@ async function refreshDepartment(department: Department, force: boolean) {
   if (!lease) return null;
 
   const now = Date.now();
-  const preferences: ScoutPreferences = { department, shirtSizes: [], pantsSizes: [], shirtBudget: null, pantsBudget: null, matchingOnly: false };
+  const preferences: ScoutPreferences = { department: department === "tour" ? "any" : department, shirtSizes: [], pantsSizes: [], shirtBudget: null, pantsBudget: null, matchingOnly: false };
   try {
-    const results = await Promise.allSettled(vintageShops.map((shop) => searchVintageShop(shop, preferences, "", { start: 0, now })));
+    const shops = department === "tour" ? tourShops : vintageShops;
+    const results = await Promise.allSettled(shops.map((shop) => searchVintageShop(shop, preferences, "", { start: 0, now }, department === "tour")));
     const listings = new Map<string, LiveListing>();
     for (const result of results) {
       if (result.status !== "fulfilled") continue;
@@ -39,7 +40,7 @@ async function refreshDepartment(department: Department, force: boolean) {
         listings.set(sourceKey(item), item);
       }
     }
-    if (!listings.size) return 0;
+    if (!listings.size && (department !== "tour" || !results.some((result) => result.status === "fulfilled" && result.value.status !== "unavailable"))) return 0;
     await sql`UPDATE seams_catalog SET checked_at = ${new Date(now).toISOString()}::timestamptz, listings = ${JSON.stringify(Array.from(listings.values()))}::jsonb
       WHERE department = ${department} AND lease_until = ${lease.lease_until}::timestamptz`;
     return listings.size;
@@ -75,12 +76,12 @@ function matchesInterest(item: LiveListing, kind: GarmentKind, interest: string)
   }
 }
 
-export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSettings, keywords = "", email = false) {
+export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSettings, keywords = "", email = false, tour = false) {
   const terms = keywords.toLowerCase().match(/[a-z0-9]+/g) ?? [];
   const fitPreferences = { shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes } as ScoutPreferences;
   const unique = new Map<string, LiveListing>();
   for (const row of catalog) {
-    if (settings.department !== "any" && settings.department !== row.department) continue;
+    if (tour ? row.department !== "tour" : row.department === "tour" || (settings.department !== "any" && settings.department !== row.department)) continue;
     for (const item of row.listings) {
       const kind = classifyGarment(item);
       if (kind === "unknown" || (item.endsAt && Date.parse(item.endsAt) <= Date.now())) continue;

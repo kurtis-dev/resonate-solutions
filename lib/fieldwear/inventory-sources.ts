@@ -1,6 +1,7 @@
 import { classifyGarment, type ListingInput } from "./listing-model";
 import { setTimeout as delay } from "node:timers/promises";
-import { vintageShops } from "./marketplace-directory";
+import { isPeriodTourShirt } from "@/lib/seams/tour-shirts";
+import { vintageShops, tourShops } from "./marketplace-directory";
 import { vintageSignals } from "./vintage-signals";
 import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, reportedPantsFit, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 
@@ -11,7 +12,7 @@ export type SourceResult = {
 };
 
 type Window = { start: number; now: number };
-type Shop = (typeof vintageShops)[number];
+type Shop = (typeof vintageShops | typeof tourShops)[number];
 const etsy = "https://openapi.etsy.com/v3/application";
 const parallelLimit = 6;
 // Keep a margin under Etsy's five requests per second for this app key.
@@ -173,7 +174,7 @@ export function isSturdyShopGarment(title: string, notes: string, kind: "shirt" 
   return quality.build > 0 || (quality.build === 0 && workwear);
 }
 
-export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, { now }: Window): Promise<SourceResult> {
+export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, { now }: Window, tour = false): Promise<SourceResult> {
   const options: RequestInit = { cache: "no-store", signal: AbortSignal.timeout(9_000), redirect: "error" };
   const collections = preferences.department === "women" && "womensCollections" in shop ? shop.womensCollections : shop.collections;
   const pages = await Promise.allSettled(collections.map(async (collection) => {
@@ -203,9 +204,9 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       const externalId = String(product.id);
       if (listings.has(externalId) || !product.published_at || !isFresh(product.published_at, { start: 0, now })) continue;
       const title = plainText(product.title);
-      if (!title || shopExcluded.test(title) || newerThanPreferred.test(title)) continue;
+      if (!title || (!tour && shopExcluded.test(title)) || newerThanPreferred.test(title)) continue;
       const rawType = product.product_type?.trim() ?? "";
-      const inferred = classifyGarment({ title });
+      const inferred = tour ? "shirt" : classifyGarment({ title });
       const garmentKind = inferred !== "unknown" ? inferred
         : /^(?:button ups?|shirts?)$/i.test(rawType) ? "shirt" : "unknown";
       if (garmentKind === "unknown" || (preferences.department !== "women" && garmentKind !== "shirt" && garmentKind !== "pants")) continue;
@@ -217,6 +218,7 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       const optionValue = (variant: NonNullable<ShopProduct["variants"]>[number], position: number) =>
         [variant.option1, variant.option2, variant.option3][position - 1]?.trim() ?? "";
       const notes = shopSellerNotes(product.body_html);
+      if (tour && !isPeriodTourShirt(title, notes)) continue;
       const variant = product.variants?.find((value) => {
         if (!value.available) return false;
         if (garmentKind !== "pants" || !waistPosition || !inseamPosition) return true;
@@ -234,7 +236,9 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       if (!matchesScoutFit({ title, size, garmentKind }, preferences)) continue;
       const description = [notes, inferred === "unknown" ? "Garment type: shirt." : ""].filter(Boolean).join("\n");
       if (!terms.every((term) => words(`${title} ${description} ${labeledColor ?? ""}`).includes(term))) continue;
-      if (garmentKind === "shirt" || garmentKind === "pants") {
+      if (tour) {
+        if (vintageSignals({title, description}).build < 0) continue;
+      } else if (garmentKind === "shirt" || garmentKind === "pants") {
         if (!isSturdyShopGarment(title, description, garmentKind)) continue;
       } else if (vintageSignals({title, description}).build < 0) continue;
       const price = variant.price && /^\d{1,6}(?:\.\d{1,2})?$/.test(variant.price) ? Math.round(Number(variant.price) * 100) : null;
@@ -245,7 +249,7 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       const condition = notes.match(/^(?:condition|flaws)\s*:\s*(.+)$/im)?.[1]
         ?? notes.match(/^pre[- ]owned\s*[-–:]\s*(.+)$/im)?.[1];
       listings.set(externalId, {
-        source: shop.source, externalId, title, description, imageUrl, imageUrls, size, sizeBasis, condition, color: labeledColor || undefined,
+        source: shop.source, externalId, title, description: tour ? ["Garment type: shirt. Tour or era is seller-described. Check tag and print photographs.", description].join("\n") : description, imageUrl, imageUrls, size, sizeBasis, condition, color: labeledColor || undefined,
         listedAt: new Date(product.published_at).toISOString(), priceCents: price,
         url: `${shop.origin}/products/${product.handle}${variantSize && Number.isSafeInteger(variant.id) ? `?variant=${variant.id}` : ""}`,
       });
