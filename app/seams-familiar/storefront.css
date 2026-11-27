@@ -1,37 +1,36 @@
 @font-face {
   font-family: "Seams Broadcast";
-  src: url("/assets/seams/preview/archivo-black.woff2") format("woff2");
+  src: url("/assets/seams/wordmarks/archivo-black.woff2") format("woff2");
   font-display: swap;
 }
 
-.fieldwear-scout.seams-public[data-design-preview] {
+.fieldwear-scout.seams-public {
   background: #f0ebe2;
 }
-.seams-public[data-design-preview]:not([data-decade]) {
+.seams-public:not([data-decade]) {
   --accent: #4c3051;
   --ink: #2c2230;
   --line: #d6ccc0;
 }
-.seams-public[data-design-preview] > header {
+.seams-public > header {
   background: #fbf6ea;
   border-bottom: 1px solid #c8bcaf;
 }
-.seams-public[data-design-preview] .scout-brand-hero {
-  padding-block: 5px 13px;
+.seams-public .scout-brand-hero {
+  padding-block: 5px 18px;
 }
-.seams-public[data-design-preview] .scout-brand-hero::after {
+.seams-public .scout-brand-hero::after {
   position: absolute;
   inset: auto 0 0;
   height: 3px;
   background: linear-gradient(to right, #a34e56 0 25px, #ca775b 25px 50px, #d5a249 50px 75px, #577c70 75px 100px, #5d527c 100px 125px, transparent 125px);
   content: "";
 }
-.seams-public .scout-brand-hero .seams-preview-title {
+.seams-public .scout-brand-hero .seams-wordmark-title {
   max-width: 570px;
-  margin-block: 4px 3px;
+  margin-block: 4px 7px;
 }
 .seams-shop-sign { display: block; width: min(100%, 505px); height: auto; }
-.scout-brand-hero:has([data-wordmark]) .scout-90s-graphic { display: none; }
 .seams-broadcast {
   display: flex;
   align-items: baseline;
@@ -67,52 +66,27 @@
 .seams-broadcast-letter[data-motif="grid"] { background-image: linear-gradient(var(--pattern) 1px, transparent 1px), linear-gradient(90deg, var(--pattern) 1px, transparent 1px); background-size: .24em .24em; }
 .seams-broadcast-letter[data-motif="lightning"] { background-image: linear-gradient(-39deg, var(--face) 0 37%, var(--accent-mark) 38% 42%, #241729 43% 48%, var(--pattern) 49% 65%, var(--face) 66%); }
 
-.seams-preview-caption, .seams-preview-controls, .seams-preview-options, .seams-preview-controls label {
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: 8px;
-}
-.seams-preview-caption { justify-content: space-between; max-width: 505px; }
-.seams-preview-disclosure { font-size: .75rem; color: var(--muted-ink); }
-.seams-preview-disclosure summary {
-  min-height: 44px;
-  line-height: 44px;
-  cursor: pointer;
-}
-.seams-preview-disclosure[open] { flex-basis: 100%; padding-bottom: 5px; }
-.seams-preview-controls { font-size: .78rem; }
-.seams-preview-options button, .seams-preview-controls select {
-  min-height: 44px;
-  padding-inline: 10px;
-  border: 1px solid var(--line);
-  border-radius: 4px;
-  background: var(--paper);
-}
-.seams-preview-options button[aria-pressed="true"] { border-color: var(--accent); color: var(--accent); font-weight: 700; }
 @media (max-width: 639px) {
-  .seams-public[data-design-preview] #fresh { margin-top: 14px; }
-  .seams-public[data-design-preview] #fresh > form { margin-block: 9px; }
-  .seams-public[data-design-preview] #fresh .scout-catalog-toolbar .scout-decades {
+  .seams-public #fresh { margin-top: 14px; }
+  .seams-public #fresh > form { margin-block: 9px; }
+  .seams-public #fresh .scout-catalog-toolbar .scout-decades {
     margin: 0;
     padding: 0;
     border: 0;
     gap: 2px;
   }
-  .seams-public[data-design-preview] #fresh .scout-decades a {
+  .seams-public #fresh .scout-decades a {
     padding-inline: 8px;
     border: 0;
     border-radius: 0;
   }
-  .seams-public[data-design-preview] #fresh .scout-decades a[aria-current="page"] {
+  .seams-public #fresh .scout-decades a[aria-current="page"] {
     box-shadow: inset 0 -2px var(--accent);
     background: transparent;
     color: var(--accent);
     font-weight: 700;
   }
-  .seams-public[data-design-preview] #fresh .scout-catalog-count { min-height: 36px; }
-  .seams-preview-caption { column-gap: 6px; }
-  .seams-public .scout-brand-hero .seams-preview-caption p { font-size: .75rem; }
+  .seams-public #fresh .scout-catalog-count { min-height: 36px; }
 }
 @media (max-width: 350px) {
   .seams-broadcast { font-size: 8vw; }

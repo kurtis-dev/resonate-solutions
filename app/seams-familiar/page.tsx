@@ -1,10 +1,9 @@
 import type { Metadata } from "next";
-import localFont from "next/font/local";
 import Image from "next/image";
 import Link from "next/link";
 import { FreshCatalog } from "@/components/fieldwear/listing-workbench";
 import { LocalPickup } from "@/components/seams/local-pickup";
-import { WordmarkPreview } from "@/components/seams/wordmark-preview";
+import { SeamsWordmark } from "@/components/seams/wordmark";
 import { SeamsActivity } from "@/components/seams/activity";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
@@ -15,14 +14,7 @@ import { firstDibsPickLimit, firstDibsReady } from "@/lib/seams/digest";
 import { defaultMemberSettings, readMember, seamsPath, type Member, type MemberSettings } from "@/lib/seams/members";
 import { continueSeams, requestMemberLink, saveMemberDibs, saveMemberFit, searchMemberCatalog, signOutSeams, stopFirstDibs } from "./actions";
 import "../fieldwear/scout.css";
-import "./wordmark-preview.css";
-
-const fraunces = localFont({
-  src: "./fonts/fraunces-semibold.woff2",
-  weight: "600",
-  display: "swap",
-  variable: "--seams-wordmark-font",
-});
+import "./storefront.css";
 
 export const dynamic = "force-dynamic";
 type CatalogShelf = "" | "tour-shirts" | "goodwill" | "goodwill-pants";
@@ -164,7 +156,6 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
   const decadeChoices = [["", "All decades"], ["80s", "80s"], ["90s", "90s"]] as const;
   const keywords = typeof params.q === "string" ? params.q.slice(0, 80) : "";
   const showCatalog = !unsubscribe && !params.access;
-  const designPreview = process.env.VERCEL_ENV !== "production";
   const catalog = showCatalog ? await readSeamsCatalog().catch(() => []) : [];
   const matches = matchSeamsCatalog(catalog, settings, keywords, false, tour);
   const shelfItems = goodwill ? goodwillShelf(matches, goodwillPants) : matches;
@@ -207,8 +198,8 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
     </>
   );
   return (
+    <main className="fieldwear-scout seams-public pb-12" data-decade={showCatalog && decade || undefined}>
       {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${collection}:${keywords}`} /> : null}
-    <main className={`fieldwear-scout seams-public pb-12 ${fraunces.variable}`} data-decade={showCatalog && decade || undefined} data-design-preview={designPreview || undefined}>
       <header className="border-b border-[var(--line)]">
         <div className="scout-container flex min-h-16 items-center justify-between">
           <Link href="/" aria-label="Resonate Solutions"><Image src="/assets/resonate-logo-transparent.png" alt="Resonate Solutions" width={122} height={34} /></Link>
@@ -216,14 +207,8 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
         </div>
         <div className="scout-container">
           <div className="scout-brand-hero">
-            <span className="scout-film-stripe" aria-hidden="true" />
-            <span className="scout-90s-graphic" aria-hidden="true"><i /><i /><i /></span>
-            {designPreview ? <WordmarkPreview /> : (
-              <>
-                <h1>Seams<br className="seams-wordmark-break" /> Familiar</h1>
-                <p>Vintage clothing · Good clothes come around again.</p>
-              </>
-            )}
+            <SeamsWordmark broadcast={showCatalog && decade === "90s"} />
+            <p>Vintage worth wearing again.</p>
           </div>
         </div>
       </header>
@@ -258,11 +243,11 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
                   <button type="submit" className={button}>Search</button>
                 </form>
               )}
-              {designPreview ? <div className="hidden sm:block">{decadeNavigation}</div> : decadeNavigation}
+              <div className="hidden sm:block">{decadeNavigation}</div>
               <FreshCatalog key={stamp + ":" + keywords + ":" + collection + ":" + decade + ":" + JSON.stringify(settings)}
                 items={cards} womenswear={!tour && settings.department !== "men"} tourShelf={tour}
                 fixedKind={goodwillPants ? "pants" : undefined} personalActions={false} showNinetiesCollection={false}
-                compactFilters filterNavigation={catalogNavigation} mobileNavigation={designPreview ? decadeNavigation : undefined}
+                compactFilters filterNavigation={catalogNavigation} mobileNavigation={decadeNavigation}
                 pickupPanel={!tour ? <LocalPickup department={settings.department} /> : undefined}
                 emptyMessage={catalog.length ? "No listings match. Try another search or adjust your filters." : "The shop catalog is being refreshed."} />
             </section>
