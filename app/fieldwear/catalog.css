@@ -353,6 +353,7 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
   border-radius: 0;
   background: var(--instant-print) center / var(--instant-width) 100% no-repeat;
   box-shadow: none;
+  filter: drop-shadow(0 1px 1px rgb(46 34 26 / 0.13)) drop-shadow(0 4px 5px rgb(46 34 26 / 0.11));
 }
 .seams-public article > .scout-photo-well[data-frame="taped"] {
   --instant-print: url("/assets/seams/instant-taped.webp");
