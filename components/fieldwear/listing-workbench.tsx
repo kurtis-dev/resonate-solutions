@@ -453,6 +453,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const items = useMemo(() => expired ? allItems.filter((item) => item.source !== "shopifycatalog") : allItems, [allItems, expired]);
   const [kind, setKind] = useState<"all" | "shirt" | "pants" | "outerwear" | "dress" | "skirt">(fixedKind ?? initialKind);
   const filterDialog = useRef<HTMLDialogElement>(null);
+  const filterButton = useRef<HTMLButtonElement>(null);
   const filterTitleId = useId();
   const pickupPanelRef = useRef<HTMLDivElement>(null);
   const openPickup = () => {
@@ -550,25 +551,30 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
     : [["all", "All"], ["shirt", "Shirts"], ["pants", "Bottoms"]] as const;
 
   const collectionOptions = collections.filter(([id]) => (showNinetiesCollection || id !== "90s") && (!fixedKind || id !== "lined"));
+  const styleOptions = kind === "all" ? [...garmentOptions.shirt, ...garmentOptions.pants] : kind === "shirt" || kind === "pants" ? garmentOptions[kind] : [];
+  const eraOptions = [["pre-1999", "Pre-1999 clues"], ["1990s", "1990s, year open"], ["undated", "Undated"]] as const;
+  const fabricOptions = [["either", "Cotton or wool"], ["cotton", "Cotton"], ["wool", "Wool"], ["pure", "100% cotton or wool"], ["blend", "Sturdy blends"]] as const;
+  const sortChoices = [
+    ["relevance", "Best match", ""],
+    ["oldest-garment", "Older garment clues", "Older first"],
+    ["low", "Price + shipping, low to high", "Price: low to high"],
+    ["high", "Price + shipping, high to low", "Price: high to low"],
+  ] as const;
+  const sortOptions = sortChoices.map(([value, label]) => <option key={value} value={value}>{label}</option>);
+  const priceLabel = (value: string) => money(Math.round(Number(value) * 100)).replace(/\.00$/, "");
+  const budget = min && max ? `${priceLabel(min)}–${priceLabel(max)}` : max ? `Up to ${priceLabel(max)}` : `From ${priceLabel(min)}`;
+  const marketLabel = marketplace.startsWith("shopifycatalog:") ? marketplace.slice(15) : marketplace === "shops" ? "Vintage shops" : marketplaceName(marketplace);
   const activeRefinements = [
-    collection !== "all" && "Collection",
-    garmentType && "Garment type",
-    marketplace && "Marketplace",
-    era && "Era",
-    fabric && "Fabric",
-    tagSize && `Size ${tagSize}`,
-    (min || max) && "Price",
-    colors.length > 0 && "Color",
-    order !== "relevance" && "Sort",
-  ].filter(Boolean);
-  const sortOptions = (
-    <>
-      <option value="relevance">Best match</option>
-      <option value="oldest-garment">Older garment clues</option>
-      <option value="low">Price + shipping, low to high</option>
-      <option value="high">Price + shipping, high to low</option>
-    </>
-  );
+    { id: "collection", label: collection !== "all" ? collectionOptions.find(([value]) => value === collection)?.[1] : "", clear: () => setCollection("all") },
+    { id: "style", label: styleOptions.find(([value]) => value === garmentType)?.[1], clear: () => setGarmentType("") },
+    { id: "marketplace", label: marketplace && marketLabel, clear: () => setMarketplace("") },
+    { id: "era", label: eraOptions.find(([value]) => value === era)?.[1], clear: () => setEra("") },
+    { id: "fabric", label: fabricOptions.find(([value]) => value === fabric)?.[1], clear: () => setFabric("") },
+    { id: "size", label: tagSize && `Size ${tagSize}`, clear: () => setTagSize("") },
+    { id: "price", label: (min || max) && (invalidRange ? "Price range needs review" : budget), clear: () => { setMin(""); setMax(""); } },
+    ...colors.map((color) => ({ id: `color-${color}`, label: color, clear: () => toggleColor(color) })),
+    { id: "sort", label: sortChoices.find(([value]) => value === order)?.[2], clear: () => setOrder("relevance") },
+  ].filter(({ label }) => Boolean(label));
   return (
     <div>
       {toolbarNavigation && !tourShelf && !fixedKind ? (
@@ -603,8 +609,8 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
           ))}
         </div> : null}
         <div className="ml-auto flex items-center gap-1 sm:gap-2">
-          <button type="button" className="scout-toolbar-button" aria-haspopup="dialog" onClick={() => filterDialog.current?.showModal()}>
-            <SlidersHorizontal size={16} aria-hidden="true" />Filters{hasFilters ? " •" : ""}
+          <button ref={filterButton} type="button" className="scout-toolbar-button" aria-haspopup="dialog" onClick={() => filterDialog.current?.showModal()}>
+            <SlidersHorizontal size={16} aria-hidden="true" />Filters{!toolbarNavigation && hasFilters ? " •" : ""}
           </button>
           <label className={`scout-sort ${compactFilters ? "scout-desktop-control" : ""}`}>
             <span>Sort</span>
@@ -645,7 +651,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         {!tourShelf ? <label className="min-w-0 text-xs font-medium">{toolbarNavigation ? "Style" : "Garment type"}
           <select value={garmentType} onChange={(event) => { setGarmentType(event.target.value); setPage(1); }} className={control}>
             <option value="">Any type</option>
-            {(kind === "all" ? [...garmentOptions.shirt, ...garmentOptions.pants] : kind === "shirt" || kind === "pants" ? garmentOptions[kind] : []).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
+            {styleOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label> : null}
         <label className="min-w-0 text-xs font-medium">Marketplace
@@ -661,19 +667,13 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         <label className="min-w-0 text-xs font-medium">Era
           <select value={era} onChange={(event) => { setEra(event.target.value); setPage(1); }} className={control}>
             <option value="">Any era</option>
-            <option value="pre-1999">Pre-1999 clues</option>
-            <option value="1990s">1990s, year open</option>
-            <option value="undated">Undated</option>
+            {eraOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label>
         <label className="min-w-0 text-xs font-medium">Fabric
           <select value={fabric} onChange={(event) => { setFabric(event.target.value); setPage(1); }} className={control}>
             <option value="">Any fabric</option>
-            <option value="either">Cotton or wool</option>
-            <option value="cotton">Cotton</option>
-            <option value="wool">Wool</option>
-            <option value="pure">100% cotton or wool</option>
-            <option value="blend">Sturdy blends</option>
+            {fabricOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label>
           <label className="col-span-2 min-w-0 text-xs font-medium">Listing size
@@ -705,12 +705,24 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         </div>
       </dialog>
       {toolbarNavigation && activeRefinements.length > 0 ? (
-        <div className="scout-refinement-summary">
-          <p><strong>Active</strong> {activeRefinements.join(" · ")}</p>
-          <button type="button" className="scout-toolbar-button" onClick={() => {
+        <div className="scout-refinement-summary" role="group" aria-label="Active filters">
+          <div className="scout-refinement-chips">
+            {activeRefinements.map(({ id, label, clear }) => (
+              <button key={id} type="button" className="scout-refinement-chip" aria-label={`Remove ${label} filter`}
+                onClick={(event) => {
+                  const adjacent = event.currentTarget.nextElementSibling ?? event.currentTarget.previousElementSibling;
+                  clear();
+                  setPage(1);
+                  (adjacent instanceof HTMLButtonElement ? adjacent : filterButton.current)?.focus({ preventScroll: true });
+                }}>
+                <span>{label}</span><X size={13} aria-hidden="true" />
+              </button>
+            ))}
+          </div>
+          <button type="button" className="scout-toolbar-button scout-clear-refinements" onClick={() => {
             clearFilters();
-            resultsRef.current?.focus({ preventScroll: true });
-          }}>Clear filters</button>
+            filterButton.current?.focus({ preventScroll: true });
+          }}>Clear all</button>
         </div>
       ) : null}
       <div className="scout-catalog-count flex min-h-12 flex-wrap items-center justify-between gap-x-2">
@@ -726,7 +738,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         </div> : null}
       </div>
       {expired ? <p role="status" className="mb-3 text-xs text-[var(--muted-ink)]">Use Search now to check Shopify stock again.</p> : null}
-      {colors.length > 0 ? (
+      {!toolbarNavigation && colors.length > 0 ? (
         <div className="mb-3 flex flex-wrap gap-2" aria-label="Selected colors">
           {colorFamilies.filter(({ label }) => colors.includes(label)).map(({ label, swatch }) => (
             <button key={label} type="button" className="scout-color-chip" onClick={() => toggleColor(label)} aria-label={`Remove ${label} color filter`}>

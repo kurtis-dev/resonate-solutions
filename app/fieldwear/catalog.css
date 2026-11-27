@@ -447,17 +447,45 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 8px;
+  gap: 5px;
+  padding-block: 2px;
   border-bottom: 1px solid var(--line);
-  color: var(--muted-ink);
   font-size: .8125rem;
   line-height: 1.45;
 }
-.scout-refinement-summary strong {
-  margin-right: 4px;
-  color: var(--ink);
+.scout-refinement-chips {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  min-width: 0;
+  gap: 0 5px;
 }
-.scout-refinement-summary button,
+.scout-refinement-chip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  gap: 7px;
+  min-height: 44px;
+  padding-inline: 9px;
+  border-radius: 3px;
+  color: var(--ink);
+  font-weight: 700;
+  text-align: left;
+}
+.scout-refinement-chip span { overflow-wrap: anywhere; }
+.scout-refinement-chip svg { flex: none; color: var(--accent); }
+.scout-refinement-chip:hover { background: rgb(255 253 250 / .7); }
+.scout-refinement-chip:focus-visible { outline-offset: -2px; }
+.fieldwear-scout .scout-clear-refinements {
+  font-size: .8125rem;
+}
+@media (min-width: 640px) {
+  .scout-refinement-summary {
+    justify-content: flex-start;
+    gap: 14px;
+  }
+}
+.scout-clear-refinements,
 .scout-clear-search {
   flex-shrink: 0;
   color: var(--accent);
