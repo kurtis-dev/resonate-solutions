@@ -149,9 +149,14 @@ const seamsBrandQueries = [
   '("Bernard Altmann","Bemidji","Faribault") (wool,shirt,sweater,jacket,pants)',
   '(Sears,Roebucks,"Saddle King",Pointer) (denim,canvas,work,shirt,jacket,jeans,pants)',
   '(Jordache,"Liz Claiborne") (denim,wool,jeans,trousers,shirt,jacket,skirt,dress)',
+  '("Johnson Woolen Mills","Johnson Woolens") (wool,mackinaw,shirt,coat,pants)',
+  '("Chippewa Woolen Mill","Chippewa Woolen Mills","Chippewa Woolens") (wool,coat,jacket,pants)',
+  '(Duxbak,Drybak,"Kamp-it") (canvas,duck,wool,hunting,shirt,jacket,coat,pants)',
+  '("Hirsch-Weis","Hirsch Weis","White Stag") (wool,canvas,ski,anorak,jacket,coat,pants)',
+  '("Bradley Knitting",Jersild,Dehen) (wool,sweater,cardigan,knit,letterman,varsity,jacket)',
 ];
 
-const catalogBrandAliases = ["Big Mac", "Big Yank", "Five Brother", "Fieldmaster", "Duxbak", "King Louie", "OshKosh", "Woolrich", "Pendleton", "L.L.Bean", "AmeriCo", "Ralph Lauren", "Eddie Bauer", "Laura Ashley", "Orvis", "Filson", "Carhartt", "Wrangler", "Levi’s", "Lee", "Dickies", "Round House", "Big Smith", "Key Imperial", "Red Kap", "Columbia", "Talbots", "Evan Picone", "London Fog", "Jantzen", "Lands’ End", "Maverick"];
+const catalogBrandAliases = ["Big Mac", "Big Yank", "Five Brother", "Fieldmaster", "King Louie", "OshKosh", "Woolrich", "Pendleton", "L.L.Bean", "AmeriCo", "Ralph Lauren", "Eddie Bauer", "Laura Ashley", "Orvis", "Filson", "Carhartt", "Wrangler", "Levi’s", "Lee", "Dickies", "Round House", "Big Smith", "Key Imperial", "Red Kap", "Columbia", "Talbots", "Evan Picone", "London Fog", "Jantzen", "Lands’ End", "Maverick"];
 
 export async function searchSeamsEbayBrands(department: "men" | "women", shopListings: readonly LiveListing[]): Promise<SourceResult> {
   const client = process.env.EBAY_CLIENT_ID;

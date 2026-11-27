@@ -8,9 +8,18 @@ const sometime90s = /\b(?:19)?90'?s\b/i;
 const postNineties = /\b(?:(?:year manufactured:|from|dated|made in|circa)\s*20[0-2]\d|(?:20)?00s|2010s|2020s|y2k)\b/i;
 const from2000s = /\b(?:2000[’']?s|early 2000s|(?:from|made in|manufactured in|dated|circa|year manufactured:)\s*200\d)\b|^(?:vintage\s+)?200\d\b/i;
 const lateNineties = /\b(?:year manufactured:|from|dated|made in|circa)\s*1999\b/i;
-const historicLabels = /\b(?:actwu|acwa|amalgamated clothing (?:and textile )?workers|gimbels|(?:made in|country of origin:)\s*(?:west germany|czechoslovakia|u\.?s\.?s\.?r\.?))\b/i;
+const historicLabels = /\b(?:actwu|acwa|i\.?l\.?g\.?w\.?u|international ladies'? garment workers(?:'|’)? union|amalgamated clothing (?:and textile )?workers|gimbels|(?:made in|country of origin:)\s*(?:west germany|czechoslovakia|u\.?s\.?s\.?r\.?))\b/i;
+const archivalMillLabels = [
+  { pattern: /\bchippewa falls woolen (?:and textile )?mill(?:s| company| co\b)?\b/i, note: "The listing mentions the Chippewa Falls Woolen Mill name. Compare the actual tag with the museum examples from before the mill closed in 1962." },
+  { pattern: /\bhirsch[- ]weis (?:mfg\.?|manufacturing)(?: company| co\b)?\b/i, note: "The listing mentions the Hirsch-Weis Manufacturing name. Compare the tag with period records from before its 1956 name change." },
+];
 const durableFabric = /\b(?:duck(?: canvas)?|canvas|denim|chamois|sateen|moleskin|melton|twill|herringbone|wool whipcord|heavy[- ]?weight|heavy cotton|heavy flannel)\b/i;
-const durableBuild = /\b(?:double[- ]knee|reinforced|bar[- ]?tack|flat[- ]?fell(?:ed)?|felled seams|triple[- ]stitched|gusset(?:ed)?|riveted|blanket[- ]lined|flannel[- ]lined)\b/i;
+const constructionClues = [
+  { pattern: /\b(?:double[- ]knees?|double[- ]layer(?:ed)? (?:knees|shoulders|back)|reinforced (?:knees|elbows|seams)|leather elbow patches)\b/i, label: "reinforced wear points" },
+  { pattern: /\b(?:bar[- ]?tacks?|flat[- ]?fell(?:ed)?|felled seams|triple[- ]stitched|riveted)\b/i, label: "reinforced stitching or rivets" },
+  { pattern: /\b(?:gussets?|gusseted)\b/i, label: "gussets" },
+  { pattern: /\b(?:blanket[- ]lined|flannel[- ]lined)\b/i, label: "a blanket or flannel lining" },
+];
 const synthetic = /\b(?:polyester|poly[- ]?cotton|cotton[- ]poly|poly blend|nylon|acrylic|spandex|elastane|synthetic)\b/i;
 const light = /\b(?:light[- ]?weight|thin fabric|sheer|performance|moisture[- ]wicking|quick[- ]dry)\b/i;
 const lining = /\b(?:lining|liner|fill|padding|insulation)\s*[:=-]\s*(?:(?!\b(?:shell|outer(?: fabric| material)?|body)\s*[:=-])[^\n;])*/gi;
@@ -23,7 +32,9 @@ export function vintageSignals({ title, description }: Pick<ListingInput, "title
   const eraText = withoutStyleDates(text);
   const eraTitle = withoutStyleDates(title);
   const shell = text.replace(lining, "").replace(liningMaterial, "").replace(/\b(?:lining|liner|fill|padding|insulation)\s+(?:\d{1,3}\s*%\s*)?(?:cotton|wool|polyester|nylon|acrylic|synthetic)\b/gi, "");
-  const substantial = durableFabric.test(shell) || durableBuild.test(text);
+  const construction = constructionClues.filter(({ pattern }) => pattern.test(text));
+  const reinforced = /\breinforced\b/i.test(text) || construction.some(({ pattern }) => pattern.test(shell));
+  const substantial = durableFabric.test(shell) || reinforced || construction.length > 0;
   const blend = synthetic.test(shell);
   const pureSynthetic = /\b100\s*%\s*(?:polyester|nylon|acrylic)\b/i.test(shell);
   const mixedFibers = blend || /\b(?:blend(?:ed)?|mixed[- ]fiber)\b/i.test(shell);
@@ -34,16 +45,19 @@ export function vintageSignals({ title, description }: Pick<ListingInput, "title
   const fromNineties = sometime90s.test(eraText) || /\b(?:from|made in|dated|circa|year manufactured:)\s*199\d\b/i.test(eraText) || /^(?:vintage\s+)?199\d\b|\b199\d\s+(?:world\s+)?(?:tour|concert)\b/i.test(eraTitle);
   const before1999 = old.test(eraText) || fromEighties || /^(?:vintage\s+)?199[0-8]\b|\b199[0-8]\s+(?:world\s+)?(?:tour|concert)\b/i.test(eraTitle);
   const isModern = modern.test(text);
+  const archivalMill = archivalMillLabels.find(({ pattern }) => pattern.test(text));
+  const mentionsArchivalTag = archivalMill && text.split(/[\n;!?]/).some((part) =>
+    archivalMill.pattern.test(part) && /\b(?:tag|label|stamp)\b/i.test(part));
   const dated2000s = from2000s.test(text);
   const afterNineties = dated2000s || postNineties.test(text);
   const period = isModern || afterNineties || lateNineties.test(text) ? -2
-    : before1999 || historicLabels.test(text) ? 2 : fromNineties ? 1 : 0;
-  const build = pureSynthetic || (blend && (light.test(shell) || !substantial)) ? -2 : substantial && (natural || durableBuild.test(shell)) ? 2 : substantial || natural ? 1 : 0;
+    : before1999 || historicLabels.test(text) || mentionsArchivalTag ? 2 : fromNineties ? 1 : 0;
+  const build = pureSynthetic || (blend && (light.test(shell) || !substantial)) ? -2 : substantial && (natural || reinforced) ? 2 : substantial || natural ? 1 : 0;
   const eraNote = dated2000s && !isModern ? "Seller date language points to the 2000s. Check the label photos."
     : period < 0 ? "Listing wording points to a newer garment or reissue."
-    : period === 2 ? (before1999 ? "Seller date language points to before 1999. Check the label photos." : "A period label or origin is mentioned. Check the actual tag and garment.")
+    : period === 2 ? (archivalMill?.note ?? (before1999 ? "Seller date language points to before 1999. Check the label photos." : "A period label or origin is mentioned. Check the actual tag and garment."))
     : period === 1 ? "Seller mentions the 1990s. The exact year is open."
-    : "Garment date is open.";
+    : archivalMill?.note ?? "Garment date is open.";
   const fabricNote = natural ? "Listing states 100% cotton or wool."
     : mixedFibers && substantial && build > 0 ? "Listing describes a blend with a substantial fabric or reinforced build."
     : cotton || wool ? `Listing mentions ${cotton && wool ? "cotton and wool" : cotton ? "cotton" : "wool"} in the shell. Check the fiber tag for percentages.`
@@ -53,7 +67,8 @@ export function vintageSignals({ title, description }: Pick<ListingInput, "title
   const decade = !isModern && (dated2000s || /\b(?:00[’']?s|y2k)\b/i.test(text)) ? "y2k"
     : !isModern && !afterNineties ? eraDecade : null;
   const sturdy2000s = decade === "y2k" && build > 0 && substantial && !light.test(shell);
-  return { decade, period, build, sturdy2000s, natural, eraNote, fabricNote, cotton, wool, sturdyBlend: mixedFibers && substantial && !pureSynthetic && !light.test(shell), canvas: canvas.test(shell) };
+  const constructionNote = construction.length ? `The listing mentions ${construction.map(({ label }) => label).join(", ")}. Check the detail photos.` : null;
+  return { decade, period, build, sturdy2000s, natural, eraNote, fabricNote, constructionNote, cotton, wool, sturdyBlend: mixedFibers && substantial && !pureSynthetic && !light.test(shell), canvas: canvas.test(shell) };
 }
 
 export function listingMeasurements(description = "") {
