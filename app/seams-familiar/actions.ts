@@ -72,6 +72,8 @@ export async function searchMemberCatalog(form: FormData) {
   await refreshSeamsCatalog();
   const query = new URLSearchParams();
   if (keywords) query.set("q", keywords);
+  const decade = form.get("decade");
+  if (decade === "80s" || decade === "90s") query.set("decade", decade);
   if (form.get("collection") === "tour-shirts") query.set("collection", "tour-shirts");
   redirect(seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh");
 }

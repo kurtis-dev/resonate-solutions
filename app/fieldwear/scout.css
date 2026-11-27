@@ -128,19 +128,38 @@
   .fieldwear-scout .scout-first-dibs .scout-90s-graphic { right: 220px; }
 }
 
-.fieldwear-scout.seams-public {
-  --checkerboard-width: 12px;
+.seams-public[data-decade] {
+  --decade-rail-width: 12px;
   position: relative;
   padding-inline-start: 6px;
 }
-.fieldwear-scout.seams-public::before {
+.seams-public[data-decade]::before {
   content: "";
   position: absolute;
   inset: 0 auto 0 0;
-  width: var(--checkerboard-width);
-  background: repeating-conic-gradient(#171717 0 25%, #fff 0 50%) 0 0 / var(--checkerboard-width) var(--checkerboard-width);
+  width: var(--decade-rail-width);
   pointer-events: none;
 }
+.seams-public[data-decade="80s"]::before {
+  background: linear-gradient(to right, #e94d58 0 20%, #e99135 20% 40%, #edc541 40% 60%, #348358 60% 80%, #3965c9 80%);
+}
+.seams-public[data-decade="90s"]::before {
+  background: repeating-conic-gradient(#171717 0 25%, #fff 0 50%) 0 0 / var(--decade-rail-width) var(--decade-rail-width);
+}
+.seams-public:not([data-decade="80s"]) .scout-film-stripe,
+.seams-public:not([data-decade="90s"]) .scout-90s-graphic { display: none; }
+.seams-public[data-decade="80s"] {
+  --accent: #394d39;
+  --ink: #272720;
+  --muted-ink: #565647;
+  --line: #e3ded1;
+}
+.fieldwear-scout .scout-decades a { display: inline-flex; align-items: center; }
+.fieldwear-scout .scout-decades a[aria-current="page"] {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: var(--paper);
+}
 @media (min-width: 768px) {
-  .fieldwear-scout.seams-public { --checkerboard-width: 16px; padding-inline-start: 0; }
+  .seams-public[data-decade] { --decade-rail-width: 16px; padding-inline-start: 0; }
 }

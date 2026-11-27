@@ -35,7 +35,7 @@ export const footerNavigationGroups: readonly NavigationGroup[] = [
   },
   {
     label: "Products",
-    links: [menuPilotLink, ownerPortalLink, pricingLink]
+    links: [menuPilotLink, ownerPortalLink, { label: "Seams Familiar", href: "/seams-familiar" }, pricingLink]
   },
   {
     label: "Get Started",

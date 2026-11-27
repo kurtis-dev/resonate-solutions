@@ -338,3 +338,15 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
   background: var(--film-stripe);
 }
 .fieldwear-scout .scout-collections { border-color: var(--line); }
+
+.seams-public:not([data-decade="80s"]) article > .scout-photo-well {
+  border-color: var(--line);
+  background: var(--matte);
+  box-shadow: none;
+}
+.seams-public:not([data-decade="80s"]) article > .scout-photo-well::after { content: none; }
+.seams-public[data-decade="80s"] article > .scout-photo-well::before { inset-block-end: 36px; }
+.seams-public[data-decade="80s"] article > .scout-photo-well img {
+  bottom: 39px;
+  height: calc(100% - 49px);
+}

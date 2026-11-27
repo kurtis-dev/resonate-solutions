@@ -417,8 +417,8 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false }: {
-  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean;
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, showNinetiesCollection = true }: {
+  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean; showNinetiesCollection?: boolean;
 }) {
   const [expired, setExpired] = useState(false);
   useEffect(() => {
@@ -519,7 +519,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
     <div>
       {!tourShelf ? <div className="scout-collections" role="group" aria-label="Workwear collections">
         <span className="scout-collections-label" aria-hidden="true">Collections</span>
-        {collections.map(([id, label]) => (
+        {collections.filter(([id]) => showNinetiesCollection || id !== "90s").map(([id, label]) => (
           <button key={id} type="button" className="scout-collection" aria-pressed={collection === id}
             onClick={() => { setCollection(id); setPage(1); }}>{label}</button>
         ))}

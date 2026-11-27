@@ -7,6 +7,7 @@ const publicRoutes = [
   "/menupilot/examples",
   "/portal",
   "/pricing",
+  "/seams-familiar",
   "/excellent-pins",
   "/excellent-pins/library",
   "/m/mellow-moose-burgers"

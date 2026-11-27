@@ -1,7 +1,7 @@
 import type { MetadataRoute } from "next";
 import { absoluteUrl } from "@/lib/seo";
 
-const privatePaths = ["/admin/", "/dashboard/", "/api/", "/fieldwear"];
+const privatePaths = ["/admin/", "/dashboard/", "/api/", "/fieldwear", "/seams-familiar/owner"];
 
 export default function robots(): MetadataRoute.Robots {
   return {
