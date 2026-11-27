@@ -21,7 +21,7 @@ export function WordmarkPreview() {
       <h1 className="seams-preview-title">
         <span className="sr-only">Seams Familiar</span>
         {wordmark === "shop" ? (
-          <Image src="/assets/seams/preview/shop-sign.webp" className="seams-shop-sign" alt="" width={1000} height={153} priority />
+          <Image src="/assets/seams/preview/shop-sign-lettering.svg" className="seams-shop-sign" alt="" width={724} height={99} priority />
         ) : (
           <span className="seams-broadcast" aria-hidden="true">
             {["SEAMS", "FAMILIAR"].map((word, wordIndex) => (
