@@ -41,6 +41,7 @@ type EbayItem = {
   seller?: { username?: string };
   shortDescription?: string;
   localizedAspects?: { name?: string; value?: string }[];
+  estimatedAvailabilities?: { estimatedAvailabilityStatus?: string }[];
 };
 
 let tokenCache: { value: string; expires: number } | undefined;
@@ -141,6 +142,78 @@ const goodwillSellers = [
   "goodwillscwi", "goodwillgoodskills", "seattlegoodwill", "goodwill_north_central_texas",
   "rappahannockgoodwill", "goodwillsocalshop", "goodwill_colorado_collectables",
 ];
+
+const seamsBrandQueries = [
+  '"Arizona" (denim,jeans,shirt,jacket)',
+  '(USN,"US Navy") (denim,utility,wool,shirt,pants)',
+  '("Bernard Altmann","Bemidji","Faribault") (wool,shirt,sweater,jacket,pants)',
+  '(Sears,Roebucks,"Saddle King",Pointer) (denim,canvas,work,shirt,jacket,jeans,pants)',
+  '(Jordache,"Liz Claiborne") (denim,wool,jeans,trousers,shirt,jacket,skirt,dress)',
+];
+
+const catalogBrandAliases = ["Big Mac", "Big Yank", "Five Brother", "Fieldmaster", "Duxbak", "King Louie", "OshKosh", "Woolrich", "Pendleton", "L.L.Bean", "AmeriCo", "Ralph Lauren", "Eddie Bauer", "Laura Ashley", "Orvis", "Filson", "Carhartt", "Wrangler", "Levi’s", "Lee", "Dickies", "Round House", "Big Smith", "Key Imperial", "Red Kap", "Columbia", "Talbots", "Evan Picone", "London Fog", "Jantzen", "Lands’ End", "Maverick"];
+
+export async function searchSeamsEbayBrands(department: "men" | "women", shopListings: readonly LiveListing[]): Promise<SourceResult> {
+  const client = process.env.EBAY_CLIENT_ID;
+  const secret = process.env.EBAY_CLIENT_SECRET;
+  if (!client || !secret) return { status: "needs-access", listings: [] };
+  const token = await ebayToken(client, secret);
+  const now = Date.now();
+  const titles = shopListings.map((item) => item.title.toLowerCase().replace(/[’‘]/g, "'"));
+  const observed = catalogBrandAliases.filter((brand) => {
+    const escaped = brand.toLowerCase().replace(/[’‘]/g, "'").replace(/[.]/g, "\\.");
+    return titles.some((title) => new RegExp(`\\b${escaped}\\b`, "i").test(title));
+  });
+  const observedQueries = [];
+  for (let index = 0; index < observed.length; index += 5) {
+    observedQueries.push(`(${observed.slice(index, index + 5).map((brand) => `"${brand}"`).join(",")}) (wool,cotton,denim,canvas,leather,flannel)`);
+  }
+  const searches = await Promise.allSettled([...seamsBrandQueries, ...observedQueries].map(async (q) => {
+    const params = new URLSearchParams({
+      q, category_ids: department === "men" ? "1059" : "15724", limit: "45", sort: "newlyListed",
+      filter: "conditions:{USED},deliveryCountry:US,buyingOptions:{FIXED_PRICE|AUCTION}",
+    });
+    const response = await fetch(`${ebay}/buy/browse/v1/item_summary/search?${params}`, {
+      headers: { Authorization: `Bearer ${token}`, "X-EBAY-C-MARKETPLACE-ID": "EBAY_US" },
+      cache: "no-store", signal: AbortSignal.timeout(6500),
+    });
+    if (!response.ok) throw new Error(`Brand catalog eBay search status ${response.status}`);
+    return ((await response.json()) as { itemSummaries?: EbayItem[] }).itemSummaries ?? [];
+  }));
+  const listings = new Map<string, LiveListing>();
+  let completed = 0;
+  for (const result of searches) {
+    if (result.status !== "fulfilled") continue;
+    completed++;
+    for (const item of result.value) {
+      const listing = mapItem(item, now);
+      if (!listing || listing.priceCents == null || excluded.test(listing.title)) continue;
+      const kind = classifyGarment(listing);
+      const signals = vintageSignals(listing);
+      if (kind === "unknown" || signals.build < 0 || (signals.period < 0 && !signals.sturdy2000s)
+        || (signals.period === 0 && signals.build === 0 && !signals.wool)) continue;
+      listings.set(listing.externalId, listing);
+    }
+  }
+  const unavailableIds: string[] = [];
+  const newest = Array.from(listings.values()).sort((a, b) => b.listedAt.localeCompare(a.listedAt));
+  await Promise.allSettled(newest.slice(0, 12).map(async (item) => {
+    const params = new URLSearchParams({ legacy_item_id: item.externalId });
+    const response = await fetch(`${ebay}/buy/browse/v1/item/get_item_by_legacy_id?${params}`, {
+      headers: { Authorization: `Bearer ${token}`, "X-EBAY-C-MARKETPLACE-ID": "EBAY_US" },
+      cache: "no-store", signal: AbortSignal.timeout(3600),
+    });
+    const details = response.ok ? await response.json() as EbayItem : null;
+    const statuses = details?.estimatedAvailabilities?.map((entry) => entry.estimatedAvailabilityStatus);
+    if (response.status === 404 || (details?.itemEndDate && Date.parse(details.itemEndDate) <= now)
+      || (statuses?.length && statuses.every((status) => status === "OUT_OF_STOCK"))) {
+      listings.delete(item.externalId);
+      unavailableIds.push(item.externalId);
+    }
+  }));
+  return { status: completed === searches.length ? "searched" : completed ? "partial" : "unavailable",
+    listings: newest.filter((item) => listings.has(item.externalId)), unavailableIds };
+}
 
 export async function searchGoodwillEbay(department: "any" | "men" | "women", zip?: string): Promise<SourceResult> {
   const client = process.env.EBAY_CLIENT_ID;

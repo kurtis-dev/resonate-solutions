@@ -434,9 +434,10 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true, compactFilters = false, filterNavigation, toolbarNavigation, pickupPanel, emptyMessage }: {
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true, compactFilters = false, filterNavigation, toolbarNavigation, pickupPanel, emptyMessage, clearSearch, initialKind = "all" }: {
   items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean; fixedKind?: "pants"; showNinetiesCollection?: boolean;
-  compactFilters?: boolean; filterNavigation?: ReactNode; toolbarNavigation?: ReactNode; pickupPanel?: ReactNode; emptyMessage?: string;
+  compactFilters?: boolean; filterNavigation?: ReactNode; toolbarNavigation?: ReactNode; pickupPanel?: ReactNode; emptyMessage?: string; clearSearch?: ReactNode;
+  initialKind?: Exclude<GarmentKind, "unknown"> | "all";
 }) {
   const [expired, setExpired] = useState(false);
   useEffect(() => {
@@ -450,7 +451,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
     };
   }, [catalogExpiresAt]);
   const items = useMemo(() => expired ? allItems.filter((item) => item.source !== "shopifycatalog") : allItems, [allItems, expired]);
-  const [kind, setKind] = useState<"all" | "shirt" | "pants" | "outerwear" | "dress" | "skirt">(fixedKind ?? "all");
+  const [kind, setKind] = useState<"all" | "shirt" | "pants" | "outerwear" | "dress" | "skirt">(fixedKind ?? initialKind);
   const filterDialog = useRef<HTMLDialogElement>(null);
   const filterTitleId = useId();
   const pickupPanelRef = useRef<HTMLDivElement>(null);
@@ -514,10 +515,10 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const visible = results.slice(from, from + freshPageSize);
   const frames = personalActions ? null : shuffleCatalogFrames(visible);
   const control = "mt-1 min-h-11 w-full rounded-[4px] border border-[var(--line)] bg-white px-3 text-base font-normal text-[var(--ink)]";
-  const hasFilters = Boolean((compactFilters && (kind !== (fixedKind ?? "all") || order !== "relevance")) || collection !== "all" || marketplace || garmentType || era || fabric || tagSize || colors.length || min || max);
+  const hasFilters = Boolean((compactFilters && ((!toolbarNavigation && kind !== (fixedKind ?? "all")) || order !== "relevance")) || collection !== "all" || marketplace || garmentType || era || fabric || tagSize || colors.length || min || max);
   const clearFilters = () => {
     if (compactFilters) {
-      setKind(fixedKind ?? "all");
+      if (!toolbarNavigation) setKind(fixedKind ?? "all");
       setOrder("relevance");
     }
     setCollection("all");
@@ -545,9 +546,21 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const shopsSelected = marketplace === "shops";
   const tabs = womenswear
     ? [["all", "All"], ["shirt", "Tops"], ["pants", "Pants"], ["skirt", "Skirts"], ["dress", "Dresses"], ["outerwear", "Jackets"]] as const
+    : toolbarNavigation ? [["all", "All"], ["shirt", "Shirts"], ["pants", "Pants"], ["outerwear", "Jackets"]] as const
     : [["all", "All"], ["shirt", "Shirts"], ["pants", "Bottoms"]] as const;
 
   const collectionOptions = collections.filter(([id]) => (showNinetiesCollection || id !== "90s") && (!fixedKind || id !== "lined"));
+  const activeRefinements = [
+    collection !== "all" && "Collection",
+    garmentType && "Garment type",
+    marketplace && "Marketplace",
+    era && "Era",
+    fabric && "Fabric",
+    tagSize && `Size ${tagSize}`,
+    (min || max) && "Price",
+    colors.length > 0 && "Color",
+    order !== "relevance" && "Sort",
+  ].filter(Boolean);
   const sortOptions = (
     <>
       <option value="relevance">Best match</option>
@@ -558,6 +571,20 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   );
   return (
     <div>
+      {toolbarNavigation && !tourShelf && !fixedKind ? (
+        <label className="scout-garment-picker">
+          <span>Garment type</span>
+          <select className="scout-control" value={kind} onChange={(event) => {
+            setKind(event.target.value as typeof kind);
+            setGarmentType("");
+            setTagSize("");
+            setPage(1);
+          }}>
+            {tabs.map(([value, label]) => <option key={value} value={value}>{value === "all" ? "All garments" : label}</option>)}
+          </select>
+          {kind !== "all" ? <input type="hidden" form="seams-catalog-search" name="garment" value={kind} /> : null}
+        </label>
+      ) : null}
       {pickupPanel ? <div ref={pickupPanelRef} className={`scout-pickup-panel ${toolbarNavigation ? "scout-pickup-on-demand" : ""}`}>{pickupPanel}</div> : null}
       {!tourShelf && !toolbarNavigation ? <div className={`scout-collections ${compactFilters ? "scout-desktop-control" : ""}`} role="group" aria-label="Workwear collections">
         <span className="scout-collections-label" aria-hidden="true">Collections</span>
@@ -609,13 +636,13 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
               {collectionOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
           </label> : null}
-          {!tourShelf && !fixedKind ? <label className={`min-w-0 text-xs font-medium ${toolbarNavigation ? "" : "sm:hidden"}`}>Garment category
+          {!tourShelf && !fixedKind && !toolbarNavigation ? <label className="min-w-0 text-xs font-medium sm:hidden">Garment category
             <select value={kind} onChange={(event) => { setKind(event.target.value as typeof kind); setGarmentType(""); setTagSize(""); setPage(1); }} className={control}>
               {tabs.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
           </label> : null}
         </> : null}
-        {!tourShelf ? <label className="min-w-0 text-xs font-medium">Garment type
+        {!tourShelf ? <label className="min-w-0 text-xs font-medium">{toolbarNavigation ? "Style" : "Garment type"}
           <select value={garmentType} onChange={(event) => { setGarmentType(event.target.value); setPage(1); }} className={control}>
             <option value="">Any type</option>
             {(kind === "all" ? [...garmentOptions.shirt, ...garmentOptions.pants] : kind === "shirt" || kind === "pants" ? garmentOptions[kind] : []).map(([value, label]) => <option key={value} value={value}>{label}</option>)}
@@ -677,10 +704,20 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
           <form method="dialog"><button className="scout-primary">Show {results.length} {results.length === 1 ? "piece" : "pieces"}</button></form>
         </div>
       </dialog>
+      {toolbarNavigation && activeRefinements.length > 0 ? (
+        <div className="scout-refinement-summary">
+          <p><strong>Active</strong> {activeRefinements.join(" · ")}</p>
+          <button type="button" className="scout-toolbar-button" onClick={() => {
+            clearFilters();
+            resultsRef.current?.focus({ preventScroll: true });
+          }}>Clear filters</button>
+        </div>
+      ) : null}
       <div className="scout-catalog-count flex min-h-12 flex-wrap items-center justify-between gap-x-2">
         <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 py-2 text-sm text-[var(--muted-ink)]" role="status">
           {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : allItems.length ? "No listings match these filters." : emptyMessage ?? "No listings match these filters."}
         </div>
+        {!allItems.length ? clearSearch : null}
         {!toolbarNavigation ? <div className={`flex flex-wrap gap-1 ${compactFilters ? "scout-desktop-control" : ""}`}>
         {marketplaces.includes("shopifycatalog") ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" aria-pressed={marketplace === "shopifycatalog"}
           onClick={() => { setMarketplace(marketplace === "shopifycatalog" ? "" : "shopifycatalog"); setPage(1); }}>Shopify Catalog</button> : null}
@@ -739,6 +776,7 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
   item: ListingView; grid?: boolean; priority?: boolean; showSimilar?: boolean; personalActions?: boolean; frame?: CatalogFrame;
 }) {
   const dialog = useRef<HTMLDialogElement>(null);
+  const measurementSection = useRef<HTMLElement>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const displayPrice = item.priceCents == null ? "Price unlisted" : `${money(item.priceCents)}${item.priceKind === "bid" ? " bid" : ""}`;
   const total = item.priceCents != null && item.shippingCents != null ? money(item.priceCents + item.shippingCents) : null;
@@ -754,12 +792,12 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
   const cardSize = frame ? item.size?.replace(/^(\d+(?:\.\d+)?)\s*[x×]\s*(\d+(?:\.\d+)?)$/i, "$1 × $2") : item.size;
   const cardSizeLabel = item.sizeBasis === "measured" ? "Measured" : sizeLabel;
   const details = [
-    { label: "Measurements", value: item.measurements.join(" · ") },
+    { label: "Measurements", value: frame ? null : item.measurements.join(" · ") },
     { label: "Condition", value: item.condition },
     { label: "Fabric", value: item.vintage.fabricNote },
     { label: "Color", value: item.colors.join(", ") },
     { label: "Era", value: item.vintage.eraNote },
-    { label: "Pickup", value: item.pickupAvailable ? (item.source === "fredgoodwill" ? "Check pickup eligibility and scheduling at Goodwill checkout." : "Check pickup details on the eBay listing.") : null },
+    { label: "Pickup", value: item.pickupAvailable ? (item.source === "fredgoodwill" ? "Check pickup eligibility and scheduling at Goodwill checkout." : "Check pickup availability and details with the seller.") : null },
     { label: "Shipping", value: item.pickupAvailable ? null : item.shippingCents != null ? money(item.shippingCents)
       : item.source === "fredgoodwill" ? "Check availability and cost at checkout" : "Unknown" },
     { label: item.priceKind === "bid" ? "Bid + shipping" : "Item + shipping", value: total },
@@ -809,9 +847,31 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
                   onAuxClick={personalActions ? undefined : (event) => { if (event.button === 1) recordSeamsActivity("seller-click", item.garmentKind, item.source); }}
                   className="scout-primary inline-flex items-center gap-2 text-sm">View original listing <ExternalLink size={15} aria-hidden="true" /></a>
               </div>
+              {frame && item.measurements.length > 0 ? (
+                <button type="button" className="scout-measurement-link" onClick={() => {
+                  measurementSection.current?.focus({ preventScroll: true });
+                  measurementSection.current?.scrollIntoView({ block: "start", inline: "nearest" });
+                }}>See measurements</button>
+              ) : null}
             </div>
-            <ListingGallery item={item} />
+            <ListingGallery item={item} polished={Boolean(frame)} />
             <div className="scout-item-facts min-w-0">
+              {frame ? (
+                <section ref={measurementSection} tabIndex={-1} className="scout-measurements" aria-label="Measurements">
+                  <h3>Measurements</h3>
+                  {item.measurements.length ? (
+                    <>
+                      <dl>
+                        {item.measurements.map((measurement) => {
+                          const pair = measurement.match(/^(.+?) (\d.* (?:in|cm))$/);
+                          return <div key={measurement}><dt>{pair?.[1] ?? "Seller measurement"}</dt><dd>{pair?.[2] ?? measurement}</dd></div>;
+                        })}
+                      </dl>
+                      <p>From the listing. Check how the seller measured before comparing sizes.</p>
+                    </>
+                  ) : <p>No measurements listed. Check the seller’s photos or ask for measurements.</p>}
+                </section>
+              ) : null}
               <dl>
                 {details.filter(({ value }) => value).map(({ label, value }) => (
                   <div key={label} className="grid grid-cols-[6.5rem_1fr] gap-2 border-t border-[var(--line)] py-2 text-sm">
@@ -847,36 +907,58 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
   );
 }
 
-function ListingGallery({ item }: { item: ListingView }) {
+function ListingGallery({ item, polished }: { item: ListingView; polished: boolean }) {
   const photos = Array.from(new Set([item.imageUrl, ...(item.imageUrls ?? [])].filter((url): url is string => Boolean(url))));
   const [selected, setSelected] = useState(0);
   const [zoomed, setZoomed] = useState(false);
   const current = photos[selected];
   const scrollArea = useRef<HTMLDivElement>(null);
+  const thumbnails = useRef<HTMLDivElement>(null);
+  const showPhoto = (index: number) => {
+    setSelected(index);
+    setZoomed(false);
+  };
   useEffect(() => {
     const area = scrollArea.current;
     if (zoomed && area) area.scrollTo((area.scrollWidth - area.clientWidth) / 2, (area.scrollHeight - area.clientHeight) / 2);
   }, [zoomed]);
+  useEffect(() => {
+    const strip = thumbnails.current;
+    const button = strip?.children[selected];
+    if (!polished || !strip || !(button instanceof HTMLElement)) return;
+    const track = strip.getBoundingClientRect();
+    const target = button.getBoundingClientRect();
+    if (target.left < track.left) strip.scrollLeft -= track.left - target.left;
+    if (target.right > track.right) strip.scrollLeft += target.right - track.right;
+  }, [selected, polished]);
   return (
-    <div className="scout-item-gallery min-w-0">
+    <div className={`scout-item-gallery min-w-0 ${polished ? "scout-gallery-polished" : ""}`}>
       <div ref={scrollArea} className="scout-gallery-scroll" data-zoomed={zoomed}>
-        {current ? (
+        {current && polished ? (
+          <div className="scout-photo-well scout-gallery-photo">
+            <ListingPhoto key={current} imageUrl={current} title={`${item.title}, seller photo ${selected + 1}`} priority />
+          </div>
+        ) : current ? (
           <button type="button" className="scout-photo-well scout-gallery-photo" onClick={() => setZoomed(!zoomed)} aria-label={zoomed ? "Zoom out" : "Zoom in"}>
             <ListingPhoto key={current} imageUrl={current} title={item.title} priority />
           </button>
         ) : <div className="scout-photo-well"><ListingPhoto imageUrl={null} title={item.title} /></div>}
       </div>
       {current ? <div className="scout-gallery-toolbar">
-        <span aria-live="polite">{photos.length > 1 ? `Photo ${selected + 1} of ${photos.length}` : "Seller photo"}</span>
+        {polished && photos.length > 1 ? <div className="scout-gallery-navigation">
+          <button type="button" onClick={() => showPhoto((selected + photos.length - 1) % photos.length)} aria-label="Previous photo"><ChevronLeft size={18} aria-hidden="true" /></button>
+          <span aria-live="polite">Photo {selected + 1} of {photos.length}</span>
+          <button type="button" onClick={() => showPhoto((selected + 1) % photos.length)} aria-label="Next photo"><ChevronRight size={18} aria-hidden="true" /></button>
+        </div> : <span aria-live="polite">{photos.length > 1 ? `Photo ${selected + 1} of ${photos.length}` : "Seller photo"}</span>}
         <button type="button" className="scout-toolbar-button" onClick={() => setZoomed(!zoomed)}>
           {zoomed ? <ZoomOut size={16} aria-hidden="true" /> : <ZoomIn size={16} aria-hidden="true" />}
           {zoomed ? "Zoom out" : "Zoom in"}
         </button>
       </div> : null}
-      {photos.length > 1 ? <div className="scout-thumbnails" role="group" aria-label="Seller photos">
+      {photos.length > 1 ? <div ref={thumbnails} className="scout-thumbnails" role="group" aria-label="Seller photos">
         {photos.map((url, index) => (
           <button key={url} className="scout-thumbnail" type="button" aria-label={`Photo ${index + 1}`} aria-pressed={selected === index}
-            onClick={() => { setSelected(index); setZoomed(false); }}>
+            onClick={() => showPhoto(index)}>
             <ListingPhoto imageUrl={url} title="" />
           </button>
         ))}

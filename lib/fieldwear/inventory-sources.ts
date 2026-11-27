@@ -5,10 +5,11 @@ import { isGoodwillPickupOnly, vintageShops, tourShops } from "./marketplace-dir
 import { vintageSignals } from "./vintage-signals";
 import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, reportedPantsFit, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 
-export type LiveListing = ListingInput & { listedAt: string; endsAt?: string };
+export type LiveListing = ListingInput & { listedAt: string; endsAt?: string; catalogFirstSeenAt?: string; catalogCheckedAt?: string };
 export type SourceResult = {
   status: "searched" | "partial" | "unavailable" | "needs-access" | "no-feed";
   listings: LiveListing[];
+  unavailableIds?: string[];
 };
 
 type Window = { start: number; now: number };

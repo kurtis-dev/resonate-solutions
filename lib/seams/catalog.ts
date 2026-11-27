@@ -1,8 +1,8 @@
 import { isSturdyShopGarment, searchVintageShop, type LiveListing } from "@/lib/fieldwear/inventory-sources";
-import { isGoodwillPickupOnly, vintageShops, tourShops } from "@/lib/fieldwear/marketplace-directory";
+import { isGoodwillPickupOnly, isVintageShop, vintageShops, tourShops } from "@/lib/fieldwear/marketplace-directory";
 import { classifyGarment, type GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentMatch, sizeMatch, type ScoutPreferences } from "@/lib/fieldwear/preferences";
-import { searchGoodwillEbay } from "@/lib/fieldwear/live-search";
+import { searchGoodwillEbay, searchSeamsEbayBrands } from "@/lib/fieldwear/live-search";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { initializeSeams, seamsSql, type MemberSettings } from "./members";
 
@@ -15,37 +15,68 @@ export const interestLabels = {
 
 const sourceKey = (listing: LiveListing) => `${listing.source}:${listing.externalId}`;
 export { sourceKey as seamsListingKey };
+const maxUnverifiedAge = 36 * 60 * 60 * 1000;
+const observationKey = (item: LiveListing) => item.source === "ebay"
+  ? item.seller === "Goodwill on eBay" ? "ebay-goodwill" : "ebay-brands"
+  : item.source;
 
-async function refreshDepartment(department: Department, force: boolean) {
+async function refreshDepartment(department: Department, force: boolean, now: number) {
   const sql = await seamsSql();
   const [lease] = await sql`INSERT INTO seams_catalog (department, lease_until) VALUES (${department}, now() + interval '2 minutes')
     ON CONFLICT (department) DO UPDATE SET lease_until = EXCLUDED.lease_until
     WHERE (seams_catalog.lease_until IS NULL OR seams_catalog.lease_until < now())
     AND (${force} OR seams_catalog.checked_at IS NULL OR seams_catalog.checked_at < now() - interval '15 minutes')
-    RETURNING lease_until::text AS lease_until` as { lease_until: string }[];
+    RETURNING lease_until::text AS lease_until, checked_at::text AS checked_at, listings` as { lease_until: string; checked_at: string | null; listings: LiveListing[] | null }[];
   if (!lease) return null;
 
-  const now = Date.now();
+  const observedAt = new Date(now).toISOString();
+  const previous = lease.listings ?? [];
+  const previousById = new Map(previous.map((item) => [sourceKey(item), item]));
   const preferences: ScoutPreferences = { department: department === "tour" ? "any" : department, shirtSizes: [], pantsSizes: [], shirtBudget: null, pantsBudget: null, matchingOnly: false };
   try {
     const shops = department === "tour" ? tourShops : vintageShops;
-    const results = await Promise.allSettled([
-      ...shops.map((shop) => searchVintageShop(shop, preferences, "", { start: 0, now }, { tour: department === "tour", includePickupOnly: true })),
-      ...(department === "tour" ? [] : [searchGoodwillEbay(department)]),
-    ]);
+    const lookups = [
+      ...shops.map((shop) => ({ name: shop.source, run: searchVintageShop(shop, preferences, "", { start: 0, now }, { tour: department === "tour", includePickupOnly: true }) })),
+      ...(department === "tour" ? [] : [
+        { name: "ebay-goodwill", run: searchGoodwillEbay(department) },
+        { name: "ebay-brands", run: searchSeamsEbayBrands(department, previous.filter((item) => isVintageShop(item.source))) },
+      ]),
+    ];
+    const results = await Promise.allSettled(lookups.map(({ run }) => run));
     const listings = new Map<string, LiveListing>();
-    for (const result of results) {
+    const completed = new Set<string>();
+    const unavailable = new Set<string>();
+    let observedAnySource = false;
+    for (let index = 0; index < results.length; index++) {
+      const result = results[index];
       if (result.status !== "fulfilled") continue;
+      if (result.value.status === "searched") completed.add(lookups[index].name);
+      result.value.unavailableIds?.forEach((id) => unavailable.add(`ebay:${id}`));
+      if (result.value.status === "searched" || result.value.status === "partial") observedAnySource = true;
       for (const item of result.value.listings) {
         const signals = vintageSignals(item);
         if (item.priceCents == null || !item.imageUrl || signals.build < 0 || (signals.build === 0 && signals.period < 0)) continue;
         const fit = { ...item, garmentKind: classifyGarment(item) };
-        if (department === "women" && departmentMatch(fit, "women") < 2 && departmentMatch(fit, "unisex") < 2) continue;
-        listings.set(sourceKey(item), item);
+        if (lookups[index].name === "ebay-brands") {
+          if (department !== "tour" && !departmentMatch(fit, department)) continue;
+        } else if (department === "women" && departmentMatch(fit, "women") < 2 && departmentMatch(fit, "unisex") < 2) continue;
+        const id = sourceKey(item);
+        const earlier = previousById.get(id);
+        const firstSeen = earlier ? earlier.catalogFirstSeenAt ?? lease.checked_at ?? observedAt : observedAt;
+        const existing = listings.get(id);
+        if (existing?.seller === "Goodwill on eBay") continue;
+        listings.set(id, { ...item, catalogFirstSeenAt: firstSeen, catalogCheckedAt: observedAt });
       }
     }
-    if (!listings.size && (department !== "tour" || !results.some((result) => result.status === "fulfilled" && result.value.status !== "unavailable"))) return 0;
-    await sql`UPDATE seams_catalog SET checked_at = ${new Date(now).toISOString()}::timestamptz, listings = ${JSON.stringify(Array.from(listings.values()))}::jsonb
+    if (!observedAnySource) return 0;
+    unavailable.forEach((id) => listings.delete(id));
+    for (const item of previous) {
+      const checked = Date.parse(item.catalogCheckedAt ?? lease.checked_at ?? "");
+      if (completed.has(observationKey(item)) || now - checked > maxUnverifiedAge || !Number.isFinite(checked)
+        || (item.endsAt && Date.parse(item.endsAt) <= now) || listings.has(sourceKey(item)) || unavailable.has(sourceKey(item))) continue;
+      listings.set(sourceKey(item), { ...item, catalogCheckedAt: new Date(checked).toISOString(), catalogFirstSeenAt: item.catalogFirstSeenAt ?? new Date(checked).toISOString() });
+    }
+    await sql`UPDATE seams_catalog SET checked_at = ${observedAt}::timestamptz, listings = ${JSON.stringify(Array.from(listings.values()))}::jsonb
       WHERE department = ${department} AND lease_until = ${lease.lease_until}::timestamptz`;
     return listings.size;
   } finally {
@@ -55,7 +86,8 @@ async function refreshDepartment(department: Department, force: boolean) {
 
 export async function refreshSeamsCatalog(force = false) {
   await initializeSeams();
-  const outcomes = await Promise.allSettled(departments.map((department) => refreshDepartment(department, force)));
+  const now = Date.now();
+  const outcomes = await Promise.allSettled(departments.map((department) => refreshDepartment(department, force, now)));
   return outcomes.map((outcome, index) => ({ department: departments[index], count: outcome.status === "fulfilled" ? outcome.value : 0 }));
 }
 
@@ -64,6 +96,12 @@ export async function readSeamsCatalog() {
   const sql = await seamsSql();
   return await sql`SELECT department, listings, checked_at::text AS checked_at FROM seams_catalog
     WHERE checked_at > now() - interval '36 hours'` as CatalogRow[];
+}
+
+export function needsSeamsRefresh(catalog: CatalogRow[], now = Date.now()) {
+  return catalog.length < departments.length
+    || catalog.some((row) => now - Date.parse(row.checked_at ?? "") >= 6 * 60 * 60 * 1000)
+    || !catalog.some((row) => row.listings.some((item) => item.catalogCheckedAt));
 }
 
 function matchesInterest(item: LiveListing, kind: GarmentKind, interest: string) {
@@ -80,18 +118,22 @@ function matchesInterest(item: LiveListing, kind: GarmentKind, interest: string)
   }
 }
 
-export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSettings, keywords = "", email = false, tour = false, includePickupOnly = false) {
+export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSettings, keywords = "", email = false, tour: boolean | "include" = false, includePickupOnly = false) {
   const terms = keywords.toLowerCase().match(/[a-z0-9]+/g) ?? [];
   const fitPreferences = { shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes } as ScoutPreferences;
   const unique = new Map<string, LiveListing>();
+  const now = Date.now();
   for (const row of catalog) {
-    if (tour ? row.department !== "tour" : row.department === "tour" || (settings.department !== "any" && settings.department !== row.department)) continue;
+    const tourRow = row.department === "tour";
+    if (tourRow ? !tour : tour === true || (settings.department !== "any" && settings.department !== row.department)) continue;
     for (const item of row.listings) {
       if (!includePickupOnly && (item.pickupOnly || isGoodwillPickupOnly(item.source, [item.title, item.description].join(" ")))) continue;
       const signals = vintageSignals(item);
       if (signals.decade === "y2k" && !signals.sturdy2000s) continue;
       const kind = classifyGarment(item);
-      if (kind === "unknown" || (item.endsAt && Date.parse(item.endsAt) <= Date.now())) continue;
+      if (kind === "unknown" || (item.endsAt && Date.parse(item.endsAt) <= now)
+        || (item.catalogCheckedAt && now - Date.parse(item.catalogCheckedAt) > maxUnverifiedAge)) continue;
+      if (tourRow && tour === "include" && !departmentMatch({ title: item.title, garmentKind: kind }, settings.department)) continue;
       if (!sizeMatch({ ...item, garmentKind: kind }, fitPreferences)) continue;
       if (item.priceCents == null || (settings.budget != null && item.priceCents + (item.shippingCents ?? 0) > Math.round(settings.budget * 100))) continue;
       if (!terms.every((term) => `${item.title} ${item.description ?? ""}`.toLowerCase().includes(term))) continue;
@@ -103,8 +145,10 @@ export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSetting
     const kind = classifyGarment(item);
     const signals = vintageSignals(item);
     const taste = settings.interests.filter((interest) => matchesInterest(item, kind, interest)).length;
-    return { item, rank: taste * 100 + signals.period * 10 + signals.build * 5 };
-  }).sort((a, b) => b.rank - a.rank || b.item.listedAt.localeCompare(a.item.listedAt)).map(({ item }) => item);
+    const arrived = item.catalogFirstSeenAt ? Date.parse(item.catalogFirstSeenAt) : Date.parse(item.listedAt);
+    const newest = tour === "include" && now - arrived < 7 * 86_400_000 ? arrived : 0;
+    return { item, rank: taste * 100 + signals.period * 10 + signals.build * 5, newest };
+  }).sort((a, b) => b.newest - a.newest || b.rank - a.rank || b.item.listedAt.localeCompare(a.item.listedAt)).map(({ item }) => item);
 }
 
 export function goodwillShelf(items: LiveListing[], workPantsOnly: boolean) {
@@ -123,18 +167,20 @@ export function goodwillShelf(items: LiveListing[], workPantsOnly: boolean) {
   });
 }
 
-export function previewSeamsCatalog(items: LiveListing[], includeHighlights: boolean) {
+export function previewSeamsCatalog(items: LiveListing[], includeHighlights: boolean, tourKeys?: ReadonlySet<string>) {
   const previewSize = 288;
   const preview = items.slice(0, previewSize);
-  if (!includeHighlights || items.length <= previewSize) return preview;
+  if (items.length <= previewSize || (!includeHighlights && !tourKeys?.size)) return preview;
 
   const remainder = items.slice(previewSize);
   const isGoodwillEbay = (item: LiveListing) => item.source === "ebay" && item.seller === "Goodwill on eBay";
   const isSturdy2000s = (item: LiveListing) => vintageSignals(item).sturdy2000s;
-  const reserve = [
+  const reserve = includeHighlights ? [
     { matches: isGoodwillEbay, minimum: 24 },
+    { matches: (item: LiveListing) => isVintageShop(item.source), minimum: 48 },
     { matches: isSturdy2000s, minimum: 4 },
-  ];
+  ] : [];
+  if (tourKeys?.size) reserve.push({ matches: (item) => tourKeys.has(sourceKey(item)), minimum: 12 });
   const additional = new Set<LiveListing>();
   for (const { matches, minimum } of reserve) {
     const featured = preview.filter(matches).length + Array.from(additional).filter(matches).length;

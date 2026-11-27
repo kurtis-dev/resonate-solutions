@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
+import { after } from "next/server";
 import { FreshCatalog } from "@/components/fieldwear/listing-workbench";
 import { LocalPickup } from "@/components/seams/local-pickup";
 import { SeamsWordmark } from "@/components/seams/wordmark";
@@ -9,7 +10,7 @@ import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { pageMetadata } from "@/lib/seo";
 import { toListingView } from "@/lib/fieldwear/listing-view";
-import { goodwillShelf, interestLabels, matchSeamsCatalog, previewSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
+import { interestLabels, matchSeamsCatalog, needsSeamsRefresh, previewSeamsCatalog, readSeamsCatalog, refreshSeamsCatalog, seamsListingKey } from "@/lib/seams/catalog";
 import { firstDibsPickLimit, firstDibsReady } from "@/lib/seams/digest";
 import { defaultMemberSettings, readMember, seamsPath, type Member, type MemberSettings } from "@/lib/seams/members";
 import { continueSeams, requestMemberLink, saveMemberDibs, saveMemberFit, searchMemberCatalog, signOutSeams, stopFirstDibs } from "./actions";
@@ -17,8 +18,8 @@ import "../fieldwear/scout.css";
 import "./storefront.css";
 
 export const dynamic = "force-dynamic";
-type CatalogShelf = "" | "tour-shirts" | "goodwill" | "goodwill-pants";
-type CatalogQuery = { access?: string; status?: string; q?: string; unsubscribe?: string; department?: string; collection?: string; decade?: string };
+export const maxDuration = 60;
+type CatalogQuery = { access?: string; status?: string; q?: string; unsubscribe?: string; department?: string; decade?: string; garment?: string };
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<CatalogQuery> }): Promise<Metadata> {
   const params = await searchParams;
@@ -146,49 +147,51 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
   const params = await searchParams;
   const unsubscribe = typeof params.unsubscribe === "string" && /^[a-f0-9]{64}$/.test(params.unsubscribe) ? params.unsubscribe : null;
   const member = unsubscribe ? null : await readMember();
-  const guestDepartment = params.department === "men" || params.department === "women" ? params.department : "any";
-  const settings = member?.settings ?? (member ? defaultMemberSettings : { ...defaultMemberSettings, department: guestDepartment });
-  const collection: CatalogShelf = params.collection === "tour-shirts" || params.collection === "goodwill" || params.collection === "goodwill-pants" ? params.collection : "";
-  const tour = collection === "tour-shirts";
-  const goodwillPants = collection === "goodwill-pants";
-  const goodwill = goodwillPants || collection === "goodwill";
+  const savedSettings = member?.settings ?? defaultMemberSettings;
+  const department = params.department === "men" || params.department === "women" || params.department === "any" ? params.department : savedSettings.department;
+  const settings = { ...savedSettings, department };
+  const { garment } = params;
+  const initialKind = garment === "shirt" || garment === "pants" || garment === "outerwear" || (department !== "men" && (garment === "dress" || garment === "skirt")) ? garment : "all";
   const decade = params.decade === "80s" || params.decade === "90s" ? params.decade : "";
   const decadeChoices = [["", "All decades"], ["80s", "80s"], ["90s", "90s"]] as const;
   const keywords = typeof params.q === "string" ? params.q.slice(0, 80) : "";
   const showCatalog = !unsubscribe && !params.access;
   const catalog = showCatalog ? await readSeamsCatalog().catch(() => []) : [];
-  const matches = matchSeamsCatalog(catalog, settings, keywords, false, tour);
-  const shelfItems = goodwill ? goodwillShelf(matches, goodwillPants) : matches;
-  const items = decade ? shelfItems.filter((item) => vintageSignals(item).decade === decade) : shelfItems;
+  if (showCatalog && process.env.VERCEL_ENV === "production" && needsSeamsRefresh(catalog)) {
+    after(async () => { await refreshSeamsCatalog().catch((error: unknown) => console.error("Public catalog refresh failed", error)); });
+  }
+  const matches = matchSeamsCatalog(catalog, settings, keywords, false, "include");
+  const items = decade ? matches.filter((item) => vintageSignals(item).decade === decade) : matches;
+  const tourKeys = new Set(catalog.filter((row) => row.department === "tour").flatMap((row) => row.listings.map(seamsListingKey)));
   const preferences = { department: settings.department, shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes, shirtBudget: settings.budget, pantsBudget: settings.budget, matchingOnly: true };
   const stamp = catalog.reduce((latest, row) => latest > (row.checked_at ?? "") ? latest : row.checked_at ?? "", "");
-  const cards = (member ? items : previewSeamsCatalog(items, !decade && !collection)).map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
-  const catalogHref = (filters: { decade: string; collection: CatalogShelf; department: string }) => {
+  const cards = (member ? items : previewSeamsCatalog(items, !decade, tourKeys)).map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
+  const catalogHref = (filters: { decade: string; department: string }, queryText = keywords) => {
     const query = new URLSearchParams();
-    if (keywords) query.set("q", keywords);
+    if (queryText) query.set("q", queryText);
     if (filters.decade) query.set("decade", filters.decade);
-    if (filters.collection) query.set("collection", filters.collection);
-    if (filters.collection !== "tour-shirts" && !member && filters.department !== "any") query.set("department", filters.department);
+    if (filters.department === department && initialKind !== "all") query.set("garment", initialKind);
+    if (member || filters.department !== "any") query.set("department", filters.department);
     return seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh";
   };
   const decadeNavigation = (
     <nav key="catalog-decades" className="seams-decades" aria-label="Shop by decade">
       {decadeChoices.map(([value, label]) => (
-        <Link key={value} href={catalogHref({ decade: value, collection, department: guestDepartment })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
+        <Link key={value} href={catalogHref({ decade: value, department })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
       ))}
     </nav>
   );
-  const departmentNavigation = !member && !tour ? (
-    <nav key="catalog-departments" className="seams-decades" aria-label="Shop departments">
-      {([["any", "All departments"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([department, label]) => (
-        <Link key={department} href={catalogHref({ decade, collection, department })} aria-current={guestDepartment === department ? "page" : undefined} scroll={false}>{label}</Link>
+  const departmentNavigation = (
+    <nav className="seams-shelves" aria-label="Shop departments">
+      {([["any", "All items"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([value, label]) => (
+        <Link key={value} href={catalogHref({ decade, department: value })} aria-current={department === value ? "page" : undefined} scroll={false}>{label}</Link>
       ))}
     </nav>
-  ) : undefined;
-  const placeholder = tour ? "Band, tour, or artist…" : goodwillPants ? "Canvas, carpenter, double knee…" : "Denim, wool, L.L.Bean…";
+  );
+  const placeholder = "Denim, wool, band tee…";
   return (
     <main className="fieldwear-scout seams-public pb-12" data-decade={showCatalog && decade || undefined}>
-      {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${collection}:${keywords}`} /> : null}
+      {showCatalog ? <SeamsActivity pageKey={`${department}:${decade}:${keywords}`} /> : null}
       <header className="border-b border-[var(--line)]">
         <div className="scout-container flex min-h-16 items-center justify-between">
           <Link href="/" aria-label="Resonate Solutions"><Image src="/assets/resonate-logo-transparent.png" alt="Resonate Solutions" width={122} height={34} /></Link>
@@ -213,38 +216,30 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
         ) : showCatalog ? (
           <>
             <section id="fresh" aria-labelledby="catalog-title" className="seams-catalog my-5 scroll-mt-6">
-              <nav className="seams-shelves" aria-label="Catalog shelves">
-                <Link href={catalogHref({ decade, collection: "", department: guestDepartment })} aria-current={!collection ? "page" : undefined} scroll={false}>Catalog</Link>
-                <Link href={catalogHref({ decade, collection: "tour-shirts", department: guestDepartment })} aria-current={tour ? "page" : undefined} scroll={false}>Tour shirts</Link>
-                <Link href={catalogHref({ decade, collection: "goodwill-pants", department: guestDepartment })} aria-current={goodwill ? "page" : undefined} scroll={false}>Goodwill pants</Link>
-              </nav>
-              <h2 id="catalog-title" className="seams-catalog-title">{tour ? "’80s & ’90s tour shirts" : goodwill ? (goodwillPants ? "Goodwill work pants" : "Goodwill clothing") : member?.settings ? "Your fresh finds" : "Vintage clothing"}</h2>
-              {goodwill ? <div className="seams-goodwill-links">
-                <Link href={catalogHref({ decade, collection: goodwillPants ? "goodwill" : "goodwill-pants", department: guestDepartment })}>{goodwillPants ? "All Goodwill clothing" : "Work pants only"}</Link>
-                <a href="https://shopgoodwill.com/search/advancedsearch" target="_blank" rel="noreferrer">Search on ShopGoodwill.com</a>
-              </div> : null}
-              {tour ? <p className="my-2 text-xs text-[var(--muted-ink)]">Tour and era are seller-described. Check the print and tag photos.</p> : null}
+              {departmentNavigation}
+              <h2 id="catalog-title" className="seams-catalog-title">{member?.settings ? "Your fresh finds" : "Vintage clothing"}</h2>
               {member ? (
-                <form action={searchMemberCatalog} className="my-3 flex gap-2">
-                  {collection ? <input type="hidden" name="collection" value={collection} /> : null}
+                <form id="seams-catalog-search" action={searchMemberCatalog} className="my-3 flex gap-2">
+                  <input type="hidden" name="department" value={department} />
                   {decade ? <input type="hidden" name="decade" value={decade} /> : null}
                   <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="keywords" type="search" defaultValue={keywords} placeholder={placeholder} maxLength={80} className="scout-control w-full text-base" /></label>
                   <ScoutSubmit label="Search now" pendingLabel="Checking shops…" className={button} />
                 </form>
               ) : (
-                <form method="get" action={seamsPath + "#fresh"} className="my-3 flex gap-2">
-                  {collection ? <input type="hidden" name="collection" value={collection} /> : null}
+                <form id="seams-catalog-search" method="get" action={seamsPath + "#fresh"} className="my-3 flex gap-2">
                   {decade ? <input type="hidden" name="decade" value={decade} /> : null}
-                  {guestDepartment !== "any" ? <input type="hidden" name="department" value={guestDepartment} /> : null}
+                  {department !== "any" ? <input type="hidden" name="department" value={department} /> : null}
                   <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="q" type="search" defaultValue={keywords} placeholder={placeholder} maxLength={80} className="scout-control w-full text-base" /></label>
                   <button type="submit" className={button}>Search</button>
                 </form>
               )}
-              <FreshCatalog key={stamp + ":" + keywords + ":" + collection + ":" + decade + ":" + JSON.stringify(settings)}
-                items={cards} womenswear={!tour && settings.department !== "men"} tourShelf={tour}
-                fixedKind={goodwillPants ? "pants" : undefined} personalActions={false} showNinetiesCollection={false}
-                compactFilters filterNavigation={departmentNavigation} toolbarNavigation={decadeNavigation}
-                pickupPanel={!tour ? <LocalPickup department={settings.department} /> : undefined}
+              <FreshCatalog key={stamp + ":" + keywords + ":" + decade + ":" + initialKind + ":" + JSON.stringify(settings)} initialKind={initialKind}
+                items={cards} womenswear={department !== "men"} personalActions={false} showNinetiesCollection={false}
+                compactFilters toolbarNavigation={decadeNavigation}
+                pickupPanel={<LocalPickup department={department} />}
+                clearSearch={keywords ? (
+                  <Link key="clear-catalog-search" href={catalogHref({ decade, department }, "")} className="scout-clear-search" scroll={false}>Clear search</Link>
+                ) : undefined}
                 emptyMessage={catalog.length ? "No listings match. Try another search or adjust your filters." : "The shop catalog is being refreshed."} />
             </section>
             {member ? <><FitForm settings={settings} status={params.status} /><FirstDibs member={member} status={params.status} /></>
