@@ -12,7 +12,7 @@ An orderly workwear catalog with the personality of instant prints and hand-mark
 
 ## Color and type
 
-The Scout stylesheet owns the runtime palette. White paper, plum ink, and violet controls define the browsing surface. Multicolor film stripes and an original purple-and-teal paper-cup zigzag mark the brand and signup. Warm paper and muted brass frame the seller photos and price tags. Use the existing Inter and system-sans stack for product titles, prices, sizes, and controls.
+The Scout stylesheet owns the runtime palette. White paper, plum ink, and violet controls define the browsing surface. Multicolor film stripes and an original purple-and-teal paper-cup zigzag mark the brand and signup. Warm paper and muted brass frame the seller photos and price tags. An uninterrupted black-and-white checkerboard runs along the public catalog’s left edge. Purple graphics stay on the right, away from the rail. Use the existing Inter and system-sans stack for product titles, prices, sizes, and controls.
 
 ## Layout and interaction
 

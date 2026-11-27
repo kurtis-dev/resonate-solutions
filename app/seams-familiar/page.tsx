@@ -128,7 +128,7 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
   const stamp = catalog.reduce((latest, row) => latest > (row.checked_at ?? "") ? latest : row.checked_at ?? "", "");
   const cards = (member ? items : items.slice(0, 72)).map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
   return (
-    <main className="fieldwear-scout pb-12">
+    <main className="fieldwear-scout seams-public pb-12">
       {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${tour}:${keywords}`} /> : null}
       <header className="border-b border-[var(--line)]">
         <div className="scout-container flex min-h-16 items-center justify-between">

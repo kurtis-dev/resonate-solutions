@@ -127,3 +127,20 @@
   .fieldwear-scout .scout-brand-hero .scout-90s-graphic { top: 5px; height: 132px; right: 24px; }
   .fieldwear-scout .scout-first-dibs .scout-90s-graphic { right: 220px; }
 }
+
+.fieldwear-scout.seams-public {
+  --checkerboard-width: 12px;
+  position: relative;
+  padding-inline-start: 6px;
+}
+.fieldwear-scout.seams-public::before {
+  content: "";
+  position: absolute;
+  inset: 0 auto 0 0;
+  width: var(--checkerboard-width);
+  background: repeating-conic-gradient(#171717 0 25%, #fff 0 50%) 0 0 / var(--checkerboard-width) var(--checkerboard-width);
+  pointer-events: none;
+}
+@media (min-width: 768px) {
+  .fieldwear-scout.seams-public { --checkerboard-width: 16px; padding-inline-start: 0; }
+}
