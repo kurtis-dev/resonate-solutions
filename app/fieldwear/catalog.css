@@ -339,16 +339,12 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
 }
 .fieldwear-scout .scout-collections { border-color: var(--line); }
 
-.seams-public:not([data-decade="80s"]) article > .scout-photo-well {
-  border-color: var(--line);
-  background: var(--matte);
-  box-shadow: none;
-}
-.seams-public:not([data-decade="80s"]) article > .scout-photo-well::after { content: none; }
 /* Apertures follow the scanned frame edges. Photos stay inside the opening. */
-.seams-public[data-decade="80s"] article > .scout-photo-well {
+.seams-public article > .scout-photo-well[data-frame] {
   --instant-print: url("/assets/seams/instant-ivory.webp");
   --instant-side: 7.2%;
+  --instant-left: var(--instant-side);
+  --instant-right: var(--instant-side);
   --instant-top: 7.7%;
   --instant-foot: 23.4%;
   --instant-width: 100%;
@@ -358,50 +354,79 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
   background: var(--instant-print) center / var(--instant-width) 100% no-repeat;
   box-shadow: none;
 }
-.seams-public[data-decade="80s"] article:nth-of-type(4n + 2) > .scout-photo-well {
+.seams-public article > .scout-photo-well[data-frame="taped"] {
   --instant-print: url("/assets/seams/instant-taped.webp");
   --instant-side: 7.5%;
   --instant-top: 12.7%;
   --instant-foot: 22.3%;
+  --tape-silhouette: polygon(26% 1.5%, 73% 0, 74% 14.8%, 43% 15.1%, 22% 16.2%, 23% 10%);
 }
-.seams-public[data-decade="80s"] article:nth-of-type(4n + 3) > .scout-photo-well {
+.seams-public article > .scout-photo-well[data-frame="worn"] {
   --instant-print: url("/assets/seams/instant-worn.webp");
   --instant-side: 7.9%;
   --instant-top: 7.6%;
   --instant-foot: 25.4%;
 }
-.seams-public[data-decade="80s"] article:nth-of-type(4n) > .scout-photo-well {
+.seams-public article > .scout-photo-well[data-frame="pearl"] {
   --instant-print: url("/assets/seams/instant-pearl.webp");
   --instant-width: 94%;
   --instant-side: 10.7%;
   --instant-top: 7.4%;
   --instant-foot: 25%;
 }
-.seams-public[data-decade="80s"] article > .scout-photo-well::before,
-.seams-public[data-decade="80s"] article > .scout-photo-well img,
-.seams-public[data-decade="80s"] article > .scout-photo-well .scout-photo-fallback {
-  inset: var(--instant-top) var(--instant-side) var(--instant-foot);
+.seams-public article > .scout-photo-well[data-frame="rose"] {
+  --instant-print: url("/assets/seams/instant-rose.webp");
+  --instant-left: 10.8%;
+  --instant-right: 7.5%;
+  --instant-top: 10.3%;
+  --instant-foot: 28.7%;
+  --tape-silhouette: polygon(0 10%, 18% 0, 25% 6%, 3% 18%, 0 14%);
 }
-.seams-public[data-decade="80s"] article > .scout-photo-well img {
-  width: calc(100% - 2 * var(--instant-side));
+.seams-public article > .scout-photo-well[data-frame="frost"] {
+  --instant-print: url("/assets/seams/instant-frost.webp");
+  --instant-width: 94%;
+  --instant-left: 9.4%;
+  --instant-right: 10.3%;
+  --instant-top: 7.8%;
+  --instant-foot: 29.2%;
+}
+.seams-public article > .scout-photo-well[data-frame="coffee"] {
+  --instant-print: url("/assets/seams/instant-coffee.webp");
+  --instant-side: 7.7%;
+  --instant-top: 7.4%;
+  --instant-foot: 30.2%;
+}
+.seams-public article > .scout-photo-well[data-frame="album"] {
+  --instant-print: url("/assets/seams/instant-album.webp");
+  --instant-side: 7.1%;
+  --instant-top: 7%;
+  --instant-foot: 30.4%;
+}
+.seams-public article > .scout-photo-well[data-frame]::before,
+.seams-public article > .scout-photo-well[data-frame] img,
+.seams-public article > .scout-photo-well[data-frame] .scout-photo-fallback {
+  inset: var(--instant-top) var(--instant-right) var(--instant-foot) var(--instant-left);
+}
+.seams-public article > .scout-photo-well[data-frame] img {
+  width: calc(100% - var(--instant-left) - var(--instant-right));
   height: calc(100% - var(--instant-top) - var(--instant-foot));
 }
-.seams-public[data-decade="80s"] article > .scout-photo-well .scout-photo-fallback {
+.seams-public article > .scout-photo-well[data-frame] .scout-photo-fallback {
   position: absolute;
   align-content: center;
 }
-.seams-public[data-decade="80s"] article > .scout-photo-well::after { content: none; }
-.seams-public[data-decade="80s"] article:nth-of-type(4n + 2) > .scout-photo-well::after {
+.seams-public article > .scout-photo-well[data-frame]::after { content: none; }
+.seams-public article > .scout-photo-well:is([data-frame="taped"], [data-frame="rose"])::after {
   content: "";
   z-index: 1;
   inset: 0;
   width: auto;
   height: auto;
   background: inherit;
-  clip-path: polygon(26% 1.5%, 73% 0, 74% 14.8%, 43% 15.1%, 22% 16.2%, 23% 10%);
+  clip-path: var(--tape-silhouette);
   pointer-events: none;
 }
-.seams-public[data-decade="80s"] article > .scout-photo-well .scout-price-tag {
+.seams-public article > .scout-photo-well[data-frame] .scout-price-tag {
   inset-inline-start: 11%;
   inset-block-end: 6%;
 }

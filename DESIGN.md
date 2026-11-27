@@ -12,7 +12,7 @@ An orderly workwear catalog with the personality of instant prints and hand-mark
 
 ## Color and type
 
-The Scout stylesheet owns the runtime palette. White paper, plum ink, and violet controls define the browsing surface. The public All decades view uses a plain white catalog. The 80s view uses four original photographic instant-print frames (ivory, taped, worn, and narrow pearl) and a vertical multicolor film stripe. Each aperture contains the seller photo, with spacing below for the price tag. The 90s view uses an uninterrupted black-and-white checkerboard along the left edge and the purple-and-teal zigzag on the right. Use the existing Inter and system-sans stack for product titles, prices, sizes, and controls.
+The Scout stylesheet owns the runtime palette. White paper, plum ink, and violet controls define the browsing surface. The public catalog uses white paper and eight original photographic instant-print frames. Frames shuffle across each catalog page without repetition in a row. Each aperture contains the seller photo, with spacing below for the price tag. The 80s view adds a vertical multicolor film stripe. The 90s view uses an uninterrupted black-and-white checkerboard along the left edge and the purple-and-teal zigzag on the right. Use the existing Inter and system-sans stack for product titles, prices, sizes, and controls.
 
 ## Layout and interaction
 

@@ -389,6 +389,23 @@ export function ListingShelf({ id, label, description, items, comparePrices = fa
 }
 
 const freshPageSize = 12;
+const catalogFrames = ["ivory", "taped", "worn", "pearl", "rose", "frost", "coffee", "album"] as const;
+type CatalogFrame = (typeof catalogFrames)[number];
+
+function shuffleCatalogFrames(items: ListingView[]) {
+  let seed = 2166136261;
+  const key = items.map(({ source, externalId }) => `${source}:${externalId}`).join("|");
+  for (let index = 0; index < key.length; index++) {
+    seed = Math.imul(seed ^ key.charCodeAt(index), 16777619);
+  }
+  const frames = [...catalogFrames];
+  for (let index = frames.length - 1; index > 0; index--) {
+    seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0;
+    const swap = Math.floor(seed / 4294967296 * (index + 1));
+    [frames[index], frames[swap]] = [frames[swap], frames[index]];
+  }
+  return frames;
+}
 const collections = [["all", "All finds"], ["90s", "90s"], ["canvas", "Canvas & duck"], ["lined", "Lined layers"]] as const;
 type Collection = (typeof collections)[number][0];
 const priceForSort = (item: ListingView) => item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
@@ -485,6 +502,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const currentPage = Math.min(page, lastPage);
   const from = (currentPage - 1) * freshPageSize;
   const visible = results.slice(from, from + freshPageSize);
+  const frames = personalActions ? null : shuffleCatalogFrames(visible);
   const control = "mt-1 min-h-11 w-full rounded-[4px] border border-[var(--line)] bg-white px-3 text-base font-normal text-[var(--ink)]";
   const hasFilters = Boolean(collection !== "all" || marketplace || garmentType || era || fabric || tagSize || colors.length || min || max);
   const clearFilters = () => {
@@ -639,7 +657,9 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         </div>
       ) : null}
       <div className="scout-photo-grid">
-        {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid showSimilar={!womenswear} personalActions={personalActions} priority={index < 4} />)}
+        {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid
+          showSimilar={!womenswear} personalActions={personalActions} priority={index < 4}
+          frame={frames?.[index % catalogFrames.length]} />)}
       </div>
       {lastPage > 1 ? (
         <nav className="mt-5 flex items-center justify-between gap-4" aria-label="Catalog pages">
@@ -662,7 +682,9 @@ function ListingPhoto({ imageUrl, title, priority = false }: Pick<ListingView, "
   );
 }
 
-function ListingCard({ item, grid = false, priority = false, showSimilar = true, personalActions = true }: { item: ListingView; grid?: boolean; priority?: boolean; showSimilar?: boolean; personalActions?: boolean }) {
+function ListingCard({ item, grid = false, priority = false, showSimilar = true, personalActions = true, frame }: {
+  item: ListingView; grid?: boolean; priority?: boolean; showSimilar?: boolean; personalActions?: boolean; frame?: CatalogFrame;
+}) {
   const dialog = useRef<HTMLDialogElement>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
   const displayPrice = item.priceCents == null ? "Price unlisted" : `${money(item.priceCents)}${item.priceKind === "bid" ? " bid" : ""}`;
@@ -689,7 +711,7 @@ function ListingCard({ item, grid = false, priority = false, showSimilar = true,
 
   return (
     <article className={grid ? "min-w-0" : "w-[66vw] min-w-[200px] max-w-[290px] shrink-0 snap-start sm:w-[255px]"}>
-      <button type="button" className="scout-photo-well" onClick={openDetails} aria-label={`Open ${item.title}, ${displayPrice}`} aria-haspopup="dialog">
+      <button type="button" className="scout-photo-well" data-frame={frame} onClick={openDetails} aria-label={`Open ${item.title}, ${displayPrice}`} aria-haspopup="dialog">
         <ListingPhoto key={item.imageUrl} imageUrl={item.imageUrl} title={item.title} priority={priority} />
         {item.priceCents != null ? <span className="scout-price-tag" aria-hidden="true">{displayPrice}</span> : null}
       </button>
