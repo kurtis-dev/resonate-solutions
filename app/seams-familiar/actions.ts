@@ -74,7 +74,8 @@ export async function searchMemberCatalog(form: FormData) {
   if (keywords) query.set("q", keywords);
   const decade = form.get("decade");
   if (decade === "80s" || decade === "90s") query.set("decade", decade);
-  if (form.get("collection") === "tour-shirts") query.set("collection", "tour-shirts");
+  const collection = form.get("collection");
+  if (collection === "tour-shirts" || collection === "goodwill-pants") query.set("collection", collection);
   redirect(seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh");
 }
 

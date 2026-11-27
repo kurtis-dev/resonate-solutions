@@ -1,4 +1,4 @@
-import { searchVintageShop, type LiveListing } from "@/lib/fieldwear/inventory-sources";
+import { isSturdyShopGarment, searchVintageShop, type LiveListing } from "@/lib/fieldwear/inventory-sources";
 import { isGoodwillPickupOnly, vintageShops, tourShops } from "@/lib/fieldwear/marketplace-directory";
 import { classifyGarment, type GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentMatch, sizeMatch, type ScoutPreferences } from "@/lib/fieldwear/preferences";
@@ -105,6 +105,14 @@ export function matchSeamsCatalog(catalog: CatalogRow[], settings: MemberSetting
     const taste = settings.interests.filter((interest) => matchesInterest(item, kind, interest)).length;
     return { item, rank: taste * 100 + signals.period * 10 + signals.build * 5 };
   }).sort((a, b) => b.rank - a.rank || b.item.listedAt.localeCompare(a.item.listedAt)).map(({ item }) => item);
+}
+
+export function isGoodwillWorkPants(item: LiveListing) {
+  const goodwill = item.source === "fredgoodwill" || (item.source === "ebay" && item.seller === "Goodwill on eBay");
+  if (!goodwill || classifyGarment(item) !== "pants") return false;
+  const notes = item.description ?? "";
+  if (!isSturdyShopGarment(item.title, notes, "pants")) return false;
+  return /\b(?:carpenter|work(?:wear)?|double[- ]knee|duck canvas|canvas|dungarees?|fatigue|sateen|painter|riveted)\b/i.test(`${item.title} ${notes}`);
 }
 
 export function previewSeamsCatalog(items: LiveListing[], includeHighlights: boolean) {

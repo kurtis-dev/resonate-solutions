@@ -150,7 +150,13 @@ export async function searchGoodwillEbay(department: "any" | "men" | "women", zi
     ? ["deliveryOptions:{SELLER_ARRANGED_LOCAL_PICKUP}", "pickupCountry:US", `pickupPostalCode:${zip}`, "pickupRadius:50", "pickupRadiusUnit:mi"]
     : ["deliveryCountry:US"];
   const lanes = zip ? ["(denim,wool,canvas,cotton,flannel,chamois,workwear,corduroy)"] : ["(denim,canvas,workwear,chore,carpenter)", "(wool,chamois,flannel,corduroy,chambray)", "(cotton,twill,sateen,leather)"];
-  const response = await Promise.allSettled(categories.flatMap((category) => lanes.map(async (q) => {
+  const queries = categories.flatMap((category) => [
+    ...lanes.map((q) => ({ category, q })),
+    ...(zip ? [] : ["(carpenter,canvas,duck,workwear,dungarees)", '(Carhartt,Dickies,Wrangler,"double knee",fatigue)'].map((q) => ({
+      category: category === "1059" ? "57989" : "63863", q,
+    }))),
+  ]);
+  const response = await Promise.allSettled(queries.map(async ({ category, q }) => {
     const params = new URLSearchParams({
       q, category_ids: category, limit: zip ? "40" : "100",
       filter: ["conditions:{USED}", `sellers:{${goodwillSellers.join("|")}}`, ...fulfillment].join(","),
@@ -161,7 +167,7 @@ export async function searchGoodwillEbay(department: "any" | "men" | "women", zi
     });
     if (!page.ok) throw new Error(`Goodwill eBay search status ${page.status}`);
     return ((await page.json()) as { itemSummaries?: EbayItem[] }).itemSummaries ?? [];
-  })));
+  }));
 
   const listings = new Map<string, LiveListing>();
   let completed = 0;
@@ -173,9 +179,12 @@ export async function searchGoodwillEbay(department: "any" | "men" | "women", zi
       if (!seller || !goodwillSellers.includes(seller) || (!zip && !item.shippingOptions?.length)) continue;
       if (!zip && /\b(?:local )?pick[- ]?up only\b/i.test(item.title ?? "")) continue;
       const listing = mapItem(item, now);
-      if (!listing || listing.priceCents == null || classifyGarment(listing) === "unknown" || excluded.test(listing.title)) continue;
+      if (!listing || listing.priceCents == null || excluded.test(listing.title)) continue;
+      const kind = classifyGarment(listing);
+      if (kind === "unknown") continue;
       const signals = vintageSignals(listing);
-      if (signals.build < 0 || (signals.build === 0 && signals.period <= 0)) continue;
+      const sturdyPants = kind === "pants" && isSturdyShopGarment(listing.title, listing.description ?? "", kind);
+      if (signals.build < 0 || (signals.build === 0 && signals.period <= 0 && !sturdyPants)) continue;
       listings.set(listing.externalId, { ...listing, seller: "Goodwill on eBay", shippingCents: zip ? null : listing.shippingCents, pickupAvailable: Boolean(zip) });
     }
   }

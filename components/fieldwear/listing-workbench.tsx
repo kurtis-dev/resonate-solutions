@@ -417,8 +417,8 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
-export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, showNinetiesCollection = true }: {
-  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean; showNinetiesCollection?: boolean;
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true }: {
+  items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean; fixedKind?: "pants"; showNinetiesCollection?: boolean;
 }) {
   const [expired, setExpired] = useState(false);
   useEffect(() => {
@@ -432,7 +432,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
     };
   }, [catalogExpiresAt]);
   const items = useMemo(() => expired ? allItems.filter((item) => item.source !== "shopifycatalog") : allItems, [allItems, expired]);
-  const [kind, setKind] = useState<"all" | "shirt" | "pants" | "outerwear" | "dress" | "skirt">("all");
+  const [kind, setKind] = useState<"all" | "shirt" | "pants" | "outerwear" | "dress" | "skirt">(fixedKind ?? "all");
   const filterDialog = useRef<HTMLDialogElement>(null);
   const [marketplace, setMarketplace] = useState(initialSource);
   const [order, setOrder] = useState("relevance");
@@ -525,7 +525,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         ))}
       </div> : null}
       <div className="flex min-h-12 flex-wrap items-center justify-between gap-x-2 border-y border-[var(--line)]">
-        {!tourShelf ? <div className="flex flex-wrap items-center gap-1 sm:gap-3" role="group" aria-label="Garment category">
+        {!tourShelf && !fixedKind ? <div className="flex flex-wrap items-center gap-1 sm:gap-3" role="group" aria-label="Garment category">
           {tabs.map(([value, label]) => (
             <button key={value} type="button" aria-pressed={kind === value}
               onClick={() => { if (kind !== value) { setKind(value); setGarmentType(""); setTagSize(""); } setPage(1); }}

@@ -8,13 +8,14 @@ import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { pageMetadata } from "@/lib/seo";
 import { toListingView } from "@/lib/fieldwear/listing-view";
-import { interestLabels, matchSeamsCatalog, previewSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
+import { interestLabels, isGoodwillWorkPants, matchSeamsCatalog, previewSeamsCatalog, readSeamsCatalog } from "@/lib/seams/catalog";
 import { firstDibsReady } from "@/lib/seams/digest";
 import { defaultMemberSettings, readMember, seamsPath, type Member, type MemberSettings } from "@/lib/seams/members";
 import { continueSeams, requestMemberLink, saveMemberDibs, saveMemberFit, searchMemberCatalog, signOutSeams, stopFirstDibs } from "./actions";
 import "../fieldwear/scout.css";
 
 export const dynamic = "force-dynamic";
+type CatalogShelf = "" | "tour-shirts" | "goodwill-pants";
 type CatalogQuery = { access?: string; status?: string; q?: string; unsubscribe?: string; department?: string; collection?: string; decade?: string };
 
 export async function generateMetadata({ searchParams }: { searchParams: Promise<CatalogQuery> }): Promise<Metadata> {
@@ -131,28 +132,31 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
   const member = unsubscribe ? null : await readMember();
   const guestDepartment = params.department === "men" || params.department === "women" ? params.department : "any";
   const settings = member?.settings ?? (member ? defaultMemberSettings : { ...defaultMemberSettings, department: guestDepartment });
-  const tour = params.collection === "tour-shirts";
+  const collection: CatalogShelf = params.collection === "tour-shirts" || params.collection === "goodwill-pants" ? params.collection : "";
+  const tour = collection === "tour-shirts";
+  const goodwillPants = collection === "goodwill-pants";
   const decade = params.decade === "80s" || params.decade === "90s" ? params.decade : "";
   const decadeChoices = [["", "All decades"], ["80s", "80s"], ["90s", "90s"]] as const;
   const keywords = typeof params.q === "string" ? params.q.slice(0, 80) : "";
   const showCatalog = !unsubscribe && !params.access;
   const catalog = showCatalog ? await readSeamsCatalog().catch(() => []) : [];
   const matches = matchSeamsCatalog(catalog, settings, keywords, false, tour);
-  const items = decade ? matches.filter((item) => vintageSignals(item).decade === decade) : matches;
+  const shelfItems = goodwillPants ? matches.filter(isGoodwillWorkPants) : matches;
+  const items = decade ? shelfItems.filter((item) => vintageSignals(item).decade === decade) : shelfItems;
   const preferences = { department: settings.department, shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes, shirtBudget: settings.budget, pantsBudget: settings.budget, matchingOnly: true };
   const stamp = catalog.reduce((latest, row) => latest > (row.checked_at ?? "") ? latest : row.checked_at ?? "", "");
-  const cards = (member ? items : previewSeamsCatalog(items, !decade && !tour)).map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
-  const catalogHref = (filters: { decade: string; tour: boolean; department: string }) => {
+  const cards = (member ? items : previewSeamsCatalog(items, !decade && !collection)).map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
+  const catalogHref = (filters: { decade: string; collection: CatalogShelf; department: string }) => {
     const query = new URLSearchParams();
     if (keywords) query.set("q", keywords);
     if (filters.decade) query.set("decade", filters.decade);
-    if (filters.tour) query.set("collection", "tour-shirts");
-    else if (!member && filters.department !== "any") query.set("department", filters.department);
+    if (filters.collection) query.set("collection", filters.collection);
+    if (filters.collection !== "tour-shirts" && !member && filters.department !== "any") query.set("department", filters.department);
     return seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh";
   };
   return (
     <main className="fieldwear-scout seams-public pb-12" data-decade={showCatalog && decade || undefined}>
-      {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${tour}:${keywords}`} /> : null}
+      {showCatalog ? <SeamsActivity pageKey={`${guestDepartment}:${collection}:${keywords}`} /> : null}
       <header className="border-b border-[var(--line)]">
         <div className="scout-container flex min-h-16 items-center justify-between">
           <Link href="/" aria-label="Resonate Solutions"><Image src="/assets/resonate-logo-transparent.png" alt="Resonate Solutions" width={122} height={34} /></Link>
@@ -177,41 +181,45 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
         ) : showCatalog ? (
           <>
             <section id="fresh" aria-labelledby="catalog-title" className="my-5 scroll-mt-6">
-              <h2 id="catalog-title" className="text-xl font-bold tracking-tight">{tour ? "’80s & ’90s tour shirts" : member?.settings ? "Your fresh finds" : "Fresh finds"}</h2>
+              <h2 id="catalog-title" className="text-xl font-bold tracking-tight">{tour ? "’80s & ’90s tour shirts" : goodwillPants ? "Goodwill work pants" : member?.settings ? "Your fresh finds" : "Fresh finds"}</h2>
               <div className="scout-departments" aria-label="Catalog shelves">
-                <Link href={catalogHref({ decade, tour: false, department: guestDepartment })} aria-current={!tour ? "page" : undefined}>Daily catalog</Link>
-                <Link href={catalogHref({ decade, tour: true, department: guestDepartment })} aria-current={tour ? "page" : undefined}>Tour shirts</Link>
+                <Link href={catalogHref({ decade, collection: "", department: guestDepartment })} aria-current={!collection ? "page" : undefined}>Daily catalog</Link>
+                <Link href={catalogHref({ decade, collection: "tour-shirts", department: guestDepartment })} aria-current={tour ? "page" : undefined}>Tour shirts</Link>
+                <Link href={catalogHref({ decade, collection: "goodwill-pants", department: guestDepartment })} aria-current={goodwillPants ? "page" : undefined}>Goodwill pants</Link>
               </div>
               {tour ? <p className="my-2 text-xs text-[var(--muted-ink)]">Tour and era are seller-described. Check the print and tag photos.</p> : null}
+              {goodwillPants ? <p className="my-2 text-sm text-[var(--muted-ink)]">
+                Shippable listings from Goodwill storefronts. <a href="https://shopgoodwill.com/search/advancedsearch" target="_blank" rel="noreferrer" className="text-[var(--accent)] underline underline-offset-4">Search on ShopGoodwill.com</a>
+              </p> : null}
               {!member && !tour ? <nav className="scout-departments" aria-label="Shop departments">
                 {([["any", "All"], ["men", "Men’s"], ["women", "Women’s"]] as const).map(([department, label]) => {
-                  return <Link key={department} href={catalogHref({ decade, tour, department })} aria-current={guestDepartment === department ? "page" : undefined} scroll={false}>{label}</Link>;
+                  return <Link key={department} href={catalogHref({ decade, collection, department })} aria-current={guestDepartment === department ? "page" : undefined} scroll={false}>{label}</Link>;
                 })}
               </nav> : null}
               {member ? (
                 <form action={searchMemberCatalog} className="my-3 flex gap-2">
-                  {tour ? <input type="hidden" name="collection" value="tour-shirts" /> : null}
+                  {collection ? <input type="hidden" name="collection" value={collection} /> : null}
                   {decade ? <input type="hidden" name="decade" value={decade} /> : null}
-                  <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="keywords" type="search" defaultValue={keywords} placeholder="Denim, wool, L.L.Bean…" maxLength={80} className="scout-control w-full text-base" /></label>
+                  <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="keywords" type="search" defaultValue={keywords} placeholder={goodwillPants ? "Canvas, carpenter, double knee…" : "Denim, wool, L.L.Bean…"} maxLength={80} className="scout-control w-full text-base" /></label>
                   <ScoutSubmit label="Search now" pendingLabel="Checking shops…" className={button} />
                 </form>
               ) : (
                 <form method="get" action={seamsPath + "#fresh"} className="my-3 flex gap-2">
-                  {tour ? <input type="hidden" name="collection" value="tour-shirts" /> : null}
+                  {collection ? <input type="hidden" name="collection" value={collection} /> : null}
                   {decade ? <input type="hidden" name="decade" value={decade} /> : null}
                   {guestDepartment !== "any" ? <input type="hidden" name="department" value={guestDepartment} /> : null}
-                  <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="q" type="search" defaultValue={keywords} placeholder="Denim, wool, L.L.Bean…" maxLength={80} className="scout-control w-full text-base" /></label>
+                  <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="q" type="search" defaultValue={keywords} placeholder={goodwillPants ? "Canvas, carpenter, double knee…" : "Denim, wool, L.L.Bean…"} maxLength={80} className="scout-control w-full text-base" /></label>
                   <button type="submit" className={button}>Search</button>
                 </form>
               )}
               <nav className="scout-collections scout-decades" aria-label="Shop by decade">
                 {decadeChoices.map(([value, label]) => (
-                  <Link key={value} className="scout-collection" href={catalogHref({ decade: value, tour, department: guestDepartment })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
+                  <Link key={value} className="scout-collection" href={catalogHref({ decade: value, collection, department: guestDepartment })} aria-current={decade === value ? "page" : undefined} scroll={false}>{label}</Link>
                 ))}
               </nav>
               {!tour ? <LocalPickup key={settings.department} department={settings.department} /> : null}
               {!cards.length ? <p className="mb-2 text-sm text-[var(--muted-ink)]" role="status">{catalog.length ? "No matches. Try a different search or an open size or budget." : "The shop catalog is being refreshed."}</p> : null}
-              {cards.length ? <FreshCatalog key={stamp + ":" + keywords + ":" + tour + ":" + decade + ":" + JSON.stringify(settings)} items={cards} womenswear={!tour && settings.department !== "men"} tourShelf={tour} personalActions={false} showNinetiesCollection={false} /> : null}
+              {cards.length ? <FreshCatalog key={stamp + ":" + keywords + ":" + collection + ":" + decade + ":" + JSON.stringify(settings)} items={cards} womenswear={!tour && settings.department !== "men"} tourShelf={tour} fixedKind={goodwillPants ? "pants" : undefined} personalActions={false} showNinetiesCollection={false} /> : null}
             </section>
             {member ? <><FitForm settings={settings} status={params.status} /><FirstDibs member={member} status={params.status} /></>
               : <Welcome status={params.status} />}
