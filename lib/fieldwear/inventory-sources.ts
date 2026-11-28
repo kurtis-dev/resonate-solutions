@@ -3,6 +3,7 @@ import { setTimeout as delay } from "node:timers/promises";
 import { isPeriodTourShirt } from "@/lib/seams/tour-shirts";
 import { isGoodwillPickupOnly, vintageShops, tourShops } from "./marketplace-directory";
 import { vintageSignals } from "./vintage-signals";
+import { casualTopStyle, isQualityCasualTop } from "./casual-tops";
 import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, reportedPantsFit, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 
 export type LiveListing = ListingInput & { listedAt: string; endsAt?: string; catalogFirstSeenAt?: string; catalogCheckedAt?: string };
@@ -176,9 +177,10 @@ export function isSturdyShopGarment(title: string, notes: string, kind: "shirt" 
   return quality.build > 0 || (quality.build === 0 && workwear);
 }
 
-export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, { now }: Window, { tour = false, includePickupOnly = false } = {}): Promise<SourceResult> {
+export async function searchVintageShop(shop: Shop, preferences: ScoutPreferences, keywords: string, { now }: Window, { tour = false, includePickupOnly = false, casualTops = false } = {}): Promise<SourceResult> {
   const options: RequestInit = { cache: "no-store", signal: AbortSignal.timeout(9_000), redirect: "error" };
-  const collections = preferences.department === "women" && "womensCollections" in shop ? shop.womensCollections : shop.collections;
+  const defaultCollections = preferences.department === "women" && "womensCollections" in shop ? shop.womensCollections : shop.collections;
+  const collections = casualTops && "casualCollections" in shop ? [...defaultCollections, ...shop.casualCollections] : defaultCollections;
   const pages = await Promise.allSettled(collections.map(async (collection) => {
     const loadPage = async (page: number) => {
       const response = await fetch(`${shop.origin}/collections/${collection}/products.json?limit=${shopPageSize}&page=${page}`, options);
@@ -206,7 +208,8 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       const externalId = String(product.id);
       if (listings.has(externalId) || !product.published_at || !isFresh(product.published_at, { start: 0, now })) continue;
       const title = plainText(product.title);
-      if (!title || (!tour && shopExcluded.test(title)) || newerThanPreferred.test(title)) continue;
+      const casual = casualTops && !tour && Boolean(casualTopStyle(title));
+      if (!title || (!tour && !casual && shopExcluded.test(title)) || newerThanPreferred.test(title)) continue;
       const rawType = product.product_type?.trim() ?? "";
       const inferred = tour ? "shirt" : classifyGarment({ title });
       const garmentKind = inferred !== "unknown" ? inferred
@@ -242,6 +245,8 @@ export async function searchVintageShop(shop: Shop, preferences: ScoutPreference
       if (!terms.every((term) => words(`${title} ${description} ${labeledColor ?? ""}`).includes(term))) continue;
       if (tour) {
         if (vintageSignals({title, description}).build < 0) continue;
+      } else if (casual) {
+        if (!isQualityCasualTop({ title, description })) continue;
       } else if (garmentKind === "shirt" || garmentKind === "pants") {
         if (!isSturdyShopGarment(title, description, garmentKind)) continue;
       } else if (vintageSignals({title, description}).build < 0) continue;

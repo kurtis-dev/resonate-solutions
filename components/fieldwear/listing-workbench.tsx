@@ -25,6 +25,7 @@ import type { GarmentKind } from "@/lib/fieldwear/listing-model";
 import { catalogSizeTokens, departmentLabels, fitPriority, matchesScoutFit, shirtSizeTokens, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { isVintageShop, marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
 import { colorFamilies, type ColorFamily } from "@/lib/fieldwear/listing-colors";
+import { casualTopStyle } from "@/lib/fieldwear/casual-tops";
 import type { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import "@/app/fieldwear/catalog.css";
 
@@ -410,7 +411,9 @@ const collections = [["all", "All finds"], ["90s", "90s"], ["canvas", "Canvas & 
 type Collection = (typeof collections)[number][0];
 const priceForSort = (item: ListingView) => item.priceCents == null ? null : item.priceCents + (item.shippingCents ?? 0);
 const garmentOptions = {
-  shirt: [["work", "Work shirts"], ["chamois", "Chamois shirts"], ["lined", "Shirt-jackets"]],
+  shirt: [["tee", "T-shirts"], ["crew-tee", "Crew-neck tees"], ["v-tee", "V-neck tees"],
+    ["ringer-tee", "Ringer tees"], ["pocket-tee", "Pocket tees"], ["sweatshirt", "Sweatshirts"],
+    ["work", "Work shirts"], ["chamois", "Chamois shirts"], ["lined", "Shirt-jackets"]],
   pants: [["canvas", "Canvas & duck pants"], ["denim", "Jeans & denim pants"], ["trousers", "Trousers"]],
 } as const;
 
@@ -421,7 +424,15 @@ function matchesFreshType(item: ListingView, type: string) {
   if (type === "trousers") return /\b(?:trousers?|dress pants|slacks)\b/i.test(item.title);
   if (type === "chamois") return /\bchamois\b/i.test(item.title);
   if (type === "lined") return LINED_TERMS.test(item.title);
-  return !LINED_TERMS.test(item.title) && (PLAIN_WORK_TERMS.test(item.title) || /\b(?:flannel|chamois)\b/i.test(item.title));
+  if (type === "work") return !LINED_TERMS.test(item.title) && !casualTopStyle(item.title)
+    && (PLAIN_WORK_TERMS.test(item.title) || /\b(?:flannel|chamois)\b/i.test(item.title));
+  const style = casualTopStyle(item.title);
+  if (type === "sweatshirt") return style === type;
+  if (!style || style === "sweatshirt") return false;
+  if (type === "tee") return true;
+  if (type === "ringer-tee") return /\bringer\b/i.test(item.title);
+  if (type === "pocket-tee") return /\bpocket\b/i.test(item.title);
+  return style === type;
 }
 
 function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {

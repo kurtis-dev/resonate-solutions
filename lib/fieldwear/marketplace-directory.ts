@@ -1,7 +1,7 @@
 // Public storefronts verified to publish their catalog prices in USD.
 export const vintageShops = [
   { source: "dropspot", name: "Drop Spot Vintage", origin: "https://dropspotvintage.com", collections: ["mens-button-up-shirts", "mens-pants", "workwear"] },
-  { source: "rebalance", name: "Rebalance Vintage", origin: "https://rebalancevintage.com", collections: ["button-up-shirts", "all-vintage-bottoms", "workwear"] },
+  { source: "rebalance", name: "Rebalance Vintage", origin: "https://rebalancevintage.com", collections: ["button-up-shirts", "all-vintage-bottoms", "workwear"], casualCollections: ["blank-tees", "ringer-tees", "blank-sweatshirts"] },
   { source: "wyliewelling", name: "Wylie Welling", origin: "https://wyliewelling.com", collections: ["shirts", "all-live-pants", "shop-all"] },
   { source: "firstclass", name: "1STCLASS Vintage", origin: "https://1stclass-vintage.com", collections: ["carpenter", "pants", "denim", "wrangler-pants"] },
   { source: "secondtrail", name: "Second Trail Co.", origin: "https://secondtrailco.com", collections: ["mens-pants"] },

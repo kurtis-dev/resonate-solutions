@@ -1,5 +1,6 @@
 import { departmentMatch, sizeMatch, type ScoutPreferences } from "./preferences";
 import type { VintageShopSource } from "./marketplace-directory";
+import { casualTopStyle } from "./casual-tops";
 
 export const marketplaceHosts = {
   ebay: ["ebay.com", "www.ebay.com"],
@@ -183,6 +184,7 @@ export function classifyGarment(input: Pick<ListingInput, "title" | "description
   const text = `${input.title} ${input.description ?? ""} ${input.size ?? ""}`;
   if (/\b(?:skirt|kilt)\b/i.test(input.title)) return "skirt";
   if (/\bdress(?:es)?\b/i.test(input.title) && !/\bdress[- ](?:shirts?|pants?|trousers?|slacks?|blouses?)\b/i.test(input.title)) return "dress";
+  if (casualTopStyle(input.title)) return "shirt";
   if (/\b(?:pants?|jeans?|dungarees?|trousers?|carpenters?|painters?|overalls?)\b|\b(?:38|40)\s?[x×]\s?(?:32|34)\b/i.test(text)) return "pants";
   if (/\b(?:coat|parka|blazer|outerwear)\b|\bjacket\b(?![- ]?shirt)/i.test(text) && !/shirt[- ]?(?:jacket|jac)|shacket/i.test(text)) return "outerwear";
   if (/\b(?:shirts?|blouses?|cardigans?|sweaters?|flannel|chamois|overshirt|shirt[- ]?(?:jacket|jac)|shacket)\b/i.test(text)) return "shirt";

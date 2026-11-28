@@ -4,6 +4,7 @@ import { classifyGarment, type GarmentKind } from "@/lib/fieldwear/listing-model
 import { departmentMatch, sizeMatch, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { searchGoodwillEbay, searchSeamsEbayBrands } from "@/lib/fieldwear/live-search";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
+import { isQualityCasualTop } from "@/lib/fieldwear/casual-tops";
 import { initializeSeams, seamsSql, type MemberSettings } from "./members";
 
 const departments = ["men", "women", "tour"] as const;
@@ -36,7 +37,7 @@ async function refreshDepartment(department: Department, force: boolean, now: nu
   try {
     const shops = department === "tour" ? tourShops : vintageShops;
     const lookups = [
-      ...shops.map((shop) => ({ name: shop.source, run: searchVintageShop(shop, preferences, "", { start: 0, now }, { tour: department === "tour", includePickupOnly: true }) })),
+      ...shops.map((shop) => ({ name: shop.source, run: searchVintageShop(shop, preferences, "", { start: 0, now }, { tour: department === "tour", includePickupOnly: true, casualTops: true }) })),
       ...(department === "tour" ? [] : [
         { name: "ebay-goodwill", run: searchGoodwillEbay(department) },
         { name: "ebay-brands", run: searchSeamsEbayBrands(department, previous.filter((item) => isVintageShop(item.source))) },
@@ -180,6 +181,7 @@ export function previewSeamsCatalog(items: LiveListing[], includeHighlights: boo
     { matches: isGoodwillEbay, minimum: 24 },
     { matches: (item: LiveListing) => isVintageShop(item.source) && item.source !== "fredgoodwill", minimum: 48 },
     { matches: isSturdy2000s, minimum: 4 },
+    { matches: isQualityCasualTop, minimum: 24 },
   ] : [];
   if (tourKeys?.size) reserve.push({ matches: (item) => tourKeys.has(sourceKey(item)), minimum: 12 });
   const additional = new Set<LiveListing>();

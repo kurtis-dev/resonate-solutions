@@ -5,6 +5,7 @@ import { isSturdyShopGarment, searchEtsy, searchVintageShop, shopSize, type Live
 import { isVintageShop, vintageShops } from "./marketplace-directory";
 import { vintageSignals } from "./vintage-signals";
 import { matchLook, type LookHunt, type LookProfile } from "./look-search";
+import { isQualityCasualTop } from "./casual-tops";
 
 const day = 86_400_000;
 const ebay = "https://api.ebay.com";
@@ -173,9 +174,20 @@ export async function searchSeamsEbayBrands(department: "men" | "women", shopLis
   for (let index = 0; index < observed.length; index += 5) {
     observedQueries.push(`(${observed.slice(index, index + 5).map((brand) => `"${brand}"`).join(",")}) (wool,cotton,denim,canvas,leather,flannel)`);
   }
-  const searches = await Promise.allSettled([...seamsBrandQueries, ...observedQueries].map(async (q) => {
+  const clothingCategory = department === "men" ? "1059" : "15724";
+  const teeCategory = department === "men" ? "15687" : "53159";
+  const lanes = [
+    ...[...seamsBrandQueries, ...observedQueries].map((q) => ({ q, category: clothingCategory, casual: false })),
+    { q: '(blank,plain,solid,pocket) ("single stitch","made in usa",heavyweight) (tee,"t shirt")', category: teeCategory, casual: true },
+    { q: '("crew neck",crewneck) (heavyweight,"100% cotton","single stitch") (tee,"t shirt")', category: teeCategory, casual: true },
+    { q: '("v neck","v-neck") (cotton,"single stitch","made in usa") (tee,"t shirt")', category: teeCategory, casual: true },
+    { q: '(ringer,"pocket tee") ("single stitch","made in usa",1980s,1990s) (tee,"t shirt")', category: teeCategory, casual: true },
+    { q: '("Hanes Beefy","Screen Stars","Fruit of the Loom","Russell Athletic",Healthknit) ("single stitch","made in usa") (blank,plain,solid,pocket)', category: teeCategory, casual: true },
+    { q: '("v notch","double v","reverse weave",crewneck) (Champion,Russell,Hanes,Jerseys,"Fruit of the Loom") (blank,plain,solid,"made in usa",1980s,1990s) sweatshirt', category: clothingCategory, casual: true },
+  ];
+  const searches = await Promise.allSettled(lanes.map(async ({ q, category }) => {
     const params = new URLSearchParams({
-      q, category_ids: department === "men" ? "1059" : "15724", limit: "45", sort: "newlyListed",
+      q, category_ids: category, limit: "45", sort: "newlyListed",
       filter: "conditions:{USED},deliveryCountry:US,buyingOptions:{FIXED_PRICE|AUCTION}",
     });
     const response = await fetch(`${ebay}/buy/browse/v1/item_summary/search?${params}`, {
@@ -187,12 +199,18 @@ export async function searchSeamsEbayBrands(department: "men" | "women", shopLis
   }));
   const listings = new Map<string, LiveListing>();
   let completed = 0;
-  for (const result of searches) {
+  for (let index = 0; index < searches.length; index++) {
+    const result = searches[index];
     if (result.status !== "fulfilled") continue;
     completed++;
     for (const item of result.value) {
       const listing = mapItem(item, now);
-      if (!listing || listing.priceCents == null || excluded.test(listing.title)) continue;
+      if (!listing || listing.priceCents == null) continue;
+      if (lanes[index].casual) {
+        if (isQualityCasualTop(listing) && classifyGarment(listing) === "shirt") listings.set(listing.externalId, listing);
+        continue;
+      }
+      if (excluded.test(listing.title)) continue;
       const kind = classifyGarment(listing);
       const signals = vintageSignals(listing);
       if (kind === "unknown" || signals.build < 0 || (signals.period < 0 && !signals.sturdy2000s)
