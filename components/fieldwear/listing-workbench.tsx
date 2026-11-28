@@ -21,6 +21,7 @@ import {
 import { decideListing, searchScoutLook } from "@/app/fieldwear/actions";
 import { recordSeamsActivity } from "@/components/seams/activity";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
+import { useShopifyListings } from "@/components/fieldwear/use-shopify-listings";
 import type { GarmentKind } from "@/lib/fieldwear/listing-model";
 import { catalogSizeTokens, departmentLabels, fitPriority, matchesScoutFit, shirtSizeTokens, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { isVintageShop, marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
@@ -452,10 +453,11 @@ function listingSizeOrder(size: string) {
   return index < 0 ? alphaSizes.length : index;
 }
 
-export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true, compactFilters = false, filterNavigation, toolbarNavigation, pickupPanel, emptyMessage, clearSearch, initialKind = "all" }: {
+export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, shopifyUrl, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true, compactFilters = false, filterNavigation, toolbarNavigation, pickupPanel, emptyMessage, clearSearch, initialKind = "all" }: {
   items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean; fixedKind?: "pants"; showNinetiesCollection?: boolean;
   compactFilters?: boolean; filterNavigation?: ReactNode; toolbarNavigation?: ReactNode; pickupPanel?: ReactNode; emptyMessage?: string; clearSearch?: ReactNode;
   initialKind?: Exclude<GarmentKind, "unknown"> | "all";
+  shopifyUrl?: string;
 }) {
   const [expired, setExpired] = useState(false);
   useEffect(() => {
@@ -468,7 +470,9 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
       document.removeEventListener("visibilitychange", checkExpiry);
     };
   }, [catalogExpiresAt]);
-  const items = useMemo(() => expired ? allItems.filter((item) => item.source !== "shopifycatalog") : allItems, [allItems, expired]);
+  const shopifyItems = useShopifyListings(shopifyUrl);
+  const items = useMemo(() => shopifyItems.length ? [...allItems, ...shopifyItems]
+    : expired ? allItems.filter((item) => item.source !== "shopifycatalog") : allItems, [allItems, expired, shopifyItems]);
   const [localKind, setKind] = useState(fixedKind ?? initialKind);
   const kind = toolbarNavigation ? initialKind : localKind;
   const [previousKind, setPreviousKind] = useState(kind);
@@ -509,7 +513,8 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const listingSizes = useMemo(() => new Map(categoryItems.map((item) => [item, catalogSizeTokens(item)])), [categoryItems]);
   const tagSizes = useMemo(() => Array.from(new Set(styledItems.flatMap((item) => listingSizes.get(item) ?? [])))
     .sort((a, b) => listingSizeOrder(a) - listingSizeOrder(b) || a.localeCompare(b, undefined, { numeric: true })), [styledItems, listingSizes]);
-  const tagSize = tagSizes.includes(selectedSize) ? selectedSize : "";
+  const tagSize = shopifyUrl || tagSizes.includes(selectedSize) ? selectedSize : "";
+  const availableSizes = tagSize && !tagSizes.includes(tagSize) ? [...tagSizes, tagSize] : tagSizes;
   const hasVintageShops = marketplaces.some(isVintageShop);
   const { results, colorCounts } = useMemo(() => {
     const shownUrls = new Set<string>();
@@ -686,9 +691,9 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         </label> : null}
         <label className="min-w-0 text-xs font-medium">
           {sizeLabel}
-          <select value={tagSize} disabled={!tagSizes.length} onChange={(event) => { setTagSize(event.target.value); setPage(1); }} className={`${control} disabled:opacity-60`}>
-            <option value="">{tagSizes.length ? "Any size" : "No sizes listed"}</option>
-            {tagSizes.map((size) => <option key={size} value={size}>{size}</option>)}
+          <select value={tagSize} disabled={!availableSizes.length} onChange={(event) => { setTagSize(event.target.value); setPage(1); }} className={`${control} disabled:opacity-60`}>
+            <option value="">{availableSizes.length ? "Any size" : "No sizes listed"}</option>
+            {availableSizes.map((size) => <option key={size} value={size}>{size}</option>)}
           </select>
         </label>
         <label className="min-w-0 text-xs font-medium">Marketplace
@@ -758,9 +763,9 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
       ) : null}
       <div className="scout-catalog-count flex min-h-12 flex-wrap items-center justify-between gap-x-2">
         <div ref={resultsRef} tabIndex={-1} className="scroll-mt-24 py-2 text-sm text-[var(--muted-ink)]" role="status">
-          {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : allItems.length ? "No listings match these filters." : emptyMessage ?? "No listings match these filters."}
+          {invalidRange ? "Minimum price must be at or below the maximum." : results.length ? `Showing ${from + 1}–${from + visible.length} of ${results.length}` : items.length ? "No listings match these filters." : emptyMessage ?? "No listings match these filters."}
         </div>
-        {!allItems.length ? clearSearch : null}
+        {!items.length ? clearSearch : null}
         {!toolbarNavigation ? <div className={`flex flex-wrap gap-1 ${compactFilters ? "scout-desktop-control" : ""}`}>
         {marketplaces.includes("shopifycatalog") ? <button type="button" className="scout-toolbar-button text-[var(--accent)]" aria-pressed={marketplace === "shopifycatalog"}
           onClick={() => { setMarketplace(marketplace === "shopifycatalog" ? "" : "shopifycatalog"); setPage(1); }}>Shopify Catalog</button> : null}

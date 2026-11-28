@@ -250,6 +250,7 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
               )}
               <FreshCatalog key={stamp + ":" + keywords + ":" + decade + ":" + JSON.stringify(settings)} initialKind={initialKind}
                 items={cards} womenswear={department !== "men"} personalActions={false} showNinetiesCollection={false}
+                shopifyUrl={`/seams-familiar/shopify?${new URLSearchParams({ department, garment: initialKind, q: keywords, decade })}`}
                 compactFilters toolbarNavigation={decadeNavigation}
                 pickupPanel={<LocalPickup department={department} />}
                 clearSearch={keywords ? (

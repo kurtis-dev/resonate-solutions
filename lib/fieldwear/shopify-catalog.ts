@@ -1,11 +1,25 @@
 import { isSturdyShopGarment, shopSellerNotes, shopSize } from "./inventory-sources";
-import { classifyGarment, type ListingInput } from "./listing-model";
+import { classifyGarment, type GarmentKind, type ListingInput } from "./listing-model";
 import { departmentMatch, matchesScoutFit, type ScoutPreferences } from "./preferences";
 import { vintageSignals } from "./vintage-signals";
+import { casualTopStyle, isQualityCasualTop } from "./casual-tops";
 
 const endpoint = "https://catalog.shopify.com/api/ucp/mcp";
 const profileUrl = "https://www.resonate.solutions/fieldwear/shopify-agent.json";
 const ageLimit = 9 * 60 * 1000;
+export type ShopifyGarmentScope = Exclude<GarmentKind, "unknown"> | "all";
+const publicLanes: Record<ShopifyGarmentScope, string[]> = {
+  all: ["heavy cotton pocket tee", "cotton lined work shirt", "duck canvas carpenter work pants", "heavy straight leg denim jeans",
+    "wool chore jacket", "heavy wool cardigan sweater", "cotton denim button front dress", "wool tartan skirt"],
+  shirt: ["plain cotton crew neck tee", "cotton V-neck tee", "single stitch pocket tee", "plain crewneck sweatshirt",
+    "heavy cotton work shirt", "chamois shirt", "wool cardigan sweater", "cotton chambray blouse"],
+  pants: ["duck canvas carpenter work pants", "double knee heavy cotton work pants", "straight heavyweight denim work jeans",
+    "Carhartt Dickies carpenter work pants", "Wrangler Lee Riders Levi's 505 straight denim", "Key Imperial Round House Stan Ray painter pants",
+    "Red Kap Ben Davis cotton twill work trousers", "cotton sateen utility fatigue pants", "Carhartt B11 B01 B136 cotton duck work pants"],
+  outerwear: ["wool chore jacket", "denim trucker jacket", "heavy canvas work jacket"],
+  dress: ["cotton denim dress", "cotton button front dress"],
+  skirt: ["wool tartan skirt", "cotton denim midi skirt"],
+};
 type CatalogVariant = {
   id?: string;
   title?: string;
@@ -40,7 +54,7 @@ function normalizeSize(value: string) {
     .replace(/\b(\d{2})\s*W[-\s]+(\d{2})\s*L\b/gi, "$1x$2");
 }
 
-function catalogListings(products: CatalogProduct[], preferences: ScoutPreferences) {
+function catalogListings(products: CatalogProduct[], preferences: ScoutPreferences, scope?: ShopifyGarmentScope) {
   const unique = new Map<string, ListingInput>();
   for (const product of products) {
     const title = product.title?.trim();
@@ -48,10 +62,11 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
     if (!title) continue;
     const garmentKind = classifyGarment({ title, description });
     const womenswear = preferences.department === "women";
-    if (garmentKind === "unknown" || (!womenswear && garmentKind !== "pants")) continue;
+    if (garmentKind === "unknown" || (scope ? scope !== "all" && garmentKind !== scope : !womenswear && garmentKind !== "pants")) continue;
     if (womenswear && departmentMatch({ title, garmentKind }, "women") < 2 && departmentMatch({ title, garmentKind }, "unisex") < 2) continue;
     const quality = vintageSignals({ title, description });
     if (garmentKind === "pants" ? !isSturdyShopGarment(title, description, "pants") : (quality.build < 0 || (quality.build <= 0 && quality.period <= 0))) continue;
+    if (scope && casualTopStyle(title) && !isQualityCasualTop({ title, description })) continue;
     const budget = garmentKind === "pants" || garmentKind === "skirt" ? preferences.pantsBudget : preferences.shirtBudget;
     if (/\b(?:select pair|assorted|mystery|bundle|lot of|nwt|deadstock|new with tags)\b/i.test(title)) continue;
     for (const variant of product.variants ?? []) {
@@ -72,8 +87,8 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
       }).slice(0, 8);
       if (!imageUrl) continue;
       const option = (name: RegExp) => variant.options?.find((value) => name.test(value.name))?.label ?? "";
-      const fit = shopSize(normalizeSize(title), description, normalizeSize(option(/^size$/i)), garmentKind === "pants" ? "pants" : "shirt");
-      if ((!womenswear && !fit.size?.includes("x")) || !matchesScoutFit({ title, size: fit.size, sizeBasis: fit.sizeBasis, garmentKind }, preferences)) continue;
+      const fit = shopSize(normalizeSize(title), description, normalizeSize(option(/^size$/i)), garmentKind === "pants" || garmentKind === "skirt" ? "pants" : "shirt");
+      if ((!scope && !womenswear && !fit.size?.includes("x")) || !matchesScoutFit({ title, size: fit.size, sizeBasis: fit.sizeBasis, garmentKind }, preferences)) continue;
       const seller = variant.seller?.name?.trim() || url.hostname.replace(/^www\./, "");
       const condition = description.match(/^(?:condition|flaws)\s*:\s*(.+)$/im)?.[1] || option(/^condition$/i) || "Secondhand";
       unique.set(url.hostname + url.pathname, {
@@ -90,12 +105,13 @@ function catalogListings(products: CatalogProduct[], preferences: ScoutPreferenc
   });
 }
 
-export async function searchShopifyCatalog(preferences: ScoutPreferences, keywords: string, profile = profileUrl) {
-  const sizes = preferences.pantsSizes.slice(0, 6);
+export async function searchShopifyCatalog(preferences: ScoutPreferences, keywords: string, profile = profileUrl, scope?: ShopifyGarmentScope) {
+  const sizes = (scope === "all" ? [] : scope && scope !== "pants" && scope !== "skirt" ? preferences.shirtSizes : preferences.pantsSizes).slice(0, 6);
   const department = { any: "", men: "men's", women: "women's", unisex: "unisex" }[preferences.department];
   const womenswear = preferences.department === "women";
   const terms = keywords.replace(/\bvintage\b/gi, "").trim();
-  const lanes = terms ? [womenswear ? terms : terms + " work pants"] : womenswear ? [
+  const lanes = scope ? (terms ? [terms, ...publicLanes[scope].slice(0, 3).map((lane) => `${terms} ${lane}`)] : publicLanes[scope])
+    : terms ? [womenswear ? terms : terms + " work pants"] : womenswear ? [
     "cotton denim chore jacket", "wool Pendleton plaid skirt", "cotton denim shirt dress",
     "cotton chambray blouse", "wool cardigan 1990s", "high rise straight denim jeans", "duck canvas carpenter pants",
   ] : [
@@ -112,9 +128,11 @@ export async function searchShopifyCatalog(preferences: ScoutPreferences, keywor
     "Wrangler Riggs reinforced carpenter cotton denim",
     "cotton work dungarees utility pants reinforced pockets",
   ];
+  const priceCap = scope === "pants" || scope === "skirt" ? preferences.pantsBudget
+    : scope === "all" ? null : scope ? preferences.shirtBudget : womenswear ? null : preferences.pantsBudget;
   const checkedAt = Date.now();
   const results = await Promise.allSettled(lanes.map(async (lane, index) => {
-    const sizeWords = womenswear ? "" : index < 3 ? sizes.join(" ") : sizes[index % sizes.length] ?? "";
+    const sizeWords = !scope && womenswear ? "" : scope ? sizes[index % sizes.length] ?? "" : index < 3 ? sizes.join(" ") : sizes[index % sizes.length] ?? "";
     const fetchPage = async (cursor?: string) => {
       const request: RequestInit = {
         method: "POST",
@@ -129,7 +147,7 @@ export async function searchShopifyCatalog(preferences: ScoutPreferences, keywor
               pagination: { limit: index < 3 ? 40 : 22, ...(cursor ? { cursor } : {}) }, context: { address_country: "US" },
               filters: {
                 ships_to: { country: "US" }, condition: ["secondhand"], available: true,
-                ...(womenswear || preferences.pantsBudget == null ? {} : { price: { max: Math.round(preferences.pantsBudget * 100) } }),
+                ...(priceCap == null ? {} : { price: { max: Math.round(priceCap * 100) } }),
               },
             },
           } },
@@ -158,5 +176,5 @@ export async function searchShopifyCatalog(preferences: ScoutPreferences, keywor
   const products = results.flatMap((result) => result.status === "fulfilled" ? result.value.products : []);
   const status: "searched" | "partial" | "unavailable" = results.every((result) => result.status === "rejected") ? "unavailable"
     : results.some((result) => result.status === "rejected" || result.value.partial) ? "partial" : "searched";
-  return { status, listings: catalogListings(products, preferences), checkedAt, expiresAt: checkedAt + ageLimit };
+  return { status, listings: catalogListings(products, preferences, scope), checkedAt, expiresAt: checkedAt + ageLimit };
 }

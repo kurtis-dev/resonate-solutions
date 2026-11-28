@@ -80,7 +80,7 @@ async function refreshDepartment(department: Department, force: boolean, now: nu
         listings.set(id, { ...item, catalogFirstSeenAt: firstSeen, catalogCheckedAt: observedAt, catalogRulesVersion });
       }
     }
-    if (!observedAnySource) return { count: 0, feeds };
+    if (!observedAnySource) return { count: 0, added: 0, feeds };
     unavailable.forEach((id) => listings.delete(id));
     for (const item of previous) {
       const checked = Date.parse(item.catalogCheckedAt ?? lease.checked_at ?? "");
@@ -90,7 +90,8 @@ async function refreshDepartment(department: Department, force: boolean, now: nu
     }
     await sql`UPDATE seams_catalog SET checked_at = ${observedAt}::timestamptz, listings = ${JSON.stringify(Array.from(listings.values()))}::jsonb
       WHERE department = ${department} AND lease_until = ${lease.lease_until}::timestamptz`;
-    return { count: listings.size, feeds };
+    const added = Array.from(listings.keys()).filter((key) => !previousById.has(key)).length;
+    return { count: listings.size, added, feeds };
   } finally {
     await sql`UPDATE seams_catalog SET lease_until = NULL WHERE department = ${department} AND lease_until = ${lease.lease_until}::timestamptz`;
   }
@@ -104,6 +105,7 @@ export async function refreshSeamsCatalog(force = false) {
     department: departments[index],
     result: outcome.status === "rejected" ? "failed" : outcome.value ? "checked" : "skipped",
     count: outcome.status === "fulfilled" ? outcome.value?.count ?? 0 : 0,
+    added: outcome.status === "fulfilled" ? outcome.value?.added ?? 0 : 0,
     feeds: outcome.status === "fulfilled" ? outcome.value?.feeds ?? [] : [],
   }));
   console.info("Seams catalog refresh", JSON.stringify(report));
