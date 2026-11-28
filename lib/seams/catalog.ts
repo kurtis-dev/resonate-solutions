@@ -17,7 +17,7 @@ export const interestLabels = {
 const sourceKey = (listing: LiveListing) => `${listing.source}:${listing.externalId}`;
 export { sourceKey as seamsListingKey };
 const maxUnverifiedAge = 36 * 60 * 60 * 1000;
-const catalogRulesVersion = 1;
+const catalogRulesVersion = 2;
 const observationKey = (item: LiveListing) => item.source === "ebay"
   ? item.seller === "Goodwill on eBay" ? "ebay-goodwill" : "ebay-brands"
   : item.source;
@@ -201,6 +201,8 @@ export function previewSeamsCatalog(items: LiveListing[], includeHighlights: boo
     { matches: (item: LiveListing) => isVintageShop(item.source) && item.source !== "fredgoodwill", minimum: 48 },
     { matches: isSturdy2000s, minimum: 4 },
     { matches: isQualityCasualTop, minimum: 24 },
+    { matches: (item: LiveListing) => casualTopStyle(item.title) === "crew-tee", minimum: 12 },
+    { matches: (item: LiveListing) => casualTopStyle(item.title) === "v-tee", minimum: 12 },
   ] : [];
   if (tourKeys?.size) reserve.push({ matches: (item) => tourKeys.has(sourceKey(item)), minimum: 12 });
   const additional = new Set<LiveListing>();
