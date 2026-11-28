@@ -32,7 +32,14 @@ export const defaultScoutPreferences: ScoutPreferences = {
 };
 
 const alphaSize = /\b(?:\d\s*-?\s*X(?:XL|LT|L|T)?|XXXXL|XXXL|XXL|XXS|XLT|TXL|LT|MT|XS|XL|SMALL|MEDIUM|LARGE|S|M|L)(?:[ -]?(?:TALL|LONG|EXTRA LONG))?\b/gi;
-const waistInseam = /\bW?\s*(\d{2}(?:\.\d{1,2})?)\s*[x×]\s*L?\s*(\d{2}(?:\.\d{1,2})?)\b/gi;
+const waistInseam = /\bW?\s*(\d{2}(?:\.\d{1,2})?)\s*[x×]\s*L?\s*(\d{1,2}(?:\.\d{1,2})?)\b/gi;
+const exactWaistInseam = new RegExp(`^${waistInseam.source}$`, "i");
+const exactAlphaSize = new RegExp(`^(?:${alphaSize.source}|extra small|extra large)$`, "i");
+const numericClothingSize = /^\d{1,2}(?:\.\d{1,2}| [13]\/4| 1\/2)?[WPRSL]?$/i;
+
+function plausiblePantsDimensions(waist: string, inseam: string) {
+  return Number(waist) >= 18 && Number(waist) <= 80 && Number(inseam) >= 3 && Number(inseam) <= 48;
+}
 
 function normalizeAlpha(value: string) {
   const compact = value.toUpperCase().replace(/[ -]/g, "").replace(/(?:EXTRA)?LONG$/, "TALL");
@@ -46,7 +53,7 @@ function normalizeAlpha(value: string) {
 }
 
 export function shirtSizeTokens(input: string) {
-  const spelled = input.replace(/\b(women|men|ladie|girl|boy)[’']s\b/gi, "$1s").replace(/\b(extra small|extra large|large tall|medium tall|xl extra long)\b/gi, (match) =>
+  const spelled = input.replace(/(\w)[’']s\b/gi, "$1").replace(/\b(extra small|extra large|large tall|medium tall|xl extra long)\b/gi, (match) =>
     ({ "extra small": "XS", "extra large": "XL", "large tall": "LT", "medium tall": "MT", "xl extra long": "XLT" })[match.toLowerCase()] ?? match);
   const numeric = Array.from(spelled.matchAll(/\b(?:tagged(?: size)?|size|sz|us|womens?)\s*[:.=]?\s*(\d{1,2}(?:\.5)?w?)\b/gi), ([, value]) => value.toUpperCase());
   if (/^\d{1,2}(?:\.5)?W?$/i.test(spelled.trim())) numeric.push(spelled.trim().toUpperCase());
@@ -54,16 +61,40 @@ export function shirtSizeTokens(input: string) {
 }
 
 export function pantsSizeTokens(input: string) {
-  const dimensions = Array.from(input.matchAll(waistInseam), ([, waist, inseam]) => `${waist}x${inseam}`);
+  const dimensions = Array.from(input.matchAll(waistInseam)).flatMap(([, waist, inseam]) =>
+    plausiblePantsDimensions(waist, inseam) ? [`${Number(waist)}x${Number(inseam)}`] : []);
   return dimensions.length ? dimensions : shirtSizeTokens(input);
 }
 
 export function reportedPantsFit(title: string) {
-  const fit = title.match(/\b(?:fits?(?:[ -]+like)?|actual(?:[ -]+(?:size|fit))?|measures)\s*[:=]?[ -]*W?\s*(\d{2}(?:\.\d{1,2})?)\s*[x×]\s*L?\s*(\d{2}(?:\.\d{1,2})?)\b/i);
-  return fit ? `${fit[1]}x${fit[2]}` : undefined;
+  const fit = title.match(/\b(?:fits?(?:[ -]+like)?|actual(?:[ -]+(?:size|fit))?|measures)\s*[:=]?[ -]*W?\s*(\d{2}(?:\.\d{1,2})?)\s*[x×]\s*L?\s*(\d{1,2}(?:\.\d{1,2})?)\b/i);
+  return fit ? pantsSizeTokens(fit[0]).find((size) => size.includes("x")) : undefined;
 }
 
 export type FitListing = { title: string; size?: string | null; sizeBasis?: "tag" | "seller-fit" | "measured"; garmentKind: string };
+
+export function catalogSizeTokens({ title, size, sizeBasis, garmentKind, source }: FitListing & { source: string }) {
+  if (!size) return [];
+  const bottoms = garmentKind === "pants" || garmentKind === "skirt";
+  const inferredEbaySize = source === "ebay" && !sizeBasis;
+  const sizeTitle = title.replace(/\b(?:[a-z]\.){2,}|\b[LS]\s*\/\s*[LS]\b/gi, "");
+  const sizeCandidates = inferredEbaySize ? shirtSizeTokens(sizeTitle) : [];
+  const sizes = size.split(/\s+\/\s+/).flatMap((part) => {
+    const label = part.trim();
+    const dimensions = label.match(exactWaistInseam);
+    if (dimensions) {
+      const [, waist, inseam] = dimensions;
+      return bottoms && plausiblePantsDimensions(waist, inseam) ? [`${Number(waist)}x${Number(inseam)}`] : [];
+    }
+    if (numericClothingSize.test(label)) return [label.toUpperCase()];
+    const normalized = shirtSizeTokens(label);
+    if (!exactAlphaSize.test(label) || normalized.length !== 1) return [];
+    const [alpha] = normalized;
+    if (inferredEbaySize && (alpha === "S" || alpha === "L") && !sizeCandidates.includes(alpha)) return [];
+    return [alpha];
+  });
+  return Array.from(new Set(sizes));
+}
 
 export function sizeMatch(item: FitListing, preferences: ScoutPreferences) {
   const pants = item.garmentKind === "pants" || item.garmentKind === "skirt";

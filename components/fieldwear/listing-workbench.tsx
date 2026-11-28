@@ -22,7 +22,7 @@ import { decideListing, searchScoutLook } from "@/app/fieldwear/actions";
 import { recordSeamsActivity } from "@/components/seams/activity";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import type { GarmentKind } from "@/lib/fieldwear/listing-model";
-import { departmentLabels, fitPriority, matchesScoutFit, shirtSizeTokens, type ScoutPreferences } from "@/lib/fieldwear/preferences";
+import { catalogSizeTokens, departmentLabels, fitPriority, matchesScoutFit, shirtSizeTokens, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { isVintageShop, marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
 import { colorFamilies, type ColorFamily } from "@/lib/fieldwear/listing-colors";
 import type { vintageSignals } from "@/lib/fieldwear/vintage-signals";
@@ -495,8 +495,9 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const catalogMerchants = Array.from(new Set(items.flatMap((item) => item.source === "shopifycatalog" && item.sellerName ? [item.sellerName] : []))).sort();
   const categoryItems = useMemo(() => kind === "all" ? items : items.filter((item) => item.garmentKind === kind), [items, kind]);
   const styledItems = useMemo(() => categoryItems.filter((item) => matchesFreshType(item, garmentType)), [categoryItems, garmentType]);
-  const tagSizes = useMemo(() => Array.from(new Set(styledItems.flatMap(({ size }) => size ? [size] : [])))
-    .sort((a, b) => listingSizeOrder(a) - listingSizeOrder(b) || a.localeCompare(b, undefined, { numeric: true })), [styledItems]);
+  const listingSizes = useMemo(() => new Map(categoryItems.map((item) => [item, catalogSizeTokens(item)])), [categoryItems]);
+  const tagSizes = useMemo(() => Array.from(new Set(styledItems.flatMap((item) => listingSizes.get(item) ?? [])))
+    .sort((a, b) => listingSizeOrder(a) - listingSizeOrder(b) || a.localeCompare(b, undefined, { numeric: true })), [styledItems, listingSizes]);
   const tagSize = tagSizes.includes(selectedSize) ? selectedSize : "";
   const hasVintageShops = marketplaces.some(isVintageShop);
   const { results, colorCounts } = useMemo(() => {
@@ -505,7 +506,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
       if (collection === "canvas" && !item.vintage.canvas) return false;
       if (collection === "lined" && !matchesFreshType(item, "lined")) return false;
       if (collection === "90s" && item.vintage.decade !== collection) return false;
-      if ((marketplace.startsWith("shopifycatalog:") ? item.source !== "shopifycatalog" || item.sellerName !== marketplace.slice(15) : !matchesMarketplace(item.source, marketplace)) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshEvidence(item, era, fabric)) return false;
+      if ((marketplace.startsWith("shopifycatalog:") ? item.source !== "shopifycatalog" || item.sellerName !== marketplace.slice(15) : !matchesMarketplace(item.source, marketplace)) || (tagSize && !listingSizes.get(item)?.includes(tagSize)) || invalidRange || !matchesFreshEvidence(item, era, fabric)) return false;
       const cents = priceForSort(item);
       if ((min !== "" || max !== "") && (cents == null || (min !== "" && cents < Number(min) * 100) || (max !== "" && cents > Number(max) * 100))) return false;
       const url = URL.canParse(item.url) ? new URL(item.url) : null;
@@ -528,7 +529,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
       return order === "high" ? right - left : left - right;
     });
     return { results: filtered, colorCounts: counts };
-  }, [styledItems, marketplace, collection, era, fabric, tagSize, colors, invalidRange, min, max, order]);
+  }, [styledItems, listingSizes, marketplace, collection, era, fabric, tagSize, colors, invalidRange, min, max, order]);
   const lastPage = Math.max(1, Math.ceil(results.length / freshPageSize));
   const currentPage = Math.min(page, lastPage);
   const from = (currentPage - 1) * freshPageSize;
@@ -665,7 +666,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
           <select value={garmentType} onChange={(event) => {
             const nextStyle = event.target.value;
             setGarmentType(nextStyle);
-            if (selectedSize && !categoryItems.some((item) => item.size === selectedSize && matchesFreshType(item, nextStyle))) setTagSize("");
+            if (selectedSize && !categoryItems.some((item) => listingSizes.get(item)?.includes(selectedSize) && matchesFreshType(item, nextStyle))) setTagSize("");
             setPage(1);
           }} className={control}>
             <option value="">Any type</option>
@@ -768,7 +769,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         </div>
       ) : null}
       <div className="scout-photo-grid">
-        {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={item} grid
+        {visible.map((item, index) => <ListingCard key={`${item.source}:${item.externalId}`} item={{ ...item, size: listingSizes.get(item)?.join(" / ") || null }} grid
           showSimilar={!womenswear} personalActions={personalActions} priority={index < 4}
           frame={frames?.[index % catalogFrames.length]} />)}
       </div>
