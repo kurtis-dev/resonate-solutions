@@ -22,7 +22,7 @@ import { decideListing, searchScoutLook } from "@/app/fieldwear/actions";
 import { recordSeamsActivity } from "@/components/seams/activity";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
 import type { GarmentKind } from "@/lib/fieldwear/listing-model";
-import { departmentLabels, fitPriority, matchesScoutFit, type ScoutPreferences } from "@/lib/fieldwear/preferences";
+import { departmentLabels, fitPriority, matchesScoutFit, shirtSizeTokens, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { isVintageShop, marketplaceName, matchesMarketplace } from "@/lib/fieldwear/marketplace-directory";
 import { colorFamilies, type ColorFamily } from "@/lib/fieldwear/listing-colors";
 import type { vintageSignals } from "@/lib/fieldwear/vintage-signals";
@@ -434,6 +434,13 @@ function matchesFreshEvidence(item: ListingView, era: string, fabric: string) {
   return !fabric || cotton || wool;
 }
 
+const alphaSizes = ["XXS", "XS", "S", "M", "MT", "L", "LT", "XL", "XLT", "2XL", "2XLT", "3XL", "3XLT", "4XL", "4XLT"];
+
+function listingSizeOrder(size: string) {
+  const index = alphaSizes.indexOf(shirtSizeTokens(size)[0]);
+  return index < 0 ? alphaSizes.length : index;
+}
+
 export function FreshCatalog({ items: allItems, initialSource = "", catalogExpiresAt, womenswear = false, personalActions = true, tourShelf = false, fixedKind, showNinetiesCollection = true, compactFilters = false, filterNavigation, toolbarNavigation, pickupPanel, emptyMessage, clearSearch, initialKind = "all" }: {
   items: ListingView[]; initialSource?: string; catalogExpiresAt?: number; womenswear?: boolean; personalActions?: boolean; tourShelf?: boolean; fixedKind?: "pants"; showNinetiesCollection?: boolean;
   compactFilters?: boolean; filterNavigation?: ReactNode; toolbarNavigation?: ReactNode; pickupPanel?: ReactNode; emptyMessage?: string; clearSearch?: ReactNode;
@@ -471,22 +478,26 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const [garmentType, setGarmentType] = useState("");
   const [era, setEra] = useState("");
   const [fabric, setFabric] = useState("");
-  const [tagSize, setTagSize] = useState("");
+  const [selectedSize, setTagSize] = useState("");
   const [colors, setColors] = useState<ColorFamily[]>([]);
   const [page, setPage] = useState(1);
   const resultsRef = useRef<HTMLDivElement>(null);
   const invalidRange = min !== "" && max !== "" && Number(min) > Number(max);
   const marketplaces = Array.from(new Set(items.map((item) => item.source))).sort((a, b) => marketplaceName(a).localeCompare(marketplaceName(b)));
   const catalogMerchants = Array.from(new Set(items.flatMap((item) => item.source === "shopifycatalog" && item.sellerName ? [item.sellerName] : []))).sort();
-  const tagSizes = Array.from(new Set(items.flatMap(({ size }) => size ? [size] : []))).sort((a, b) => a.localeCompare(b, undefined, { numeric: true }));
+  const categoryItems = useMemo(() => kind === "all" ? items : items.filter((item) => item.garmentKind === kind), [items, kind]);
+  const styledItems = useMemo(() => categoryItems.filter((item) => matchesFreshType(item, garmentType)), [categoryItems, garmentType]);
+  const tagSizes = useMemo(() => Array.from(new Set(styledItems.flatMap(({ size }) => size ? [size] : [])))
+    .sort((a, b) => listingSizeOrder(a) - listingSizeOrder(b) || a.localeCompare(b, undefined, { numeric: true })), [styledItems]);
+  const tagSize = tagSizes.includes(selectedSize) ? selectedSize : "";
   const hasVintageShops = marketplaces.some(isVintageShop);
   const { results, colorCounts } = useMemo(() => {
     const shownUrls = new Set<string>();
-    const base = items.filter((item) => {
+    const base = styledItems.filter((item) => {
       if (collection === "canvas" && !item.vintage.canvas) return false;
       if (collection === "lined" && !matchesFreshType(item, "lined")) return false;
       if (collection === "90s" && item.vintage.decade !== collection) return false;
-      if ((kind !== "all" && item.garmentKind !== kind) || (marketplace.startsWith("shopifycatalog:") ? item.source !== "shopifycatalog" || item.sellerName !== marketplace.slice(15) : !matchesMarketplace(item.source, marketplace)) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshType(item, garmentType) || !matchesFreshEvidence(item, era, fabric)) return false;
+      if ((marketplace.startsWith("shopifycatalog:") ? item.source !== "shopifycatalog" || item.sellerName !== marketplace.slice(15) : !matchesMarketplace(item.source, marketplace)) || (tagSize && item.size !== tagSize) || invalidRange || !matchesFreshEvidence(item, era, fabric)) return false;
       const cents = priceForSort(item);
       if ((min !== "" || max !== "") && (cents == null || (min !== "" && cents < Number(min) * 100) || (max !== "" && cents > Number(max) * 100))) return false;
       const url = URL.canParse(item.url) ? new URL(item.url) : null;
@@ -509,7 +520,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
       return order === "high" ? right - left : left - right;
     });
     return { results: filtered, colorCounts: counts };
-  }, [items, kind, marketplace, collection, garmentType, era, fabric, tagSize, colors, invalidRange, min, max, order]);
+  }, [styledItems, marketplace, collection, era, fabric, tagSize, colors, invalidRange, min, max, order]);
   const lastPage = Math.max(1, Math.ceil(results.length / freshPageSize));
   const currentPage = Math.min(page, lastPage);
   const from = (currentPage - 1) * freshPageSize;
@@ -552,6 +563,14 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
 
   const collectionOptions = collections.filter(([id]) => (showNinetiesCollection || id !== "90s") && (!fixedKind || id !== "lined"));
   const styleOptions = kind === "all" ? [...garmentOptions.shirt, ...garmentOptions.pants] : kind === "shirt" || kind === "pants" ? garmentOptions[kind] : [];
+  const sizeLabel = {
+    all: "Listing size",
+    shirt: womenswear ? "Top size" : "Shirt size",
+    pants: "Pants size",
+    outerwear: "Jacket size",
+    dress: "Dress size",
+    skirt: "Skirt size",
+  }[kind];
   const eraOptions = [["pre-1999", "Pre-1999 clues"], ["1990s", "1990s, year open"], ["undated", "Undated"]] as const;
   const fabricOptions = [["either", "Cotton or wool"], ["cotton", "Cotton"], ["wool", "Wool"], ["pure", "100% cotton or wool"], ["blend", "Sturdy blends"]] as const;
   const sortChoices = [
@@ -649,11 +668,23 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
           </label> : null}
         </> : null}
         {!tourShelf ? <label className="min-w-0 text-xs font-medium">{toolbarNavigation ? "Style" : "Garment type"}
-          <select value={garmentType} onChange={(event) => { setGarmentType(event.target.value); setPage(1); }} className={control}>
+          <select value={garmentType} onChange={(event) => {
+            const nextStyle = event.target.value;
+            setGarmentType(nextStyle);
+            if (selectedSize && !categoryItems.some((item) => item.size === selectedSize && matchesFreshType(item, nextStyle))) setTagSize("");
+            setPage(1);
+          }} className={control}>
             <option value="">Any type</option>
             {styleOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label> : null}
+        <label className="min-w-0 text-xs font-medium">
+          {sizeLabel}
+          <select value={tagSize} disabled={!tagSizes.length} onChange={(event) => { setTagSize(event.target.value); setPage(1); }} className={`${control} disabled:opacity-60`}>
+            <option value="">{tagSizes.length ? "Any size" : "No sizes listed"}</option>
+            {tagSizes.map((size) => <option key={size} value={size}>{size}</option>)}
+          </select>
+        </label>
         <label className="min-w-0 text-xs font-medium">Marketplace
           <select value={marketplace} onChange={(event) => { setMarketplace(event.target.value); setPage(1); }} className={control}>
             <option value="">All marketplaces</option>
@@ -676,12 +707,6 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
             {fabricOptions.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
           </select>
         </label>
-          <label className="col-span-2 min-w-0 text-xs font-medium">Listing size
-            <select value={tagSize} onChange={(event) => { setTagSize(event.target.value); setPage(1); }} className={control}>
-              <option value="">Any listing size</option>
-              {tagSizes.map((size) => <option key={size} value={size}>{size}</option>)}
-            </select>
-          </label>
           <label className="text-xs font-medium">Min price + shipping ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={min} onChange={(event) => { setMin(event.target.value); setPage(1); }} className={control} /></label>
           <label className="text-xs font-medium">Max price + shipping ($)<input type="number" min="0" step="0.01" inputMode="decimal" value={max} onChange={(event) => { setMax(event.target.value); setPage(1); }} className={control} /></label>
           <fieldset className="col-span-full min-w-0">
