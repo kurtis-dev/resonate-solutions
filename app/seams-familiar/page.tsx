@@ -7,6 +7,7 @@ import { LocalPickup } from "@/components/seams/local-pickup";
 import { SeamsWordmark } from "@/components/seams/wordmark";
 import { SeamsActivity } from "@/components/seams/activity";
 import { ScoutSubmit } from "@/components/fieldwear/scout-submit";
+import { classifyGarment } from "@/lib/fieldwear/listing-model";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
 import { pageMetadata } from "@/lib/seo";
 import { toListingView } from "@/lib/fieldwear/listing-view";
@@ -167,7 +168,8 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
     after(async () => { await refreshSeamsCatalog().catch((error: unknown) => console.error("Public catalog refresh failed", error)); });
   }
   const matches = matchSeamsCatalog(catalog, settings, keywords, false, "include");
-  const items = decade ? matches.filter((item) => vintageSignals(item).decade === decade) : matches;
+  const items = matches.filter((item) =>
+    (initialKind === "all" || classifyGarment(item) === initialKind) && (!decade || vintageSignals(item).decade === decade));
   const tourKeys = new Set(catalog.filter((row) => row.department === "tour").flatMap((row) => row.listings.map(seamsListingKey)));
   const preferences = { department: settings.department, shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes, shirtBudget: settings.budget, pantsBudget: settings.budget, matchingOnly: true };
   const stamp = catalog.reduce((latest, row) => latest > (row.checked_at ?? "") ? latest : row.checked_at ?? "", "");
