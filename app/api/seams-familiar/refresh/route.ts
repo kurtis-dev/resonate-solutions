@@ -1,5 +1,5 @@
 import { timingSafeEqual } from "node:crypto";
-import { refreshSeamsCatalog } from "@/lib/seams/catalog";
+import { runDailyCatalog } from "@/lib/seams/daily-catalog-report";
 
 export const dynamic = "force-dynamic";
 export const maxDuration = 60;
@@ -13,8 +13,6 @@ export async function GET(request: Request) {
     return new Response(null, { status: 401 });
   }
 
-  const report = await refreshSeamsCatalog(true);
-  const ok = report.every(({ department, count, result }) =>
-    result === "skipped" || (result === "checked" && (department === "tour" || count > 0)));
-  return Response.json({ report }, { status: ok ? 200 : 503 });
+  const report = await runDailyCatalog();
+  return Response.json({ report }, { status: report.ok ? 200 : 503 });
 }

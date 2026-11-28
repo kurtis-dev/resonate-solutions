@@ -51,7 +51,7 @@ async function refreshDepartment(department: Department, force: boolean, now: nu
     ];
     const results = await Promise.allSettled(lookups.map(({ run }) => run));
     const feeds = results.map((result, index) => {
-      if (result.status === "rejected") return { source: lookups[index].name, status: "unavailable", fetched: 0, casual: 0 };
+      if (result.status === "rejected") return { source: lookups[index].name, status: "unavailable" as const, fetched: 0, casual: 0 };
       return { source: lookups[index].name, status: result.value.status, fetched: result.value.listings.length,
         casual: result.value.listings.filter((listing) => casualTopStyle(listing.title)).length };
     });
@@ -97,9 +97,8 @@ async function refreshDepartment(department: Department, force: boolean, now: nu
   }
 }
 
-export async function refreshSeamsCatalog(force = false) {
+export async function refreshSeamsCatalog(force = false, now = Date.now()) {
   await initializeSeams();
-  const now = Date.now();
   const outcomes = await Promise.allSettled(departments.map((department) => refreshDepartment(department, force, now)));
   const report = outcomes.map((outcome, index) => ({
     department: departments[index],

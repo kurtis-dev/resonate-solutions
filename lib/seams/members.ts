@@ -46,6 +46,9 @@ export function initializeSeams() {
     await sql`CREATE TABLE IF NOT EXISTS seams_catalog (
       department text PRIMARY KEY, listings jsonb NOT NULL DEFAULT '[]', checked_at timestamptz, lease_until timestamptz
     )`;
+    await sql`CREATE TABLE IF NOT EXISTS seams_daily_catalog_runs (
+      started_at timestamptz PRIMARY KEY, result jsonb NOT NULL
+    )`;
     await sql`CREATE TABLE IF NOT EXISTS seams_activity (
       day date NOT NULL, event text NOT NULL, kind text NOT NULL, source text NOT NULL,
       total bigint NOT NULL, PRIMARY KEY (day, event, kind, source)
