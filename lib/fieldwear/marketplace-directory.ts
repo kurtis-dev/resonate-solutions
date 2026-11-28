@@ -8,6 +8,8 @@ export const vintageShops = [
   { source: "fredgoodwill", name: "Goodwill Rewards Marketplace", origin: "https://shop.fredgoodwill.org", collections: ["mens-bottoms", "carhartt-workwear", "workwear"], womensCollections: ["women", "womens-bottoms", "dresses"] },
   { source: "cobblestore", name: "Cobblestore", origin: "https://cobblestore.com", collections: ["jeans", "vintage-pants", "sale"] },
   { source: "thriftmanguy", name: "Thrift Man Guy", origin: "https://thriftmanguy.com", collections: ["carhartt-pants", "carhartt-jeans", "levis-jeans", "jeans-pants", "workwear"] },
+  { source: "secondlife", name: "Second Life Vintage", origin: "https://secondlifevtg.com", collections: ["buttonupshirts", "denimpants"], womensCollections: ["womens"], casualCollections: ["blankessentials", "sweatshirtshoodies"] },
+  { source: "distress", name: "Distress Vintage", origin: "https://www.distressvintage.com", collections: ["t-shirts"] },
 ] as const;
 
 export function isGoodwillPickupOnly(source: string, listingText: string) {

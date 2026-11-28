@@ -181,6 +181,7 @@ export async function searchSeamsEbayBrands(department: "men" | "women", shopLis
     { q: '(blank,plain,solid,pocket) ("single stitch","made in usa",heavyweight) (tee,"t shirt")', category: teeCategory, casual: true },
     { q: '("crew neck",crewneck) (heavyweight,"100% cotton","single stitch") (tee,"t shirt")', category: teeCategory, casual: true },
     { q: '("v neck","v-neck") (cotton,"single stitch","made in usa") (tee,"t shirt")', category: teeCategory, casual: true },
+    { q: 'cotton ("v neck","crew neck",crewneck,pocket) (tee,"t shirt")', category: teeCategory, casual: true },
     { q: '(ringer,"pocket tee") ("single stitch","made in usa",1980s,1990s) (tee,"t shirt")', category: teeCategory, casual: true },
     { q: '("Hanes Beefy","Screen Stars","Fruit of the Loom","Russell Athletic",Healthknit) ("single stitch","made in usa") (blank,plain,solid,pocket)', category: teeCategory, casual: true },
     { q: '("v notch","double v","reverse weave",crewneck) (Champion,Russell,Hanes,Jerseys,"Fruit of the Loom") (blank,plain,solid,"made in usa",1980s,1990s) sweatshirt', category: clothingCategory, casual: true },

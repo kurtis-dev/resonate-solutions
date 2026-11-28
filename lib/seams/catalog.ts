@@ -1,10 +1,10 @@
-import { isSturdyShopGarment, searchVintageShop, type LiveListing } from "@/lib/fieldwear/inventory-sources";
+import { isSturdyShopGarment, searchEtsy, searchVintageShop, type LiveListing } from "@/lib/fieldwear/inventory-sources";
 import { isGoodwillPickupOnly, isVintageShop, vintageShops, tourShops } from "@/lib/fieldwear/marketplace-directory";
 import { classifyGarment, type GarmentKind } from "@/lib/fieldwear/listing-model";
 import { departmentMatch, sizeMatch, type ScoutPreferences } from "@/lib/fieldwear/preferences";
 import { searchGoodwillEbay, searchSeamsEbayBrands } from "@/lib/fieldwear/live-search";
 import { vintageSignals } from "@/lib/fieldwear/vintage-signals";
-import { isQualityCasualTop } from "@/lib/fieldwear/casual-tops";
+import { casualTopStyle, isQualityCasualTop } from "@/lib/fieldwear/casual-tops";
 import { initializeSeams, seamsSql, type MemberSettings } from "./members";
 
 const departments = ["men", "women", "tour"] as const;
@@ -17,6 +17,7 @@ export const interestLabels = {
 const sourceKey = (listing: LiveListing) => `${listing.source}:${listing.externalId}`;
 export { sourceKey as seamsListingKey };
 const maxUnverifiedAge = 36 * 60 * 60 * 1000;
+const catalogRulesVersion = 1;
 const observationKey = (item: LiveListing) => item.source === "ebay"
   ? item.seller === "Goodwill on eBay" ? "ebay-goodwill" : "ebay-brands"
   : item.source;
@@ -26,7 +27,11 @@ async function refreshDepartment(department: Department, force: boolean, now: nu
   const [lease] = await sql`INSERT INTO seams_catalog (department, lease_until) VALUES (${department}, now() + interval '2 minutes')
     ON CONFLICT (department) DO UPDATE SET lease_until = EXCLUDED.lease_until
     WHERE (seams_catalog.lease_until IS NULL OR seams_catalog.lease_until < now())
-    AND (${force} OR seams_catalog.checked_at IS NULL OR seams_catalog.checked_at < now() - interval '15 minutes')
+    AND (${force} OR seams_catalog.checked_at IS NULL OR seams_catalog.checked_at < now() - interval '15 minutes'
+      OR (jsonb_array_length(seams_catalog.listings) > 0 AND NOT EXISTS (
+        SELECT 1 FROM jsonb_array_elements(seams_catalog.listings) AS entry
+        WHERE entry->>'catalogRulesVersion' = ${String(catalogRulesVersion)}
+      )))
     RETURNING lease_until::text AS lease_until, checked_at::text AS checked_at, listings` as { lease_until: string; checked_at: string | null; listings: LiveListing[] | null }[];
   if (!lease) return null;
 
@@ -41,9 +46,15 @@ async function refreshDepartment(department: Department, force: boolean, now: nu
       ...(department === "tour" ? [] : [
         { name: "ebay-goodwill", run: searchGoodwillEbay(department) },
         { name: "ebay-brands", run: searchSeamsEbayBrands(department, previous.filter((item) => isVintageShop(item.source))) },
+        { name: "etsy", run: searchEtsy(preferences, "", { start: 0, now }, { casualTops: true }) },
       ]),
     ];
     const results = await Promise.allSettled(lookups.map(({ run }) => run));
+    const feeds = results.map((result, index) => {
+      if (result.status === "rejected") return { source: lookups[index].name, status: "unavailable", fetched: 0, casual: 0 };
+      return { source: lookups[index].name, status: result.value.status, fetched: result.value.listings.length,
+        casual: result.value.listings.filter((listing) => casualTopStyle(listing.title)).length };
+    });
     const listings = new Map<string, LiveListing>();
     const completed = new Set<string>();
     const unavailable = new Set<string>();
@@ -66,10 +77,10 @@ async function refreshDepartment(department: Department, force: boolean, now: nu
         const firstSeen = earlier ? earlier.catalogFirstSeenAt ?? lease.checked_at ?? observedAt : observedAt;
         const existing = listings.get(id);
         if (existing?.seller === "Goodwill on eBay") continue;
-        listings.set(id, { ...item, catalogFirstSeenAt: firstSeen, catalogCheckedAt: observedAt });
+        listings.set(id, { ...item, catalogFirstSeenAt: firstSeen, catalogCheckedAt: observedAt, catalogRulesVersion });
       }
     }
-    if (!observedAnySource) return 0;
+    if (!observedAnySource) return { count: 0, feeds };
     unavailable.forEach((id) => listings.delete(id));
     for (const item of previous) {
       const checked = Date.parse(item.catalogCheckedAt ?? lease.checked_at ?? "");
@@ -79,7 +90,7 @@ async function refreshDepartment(department: Department, force: boolean, now: nu
     }
     await sql`UPDATE seams_catalog SET checked_at = ${observedAt}::timestamptz, listings = ${JSON.stringify(Array.from(listings.values()))}::jsonb
       WHERE department = ${department} AND lease_until = ${lease.lease_until}::timestamptz`;
-    return listings.size;
+    return { count: listings.size, feeds };
   } finally {
     await sql`UPDATE seams_catalog SET lease_until = NULL WHERE department = ${department} AND lease_until = ${lease.lease_until}::timestamptz`;
   }
@@ -89,7 +100,14 @@ export async function refreshSeamsCatalog(force = false) {
   await initializeSeams();
   const now = Date.now();
   const outcomes = await Promise.allSettled(departments.map((department) => refreshDepartment(department, force, now)));
-  return outcomes.map((outcome, index) => ({ department: departments[index], count: outcome.status === "fulfilled" ? outcome.value : 0 }));
+  const report = outcomes.map((outcome, index) => ({
+    department: departments[index],
+    result: outcome.status === "rejected" ? "failed" : outcome.value ? "checked" : "skipped",
+    count: outcome.status === "fulfilled" ? outcome.value?.count ?? 0 : 0,
+    feeds: outcome.status === "fulfilled" ? outcome.value?.feeds ?? [] : [],
+  }));
+  console.info("Seams catalog refresh", JSON.stringify(report));
+  return report;
 }
 
 export async function readSeamsCatalog() {
@@ -102,6 +120,7 @@ export async function readSeamsCatalog() {
 export function needsSeamsRefresh(catalog: CatalogRow[], now = Date.now()) {
   return catalog.length < departments.length
     || catalog.some((row) => now - Date.parse(row.checked_at ?? "") >= 6 * 60 * 60 * 1000)
+    || catalog.some((row) => row.listings.length > 0 && !row.listings.some((item) => item.catalogRulesVersion === catalogRulesVersion))
     || !catalog.some((row) => row.listings.some((item) => item.catalogCheckedAt));
 }
 

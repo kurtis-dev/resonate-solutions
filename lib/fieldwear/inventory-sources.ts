@@ -6,7 +6,7 @@ import { vintageSignals } from "./vintage-signals";
 import { casualTopStyle, isQualityCasualTop } from "./casual-tops";
 import { departmentMatch, fitPriority, matchesScoutFit, pantsSizeTokens, reportedPantsFit, shirtSizeTokens, type ScoutPreferences } from "./preferences";
 
-export type LiveListing = ListingInput & { listedAt: string; endsAt?: string; catalogFirstSeenAt?: string; catalogCheckedAt?: string };
+export type LiveListing = ListingInput & { listedAt: string; endsAt?: string; catalogFirstSeenAt?: string; catalogCheckedAt?: string; catalogRulesVersion?: number };
 export type SourceResult = {
   status: "searched" | "partial" | "unavailable" | "needs-access" | "no-feed";
   listings: LiveListing[];
@@ -274,7 +274,7 @@ type EtsyListing = {
   price?: { amount?: number; divisor?: number; currency_code?: string };
 };
 
-export async function searchEtsy(preferences: ScoutPreferences, keywords: string, window: Window): Promise<SourceResult> {
+export async function searchEtsy(preferences: ScoutPreferences, keywords: string, window: Window, { casualTops = false } = {}): Promise<SourceResult> {
   const key = process.env.ETSY_API_KEY?.trim();
   const secret = process.env.ETSY_SHARED_SECRET?.trim();
   if (!key || !secret) return { status: "needs-access", listings: [] };
@@ -283,7 +283,9 @@ export async function searchEtsy(preferences: ScoutPreferences, keywords: string
   const customKind = classifyGarment({ title: keywords });
   const lanes = keywords
     ? (customKind === "shirt" || customKind === "pants" ? [[customKind, keywords]] : [["shirt", keywords + " shirt"], ["pants", keywords + " pants"]])
-    : [["shirt", "cotton work shirt"], ["shirt", "chamois shirt"], ["shirt", "lined shirt jacket"], ["pants", "carpenter work pants"], ["pants", "denim jeans"]];
+    : casualTops
+      ? [["shirt", "blank cotton crew neck tee"], ["shirt", "cotton v neck single stitch tee"], ["shirt", "blank single stitch pocket tee"], ["shirt", "plain crewneck sweatshirt"]]
+      : [["shirt", "cotton work shirt"], ["shirt", "chamois shirt"], ["shirt", "lined shirt jacket"], ["pants", "carpenter work pants"], ["pants", "denim jeans"]];
   const querySet = new Set(lanes.flatMap(([kind, phrase]) => {
     const sizes = kind === "pants" ? preferences.pantsSizes : preferences.shirtSizes;
     // Broad searches catch alternate sizing language. A focused search gives the priority size its own result page.
@@ -307,6 +309,7 @@ export async function searchEtsy(preferences: ScoutPreferences, keywords: string
     const title = plainText(item.title);
     const description = plainText(item.description);
     const candidate = { title, description, listedAt: new Date(seconds * 1000).toISOString(), garmentKind: classifyGarment({ title }), item };
+    if (casualTops && (candidate.garmentKind !== "shirt" || !isQualityCasualTop(candidate))) return [];
     return fitsSearch(candidate, preferences) ? [candidate] : [];
   });
   const status = successes.length === settled.length ? "searched" : "partial";
@@ -321,7 +324,8 @@ export async function searchEtsy(preferences: ScoutPreferences, keywords: string
     const { amount, divisor, currency_code } = item.price ?? {};
     const priceCents = currency_code === "USD" && typeof amount === "number" && amount >= 0 && typeof divisor === "number" && divisor > 0
       ? Math.round(amount / divisor * 100) : null;
+    const fit = casualTops ? shopSize(title, description, "", "shirt") : {};
     return { source: "etsy", externalId: String(item.listing_id), url: `https://www.etsy.com/listing/${item.listing_id}`, title,
-      description, imageUrl, imageUrls, listedAt, priceCents };
+      description, imageUrl, imageUrls, listedAt, priceCents, ...fit };
   }, status);
 }
