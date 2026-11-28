@@ -458,7 +458,9 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
     };
   }, [catalogExpiresAt]);
   const items = useMemo(() => expired ? allItems.filter((item) => item.source !== "shopifycatalog") : allItems, [allItems, expired]);
-  const [kind, setKind] = useState<"all" | "shirt" | "pants" | "outerwear" | "dress" | "skirt">(fixedKind ?? initialKind);
+  const [localKind, setKind] = useState(fixedKind ?? initialKind);
+  const kind = toolbarNavigation ? initialKind : localKind;
+  const [previousKind, setPreviousKind] = useState(kind);
   const filterDialog = useRef<HTMLDialogElement>(null);
   const filterButton = useRef<HTMLButtonElement>(null);
   const filterTitleId = useId();
@@ -481,6 +483,12 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   const [selectedSize, setTagSize] = useState("");
   const [colors, setColors] = useState<ColorFamily[]>([]);
   const [page, setPage] = useState(1);
+  if (kind !== previousKind) {
+    setPreviousKind(kind);
+    setGarmentType("");
+    setTagSize("");
+    setPage(1);
+  }
   const resultsRef = useRef<HTMLDivElement>(null);
   const invalidRange = min !== "" && max !== "" && Number(min) > Number(max);
   const marketplaces = Array.from(new Set(items.map((item) => item.source))).sort((a, b) => marketplaceName(a).localeCompare(marketplaceName(b)));
@@ -596,20 +604,6 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
   ].filter(({ label }) => Boolean(label));
   return (
     <div>
-      {toolbarNavigation && !tourShelf && !fixedKind ? (
-        <label className="scout-garment-picker">
-          <span>Garment type</span>
-          <select className="scout-control" value={kind} onChange={(event) => {
-            setKind(event.target.value as typeof kind);
-            setGarmentType("");
-            setTagSize("");
-            setPage(1);
-          }}>
-            {tabs.map(([value, label]) => <option key={value} value={value}>{value === "all" ? "All garments" : label}</option>)}
-          </select>
-          {kind !== "all" ? <input type="hidden" form="seams-catalog-search" name="garment" value={kind} /> : null}
-        </label>
-      ) : null}
       {pickupPanel ? <div ref={pickupPanelRef} className={`scout-pickup-panel ${toolbarNavigation ? "scout-pickup-on-demand" : ""}`}>{pickupPanel}</div> : null}
       {!tourShelf && !toolbarNavigation ? <div className={`scout-collections ${compactFilters ? "scout-desktop-control" : ""}`} role="group" aria-label="Workwear collections">
         <span className="scout-collections-label" aria-hidden="true">Collections</span>
@@ -623,7 +617,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
         {!tourShelf && !fixedKind && !toolbarNavigation ? <div className={`flex flex-wrap items-center gap-1 sm:gap-3 ${compactFilters ? "scout-desktop-control" : ""}`} role="group" aria-label="Garment category">
           {tabs.map(([value, label]) => (
             <button key={value} type="button" aria-pressed={kind === value}
-              onClick={() => { if (kind !== value) { setKind(value); setGarmentType(""); setTagSize(""); } setPage(1); }}
+              onClick={() => { setKind(value); setPage(1); }}
               className="scout-tab">{label}</button>
           ))}
         </div> : null}
@@ -662,7 +656,7 @@ export function FreshCatalog({ items: allItems, initialSource = "", catalogExpir
             </select>
           </label> : null}
           {!tourShelf && !fixedKind && !toolbarNavigation ? <label className="min-w-0 text-xs font-medium sm:hidden">Garment category
-            <select value={kind} onChange={(event) => { setKind(event.target.value as typeof kind); setGarmentType(""); setTagSize(""); setPage(1); }} className={control}>
+            <select value={kind} onChange={(event) => { setKind(event.target.value as typeof kind); setPage(1); }} className={control}>
               {tabs.map(([value, label]) => <option key={value} value={value}>{label}</option>)}
             </select>
           </label> : null}

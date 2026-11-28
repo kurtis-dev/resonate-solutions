@@ -79,7 +79,32 @@
 .seams-shelves {
   gap: clamp(12px, 4vw, 28px);
   border-bottom: 1px solid var(--line);
-  margin-bottom: 15px;
+}
+.seams-garments {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: clamp(2px, 1.5vw, 12px);
+  margin-block: 2px 12px;
+}
+.seams-garments a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 44px;
+  padding-inline: clamp(5px, 1.25vw, 10px);
+  border-radius: 3px;
+  color: var(--muted-ink);
+  font-size: .8125rem;
+  font-weight: 650;
+  white-space: nowrap;
+}
+.seams-garments a:hover,
+.seams-garments a[aria-current="page"] {
+  color: var(--accent);
+  text-decoration: underline;
+  text-underline-offset: 4px;
+}
+.seams-garments a[aria-current="page"] {
+  font-weight: 800;
 }
 .seams-shelves a,
 .seams-decades a {

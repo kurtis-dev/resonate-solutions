@@ -498,22 +498,6 @@ html:has(.fieldwear-scout .scout-dialog[open]) { overflow: hidden; }
   font-size: .875rem;
   font-weight: 700;
 }
-.scout-garment-picker {
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-  gap: 10px;
-  margin-bottom: 10px;
-  color: var(--ink);
-  font-size: .8125rem;
-  font-weight: 700;
-}
-.scout-garment-picker select {
-  min-width: 0;
-  width: min(190px, 66%);
-  font-size: 1rem;
-  font-weight: 500;
-}
 
 .fieldwear-scout article > .scout-photo-well::after {
   content: "";

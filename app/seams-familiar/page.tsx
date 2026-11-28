@@ -150,8 +150,14 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
   const savedSettings = member?.settings ?? defaultMemberSettings;
   const department = params.department === "men" || params.department === "women" || params.department === "any" ? params.department : savedSettings.department;
   const settings = { ...savedSettings, department };
-  const { garment } = params;
-  const initialKind = garment === "shirt" || garment === "pants" || garment === "outerwear" || (department !== "men" && (garment === "dress" || garment === "skirt")) ? garment : "all";
+  const garmentChoices = [
+    ["all", "All garments"],
+    ["shirt", department === "men" ? "Shirts" : "Tops"],
+    ["pants", "Pants"],
+    ["outerwear", "Jackets"],
+    ...(department === "men" ? [] : [["skirt", "Skirts"], ["dress", "Dresses"]] as const),
+  ] as const;
+  const initialKind = garmentChoices.find(([value]) => value === params.garment)?.[0] ?? "all";
   const decade = params.decade === "80s" || params.decade === "90s" ? params.decade : "";
   const decadeChoices = [["", "All decades"], ["80s", "80s"], ["90s", "90s"]] as const;
   const keywords = typeof params.q === "string" ? params.q.slice(0, 80) : "";
@@ -166,11 +172,12 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
   const preferences = { department: settings.department, shirtSizes: settings.topSizes, pantsSizes: settings.bottomSizes, shirtBudget: settings.budget, pantsBudget: settings.budget, matchingOnly: true };
   const stamp = catalog.reduce((latest, row) => latest > (row.checked_at ?? "") ? latest : row.checked_at ?? "", "");
   const cards = (member ? items : previewSeamsCatalog(items, !decade, tourKeys)).map((item) => toListingView(item, item.listedAt, stamp || item.listedAt, null, preferences));
-  const catalogHref = (filters: { decade: string; department: string }, queryText = keywords) => {
+  const catalogHref = (filters: { decade: string; department: string; garment?: typeof initialKind }, queryText = keywords) => {
     const query = new URLSearchParams();
     if (queryText) query.set("q", queryText);
     if (filters.decade) query.set("decade", filters.decade);
-    if (filters.department === department && initialKind !== "all") query.set("garment", initialKind);
+    const garment = filters.garment ?? (filters.department === department ? initialKind : "all");
+    if (garment !== "all") query.set("garment", garment);
     if (member || filters.department !== "any") query.set("department", filters.department);
     return seamsPath + (query.size ? "?" + query.toString() : "") + "#fresh";
   };
@@ -217,10 +224,17 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
           <>
             <section id="fresh" aria-labelledby="catalog-title" className="seams-catalog my-5 scroll-mt-6">
               {departmentNavigation}
+              <nav className="seams-garments" aria-label="Shop by garment">
+                {garmentChoices.map(([value, label]) => (
+                  <Link key={value} href={catalogHref({ decade, department, garment: value })}
+                    aria-current={initialKind === value ? "page" : undefined} scroll={false}>{label}</Link>
+                ))}
+              </nav>
               <h2 id="catalog-title" className="seams-catalog-title">{member?.settings ? "Your fresh finds" : "Vintage clothing"}</h2>
               {member ? (
                 <form id="seams-catalog-search" action={searchMemberCatalog} className="my-3 flex gap-2">
                   <input type="hidden" name="department" value={department} />
+                  {initialKind !== "all" ? <input type="hidden" name="garment" value={initialKind} /> : null}
                   {decade ? <input type="hidden" name="decade" value={decade} /> : null}
                   <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="keywords" type="search" defaultValue={keywords} placeholder={placeholder} maxLength={80} className="scout-control w-full text-base" /></label>
                   <ScoutSubmit label="Search now" pendingLabel="Checking shops…" className={button} />
@@ -229,11 +243,12 @@ export default async function SeamsFamiliar({ searchParams }: { searchParams: Pr
                 <form id="seams-catalog-search" method="get" action={seamsPath + "#fresh"} className="my-3 flex gap-2">
                   {decade ? <input type="hidden" name="decade" value={decade} /> : null}
                   {department !== "any" ? <input type="hidden" name="department" value={department} /> : null}
+                  {initialKind !== "all" ? <input type="hidden" name="garment" value={initialKind} /> : null}
                   <label className="min-w-0 flex-1"><span className="sr-only">Search listings</span><input key={keywords} name="q" type="search" defaultValue={keywords} placeholder={placeholder} maxLength={80} className="scout-control w-full text-base" /></label>
                   <button type="submit" className={button}>Search</button>
                 </form>
               )}
-              <FreshCatalog key={stamp + ":" + keywords + ":" + decade + ":" + initialKind + ":" + JSON.stringify(settings)} initialKind={initialKind}
+              <FreshCatalog key={stamp + ":" + keywords + ":" + decade + ":" + JSON.stringify(settings)} initialKind={initialKind}
                 items={cards} womenswear={department !== "men"} personalActions={false} showNinetiesCollection={false}
                 compactFilters toolbarNavigation={decadeNavigation}
                 pickupPanel={<LocalPickup department={department} />}
